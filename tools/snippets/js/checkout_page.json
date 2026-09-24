@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "getCheckoutPage",
+      "code": "const response = await client.checkoutPage.getCheckoutPage();\nconst settings = response.map.checkout_page;\nconsole.log(settings.customer_checkout.allow_sign_in, settings.delivery_options.enable_store_pickup);\nconsole.log(settings.order_summary.show_product_thumbnail);\n"
+    },
+    "patch_checkout_page": {
+      "function": "patchCheckoutPage",
+      "code": "const response = await client.checkoutPage.patchCheckoutPage({\n    checkout_page: {\n        order_summary: {enable_payment_expand_view: false},\n        customer_checkout: {multiple_shipping_methods: true},\n    },\n});\nconst settings = response.map.checkout_page;\nconsole.log(settings.order_summary.enable_payment_expand_view, settings.customer_checkout.multiple_shipping_methods);\n"
+    },
+    "head_checkout_page": {
+      "function": "headCheckoutPage",
+      "code": "const response = await client.checkoutPage.headCheckoutPage();\nconsole.log(response.statusCode);\n"
+    },
+    "get_checkout_page_section": {
+      "function": "getCheckoutPageSection",
+      "code": "const response = await client.checkoutPage.getCheckoutPageSection('order_summary');\nconst summary = response.map.order_summary;\nconsole.log(summary.show_product_thumbnail, summary.show_quantity, summary.order_confirm_captcha);\n"
+    },
+    "patch_checkout_page_section": {
+      "function": "patchCheckoutPageSection",
+      "code": "const response = await client.checkoutPage.patchCheckoutPageSection('order_summary', {\n    order_summary: {show_product_thumbnail: false},\n});\nconsole.log(response.map.order_summary.show_product_thumbnail);\n"
+    }
+  }
+}

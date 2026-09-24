@@ -79,6 +79,18 @@
                   "api-reference/category-page/get-a-settings-section",
                   "api-reference/category-page/update-a-settings-section"
                 ]
+              },
+              {
+                "group": "Checkout page",
+                "expanded": false,
+                "pages": [
+                  "checkout-page",
+                  "api-reference/checkout-page/get-checkout-page-settings",
+                  "api-reference/checkout-page/update-checkout-page-settings",
+                  "api-reference/checkout-page/get-checkout-page-settings-headers",
+                  "api-reference/checkout-page/get-a-settings-section",
+                  "api-reference/checkout-page/update-a-settings-section"
+                ]
               }
             ]
           },

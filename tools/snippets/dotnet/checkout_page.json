@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "GetCheckoutPageAsync",
+      "code": "var response = await client.CheckoutPage.GetCheckoutPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkoutPage = (IReadOnlyDictionary<string, object?>)body[\"checkout_page\"]!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)checkoutPage[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"enable_payment_expand_view\"]);"
+    },
+    "patch_checkout_page": {
+      "function": "PatchCheckoutPageAsync",
+      "code": "var response = await client.CheckoutPage.PatchCheckoutPageAsync(new Dictionary<string, object?>\n{\n    [\"checkout_page\"] = new Dictionary<string, object?>\n    {\n        [\"order_summary\"] = new Dictionary<string, object?> { [\"enable_payment_expand_view\"] = false },\n        [\"customer_checkout\"] = new Dictionary<string, object?> { [\"multiple_shipping_methods\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkoutPage = (IReadOnlyDictionary<string, object?>)body[\"checkout_page\"]!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)checkoutPage[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"enable_payment_expand_view\"]);"
+    },
+    "head_checkout_page": {
+      "function": "HeadCheckoutPageAsync",
+      "code": "var response = await client.CheckoutPage.HeadCheckoutPageAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_checkout_page_section": {
+      "function": "GetCheckoutPageSectionAsync",
+      "code": "var response = await client.CheckoutPage.GetCheckoutPageSectionAsync(\"order_summary\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)body[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"show_product_thumbnail\"]);"
+    },
+    "patch_checkout_page_section": {
+      "function": "PatchCheckoutPageSectionAsync",
+      "code": "var response = await client.CheckoutPage.PatchCheckoutPageSectionAsync(\"order_summary\", new Dictionary<string, object?>\n{\n    [\"order_summary\"] = new Dictionary<string, object?> { [\"show_product_thumbnail\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)body[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"show_product_thumbnail\"]);"
+    }
+  }
+}

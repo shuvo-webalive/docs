@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "get_checkout_page",
+      "code": "response = client.checkout_page.get_checkout_page()\nsettings = response.map[\"checkout_page\"]\nprint(settings[\"billing_address\"][\"active_fields\"])\nprint(settings[\"customer_checkout\"][\"allow_sign_in\"])\nprint(settings[\"order_summary\"][\"show_quantity\"])\nprint(response.map[\"group_meta\"][\"billing_address\"][\"writable\"])\n"
+    },
+    "patch_checkout_page": {
+      "function": "patch_checkout_page",
+      "code": "response = client.checkout_page.patch_checkout_page({\n    \"checkout_page\": {\n        \"order_summary\": {\"enable_payment_expand_view\": False},\n        \"customer_checkout\": {\"multiple_shipping_methods\": True},\n    },\n})\nsettings = response.map[\"checkout_page\"]\nprint(settings[\"order_summary\"][\"enable_payment_expand_view\"])\nprint(settings[\"customer_checkout\"][\"multiple_shipping_methods\"])\n"
+    },
+    "head_checkout_page": {
+      "function": "head_checkout_page",
+      "code": "response = client.checkout_page.head_checkout_page()\nprint(response.status_code)\n"
+    },
+    "get_checkout_page_section": {
+      "function": "get_checkout_page_section",
+      "code": "response = client.checkout_page.get_checkout_page_section(\"order_summary\")\nsummary = response.map[\"order_summary\"]\nprint(summary[\"show_product_thumbnail\"], summary[\"show_quantity\"])\nprint(summary[\"enable_payment_expand_view\"], summary[\"order_confirm_captcha\"])\n"
+    },
+    "patch_checkout_page_section": {
+      "function": "patch_checkout_page_section",
+      "code": "response = client.checkout_page.patch_checkout_page_section(\n    \"order_summary\", {\"order_summary\": {\"show_product_thumbnail\": False}}\n)\nprint(response.map[\"order_summary\"][\"show_product_thumbnail\"])\n"
+    }
+  }
+}

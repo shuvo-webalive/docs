@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "getCheckoutPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$response = CheckoutPage::getCheckoutPage($client);\n\n$settings = $response->map['checkout_page'];\necho 'Billing fields: ', implode(', ', $settings['billing_address']['active_fields']), PHP_EOL;\necho 'Guest checkout: ', $settings['customer_checkout']['checkout_as_guest']['enabled'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "patch_checkout_page": {
+      "function": "patchCheckoutPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$response = CheckoutPage::patchCheckoutPage($client, [\n    'checkout_page' => [\n        'order_summary' => ['enable_payment_expand_view' => false],\n        'customer_checkout' => ['multiple_shipping_methods' => true],\n    ],\n]);\n\n$settings = $response->map['checkout_page'];\necho $settings['order_summary']['enable_payment_expand_view'] ? 'true' : 'false', PHP_EOL;\necho $settings['customer_checkout']['multiple_shipping_methods'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_checkout_page": {
+      "function": "headCheckoutPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$response = CheckoutPage::headCheckoutPage($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_checkout_page_section": {
+      "function": "getCheckoutPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$response = CheckoutPage::getCheckoutPageSection($client, 'order_summary');\n\nforeach ($response->map['order_summary'] as $field => $value) {\n    echo $field, ': ', $value ? 'true' : 'false', PHP_EOL;\n}"
+    },
+    "patch_checkout_page_section": {
+      "function": "patchCheckoutPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$response = CheckoutPage::patchCheckoutPageSection($client, 'order_summary', [\n    'order_summary' => ['show_product_thumbnail' => false],\n]);\n\necho $response->map['order_summary']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}
