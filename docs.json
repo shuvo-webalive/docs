@@ -43,7 +43,7 @@
           {
             "group": "Customers",
             "icon": "users",
-            "expanded": true,
+            "expanded": false,
             "pages": [
               "customers",
               "api-reference/customers/list-customers",

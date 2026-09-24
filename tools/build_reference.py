@@ -341,7 +341,7 @@ def navigation(areas):
     for area in areas:
         modules = area["modules"]
         if len(modules) == 1 and modules[0].TAG == area["name"]:
-            groups.append({"group": area["name"], "icon": area["icon"], "expanded": True, "pages": module_pages(modules[0])})
+            groups.append({"group": area["name"], "icon": area["icon"], "expanded": False, "pages": module_pages(modules[0])})
         else:
             groups.append({"group": area["name"], "icon": area["icon"], "expanded": False, "pages": [
                 {"group": module.TAG, "expanded": False, "pages": module_pages(module)} for module in modules]})
