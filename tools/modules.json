@@ -25,7 +25,8 @@
         "animation_effects",
         "customer_portal",
         "ecommerce_settings",
-        "price_display_settings"
+        "price_display_settings",
+        "product_listing"
       ]
     },
     {

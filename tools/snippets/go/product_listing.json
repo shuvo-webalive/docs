@@ -1,0 +1,18 @@
+{
+  "sdk": "go",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "GetProductListing",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductListingSettings().GetProductListing(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_listing\"].(map[string]any)\nload := settings[\"load\"].(map[string]any)\nsorting := settings[\"sorting\"].(map[string]any)\nfmt.Println(load[\"type\"], load[\"pagination\"].(map[string]any)[\"per_page\"], sorting[\"enabled\"], sorting[\"sort_by\"])"
+    },
+    "patch_product_listing": {
+      "function": "PatchProductListing",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductListingSettings().PatchProductListing(ctx, map[string]any{\n\t\"product_listing\": map[string]any{\n\t\t\"sorting\": map[string]any{\"enabled\": true, \"sort_by\": \"price_asc\"},\n\t\t\"load\":    map[string]any{\"pagination\": map[string]any{\"per_page\": 24}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_listing\"].(map[string]any)\nsorting := settings[\"sorting\"].(map[string]any)\nfmt.Println(sorting[\"enabled\"], sorting[\"sort_by\"], settings[\"load\"].(map[string]any)[\"pagination\"].(map[string]any)[\"per_page\"])"
+    },
+    "head_product_listing": {
+      "function": "HeadProductListing",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductListingSettings().HeadProductListing(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

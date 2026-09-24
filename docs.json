@@ -188,6 +188,16 @@
                   "api-reference/price-display-settings/get-a-settings-section",
                   "api-reference/price-display-settings/update-a-settings-section"
                 ]
+              },
+              {
+                "group": "Product listing",
+                "expanded": false,
+                "pages": [
+                  "product-listing",
+                  "api-reference/product-listing/get-product-listing-settings",
+                  "api-reference/product-listing/update-product-listing-settings",
+                  "api-reference/product-listing/check-the-product-listing-settings"
+                ]
               }
             ]
           },

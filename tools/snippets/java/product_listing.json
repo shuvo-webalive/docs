@@ -1,0 +1,18 @@
+{
+  "sdk": "java",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "getProductListing",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.productListing().getProductListing();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_listing\");\nMap<?, ?> load = (Map<?, ?>) settings.get(\"load\");\nMap<?, ?> sorting = (Map<?, ?>) settings.get(\"sorting\");\nSystem.out.println(load.get(\"type\") + \" \" + ((Map<?, ?>) load.get(\"pagination\")).get(\"per_page\"));\nSystem.out.println(sorting.get(\"enabled\") + \" \" + sorting.get(\"sort_by\"));"
+    },
+    "patch_product_listing": {
+      "function": "patchProductListing",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.productListing().patchProductListing(Map.of(\"product_listing\", Map.of(\n        \"sorting\", Map.of(\"enabled\", true, \"sort_by\", \"price_asc\"),\n        \"load\", Map.of(\"pagination\", Map.of(\"per_page\", 24)))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_listing\");\nMap<?, ?> sorting = (Map<?, ?>) settings.get(\"sorting\");\nMap<?, ?> load = (Map<?, ?>) settings.get(\"load\");\nSystem.out.println(sorting.get(\"enabled\") + \" \" + sorting.get(\"sort_by\"));\nSystem.out.println(((Map<?, ?>) load.get(\"pagination\")).get(\"per_page\"));"
+    },
+    "head_product_listing": {
+      "function": "headProductListing",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.productListing().headProductListing();\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

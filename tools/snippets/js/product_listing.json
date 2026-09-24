@@ -1,0 +1,18 @@
+{
+  "sdk": "js",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "getProductListing",
+      "code": "const response = await client.productListing.getProductListing();\nconst settings = response.map.product_listing;\nconsole.log(settings.sorting.enabled, settings.sorting.sort_by);\nconsole.log(settings.load.type, settings.load.pagination.per_page);\n"
+    },
+    "patch_product_listing": {
+      "function": "patchProductListing",
+      "code": "const response = await client.productListing.patchProductListing({\n    product_listing: {sorting: {enabled: true, sort_by: 'price_asc'}, load: {pagination: {per_page: 24}}},\n});\nconst settings = response.map.product_listing;\nconsole.log(settings.sorting.sort_by, settings.load.pagination.per_page);\n"
+    },
+    "head_product_listing": {
+      "function": "headProductListing",
+      "code": "const response = await client.productListing.headProductListing();\nconsole.log(response.statusCode);\n"
+    }
+  }
+}
