@@ -70,7 +70,33 @@
 #sidebar-content a[aria-current] .method-nav-pill > span[class*="bg-red"] { background-color: #d92d20 !important; border-color: #d92d20; color: #ffffff !important; }
 
 #sidebar-content ul:has(.method-nav-pill) > li > a:not(:has(.method-nav-pill)) {
-  padding-left: calc(1.75rem + 2.7rem + 0.6rem) !important;
+  padding-left: 1.75rem !important;
+  column-gap: 0.6rem !important;
+}
+
+#sidebar-content ul:has(.method-nav-pill) > li > a:not(:has(.method-nav-pill))::before {
+  content: "";
+  flex: 0 0 2.7rem;
+  height: 1.2rem;
+  margin-top: 0.08rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.3rem;
+  background: #f2f4f7 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475467%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204h6a4%204%200%200%201%204%204v12a3%203%200%200%200-3-3H2z%22/%3E%3Cpath%20d%3D%22M22%204h-6a4%204%200%200%200-4%204v12a3%203%200%200%201%203-3h7z%22/%3E%3C/svg%3E") center / 0.8rem no-repeat;
+}
+
+.dark #sidebar-content ul:has(.method-nav-pill) > li > a:not(:has(.method-nav-pill))::before {
+  border-color: rgba(152, 162, 179, 0.45);
+  background: rgba(152, 162, 179, 0.14) url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23d0d5dd%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204h6a4%204%200%200%201%204%204v12a3%203%200%200%200-3-3H2z%22/%3E%3Cpath%20d%3D%22M22%204h-6a4%204%200%200%200-4%204v12a3%203%200%200%201%203-3h7z%22/%3E%3C/svg%3E") center / 0.8rem no-repeat;
+}
+
+#sidebar-content ul:has(.method-nav-pill) > li > a[aria-current]:not(:has(.method-nav-pill))::before {
+  border-color: #475467;
+  background: #475467 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204h6a4%204%200%200%201%204%204v12a3%203%200%200%200-3-3H2z%22/%3E%3Cpath%20d%3D%22M22%204h-6a4%204%200%200%200-4%204v12a3%203%200%200%201%203-3h7z%22/%3E%3C/svg%3E") center / 0.8rem no-repeat;
+}
+
+.dark #sidebar-content ul:has(.method-nav-pill) > li > a[aria-current]:not(:has(.method-nav-pill))::before {
+  border-color: #98a2b3;
+  background: #98a2b3 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23101828%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204h6a4%204%200%200%201%204%204v12a3%203%200%200%200-3-3H2z%22/%3E%3Cpath%20d%3D%22M22%204h-6a4%204%200%200%200-4%204v12a3%203%200%200%201%203-3h7z%22/%3E%3C/svg%3E") center / 0.8rem no-repeat;
 }
 
 #sidebar-content ul ul a[style*="padding-left:2.5rem"] {
