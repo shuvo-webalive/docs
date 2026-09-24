@@ -1,0 +1,61 @@
+---
+title: "Customer portal"
+sidebarTitle: "Overview"
+description: "Turn the customer portal on or off, change its registration, login and single sign-on settings, and read its profile page and registration form."
+---
+
+The Customer portal API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/customer_portal`.
+
+<Warning>
+  **After a write is rejected with `400`, the next write on the same client can be rejected too.** For
+  example, after a `400` at `/customer_portal/login`, a valid `{"registration": {...}}` sent to
+  `/customer_portal/registration` on the same client is rejected with `400` and
+  `login.registration: not a recognized field`: the store reads the body under the previous request's
+  section name. The same write from a new client succeeds. After a `400`, send the next write from a new client.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get customer portal settings](/api-reference/customer-portal/get-customer-portal-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customer_portal` | Returns all six customer portal sections and a `group_meta` block that says which you can write. |
+| [Update customer portal settings](/api-reference/customer-portal/update-customer-portal-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/customer_portal` | Changes the fields you send in one or more writable sections and returns all settings. |
+| [Get customer portal settings headers](/api-reference/customer-portal/get-customer-portal-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/customer_portal` | Returns the headers for the customer portal settings, with no body. |
+| [Get a customer portal section](/api-reference/customer-portal/get-a-customer-portal-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customer_portal/{section}` | Returns one customer portal section under its own key, such as `login`. |
+| [Update a customer portal section](/api-reference/customer-portal/update-a-customer-portal-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/customer_portal/{section}` | Changes the fields you send in one writable section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Four sections are writable and two are read-only.** `group_meta` marks `portal`, `registration`,
+  `login` and `sso` as `kind: "setting"`, `writable: true`, and `profile_page` and
+  `registration_fields` as `kind: "resource"`, `writable: false`. Read the two read-only sections,
+  but do not write them. The `Allow` header lists `PATCH` on all six section paths, so check
+  `group_meta`, not `Allow`, to see which sections you can write.
+- **Each write path takes a different wrapper.** On `/customer_portal`, wrap the fields in
+  `customer_portal` and then in the section name. Any other body is rejected with `400` and the message
+  `request body must be wrapped in a 'customer_portal' object`. On `/customer_portal/{section}`, wrap
+  them in the section's own name, such as `login`, or send them with no wrapper. A body wrapped in
+  `customer_portal` there is rejected with `400` and `<section>.customer_portal: not a recognized field`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Other fields in the
+  same nested block, and sections you leave out, keep their stored values. `PUT`, `POST` and `DELETE`
+  are rejected on every path with `405 method_not_allowed` and an `Allow: GET, HEAD, PATCH, OPTIONS`
+  header.
+- **Values are validated, and some rules depend on other fields.** `login.captcha.fail_count` must be
+  from `1` to `50`, `registration.terms.type` must be `page`, `link` or `text`, and a boolean field
+  rejects a string with `must be a boolean (true/false or 0/1)`. `sso.require_site_access` can be
+  `true` only while `sso.enabled` is `true`, and `registration.terms.enabled` can be `true` only while
+  `registration.terms.reference` is set. Setting `sso.enabled` to `true` on its own fails with `4 fields are invalid`,
+  naming `tenant_name`, `policy_name`, `client_id` and `client_secret` under `sso.azure_ad_b2c`. A
+  write that breaks any of these rules is rejected with `400`.
+- **All customer portal writes share one rate limit.** If you send eleven writes within about 3.25
+  seconds, the eleventh is rejected with `429` and a `Retry-After` header that counts down the time
+  left before writes are accepted again. Until then, writes to every customer portal path are
+  rejected, while writes to page settings and animation effects still succeed. Reads did not hit a
+  limit: forty reads within about 1.5 seconds all succeeded. A retry before `Retry-After` has passed
+  counts as another write, so wait until it has passed before you write again.

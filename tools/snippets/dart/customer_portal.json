@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "getCustomerPortal",
+      "code": "final response = await client.customerPortal.getCustomerPortal();\nfinal customerPortal = (response.map as Map)['customer_portal'] as Map;\nprint(customerPortal['portal']);\nprint(customerPortal['login']);"
+    },
+    "patch_customer_portal": {
+      "function": "patchCustomerPortal",
+      "code": "final response = await client.customerPortal.patchCustomerPortal({\n  'customer_portal': {\n    'login': {'registration_link': false},\n    'sso': {\n      'azure_ad': {\n        'data_mapping': {'city': 'city'},\n      },\n    },\n  },\n});\nfinal customerPortal = (response.map as Map)['customer_portal'] as Map;\nprint('${customerPortal['login']} ${customerPortal['sso']}');"
+    },
+    "head_customer_portal": {
+      "function": "headCustomerPortal",
+      "code": "final response = await client.customerPortal.headCustomerPortal();\nprint(response.statusCode);"
+    },
+    "get_customer_portal_section": {
+      "function": "getCustomerPortalSection",
+      "code": "final response = await client.customerPortal.getCustomerPortalSection('login');\nfinal login = (response.map as Map)['login'] as Map;\nprint(login['enabled']);\nprint(login['captcha']);"
+    },
+    "patch_customer_portal_section": {
+      "function": "patchCustomerPortalSection",
+      "code": "final response =\n    await client.customerPortal.patchCustomerPortalSection('login', {\n  'login': {'registration_link': false},\n});\nfinal login = (response.map as Map)['login'] as Map;\nprint(login['registration_link']);"
+    }
+  }
+}

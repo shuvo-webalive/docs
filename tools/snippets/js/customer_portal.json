@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "getCustomerPortal",
+      "code": "const response = await client.customerPortal.getCustomerPortal();\nconst settings = response.map.customer_portal;\nconsole.log(settings.portal.enabled, settings.registration.enabled);\nconsole.log(settings.login.password_recovery, settings.login.registration_link);\n"
+    },
+    "patch_customer_portal": {
+      "function": "patchCustomerPortal",
+      "code": "const response = await client.customerPortal.patchCustomerPortal({\n    customer_portal: {\n        login: {registration_link: false},\n        sso: {azure_ad: {data_mapping: {city: 'city'}}},\n    },\n});\nconst settings = response.map.customer_portal;\nconsole.log(settings.login.registration_link);\nconsole.log(settings.sso.azure_ad.data_mapping.city);\n"
+    },
+    "head_customer_portal": {
+      "function": "headCustomerPortal",
+      "code": "const response = await client.customerPortal.headCustomerPortal();\nconsole.log(response.statusCode);\n"
+    },
+    "get_customer_portal_section": {
+      "function": "getCustomerPortalSection",
+      "code": "const response = await client.customerPortal.getCustomerPortalSection('login');\nconst login = response.map.login;\nconsole.log(login.enabled, login.password_recovery, login.registration_link);\n"
+    },
+    "patch_customer_portal_section": {
+      "function": "patchCustomerPortalSection",
+      "code": "const response = await client.customerPortal.patchCustomerPortalSection('login', {\n    login: {registration_link: false},\n});\nconsole.log(response.map.login.registration_link);\n"
+    }
+  }
+}

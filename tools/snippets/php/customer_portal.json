@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "getCustomerPortal",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$response = CustomerPortal::getCustomerPortal($client);\n\necho 'registration: ', $response->map['customer_portal']['registration']['enabled'] ? 'open' : 'closed', PHP_EOL;\nforeach ($response->map['group_meta'] as $section => $meta) {\n    echo $section, $meta['writable'] ? ' (writable)' : ' (read-only)', PHP_EOL;\n}"
+    },
+    "patch_customer_portal": {
+      "function": "patchCustomerPortal",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$response = CustomerPortal::patchCustomerPortal($client, [\n    'customer_portal' => [\n        'login' => ['registration_link' => false],\n        'sso' => ['azure_ad' => ['data_mapping' => ['city' => 'city']]],\n    ],\n]);\n\n$settings = $response->map['customer_portal'];\necho $settings['login']['registration_link'] ? 'true' : 'false', PHP_EOL;\necho $settings['sso']['azure_ad']['data_mapping']['city'], PHP_EOL;"
+    },
+    "head_customer_portal": {
+      "function": "headCustomerPortal",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$response = CustomerPortal::headCustomerPortal($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_customer_portal_section": {
+      "function": "getCustomerPortalSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$response = CustomerPortal::getCustomerPortalSection($client, 'login');\n\n$login = $response->map['login'];\necho 'password recovery: ', $login['password_recovery'] ? 'on' : 'off', PHP_EOL;\necho 'captcha after ', $login['captcha']['fail_count'], ' failed attempts', PHP_EOL;"
+    },
+    "patch_customer_portal_section": {
+      "function": "patchCustomerPortalSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$response = CustomerPortal::patchCustomerPortalSection($client, 'login', [\n    'login' => ['registration_link' => false],\n]);\n\necho $response->map['login']['registration_link'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}

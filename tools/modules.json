@@ -22,7 +22,8 @@
       "name": "Store settings",
       "icon": "sliders",
       "modules": [
-        "animation_effects"
+        "animation_effects",
+        "customer_portal"
       ]
     },
     {

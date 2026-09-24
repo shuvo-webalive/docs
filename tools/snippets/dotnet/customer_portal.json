@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "GetCustomerPortalAsync",
+      "code": "var response = await client.CustomerPortal.GetCustomerPortalAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerPortal = (IReadOnlyDictionary<string, object?>)body[\"customer_portal\"]!;\nvar login = (IReadOnlyDictionary<string, object?>)customerPortal[\"login\"]!;\nConsole.WriteLine($\"{login[\"enabled\"]} {login[\"registration_link\"]}\");"
+    },
+    "patch_customer_portal": {
+      "function": "PatchCustomerPortalAsync",
+      "code": "var response = await client.CustomerPortal.PatchCustomerPortalAsync(new Dictionary<string, object?>\n{\n    [\"customer_portal\"] = new Dictionary<string, object?>\n    {\n        [\"login\"] = new Dictionary<string, object?> { [\"registration_link\"] = false },\n        [\"sso\"] = new Dictionary<string, object?> { [\"azure_ad\"] = new Dictionary<string, object?> { [\"data_mapping\"] = new Dictionary<string, object?> { [\"city\"] = \"city\" } } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerPortal = (IReadOnlyDictionary<string, object?>)body[\"customer_portal\"]!;\nvar login = (IReadOnlyDictionary<string, object?>)customerPortal[\"login\"]!;\nConsole.WriteLine(login[\"registration_link\"]);"
+    },
+    "head_customer_portal": {
+      "function": "HeadCustomerPortalAsync",
+      "code": "var response = await client.CustomerPortal.HeadCustomerPortalAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_customer_portal_section": {
+      "function": "GetCustomerPortalSectionAsync",
+      "code": "var response = await client.CustomerPortal.GetCustomerPortalSectionAsync(\"login\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar login = (IReadOnlyDictionary<string, object?>)body[\"login\"]!;\nConsole.WriteLine($\"{login[\"enabled\"]} {login[\"registration_link\"]}\");"
+    },
+    "patch_customer_portal_section": {
+      "function": "PatchCustomerPortalSectionAsync",
+      "code": "var response = await client.CustomerPortal.PatchCustomerPortalSectionAsync(\"login\", new Dictionary<string, object?>\n{\n    [\"login\"] = new Dictionary<string, object?> { [\"registration_link\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar login = (IReadOnlyDictionary<string, object?>)body[\"login\"]!;\nConsole.WriteLine(login[\"registration_link\"]);"
+    }
+  }
+}

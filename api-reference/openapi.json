@@ -46,6 +46,9 @@
       "name": "Animation effects"
     },
     {
+      "name": "Customer portal"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -7662,6 +7665,1322 @@
         }
       }
     },
+    "/admin/settings/customer_portal": {
+      "get": {
+        "tags": [
+          "Customer portal"
+        ],
+        "summary": "Get customer portal settings",
+        "operationId": "get_customer_portal",
+        "description": "Returns every customer portal setting under `customer_portal`, with all six sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of each field in the four writable sections, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each field of `portal`, `registration`, `login` and `sso`, keyed by section. `profile_page` and `registration_fields` are left out. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All six sections and `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_portal": {
+                      "$ref": "#/components/schemas/CustomerPortalSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CustomerPortalGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CustomerPortalFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section, and only for `portal`, `registration`, `login` and `sso`."
+                    }
+                  }
+                },
+                "example": {
+                  "customer_portal": {
+                    "portal": {
+                      "enabled": true
+                    },
+                    "registration": {
+                      "enabled": true,
+                      "close_registration_message": null,
+                      "assign_default_group": true,
+                      "default_groups": [
+                        {
+                          "id": 4,
+                          "name": "MEMBER"
+                        }
+                      ],
+                      "requires_approval": false,
+                      "approval_groups": [],
+                      "terms": {
+                        "enabled": false,
+                        "text": "By registering, I accept the",
+                        "anchor_text": "Terms and Conditions",
+                        "type": "text",
+                        "reference": null
+                      },
+                      "facebook": {
+                        "enabled": false,
+                        "app_id": null
+                      },
+                      "google": {
+                        "enabled": false,
+                        "client_id": null
+                      },
+                      "b2b_configuration": {
+                        "enabled": false,
+                        "create_as_organisation": false,
+                        "create_as_customer": false,
+                        "organisation_selected": false
+                      },
+                      "alternate_login": {
+                        "enabled": false,
+                        "enable_email_field": false
+                      }
+                    },
+                    "login": {
+                      "enabled": true,
+                      "login_disabled_message": null,
+                      "awaiting_approval_message": "<p>Your registration is awaiting for approval</p>",
+                      "password_recovery": true,
+                      "registration_link": true,
+                      "captcha": {
+                        "enabled": false,
+                        "fail_count": 3
+                      },
+                      "enable_landing_page_after_successful_login": false,
+                      "landing_page_after_successful_login": null
+                    },
+                    "sso": {
+                      "enabled": false,
+                      "require_site_access": false,
+                      "service_provider": null,
+                      "azure_ad": {
+                        "data_mapping": {
+                          "address_line_1": null,
+                          "address_line_2": null,
+                          "post_code": null,
+                          "phone": null,
+                          "mobile": null,
+                          "country_id": 49,
+                          "state": null,
+                          "city": null
+                        },
+                        "identifier": null,
+                        "login_url": null,
+                        "reply_url_postfix": "customer/azureSamlResponse"
+                      },
+                      "azure_ad_b2c": {
+                        "tenant_name": null,
+                        "policy_name": null,
+                        "client_id": null,
+                        "client_secret": null,
+                        "reply_url_prefix": "https://your-store.example.com/",
+                        "reply_url_postfix": "customer/azureAdB2CResponse"
+                      }
+                    },
+                    "profile_page": {
+                      "page_html": null,
+                      "tabs": [
+                        {
+                          "key": "welcome_message",
+                          "active": true,
+                          "order": 1,
+                          "label": "Welcome Message"
+                        },
+                        {
+                          "key": "overview",
+                          "active": true,
+                          "order": 2,
+                          "label": "Overview"
+                        },
+                        {
+                          "key": "manage_my_account",
+                          "active": true,
+                          "order": 3,
+                          "label": "Manage My Account"
+                        },
+                        {
+                          "key": "my_eorders",
+                          "active": true,
+                          "order": 4,
+                          "label": "My Orders"
+                        },
+                        {
+                          "key": "my_entitlements",
+                          "active": true,
+                          "order": 5,
+                          "label": "My Entitlements"
+                        }
+                      ],
+                      "overview": [
+                        {
+                          "key": "overview_top_selling_product",
+                          "active": true,
+                          "order": 1,
+                          "label": "Top Selling Product",
+                          "show_product_info": true
+                        },
+                        {
+                          "key": "overview_onsale_product",
+                          "active": true,
+                          "order": 3,
+                          "label": "On Sale Product"
+                        },
+                        {
+                          "key": "overview_last_viewed_product",
+                          "active": true,
+                          "order": 5,
+                          "label": "Last Viewed Product",
+                          "show_product_info": false
+                        }
+                      ],
+                      "manage_my_account": {
+                        "sections": [
+                          {
+                            "key": "account_information",
+                            "active": true,
+                            "order": 1,
+                            "label": "Account Information"
+                          },
+                          {
+                            "key": "billing_address",
+                            "active": true,
+                            "order": 2,
+                            "label": "Billing Address"
+                          },
+                          {
+                            "key": "shipping_address",
+                            "active": true,
+                            "order": 3,
+                            "label": "Shipping Address"
+                          },
+                          {
+                            "key": "change_password",
+                            "active": true,
+                            "order": 4,
+                            "label": "Change Password"
+                          }
+                        ],
+                        "account_information": [
+                          {
+                            "key": "first_name",
+                            "active": true,
+                            "order": 1
+                          },
+                          {
+                            "key": "last_name",
+                            "active": true,
+                            "order": 2
+                          },
+                          {
+                            "key": "email",
+                            "active": true,
+                            "order": 11
+                          }
+                        ],
+                        "billing_address": [
+                          {
+                            "key": "name_group_field",
+                            "active": true,
+                            "order": 1
+                          },
+                          {
+                            "key": "country",
+                            "active": true,
+                            "order": 2
+                          },
+                          {
+                            "key": "address_line_2",
+                            "active": false,
+                            "order": 5
+                          }
+                        ],
+                        "shipping_address": [
+                          {
+                            "key": "name_group_field",
+                            "active": true,
+                            "order": 1
+                          },
+                          {
+                            "key": "country",
+                            "active": true,
+                            "order": 2
+                          },
+                          {
+                            "key": "mobile",
+                            "active": true,
+                            "order": 7
+                          }
+                        ]
+                      },
+                      "my_orders": {
+                        "flags": {
+                          "enable_due_payment": false,
+                          "show_track_my_orders": false,
+                          "display_track_in_column": false,
+                          "show_order_channel": false,
+                          "show_pay_now": true,
+                          "allow_order_share": true
+                        },
+                        "sections": [
+                          {
+                            "key": "all_order",
+                            "active": true,
+                            "order": 3,
+                            "label": "Orders"
+                          },
+                          {
+                            "key": "preorder",
+                            "active": true,
+                            "order": 4,
+                            "label": "Pre-orders"
+                          }
+                        ]
+                      },
+                      "my_entitlements": [
+                        {
+                          "key": "store_credit",
+                          "active": true,
+                          "order": 1,
+                          "label": "My Store Credit"
+                        },
+                        {
+                          "key": "gift_card",
+                          "active": true,
+                          "order": 2,
+                          "label": "My Gift Cards"
+                        },
+                        {
+                          "key": "loyalty_point",
+                          "active": true,
+                          "order": 3,
+                          "label": "My Loyalty Points"
+                        }
+                      ],
+                      "assign_to_customer": {
+                        "items": [
+                          {
+                            "key": "assign_page",
+                            "active": true,
+                            "order": 1,
+                            "label": "Assigned Pages"
+                          },
+                          {
+                            "key": "assign_product",
+                            "active": true,
+                            "order": 2,
+                            "label": "Assigned Products"
+                          },
+                          {
+                            "key": "assign_category",
+                            "active": true,
+                            "order": 3,
+                            "label": "Assigned Categories"
+                          }
+                        ],
+                        "show_pagination": null,
+                        "item_per_page": null
+                      }
+                    },
+                    "registration_fields": {
+                      "fields": [
+                        {
+                          "key": "first_name",
+                          "label": null,
+                          "default_label": "First Name",
+                          "active": true,
+                          "required": true,
+                          "system": true,
+                          "order": 1,
+                          "placeholder": "Enter your first name"
+                        },
+                        {
+                          "key": "last_name",
+                          "label": null,
+                          "default_label": "Last Name",
+                          "active": true,
+                          "required": false,
+                          "system": false,
+                          "order": 2,
+                          "placeholder": "Enter your last name"
+                        },
+                        {
+                          "key": "email",
+                          "label": null,
+                          "default_label": "Email",
+                          "active": true,
+                          "required": true,
+                          "system": true,
+                          "order": 10,
+                          "placeholder": "Enter your email address"
+                        },
+                        {
+                          "key": "company_name",
+                          "label": null,
+                          "default_label": "Company Name",
+                          "active": true,
+                          "required": false,
+                          "system": false,
+                          "order": 19,
+                          "placeholder": "Enter your company name"
+                        }
+                      ]
+                    }
+                  },
+                  "group_meta": {
+                    "portal": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/portal"
+                    },
+                    "registration": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/registration"
+                    },
+                    "login": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/login"
+                    },
+                    "sso": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/sso"
+                    },
+                    "profile_page": {
+                      "kind": "resource",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/customer_portal/profile_page"
+                    },
+                    "registration_fields": {
+                      "kind": "resource",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/customer_portal/registration_fields"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/customer_portal\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_portal.get_customer_portal()\nsettings = response.map[\"customer_portal\"]\nprint(settings[\"portal\"][\"enabled\"], settings[\"registration\"][\"requires_approval\"])\nprint(settings[\"login\"][\"registration_link\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customerPortal.getCustomerPortal();\nconst settings = response.map.customer_portal;\nconsole.log(settings.portal.enabled, settings.registration.enabled);\nconsole.log(settings.login.password_recovery, settings.login.registration_link);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerPortal::getCustomerPortal($client);\n\necho 'registration: ', $response->map['customer_portal']['registration']['enabled'] ? 'open' : 'closed', PHP_EOL;\nforeach ($response->map['group_meta'] as $section => $meta) {\n    echo $section, $meta['writable'] ? ' (writable)' : ' (read-only)', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerPortal().getCustomerPortal();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"customer_portal\");\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) settings.get(\"portal\")).get(\"enabled\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"login\")).get(\"registration_link\"));\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"profile_page\")).get(\"writable\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerPortal.GetCustomerPortalAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerPortal = (IReadOnlyDictionary<string, object?>)body[\"customer_portal\"]!;\nvar login = (IReadOnlyDictionary<string, object?>)customerPortal[\"login\"]!;\nConsole.WriteLine($\"{login[\"enabled\"]} {login[\"registration_link\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerPortal.getCustomerPortal();\nfinal customerPortal = (response.map as Map)['customer_portal'] as Map;\nprint(customerPortal['portal']);\nprint(customerPortal['login']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerPortalSettings().GetCustomerPortal(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nsettings := body[\"customer_portal\"].(map[string]any)\nfmt.Println(settings[\"portal\"].(map[string]any)[\"enabled\"], settings[\"login\"].(map[string]any)[\"registration_link\"])\nfor section, meta := range body[\"group_meta\"].(map[string]any) {\n\tfmt.Println(section, meta.(map[string]any)[\"writable\"])\n}\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Customer portal"
+        ],
+        "summary": "Update customer portal settings",
+        "operationId": "patch_customer_portal",
+        "description": "Send the fields to change inside `customer_portal`, grouped by section name: `portal`, `registration`, `login` or `sso`. One body can change several sections. Only the fields you send change; other fields in the same block, and sections you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get customer portal settings](/api-reference/customer-portal/get-customer-portal-settings) does.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_portal": {
+                      "$ref": "#/components/schemas/CustomerPortalSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CustomerPortalGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "customer_portal": {
+                    "portal": {
+                      "enabled": true
+                    },
+                    "registration": {
+                      "enabled": true,
+                      "close_registration_message": null,
+                      "assign_default_group": true,
+                      "default_groups": [
+                        {
+                          "id": 4,
+                          "name": "MEMBER"
+                        }
+                      ],
+                      "requires_approval": false,
+                      "approval_groups": [],
+                      "terms": {
+                        "enabled": false,
+                        "text": "By registering, I accept the",
+                        "anchor_text": "Terms and Conditions",
+                        "type": "text",
+                        "reference": null
+                      },
+                      "facebook": {
+                        "enabled": false,
+                        "app_id": null
+                      },
+                      "google": {
+                        "enabled": false,
+                        "client_id": null
+                      },
+                      "b2b_configuration": {
+                        "enabled": false,
+                        "create_as_organisation": false,
+                        "create_as_customer": false,
+                        "organisation_selected": false
+                      },
+                      "alternate_login": {
+                        "enabled": false,
+                        "enable_email_field": false
+                      }
+                    },
+                    "login": {
+                      "enabled": true,
+                      "login_disabled_message": null,
+                      "awaiting_approval_message": "<p>Your registration is awaiting for approval</p>",
+                      "password_recovery": true,
+                      "registration_link": false,
+                      "captcha": {
+                        "enabled": false,
+                        "fail_count": 3
+                      },
+                      "enable_landing_page_after_successful_login": false,
+                      "landing_page_after_successful_login": null
+                    },
+                    "sso": {
+                      "enabled": false,
+                      "require_site_access": false,
+                      "service_provider": null,
+                      "azure_ad": {
+                        "data_mapping": {
+                          "address_line_1": null,
+                          "address_line_2": null,
+                          "post_code": null,
+                          "phone": null,
+                          "mobile": null,
+                          "country_id": 49,
+                          "state": null,
+                          "city": "city"
+                        },
+                        "identifier": null,
+                        "login_url": null,
+                        "reply_url_postfix": "customer/azureSamlResponse"
+                      },
+                      "azure_ad_b2c": {
+                        "tenant_name": null,
+                        "policy_name": null,
+                        "client_id": null,
+                        "client_secret": null,
+                        "reply_url_prefix": "https://your-store.example.com/",
+                        "reply_url_postfix": "customer/azureAdB2CResponse"
+                      }
+                    },
+                    "profile_page": {
+                      "page_html": null,
+                      "tabs": [
+                        {
+                          "key": "welcome_message",
+                          "active": true,
+                          "order": 1,
+                          "label": "Welcome Message"
+                        },
+                        {
+                          "key": "overview",
+                          "active": true,
+                          "order": 2,
+                          "label": "Overview"
+                        },
+                        {
+                          "key": "manage_my_account",
+                          "active": true,
+                          "order": 3,
+                          "label": "Manage My Account"
+                        },
+                        {
+                          "key": "my_eorders",
+                          "active": true,
+                          "order": 4,
+                          "label": "My Orders"
+                        },
+                        {
+                          "key": "my_entitlements",
+                          "active": true,
+                          "order": 5,
+                          "label": "My Entitlements"
+                        }
+                      ],
+                      "overview": [
+                        {
+                          "key": "overview_top_selling_product",
+                          "active": true,
+                          "order": 1,
+                          "label": "Top Selling Product",
+                          "show_product_info": true
+                        },
+                        {
+                          "key": "overview_onsale_product",
+                          "active": true,
+                          "order": 3,
+                          "label": "On Sale Product"
+                        },
+                        {
+                          "key": "overview_last_viewed_product",
+                          "active": true,
+                          "order": 5,
+                          "label": "Last Viewed Product",
+                          "show_product_info": false
+                        }
+                      ],
+                      "manage_my_account": {
+                        "sections": [
+                          {
+                            "key": "account_information",
+                            "active": true,
+                            "order": 1,
+                            "label": "Account Information"
+                          },
+                          {
+                            "key": "billing_address",
+                            "active": true,
+                            "order": 2,
+                            "label": "Billing Address"
+                          },
+                          {
+                            "key": "shipping_address",
+                            "active": true,
+                            "order": 3,
+                            "label": "Shipping Address"
+                          },
+                          {
+                            "key": "change_password",
+                            "active": true,
+                            "order": 4,
+                            "label": "Change Password"
+                          }
+                        ],
+                        "account_information": [
+                          {
+                            "key": "first_name",
+                            "active": true,
+                            "order": 1
+                          },
+                          {
+                            "key": "last_name",
+                            "active": true,
+                            "order": 2
+                          },
+                          {
+                            "key": "email",
+                            "active": true,
+                            "order": 11
+                          }
+                        ],
+                        "billing_address": [
+                          {
+                            "key": "name_group_field",
+                            "active": true,
+                            "order": 1
+                          },
+                          {
+                            "key": "country",
+                            "active": true,
+                            "order": 2
+                          },
+                          {
+                            "key": "address_line_2",
+                            "active": false,
+                            "order": 5
+                          }
+                        ],
+                        "shipping_address": [
+                          {
+                            "key": "name_group_field",
+                            "active": true,
+                            "order": 1
+                          },
+                          {
+                            "key": "country",
+                            "active": true,
+                            "order": 2
+                          },
+                          {
+                            "key": "mobile",
+                            "active": true,
+                            "order": 7
+                          }
+                        ]
+                      },
+                      "my_orders": {
+                        "flags": {
+                          "enable_due_payment": false,
+                          "show_track_my_orders": false,
+                          "display_track_in_column": false,
+                          "show_order_channel": false,
+                          "show_pay_now": true,
+                          "allow_order_share": true
+                        },
+                        "sections": [
+                          {
+                            "key": "all_order",
+                            "active": true,
+                            "order": 3,
+                            "label": "Orders"
+                          },
+                          {
+                            "key": "preorder",
+                            "active": true,
+                            "order": 4,
+                            "label": "Pre-orders"
+                          }
+                        ]
+                      },
+                      "my_entitlements": [
+                        {
+                          "key": "store_credit",
+                          "active": true,
+                          "order": 1,
+                          "label": "My Store Credit"
+                        },
+                        {
+                          "key": "gift_card",
+                          "active": true,
+                          "order": 2,
+                          "label": "My Gift Cards"
+                        },
+                        {
+                          "key": "loyalty_point",
+                          "active": true,
+                          "order": 3,
+                          "label": "My Loyalty Points"
+                        }
+                      ],
+                      "assign_to_customer": {
+                        "items": [
+                          {
+                            "key": "assign_page",
+                            "active": true,
+                            "order": 1,
+                            "label": "Assigned Pages"
+                          },
+                          {
+                            "key": "assign_product",
+                            "active": true,
+                            "order": 2,
+                            "label": "Assigned Products"
+                          },
+                          {
+                            "key": "assign_category",
+                            "active": true,
+                            "order": 3,
+                            "label": "Assigned Categories"
+                          }
+                        ],
+                        "show_pagination": null,
+                        "item_per_page": null
+                      }
+                    },
+                    "registration_fields": {
+                      "fields": [
+                        {
+                          "key": "first_name",
+                          "label": null,
+                          "default_label": "First Name",
+                          "active": true,
+                          "required": true,
+                          "system": true,
+                          "order": 1,
+                          "placeholder": "Enter your first name"
+                        },
+                        {
+                          "key": "last_name",
+                          "label": null,
+                          "default_label": "Last Name",
+                          "active": true,
+                          "required": false,
+                          "system": false,
+                          "order": 2,
+                          "placeholder": "Enter your last name"
+                        },
+                        {
+                          "key": "email",
+                          "label": null,
+                          "default_label": "Email",
+                          "active": true,
+                          "required": true,
+                          "system": true,
+                          "order": 10,
+                          "placeholder": "Enter your email address"
+                        },
+                        {
+                          "key": "company_name",
+                          "label": null,
+                          "default_label": "Company Name",
+                          "active": true,
+                          "required": false,
+                          "system": false,
+                          "order": 19,
+                          "placeholder": "Enter your company name"
+                        }
+                      ]
+                    }
+                  },
+                  "group_meta": {
+                    "portal": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/portal"
+                    },
+                    "registration": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/registration"
+                    },
+                    "login": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/login"
+                    },
+                    "sso": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/customer_portal/sso"
+                    },
+                    "profile_page": {
+                      "kind": "resource",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/customer_portal/profile_page"
+                    },
+                    "registration_fields": {
+                      "kind": "resource",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/customer_portal/registration_fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `customer_portal` (`request body must be wrapped in a 'customer_portal' object`), names only `profile_page` or `registration_fields` (`customer_portal body missing`), or is not valid JSON (`Request body is not valid JSON`). Or a field is unknown or has a value it does not accept: `details[].field` names the field and `details[].code` gives the reason, such as `unknown_field` or `invalid_boolean`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "portal.bogus_field: not a recognized field",
+                    "details": [
+                      {
+                        "field": "portal.bogus_field",
+                        "code": "unknown_field",
+                        "message": "not a recognized field"
+                      }
+                    ],
+                    "request_id": "e767f586-f440-4321-9734-dfea31113eb9"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "You sent more than ten customer portal writes within about 3.25 seconds. The `Retry-After` header gives the time left before writes are accepted again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/customer_portal\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"customer_portal\": {\n      \"login\": {\n        \"registration_link\": false\n      },\n      \"sso\": {\n        \"azure_ad\": {\n          \"data_mapping\": {\n            \"city\": \"city\"\n          }\n        }\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_portal.patch_customer_portal({\n    \"customer_portal\": {\n        \"login\": {\"registration_link\": False},\n        \"sso\": {\"azure_ad\": {\"data_mapping\": {\"city\": \"city\"}}},\n    },\n})\nsettings = response.map[\"customer_portal\"]\nprint(settings[\"login\"][\"registration_link\"])\nprint(settings[\"sso\"][\"azure_ad\"][\"data_mapping\"][\"city\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customerPortal.patchCustomerPortal({\n    customer_portal: {\n        login: {registration_link: false},\n        sso: {azure_ad: {data_mapping: {city: 'city'}}},\n    },\n});\nconst settings = response.map.customer_portal;\nconsole.log(settings.login.registration_link);\nconsole.log(settings.sso.azure_ad.data_mapping.city);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerPortal::patchCustomerPortal($client, [\n    'customer_portal' => [\n        'login' => ['registration_link' => false],\n        'sso' => ['azure_ad' => ['data_mapping' => ['city' => 'city']]],\n    ],\n]);\n\n$settings = $response->map['customer_portal'];\necho $settings['login']['registration_link'] ? 'true' : 'false', PHP_EOL;\necho $settings['sso']['azure_ad']['data_mapping']['city'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerPortal().patchCustomerPortal(Map.of(\"customer_portal\", Map.of(\n        \"login\", Map.of(\"registration_link\", false),\n        \"sso\", Map.of(\"azure_ad\", Map.of(\"data_mapping\", Map.of(\"city\", \"city\"))))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer_portal\");\nMap<?, ?> azureAd = (Map<?, ?>) ((Map<?, ?>) settings.get(\"sso\")).get(\"azure_ad\");\nSystem.out.println(((Map<?, ?>) settings.get(\"login\")).get(\"registration_link\"));\nSystem.out.println(((Map<?, ?>) azureAd.get(\"data_mapping\")).get(\"city\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerPortal.PatchCustomerPortalAsync(new Dictionary<string, object?>\n{\n    [\"customer_portal\"] = new Dictionary<string, object?>\n    {\n        [\"login\"] = new Dictionary<string, object?> { [\"registration_link\"] = false },\n        [\"sso\"] = new Dictionary<string, object?> { [\"azure_ad\"] = new Dictionary<string, object?> { [\"data_mapping\"] = new Dictionary<string, object?> { [\"city\"] = \"city\" } } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerPortal = (IReadOnlyDictionary<string, object?>)body[\"customer_portal\"]!;\nvar login = (IReadOnlyDictionary<string, object?>)customerPortal[\"login\"]!;\nConsole.WriteLine(login[\"registration_link\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerPortal.patchCustomerPortal({\n  'customer_portal': {\n    'login': {'registration_link': false},\n    'sso': {\n      'azure_ad': {\n        'data_mapping': {'city': 'city'},\n      },\n    },\n  },\n});\nfinal customerPortal = (response.map as Map)['customer_portal'] as Map;\nprint('${customerPortal['login']} ${customerPortal['sso']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerPortalSettings().PatchCustomerPortal(ctx, map[string]any{\n\t\"customer_portal\": map[string]any{\n\t\t\"login\": map[string]any{\"registration_link\": false},\n\t\t\"sso\":   map[string]any{\"azure_ad\": map[string]any{\"data_mapping\": map[string]any{\"city\": \"city\"}}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"customer_portal\"].(map[string]any)\nmapping := settings[\"sso\"].(map[string]any)[\"azure_ad\"].(map[string]any)[\"data_mapping\"].(map[string]any)\nfmt.Println(settings[\"login\"].(map[string]any)[\"registration_link\"], mapping[\"city\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer_portal"
+                ],
+                "properties": {
+                  "customer_portal": {
+                    "$ref": "#/components/schemas/CustomerPortalSettingsInput",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Customer portal"
+        ],
+        "summary": "Get customer portal settings headers",
+        "operationId": "head_customer_portal",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` but no `ETag`; no customer portal `GET` or `HEAD` returns an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0`. No `ETag` and no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/customer_portal\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_portal.head_customer_portal()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customerPortal.headCustomerPortal();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerPortal::headCustomerPortal($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerPortal().headCustomerPortal();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerPortal.HeadCustomerPortalAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerPortal.headCustomerPortal();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerPortalSettings().HeadCustomerPortal(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/customer_portal/{section}": {
+      "get": {
+        "tags": [
+          "Customer portal"
+        ],
+        "summary": "Get a customer portal section",
+        "operationId": "get_customer_portal_section",
+        "description": "Returns one section, wrapped in the section's own name rather than in `customer_portal`, and without `group_meta`. The section is the same as the one [Get customer portal settings](/api-reference/customer-portal/get-customer-portal-settings) includes. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read: `portal`, `registration`, `login`, `sso`, `profile_page` or `registration_fields`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "portal",
+                "registration",
+                "login",
+                "sso",
+                "profile_page",
+                "registration_fields"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields, keyed by field name and nested the same way as the section. Works for all six sections. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "portal": {
+                      "$ref": "#/components/schemas/CustomerPortalPortal"
+                    },
+                    "registration": {
+                      "$ref": "#/components/schemas/CustomerPortalRegistration"
+                    },
+                    "login": {
+                      "$ref": "#/components/schemas/CustomerPortalLogin"
+                    },
+                    "sso": {
+                      "$ref": "#/components/schemas/CustomerPortalSso"
+                    },
+                    "profile_page": {
+                      "$ref": "#/components/schemas/CustomerPortalProfilePage"
+                    },
+                    "registration_fields": {
+                      "$ref": "#/components/schemas/CustomerPortalRegistrationFields"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CustomerPortalFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "login": {
+                    "enabled": true,
+                    "login_disabled_message": null,
+                    "awaiting_approval_message": "<p>Your registration is awaiting for approval</p>",
+                    "password_recovery": true,
+                    "registration_link": true,
+                    "captcha": {
+                      "enabled": false,
+                      "fail_count": 3
+                    },
+                    "enable_landing_page_after_successful_login": false,
+                    "landing_page_after_successful_login": null
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown settings path: customer_portal/bogus",
+                    "details": [],
+                    "request_id": "272c25fd-6f8a-4277-b1ee-181ee42f4b92"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/customer_portal/login\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_portal.get_customer_portal_section(\"login\")\nlogin = response.map[\"login\"]\nprint(login[\"enabled\"], login[\"password_recovery\"], login[\"registration_link\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customerPortal.getCustomerPortalSection('login');\nconst login = response.map.login;\nconsole.log(login.enabled, login.password_recovery, login.registration_link);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerPortal::getCustomerPortalSection($client, 'login');\n\n$login = $response->map['login'];\necho 'password recovery: ', $login['password_recovery'] ? 'on' : 'off', PHP_EOL;\necho 'captcha after ', $login['captcha']['fail_count'], ' failed attempts', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerPortal().getCustomerPortalSection(\"login\");\nMap<?, ?> login = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"login\");\nSystem.out.println(login.get(\"enabled\") + \" \" + login.get(\"registration_link\"));\nSystem.out.println(((Map<?, ?>) login.get(\"captcha\")).get(\"fail_count\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerPortal.GetCustomerPortalSectionAsync(\"login\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar login = (IReadOnlyDictionary<string, object?>)body[\"login\"]!;\nConsole.WriteLine($\"{login[\"enabled\"]} {login[\"registration_link\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerPortal.getCustomerPortalSection('login');\nfinal login = (response.map as Map)['login'] as Map;\nprint(login['enabled']);\nprint(login['captcha']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerPortalSettings().GetCustomerPortalSection(ctx, \"login\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlogin := resp.Map().(map[string]any)[\"login\"].(map[string]any)\nfmt.Println(login[\"enabled\"], login[\"password_recovery\"], login[\"registration_link\"], login[\"captcha\"].(map[string]any)[\"fail_count\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Customer portal"
+        ],
+        "summary": "Update a customer portal section",
+        "operationId": "patch_customer_portal_section",
+        "description": "Send the fields to change wrapped in the section's own name, such as `login`, or with no wrapper at all. A body wrapped in `customer_portal` is rejected with `400`. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change, under its own key and without `group_meta`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to change: `portal`, `registration`, `login` or `sso`. Do not send `profile_page` or `registration_fields`: `group_meta` marks them `writable: false`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "portal",
+                "registration",
+                "login",
+                "sso"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "portal": {
+                      "$ref": "#/components/schemas/CustomerPortalPortal"
+                    },
+                    "registration": {
+                      "$ref": "#/components/schemas/CustomerPortalRegistration"
+                    },
+                    "login": {
+                      "$ref": "#/components/schemas/CustomerPortalLogin"
+                    },
+                    "sso": {
+                      "$ref": "#/components/schemas/CustomerPortalSso"
+                    }
+                  }
+                },
+                "example": {
+                  "login": {
+                    "enabled": true,
+                    "login_disabled_message": null,
+                    "awaiting_approval_message": "<p>Your registration is awaiting for approval</p>",
+                    "password_recovery": true,
+                    "registration_link": false,
+                    "captcha": {
+                      "enabled": false,
+                      "fail_count": 3
+                    },
+                    "enable_landing_page_after_successful_login": false,
+                    "landing_page_after_successful_login": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `customer_portal` (`<section>.customer_portal: not a recognized field`), or a field is unknown or has a value it does not accept. `details[].field` names the field and `details[].code` gives the reason, such as `unknown_field`, `invalid_boolean`, `constraint_violation` or `required`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "sso.require_site_access: require_site_access can only be enabled when SSO is enabled",
+                    "details": [
+                      {
+                        "field": "sso.require_site_access",
+                        "code": "constraint_violation",
+                        "message": "require_site_access can only be enabled when SSO is enabled"
+                      }
+                    ],
+                    "request_id": "3805edd2-a0ab-4cd1-a72c-3835b0fc6aed"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "You sent more than ten customer portal writes within about 3.25 seconds. The `Retry-After` header gives the time left before writes are accepted again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPortalError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/customer_portal/login\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"login\": {\n      \"registration_link\": false\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_portal.patch_customer_portal_section(\n    \"login\", {\"login\": {\"registration_link\": False}}\n)\nprint(response.map[\"login\"][\"registration_link\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.customerPortal.patchCustomerPortalSection('login', {\n    login: {registration_link: false},\n});\nconsole.log(response.map.login.registration_link);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\CustomerPortal\\CustomerPortal;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerPortal::patchCustomerPortalSection($client, 'login', [\n    'login' => ['registration_link' => false],\n]);\n\necho $response->map['login']['registration_link'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerPortal().patchCustomerPortalSection(\"login\",\n        Map.of(\"login\", Map.of(\"registration_link\", false)));\nMap<?, ?> login = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"login\");\nSystem.out.println(login.get(\"registration_link\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerPortal.PatchCustomerPortalSectionAsync(\"login\", new Dictionary<string, object?>\n{\n    [\"login\"] = new Dictionary<string, object?> { [\"registration_link\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar login = (IReadOnlyDictionary<string, object?>)body[\"login\"]!;\nConsole.WriteLine(login[\"registration_link\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.customerPortal.patchCustomerPortalSection('login', {\n  'login': {'registration_link': false},\n});\nfinal login = (response.map as Map)['login'] as Map;\nprint(login['registration_link']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerPortalSettings().PatchCustomerPortalSection(ctx, \"login\", map[string]any{\n\t\"login\": map[string]any{\"registration_link\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"login\"].(map[string]any)[\"registration_link\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the section named in the path, or send them with no wrapper. A `customer_portal` wrapper is rejected.",
+                "properties": {
+                  "portal": {
+                    "$ref": "#/components/schemas/CustomerPortalPortal"
+                  },
+                  "registration": {
+                    "$ref": "#/components/schemas/CustomerPortalRegistration"
+                  },
+                  "login": {
+                    "$ref": "#/components/schemas/CustomerPortalLogin"
+                  },
+                  "sso": {
+                    "$ref": "#/components/schemas/CustomerPortalSso"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -12059,6 +13378,914 @@
               "request_id": {
                 "type": "string",
                 "description": "An id for this request."
+              }
+            }
+          }
+        }
+      },
+      "CustomerPortalSettings": {
+        "type": "object",
+        "description": "All six sections. `profile_page` and `registration_fields` are read-only.",
+        "properties": {
+          "portal": {
+            "$ref": "#/components/schemas/CustomerPortalPortal"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/CustomerPortalRegistration"
+          },
+          "login": {
+            "$ref": "#/components/schemas/CustomerPortalLogin"
+          },
+          "sso": {
+            "$ref": "#/components/schemas/CustomerPortalSso"
+          },
+          "profile_page": {
+            "$ref": "#/components/schemas/CustomerPortalProfilePage"
+          },
+          "registration_fields": {
+            "$ref": "#/components/schemas/CustomerPortalRegistrationFields"
+          }
+        }
+      },
+      "CustomerPortalSettingsInput": {
+        "type": "object",
+        "description": "The writable sections. Name only these four.",
+        "properties": {
+          "portal": {
+            "$ref": "#/components/schemas/CustomerPortalPortal"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/CustomerPortalRegistration"
+          },
+          "login": {
+            "$ref": "#/components/schemas/CustomerPortalLogin"
+          },
+          "sso": {
+            "$ref": "#/components/schemas/CustomerPortalSso"
+          }
+        }
+      },
+      "CustomerPortalPortal": {
+        "type": "object",
+        "description": "The switch that turns the customer portal on or off.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn the customer portal on. Defaults to `false`."
+          }
+        }
+      },
+      "CustomerPortalRegistration": {
+        "type": "object",
+        "description": "Who can register, as what, and what they must accept.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Let customers register. Defaults to `false`."
+          },
+          "close_registration_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The HTML message shown while registration is closed, or `null`."
+          },
+          "assign_default_group": {
+            "type": "boolean",
+            "description": "Assign each new registrant to a default customer group, from `default_groups`. Defaults to `false`."
+          },
+          "default_groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalCustomerGroup"
+            },
+            "description": "The customer groups a new registrant joins. A read returns each customer group as an `{id, name}` object. A write takes the customer groups' `id` values, such as `[4]`, and also accepts the objects from a read. At most 100 entries; duplicates are removed and each customer group must exist."
+          },
+          "requires_approval": {
+            "type": "boolean",
+            "description": "New customers need admin approval. Defaults to `false`."
+          },
+          "approval_groups": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalCustomerGroup"
+            },
+            "description": "Customer groups, read and written the same way as `default_groups`: a read returns each customer group as an `{id, name}` object, and a write takes the customer groups' `id` values, such as `[4]`. At most 100 entries; duplicates are removed and each customer group must exist."
+          },
+          "terms": {
+            "$ref": "#/components/schemas/CustomerPortalRegistrationTerms"
+          },
+          "facebook": {
+            "$ref": "#/components/schemas/CustomerPortalFacebookLogin"
+          },
+          "google": {
+            "$ref": "#/components/schemas/CustomerPortalGoogleLogin"
+          },
+          "b2b_configuration": {
+            "$ref": "#/components/schemas/CustomerPortalB2bConfiguration"
+          },
+          "alternate_login": {
+            "$ref": "#/components/schemas/CustomerPortalAlternateLogin"
+          }
+        }
+      },
+      "CustomerPortalCustomerGroup": {
+        "type": "object",
+        "description": "A customer group, as a read returns it.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The customer group's `id`. A write takes this number on its own."
+          },
+          "name": {
+            "type": "string",
+            "description": "The customer group's name."
+          }
+        }
+      },
+      "CustomerPortalRegistrationTerms": {
+        "type": "object",
+        "description": "Whether a registrant must accept terms, and where the terms are.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Require registrants to accept the terms. Defaults to `false`. You cannot turn it on while `terms.reference` is `null`: the write is rejected with `400` and `a terms reference is required when terms are enabled`."
+          },
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The acceptance text, such as `By registering, I accept the`."
+          },
+          "anchor_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The link text, such as `Terms and Conditions`. At most 255 characters.",
+            "maxLength": 255
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "page",
+              "link",
+              "text"
+            ],
+            "description": "Where the terms are: `page`, `link` or `text`. Any other value is rejected with `400`."
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Depends on `type`: an existing page's `id` when `type` is `page`, a safe `http(s)` or same-site URL when `type` is `link`, or free text when `type` is `text`."
+          }
+        }
+      },
+      "CustomerPortalFacebookLogin": {
+        "type": "object",
+        "description": "Facebook login.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn on Facebook login. Defaults to `false`."
+          },
+          "app_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Facebook app ID. Required when `facebook.enabled` is `true`."
+          }
+        }
+      },
+      "CustomerPortalGoogleLogin": {
+        "type": "object",
+        "description": "Google login.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn on Google login. Defaults to `false`."
+          },
+          "client_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Google client ID. Required when `google.enabled` is `true`."
+          }
+        }
+      },
+      "CustomerPortalB2bConfiguration": {
+        "type": "object",
+        "description": "What a new registrant is created as.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn on the B2B configuration. Defaults to `false`."
+          },
+          "create_as_organisation": {
+            "type": "boolean",
+            "description": "Create a new registrant as an organisation."
+          },
+          "create_as_customer": {
+            "type": "boolean",
+            "description": "Create a new registrant as a customer."
+          },
+          "organisation_selected": {
+            "type": "boolean",
+            "description": "Set organisation as the default."
+          }
+        }
+      },
+      "CustomerPortalAlternateLogin": {
+        "type": "object",
+        "description": "Third-party login, and whether it offers an email field.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn on third-party login. Defaults to `false`."
+          },
+          "enable_email_field": {
+            "type": "boolean",
+            "description": "Show an email field. Depends on `alternate_login.enabled`. Defaults to `false`."
+          }
+        }
+      },
+      "CustomerPortalLogin": {
+        "type": "object",
+        "description": "Whether customers can sign in, and what the sign-in page offers.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Let customers sign in. Defaults to `false`."
+          },
+          "login_disabled_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The HTML message shown while login is turned off, or `null`."
+          },
+          "awaiting_approval_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The HTML message shown to a customer whose registration is awaiting approval."
+          },
+          "password_recovery": {
+            "type": "boolean",
+            "description": "Show the password recovery link."
+          },
+          "registration_link": {
+            "type": "boolean",
+            "description": "Show the customer registration link."
+          },
+          "captcha": {
+            "$ref": "#/components/schemas/CustomerPortalLoginCaptcha"
+          },
+          "enable_landing_page_after_successful_login": {
+            "type": "boolean",
+            "description": "Send customers to `landing_page_after_successful_login` after they sign in. While this is `false`, that page is not used. Defaults to `false`."
+          },
+          "landing_page_after_successful_login": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The same-site path or URL customers land on after they sign in, or `null` to clear it. Used only when `enable_landing_page_after_successful_login` is `true`."
+          }
+        }
+      },
+      "CustomerPortalLoginCaptcha": {
+        "type": "object",
+        "description": "The captcha shown after failed login attempts.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show a captcha after failed login attempts. Defaults to `false`."
+          },
+          "fail_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "description": "The number of failed attempts before the captcha shows. From `1` to `50`: any other value is rejected with `400` and `must be between 1 and 50`."
+          }
+        }
+      },
+      "CustomerPortalSso": {
+        "type": "object",
+        "description": "Single sign-on. Setting `enabled` to `true` on its own is rejected with `400`: `tenant_name`, `policy_name`, `client_id` and `client_secret` under `azure_ad_b2c` are each reported as `required`.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn on customer SSO. Defaults to `false`."
+          },
+          "require_site_access": {
+            "type": "boolean",
+            "description": "Turn on the option labelled `Required customer to access site`. It can be `true` only while `sso.enabled` is `true`; otherwise the write is rejected with `400` and `require_site_access can only be enabled when SSO is enabled`. Defaults to `false`."
+          },
+          "service_provider": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "AZURE_AD_B2C",
+              "AZURE_AD",
+              null
+            ],
+            "description": "The SSO provider: `AZURE_AD_B2C` or `AZURE_AD`, or `null`."
+          },
+          "azure_ad": {
+            "$ref": "#/components/schemas/CustomerPortalAzureAd"
+          },
+          "azure_ad_b2c": {
+            "$ref": "#/components/schemas/CustomerPortalAzureAdB2c"
+          }
+        }
+      },
+      "CustomerPortalAzureAd": {
+        "type": "object",
+        "description": "The Azure AD (SAML) provider. Required when `service_provider` is `AZURE_AD`.",
+        "properties": {
+          "data_mapping": {
+            "$ref": "#/components/schemas/CustomerPortalAzureAdDataMapping"
+          },
+          "identifier": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Azure AD identifier."
+          },
+          "login_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The Azure AD login URL."
+          },
+          "reply_url_postfix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the reply URL, such as `customer/azureSamlResponse`."
+          }
+        }
+      },
+      "CustomerPortalAzureAdDataMapping": {
+        "type": "object",
+        "description": "The SAML assertion attribute for each customer field.",
+        "properties": {
+          "address_line_1": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for address line 1."
+          },
+          "address_line_2": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for address line 2."
+          },
+          "post_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for the post code."
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for the phone number."
+          },
+          "mobile": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for the mobile number."
+          },
+          "country_id": {
+            "type": "integer",
+            "description": "A country's `id`, such as `49`."
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for the state."
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The attribute for the city."
+          }
+        }
+      },
+      "CustomerPortalAzureAdB2c": {
+        "type": "object",
+        "description": "The Azure AD B2C provider. Required when `service_provider` is `AZURE_AD_B2C`.",
+        "properties": {
+          "tenant_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The B2C tenant name."
+          },
+          "policy_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The B2C policy name."
+          },
+          "client_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The B2C client ID."
+          },
+          "client_secret": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The B2C client secret. `field_metadata` types it as a plain `string`, with no secret or write-only marker."
+          },
+          "reply_url_prefix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The start of the reply URL: your store's address, such as `https://your-store.example.com/`."
+          },
+          "reply_url_postfix": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the reply URL, such as `customer/azureAdB2CResponse`."
+          }
+        }
+      },
+      "CustomerPortalProfilePage": {
+        "type": "object",
+        "description": "The customer's profile page. Read-only: `group_meta` marks it `writable: false`.",
+        "properties": {
+          "page_html": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The welcome message, as HTML, or `null`."
+          },
+          "tabs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileEntry"
+            },
+            "description": "The profile page tabs, including tabs that plugins add."
+          },
+          "overview": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileOverviewEntry"
+            },
+            "description": "The product blocks on the Overview tab, such as `overview_top_selling_product`."
+          },
+          "manage_my_account": {
+            "$ref": "#/components/schemas/CustomerPortalManageMyAccount"
+          },
+          "my_orders": {
+            "$ref": "#/components/schemas/CustomerPortalMyOrders"
+          },
+          "my_entitlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileEntry"
+            },
+            "description": "The entries on the My Entitlements tab, such as `store_credit`, `gift_card` and `loyalty_point`."
+          },
+          "assign_to_customer": {
+            "$ref": "#/components/schemas/CustomerPortalAssignToCustomer"
+          }
+        }
+      },
+      "CustomerPortalProfileField": {
+        "type": "object",
+        "description": "One field of a form on the profile page.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Names the field, such as `first_name`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Show the field."
+          },
+          "order": {
+            "type": "integer",
+            "description": "The field's position."
+          }
+        }
+      },
+      "CustomerPortalProfileEntry": {
+        "type": "object",
+        "description": "One entry of a list on the profile page: a tab, a section or an entitlement.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Names the entry, such as `overview`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Show the entry."
+          },
+          "order": {
+            "type": "integer",
+            "description": "The entry's position."
+          },
+          "label": {
+            "type": "string",
+            "description": "The entry's label, such as `Overview`."
+          }
+        }
+      },
+      "CustomerPortalProfileOverviewEntry": {
+        "type": "object",
+        "description": "One product block on the Overview tab.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Names the block, such as `overview_top_selling_product`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Show the block."
+          },
+          "order": {
+            "type": "integer",
+            "description": "The block's position."
+          },
+          "label": {
+            "type": "string",
+            "description": "The block's label."
+          },
+          "show_product_info": {
+            "type": "boolean",
+            "description": "Show product information. Only some blocks have this field."
+          }
+        }
+      },
+      "CustomerPortalManageMyAccount": {
+        "type": "object",
+        "description": "The Manage My Account tab: its sections and form fields.",
+        "properties": {
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileEntry"
+            },
+            "description": "The tab's sections: `account_information`, `billing_address`, `shipping_address` and `change_password`."
+          },
+          "account_information": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileField"
+            },
+            "description": "The fields of the account information form."
+          },
+          "billing_address": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileField"
+            },
+            "description": "The fields of the billing address form."
+          },
+          "shipping_address": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileField"
+            },
+            "description": "The fields of the shipping address form."
+          }
+        }
+      },
+      "CustomerPortalMyOrders": {
+        "type": "object",
+        "description": "What the My Orders tab shows, and which order lists it offers.",
+        "properties": {
+          "flags": {
+            "$ref": "#/components/schemas/CustomerPortalMyOrderFlags"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileEntry"
+            },
+            "description": "The order lists, such as `all_order` and `preorder`."
+          }
+        }
+      },
+      "CustomerPortalMyOrderFlags": {
+        "type": "object",
+        "description": "Six switches for the My Orders tab.",
+        "properties": {
+          "enable_due_payment": {
+            "type": "boolean",
+            "description": "Turn on due payment."
+          },
+          "show_track_my_orders": {
+            "type": "boolean",
+            "description": "Show order tracking."
+          },
+          "display_track_in_column": {
+            "type": "boolean",
+            "description": "Show tracking in a column. Needs `show_track_my_orders` set to `true`."
+          },
+          "show_order_channel": {
+            "type": "boolean",
+            "description": "Show the order channel."
+          },
+          "show_pay_now": {
+            "type": "boolean",
+            "description": "Show Pay Now."
+          },
+          "allow_order_share": {
+            "type": "boolean",
+            "description": "Let customers share an order."
+          }
+        }
+      },
+      "CustomerPortalAssignToCustomer": {
+        "type": "object",
+        "description": "The assigned pages tab, and how it paginates.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalProfileEntry"
+            },
+            "description": "The entries: `assign_page`, `assign_product` and `assign_category`."
+          },
+          "show_pagination": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "top",
+              "bottom",
+              "top_and_bottom",
+              null
+            ],
+            "description": "Where the pagination control shows: `top`, `bottom` or `top_and_bottom`, or `null`."
+          },
+          "item_per_page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 999999,
+            "description": "Items per page, from `1` to `999999`, or `null`."
+          }
+        }
+      },
+      "CustomerPortalRegistrationFields": {
+        "type": "object",
+        "description": "The fields of the registration form. Read-only: `group_meta` marks it `writable: false`.",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPortalRegistrationField"
+            },
+            "description": "One entry per registration form field."
+          }
+        }
+      },
+      "CustomerPortalRegistrationField": {
+        "type": "object",
+        "description": "One field of the registration form.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Names the field, such as `first_name`."
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The label you set for the field, or `null` when none is set."
+          },
+          "default_label": {
+            "type": "string",
+            "description": "The field's default label, such as `First Name`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Show the field on the registration form."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "The registrant must fill in the field."
+          },
+          "system": {
+            "type": "boolean",
+            "description": "`true` for a built-in field, whose `active` and `required` cannot be turned off."
+          },
+          "order": {
+            "type": "integer",
+            "description": "The field's position on the form."
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "The placeholder text. Not every field has one."
+          }
+        }
+      },
+      "CustomerPortalGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get customer portal settings](/api-reference/customer-portal/get-customer-portal-settings) and [Update customer portal settings](/api-reference/customer-portal/update-customer-portal-settings) return it.",
+        "properties": {
+          "portal": {
+            "$ref": "#/components/schemas/CustomerPortalSectionMeta"
+          },
+          "registration": {
+            "$ref": "#/components/schemas/CustomerPortalSectionMeta"
+          },
+          "login": {
+            "$ref": "#/components/schemas/CustomerPortalSectionMeta"
+          },
+          "sso": {
+            "$ref": "#/components/schemas/CustomerPortalSectionMeta"
+          },
+          "profile_page": {
+            "$ref": "#/components/schemas/CustomerPortalSectionMeta"
+          },
+          "registration_fields": {
+            "$ref": "#/components/schemas/CustomerPortalSectionMeta"
+          }
+        }
+      },
+      "CustomerPortalSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "setting",
+              "resource"
+            ],
+            "description": "`setting` for `portal`, `registration`, `login` and `sso`; `resource` for `profile_page` and `registration_fields`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write the section. `true` for the four `setting` sections and `false` for the two `resource` sections. Trust this field, not the `Allow` header, which lists `PATCH` on all six."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/customer_portal/login`."
+          }
+        }
+      },
+      "CustomerPortalFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Has the same nesting as the settings, with a `CustomerPortalFieldMetadataEntry` in place of each value. `sso.azure_ad` and `sso.azure_ad_b2c` also have a `_required_when` entry, which states when the whole block is required, such as `service_provider=AZURE_AD`."
+      },
+      "CustomerPortalFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes: `boolean`, `string`, `html`, `integer`, `enum`, `id_list` or `object_list`."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field does, or a rule about it."
+          },
+          "default": {
+            "description": "The field's default value."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The values the field accepts, for an `enum` field."
+          },
+          "min": {
+            "type": "integer",
+            "description": "The lowest value, for an `integer` field."
+          },
+          "max": {
+            "type": "integer",
+            "description": "The highest value, for an `integer` field."
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "The longest text the field accepts."
+          },
+          "max_items": {
+            "type": "integer",
+            "description": "The most entries an `id_list` field accepts."
+          },
+          "nullable": {
+            "type": "boolean",
+            "description": "`true` when the field accepts `null`."
+          },
+          "depends_on": {
+            "type": "string",
+            "description": "The field this one depends on, such as `enabled`."
+          },
+          "required_when": {
+            "type": "string",
+            "description": "The field that makes this one required, such as `enabled`."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "`true` on a field you cannot change, such as a row's `key`."
+          },
+          "item": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For an `object_list` field, a description of each field of one row."
+          },
+          "note": {
+            "type": "string",
+            "description": "A remark about the field."
+          },
+          "applies_to": {
+            "type": "string",
+            "description": "The rows the field applies to."
+          }
+        }
+      },
+      "CustomerPortalError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field that was rejected, such as `portal.enabled`."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field`, `invalid_boolean`, `constraint_violation` or `required`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
               }
             }
           }

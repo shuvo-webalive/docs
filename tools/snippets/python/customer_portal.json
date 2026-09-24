@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "get_customer_portal",
+      "code": "response = client.customer_portal.get_customer_portal()\nsettings = response.map[\"customer_portal\"]\nprint(settings[\"portal\"][\"enabled\"], settings[\"registration\"][\"requires_approval\"])\nprint(settings[\"login\"][\"registration_link\"])\n"
+    },
+    "patch_customer_portal": {
+      "function": "patch_customer_portal",
+      "code": "response = client.customer_portal.patch_customer_portal({\n    \"customer_portal\": {\n        \"login\": {\"registration_link\": False},\n        \"sso\": {\"azure_ad\": {\"data_mapping\": {\"city\": \"city\"}}},\n    },\n})\nsettings = response.map[\"customer_portal\"]\nprint(settings[\"login\"][\"registration_link\"])\nprint(settings[\"sso\"][\"azure_ad\"][\"data_mapping\"][\"city\"])\n"
+    },
+    "head_customer_portal": {
+      "function": "head_customer_portal",
+      "code": "response = client.customer_portal.head_customer_portal()\nprint(response.status_code)\n"
+    },
+    "get_customer_portal_section": {
+      "function": "get_customer_portal_section",
+      "code": "response = client.customer_portal.get_customer_portal_section(\"login\")\nlogin = response.map[\"login\"]\nprint(login[\"enabled\"], login[\"password_recovery\"], login[\"registration_link\"])\n"
+    },
+    "patch_customer_portal_section": {
+      "function": "patch_customer_portal_section",
+      "code": "response = client.customer_portal.patch_customer_portal_section(\n    \"login\", {\"login\": {\"registration_link\": False}}\n)\nprint(response.map[\"login\"][\"registration_link\"])\n"
+    }
+  }
+}
