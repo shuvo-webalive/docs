@@ -441,7 +441,7 @@ def write_programs(target, areas, snippets, setups):
                     folder = target / sdk / module.NAME / endpoint["key"]
                     folder.mkdir(parents=True, exist_ok=True)
                     code = program(sdk, setups[sdk]["setup"], snippets[module.NAME][sdk]["endpoints"][endpoint["key"]]["code"])
-                    (folder / PROGRAM_FILES[sdk]).write_text(code, encoding="utf-8")
+                    (folder / PROGRAM_FILES[sdk]).write_bytes(code.encode("utf-8"))
                     count += 1
     print("Wrote %d programs to %s" % (count, target))
     return 0
