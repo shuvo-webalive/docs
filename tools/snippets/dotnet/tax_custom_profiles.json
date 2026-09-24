@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "ListTaxCustomProfilesAsync",
+      "code": "var response = await client.TaxCustomProfiles.ListTaxCustomProfilesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customProfile in ((IReadOnlyList<object?>)body[\"custom_profiles\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customProfile[\"id\"]} {customProfile[\"name\"]} {customProfile[\"rate_rules_count\"]}\");"
+    },
+    "create_tax_custom_profile": {
+      "function": "CreateTaxCustomProfileAsync",
+      "code": "var response = await client.TaxCustomProfiles.CreateTaxCustomProfileAsync(new Dictionary<string, object?>\n{\n    [\"custom_profile\"] = new Dictionary<string, object?> { [\"name\"] = \"Wholesale customers\", [\"description\"] = \"Rates for wholesale accounts\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine(customProfile[\"id\"]);"
+    },
+    "get_tax_custom_profile": {
+      "function": "GetTaxCustomProfileAsync",
+      "code": "var response = await client.TaxCustomProfiles.GetTaxCustomProfileAsync(1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine(customProfile[\"name\"]);\nforeach (var rateRule in ((IReadOnlyList<object?>)customProfile[\"rate_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{rateRule[\"id\"]} {rateRule[\"name\"]} {rateRule[\"zones_count\"]}\");"
+    },
+    "update_tax_custom_profile": {
+      "function": "UpdateTaxCustomProfileAsync",
+      "code": "var response = await client.TaxCustomProfiles.UpdateTaxCustomProfileAsync(7, new Dictionary<string, object?>\n{\n    [\"custom_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wholesale and trade customers\", [\"description\"] = \"Rates for wholesale and trade accounts\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine($\"{customProfile[\"name\"]} {customProfile[\"description\"]}\");"
+    },
+    "delete_tax_custom_profile": {
+      "function": "DeleteTaxCustomProfileAsync",
+      "code": "var response = await client.TaxCustomProfiles.DeleteTaxCustomProfileAsync(7);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

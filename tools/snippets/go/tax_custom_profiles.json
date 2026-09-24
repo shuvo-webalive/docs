@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "ListTaxCustomProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().ListTaxCustomProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"custom_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\n}"
+    },
+    "create_tax_custom_profile": {
+      "function": "CreateTaxCustomProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().CreateTaxCustomProfile(ctx, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale customers\", \"description\": \"Rates for wholesale accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"])"
+    },
+    "get_tax_custom_profile": {
+      "function": "GetTaxCustomProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().GetTaxCustomProfile(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], len(profile[\"rate_rules\"].([]any)))"
+    },
+    "update_tax_custom_profile": {
+      "function": "UpdateTaxCustomProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().UpdateTaxCustomProfile(ctx, 7, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale and trade customers\", \"description\": \"Rates for wholesale and trade accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"])"
+    },
+    "delete_tax_custom_profile": {
+      "function": "DeleteTaxCustomProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().DeleteTaxCustomProfile(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

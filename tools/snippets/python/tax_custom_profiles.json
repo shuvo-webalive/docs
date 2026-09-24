@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "list_tax_custom_profiles",
+      "code": "response = client.tax_custom_profiles.list_tax_custom_profiles({\"limit\": 20})\nfor profile in response.map[\"custom_profiles\"]:\n    print(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "create_tax_custom_profile": {
+      "function": "create_tax_custom_profile",
+      "code": "response = client.tax_custom_profiles.create_tax_custom_profile({\n    \"custom_profile\": {\n        \"name\": \"Wholesale customers\",\n        \"description\": \"Rates for wholesale accounts\",\n    },\n})\nprint(response.map[\"custom_profile\"][\"id\"])\n"
+    },
+    "get_tax_custom_profile": {
+      "function": "get_tax_custom_profile",
+      "code": "response = client.tax_custom_profiles.get_tax_custom_profile(1)\ncustom_profile = response.map[\"custom_profile\"]\nprint(custom_profile[\"name\"], custom_profile[\"description\"])\nfor rate_rule in custom_profile[\"rate_rules\"]:\n    print(rate_rule[\"id\"], rate_rule[\"name\"], rate_rule[\"zones_count\"])\n"
+    },
+    "update_tax_custom_profile": {
+      "function": "update_tax_custom_profile",
+      "code": "response = client.tax_custom_profiles.update_tax_custom_profile(7, {\n    \"custom_profile\": {\n        \"name\": \"Wholesale and trade customers\",\n        \"description\": \"Rates for wholesale and trade accounts\",\n    },\n})\ncustom_profile = response.map[\"custom_profile\"]\nprint(custom_profile[\"name\"], custom_profile[\"description\"])\n"
+    },
+    "delete_tax_custom_profile": {
+      "function": "delete_tax_custom_profile",
+      "code": "response = client.tax_custom_profiles.delete_tax_custom_profile(7)\nprint(response.status_code)\n"
+    }
+  }
+}

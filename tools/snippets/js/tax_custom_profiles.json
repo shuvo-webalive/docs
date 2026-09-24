@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "listTaxCustomProfiles",
+      "code": "import {taxCustomProfiles} from 'webcommander-sdk';\n\nconst response = await taxCustomProfiles.listTaxCustomProfiles(client, {limit: 20});\nfor (const customProfile of response.map.custom_profiles) {\n    console.log(customProfile.id, customProfile.name, customProfile.rate_rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "create_tax_custom_profile": {
+      "function": "createTaxCustomProfile",
+      "code": "import {taxCustomProfiles} from 'webcommander-sdk';\n\nconst response = await taxCustomProfiles.createTaxCustomProfile(client, {\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n});\nconsole.log(response.map.custom_profile.id);\n"
+    },
+    "get_tax_custom_profile": {
+      "function": "getTaxCustomProfile",
+      "code": "import {taxCustomProfiles} from 'webcommander-sdk';\n\nconst response = await taxCustomProfiles.getTaxCustomProfile(client, 1);\nconst customProfile = response.map.custom_profile;\nconsole.log(customProfile.name, customProfile.description, customProfile.rate_rules_count);\nfor (const rateRule of customProfile.rate_rules) {\n    console.log(rateRule.id, rateRule.name, rateRule.zones_count);\n}\n"
+    },
+    "update_tax_custom_profile": {
+      "function": "updateTaxCustomProfile",
+      "code": "import {taxCustomProfiles} from 'webcommander-sdk';\n\nconst response = await taxCustomProfiles.updateTaxCustomProfile(client, 7, {\n    custom_profile: {name: 'Wholesale and trade customers', description: 'Rates for wholesale and trade accounts'},\n});\nconsole.log(response.map.custom_profile.name, response.map.custom_profile.description);\n"
+    },
+    "delete_tax_custom_profile": {
+      "function": "deleteTaxCustomProfile",
+      "code": "import {taxCustomProfiles} from 'webcommander-sdk';\n\nconst response = await taxCustomProfiles.deleteTaxCustomProfile(client, 7);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

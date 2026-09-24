@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "listTaxCustomProfiles",
+      "code": "final response = await client.taxCustomProfiles\n    .listTaxCustomProfiles(queryParams: {'limit': 20});\nfinal customProfiles = (response.map as Map)['custom_profiles'] as List;\nfor (final customProfile in customProfiles) {\n  print('${(customProfile as Map)['id']} ${customProfile['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
+    },
+    "create_tax_custom_profile": {
+      "function": "createTaxCustomProfile",
+      "code": "final response = await client.taxCustomProfiles.createTaxCustomProfile({\n  'custom_profile': {\n    'name': 'Wholesale customers',\n    'description': 'Rates for wholesale accounts',\n  },\n});\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint(customProfile['id']);"
+    },
+    "get_tax_custom_profile": {
+      "function": "getTaxCustomProfile",
+      "code": "final response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['rate_rules_count']}');\nfinal rateRules = customProfile['rate_rules'] as List;\nfor (final rateRule in rateRules) {\n  print('${(rateRule as Map)['id']} ${rateRule['name']}');\n}"
+    },
+    "update_tax_custom_profile": {
+      "function": "updateTaxCustomProfile",
+      "code": "final response = await client.taxCustomProfiles.updateTaxCustomProfile(7, {\n  'custom_profile': {\n    'name': 'Wholesale and trade customers',\n    'description': 'Rates for wholesale and trade accounts',\n  },\n});\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['description']}');"
+    },
+    "delete_tax_custom_profile": {
+      "function": "deleteTaxCustomProfile",
+      "code": "final response = await client.taxCustomProfiles.deleteTaxCustomProfile(7);\nprint(response.statusCode);"
+    }
+  }
+}

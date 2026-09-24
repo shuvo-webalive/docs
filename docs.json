@@ -315,6 +315,18 @@
                 ]
               },
               {
+                "group": "Custom tax profiles",
+                "expanded": false,
+                "pages": [
+                  "custom-tax-profiles",
+                  "api-reference/custom-tax-profiles/list-custom-tax-profiles",
+                  "api-reference/custom-tax-profiles/create-a-custom-tax-profile",
+                  "api-reference/custom-tax-profiles/retrieve-a-custom-tax-profile",
+                  "api-reference/custom-tax-profiles/replace-a-custom-tax-profile",
+                  "api-reference/custom-tax-profiles/delete-a-custom-tax-profile"
+                ]
+              },
+              {
                 "group": "Tax rules",
                 "expanded": false,
                 "pages": [

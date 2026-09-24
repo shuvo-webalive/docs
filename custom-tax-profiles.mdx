@@ -1,0 +1,55 @@
+---
+title: "Custom tax profiles"
+sidebarTitle: "Overview"
+description: "List, create, retrieve, replace and delete custom tax profiles, and read the rate rules each profile holds."
+---
+
+The Custom tax profiles API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax/custom_profiles`, and these profiles are separate from the tax profiles at `/api/v4/admin/tax_profiles`.
+
+<Warning>
+  **After a request is rejected, the store handles your next request on the same client with the rejected value.**
+  This applies to the id in the path, such as a `custom_profile_id`, and to a query parameter such as `limit`, and
+  it lasts for one request. After `GET /admin/tax/custom_profiles/99999999` returns `404`, your next
+  `GET /admin/tax/custom_profiles/1` also returns `404` with the message `Profile not found`, even though that
+  profile exists. After `limit=0` is rejected, your next listing call is rejected with the same message, even with
+  `limit=1`. A request that takes neither value runs normally. So after a rejected call, send one read, such as
+  [List custom tax profiles](/api-reference/custom-tax-profiles/list-custom-tax-profiles) with `limit=1`, and ignore its response before your next write.
+  To confirm a write, read the profile back.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List custom tax profiles](/api-reference/custom-tax-profiles/list-custom-tax-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_profiles` | Returns up to 20 custom tax profiles per call, with the total in `pagination`. |
+| [Create a custom tax profile](/api-reference/custom-tax-profiles/create-a-custom-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/custom_profiles` | Creates a custom tax profile and returns it; other calls take its `id` as `custom_profile_id`. |
+| [Retrieve a custom tax profile](/api-reference/custom-tax-profiles/retrieve-a-custom-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/custom_profiles/{custom_profile_id}` | Returns the custom tax profile whose `id` you pass as `custom_profile_id`, with its rate rules. |
+| [Replace a custom tax profile](/api-reference/custom-tax-profiles/replace-a-custom-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/custom_profiles/{custom_profile_id}` | Replaces a profile's `name` and `description`; a `description` you leave out becomes `null`. |
+| [Delete a custom tax profile](/api-reference/custom-tax-profiles/delete-a-custom-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/custom_profiles/{custom_profile_id}` | Deletes a custom tax profile permanently. Returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every write wraps the profile in `custom_profile`.** Send
+  `{"custom_profile": {"name": "Wholesale customers", "description": "Rates for wholesale accounts"}}` to create
+  or replace a profile. A bare record, or the plural `custom_profiles` key, is rejected with `400` and the message
+  `custom_profile missing`.
+- **An update sets `name` and `description` together, so send both.** A `PUT` without `name` is rejected with `400`
+  and the message `Profile name is required`. A `description` you leave out comes back `null`, so send the current
+  `description` again to keep it. The updates for tax profiles, tax rules and country taxes change only the fields
+  you send; this one does not.
+- **You cannot set `code`.** Create and update accept a `code` and discard it, so a profile you create has `code`
+  set to `null`. Only a profile that already had a `code` in the store shows one.
+- **A listing returns at most 20 profiles per call.** A larger `limit` is capped at `20`, and `pagination.limit` shows
+  `20`. To read every profile, raise `offset` by the number of rows each page returned until you reach
+  `pagination.total`. Only `limit`, `offset` and `page` change the listing; `q` and `field_metadata` are accepted
+  and ignored.
+- **Some requests return `200` without doing anything.** A `HEAD` on one profile returns `200` whether or not a
+  profile has that `custom_profile_id`. Some methods these paths do not handle return `200` with
+  `{"isSuccess": false, "message": "Invalid API Request"}` instead of `405`, and store nothing. Neither path sends
+  an `ETag` or `Last-Modified` header, so read the profile back to confirm a change.

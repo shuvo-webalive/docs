@@ -1,0 +1,9 @@
+---
+title: "Create a custom tax profile"
+description: "Creates a custom tax profile and returns it; other calls take its `id` as `custom_profile_id`."
+openapi: "POST /admin/tax/custom_profiles"
+---
+
+Creates a custom tax profile and returns it with the profile's `id`, which the other calls take as `custom_profile_id`. Wrap the record in `custom_profile`; `name` is required and `description` is optional. Any `code` you send is discarded, so the new profile's `code` is `null`. The response has the nine fields of a listing row, and a new profile holds no rate rules, so its `rate_rules_count` is `0`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
