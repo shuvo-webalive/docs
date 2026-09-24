@@ -3,8 +3,9 @@ title: "Introduction"
 description: "The WebCommander v4 REST API and the seven SDKs that wrap it."
 ---
 
-WebCommander exposes a store's admin data through the **v4 REST API**. Seven SDKs wrap it with the
-same calls in every language, so a call you learn in one reads the same in the others. These docs
+The WebCommander **v4 REST API** lets you read and change a store's admin data from your own code.
+Seven SDKs, one per language, call it for you with the same set of methods, so what you learn in
+one SDK applies to the others. These docs
 cover only the endpoints that **all seven SDKs implement**: if a call is documented here, you can
 make it from any of them.
 
@@ -65,8 +66,8 @@ All seven SDKs are at version 3.5.0.
 </CardGroup>
 
 <Note>
-  Every area above is available in all seven SDKs. Customers has full reference pages; the other
-  areas' pages are being added. Domain aliases are covered by the SDKs as well.
+  All seven SDKs support every area above, plus domain aliases. Only Customers has reference pages
+  so far; pages for the other areas are being added.
 </Note>
 
 ## What every SDK does for you
@@ -76,13 +77,16 @@ All seven SDKs are at version 3.5.0.
     Exchanges your credentials for an access token, caches it and renews it before it expires.
   </Card>
   <Card title="One client for everything" icon="cubes">
-    Each area is a property on the client, and each endpoint is a method on it.
+    Each area, such as customers, has one method per endpoint, for example
+    `client.admin_customers.get_customers()` in Python.
   </Card>
   <Card title="Responses as sent" icon="brackets-curly">
-    The body exactly as the API returned it, with an optional typed view over the top.
+    Each method gives you the response body exactly as the API sent it. When the response holds
+    customers or other records, you can also read it as a typed object.
   </Card>
   <Card title="Failures you cannot miss" icon="triangle-exclamation">
-    A non-2xx status is a failure, and so is a `200` whose body says `"isSuccess": false`.
+    The SDK reports any non-2xx status as a failure. It also reports a `200` whose body contains
+    `"isSuccess": false`, which the API returns for a URL it cannot route.
   </Card>
 </CardGroup>
 

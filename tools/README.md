@@ -12,6 +12,7 @@ python build_reference.py
 | File | What it holds |
 | --- | --- |
 | `customers.py` | The Customers endpoints: paths, parameters, bodies, responses and notes, as measured against a live store and recorded in the SDKs' `ENDPOINTS.md`. |
+| `customers_copy.json` | The reader-facing wording for each endpoint (subtitle, description, parameter and response text), written in plain language from the facts in `customers.py` and reviewed for accuracy. `customers.py` applies it on load. |
 | `snippets/<sdk>.json` | One file per SDK: the client setup and one sample per endpoint. Every sample was compiled or type-checked against that SDK's `development` branch. |
 | `build_reference.py` | Writes the spec, one page per endpoint, the module overview and the client setup snippet. |
 

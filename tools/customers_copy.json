@@ -1,0 +1,195 @@
+{
+  "add_addresses": {
+    "summary": "Adds primary, shipping or billing addresses to a customer and returns the updated customer.",
+    "description": "Adds one or more addresses to a customer. Send them as a list in `customer.addresses`, and give each one a `type` of `primary`, `shipping` or `billing`. [Create a customer](/api-reference/customers/create-a-customer) discards any address fields you send it, so use this call to add addresses. Any other `type` is rejected with `400 invalid_enum`. A `state` that is not in the address's `country` is rejected with `400 state_country_mismatch`, and the error names the field `addresses[0].state_id`, not `state`. On success you get `201` and the customer, including its updated `addresses` list.",
+    "parameters": {
+      "customer_id": "The customer's `customer_id`, as returned when you list or create customers. Do not use `internal_id`: it is a different number and can match a different customer."
+    },
+    "responses": {
+      "201": "The addresses were added. The body is `{\"customer\": {...}}`, with the updated `addresses` list.",
+      "400": "An address was rejected: its `type` is not `primary`, `shipping` or `billing` (`invalid_enum`), or its `state` is not in its `country` (`state_country_mismatch`)."
+    }
+  },
+  "reset_password": {
+    "summary": "Sets a new password for a customer without needing their current one.",
+    "description": "Sets a new password for a customer. You do not need their current password. Send the new password in `customer.password`. A successful reset returns `201`. A reset does not give a login to a customer whose `status` is `awaiting_verification`, because that status has no usable login. [Change a password](/api-reference/customers/change-a-password) still returns `401` for them straight after the reset. To create a customer who can sign in, send `status: \"active\"` with a `password` to [Create a customer](/api-reference/customers/create-a-customer).",
+    "parameters": {
+      "customer_id": "The customer's `customer_id`, as returned when you list or create customers. Do not use `internal_id`: it is a different number and can match a different customer."
+    },
+    "responses": {
+      "201": "The password was set. The body is `{\"status\": \"success\", \"message\": \"Password has been changed successfully\"}`."
+    }
+  },
+  "change_password": {
+    "summary": "Changes a customer's password after checking their current password.",
+    "description": "Checks the customer's current password and, if it matches, replaces it with a new one. Inside `customer`, send the customer's `email`, their current password as `old_password` and the new password as `password`. A successful change returns `200`. A wrong `old_password` returns `401`. You also get `401` for any customer whose `status` is `awaiting_verification`, even straight after a [password reset](/api-reference/customers/reset-a-password), because that status has no usable login. To create a customer who can sign in, send `status: \"active\"` with a `password` to [Create a customer](/api-reference/customers/create-a-customer).",
+    "parameters": {
+      "customer_id": "The customer's `customer_id`, as returned when you list or create customers. Do not use `internal_id`: it is a different number and can match a different customer."
+    },
+    "responses": {
+      "200": "The password was changed. The body is `{\"status\": \"success\", \"message\": \"Password has been changed successfully\"}`.",
+      "401": "The `old_password` is wrong, or the customer's `status` is `awaiting_verification`, which has no usable login."
+    }
+  },
+  "bulk_reset_passwords": {
+    "summary": "Queues a password reset email for each customer id you send in `customer_ids`.",
+    "description": "Queues a password reset email for each customer in `customer_ids`. Send `customer_id` values, not `internal_id`. The call is asynchronous: a `202` means the emails are queued, not that they have been sent. An id that matches no customer does not fail the call. It is returned in `skipped` as `{\"customer_id\": …, \"reason\": \"not_found\"}`. A call that queues nothing still returns `202`, so compare `queued` and `skipped` with the ids you sent. An empty `customer_ids` list, or an id that is not an integer, is rejected with `400 validation_failed`.",
+    "parameters": {},
+    "responses": {
+      "202": "The emails are queued, not yet sent. `queued` lists the ids that were queued. `skipped` lists each id that was not, with a `reason`. `requested` is the number of ids you sent and `total_queued` is the number queued."
+    }
+  },
+  "import_customers": {
+    "summary": "Creates or updates customers from an uploaded CSV, XLS or XLSX file.",
+    "description": "Upload the file in a multipart field named `file` (lowercase), with a filename ending in `.csv`, `.xls` or `.xlsx`, because the extension decides how the file is read. A filename without one of these extensions is rejected with `400 unsupported_file_type`. A row with a `customer_id` updates that customer and a row without one creates a customer; the `City/Suburb` and `State/Province` columns are not saved. Do not import an unedited file from [Export customers](/api-reference/customers/export-customers): the export contains every customer, so importing it updates every customer in the store.",
+    "parameters": {},
+    "responses": {
+      "201": "Returns the row counts `total`, `created`, `updated` and `failed`, and an `errors` array whose entries are `{row, email, message}`. A `201` does not mean every row was saved, so check `failed` and `errors`."
+    }
+  },
+  "list_store_credit_adjustments": {
+    "summary": "Returns a customer's store credit adjustments, newest first, up to 20 at a time.",
+    "description": "To get the next page, send the response's `pagination.next_page` as `page`; it is `null` when there are no more pages. Only `limit`, `offset` and `page` change the result: `sort`, an `action` filter and unknown parameters are ignored, not rejected. Entries do not include `balance_before` or `balance_after`, so save them from the [Adjust store credit](/api-reference/customers/adjust-store-credit) response each time you make an adjustment. You cannot rebuild a customer's balance from this list, because setting `store_credit` with [Update a customer](/api-reference/customers/update-a-customer) changes the balance without adding an entry.",
+    "parameters": {
+      "customer_id": "The customer's `customer_id` from [List customers](/api-reference/customers/list-customers). Do not send `internal_id`, because the same number can be another customer's `customer_id`.",
+      "limit": "Number of adjustments per page, up to `20`. A larger value is not rejected: you get at most `20`, and `pagination.limit` shows `20`.",
+      "offset": "Number of adjustments to skip. If you send both `offset` and `page`, `offset` is used and `page` is ignored.",
+      "page": "Page number, starting at `1`. Each page holds `limit` adjustments, at most `20`."
+    },
+    "responses": {
+      "200": "Returns `store_credit_adjustments`, newest first, and `pagination`. Each adjustment has `id`, `customer_id`, `internal_id`, `action`, `amount`, `note`, `created_at` and `created_by`. `pagination` has `total`, `limit`, `offset`, `count`, `current_page`, `total_pages`, `has_next`, `has_previous`, `previous_page` and `next_page`."
+    }
+  },
+  "adjust_store_credit": {
+    "summary": "Adds to or deducts from a customer's store credit and returns the new balance.",
+    "description": "Adds credit to a customer or deducts it, and records the change in their store credit history. Send `action`, `amount` and an optional `note` at the top level of the JSON body, not inside a `customer` object. `action` is `add` or `deduct` and sets the direction, so `amount` is always a positive number. Save `balance_before` and `balance_after` from the response if you need them, because [List store credit adjustments](/api-reference/customers/list-store-credit-adjustments) does not return them.",
+    "parameters": {
+      "customer_id": "The customer's `customer_id` from [List customers](/api-reference/customers/list-customers). Do not send `internal_id`: the same number can be another customer's `customer_id`, and that customer would get the adjustment."
+    },
+    "responses": {
+      "201": "Returns the saved `store_credit_adjustment` and the customer's new balance as `store_credit`, which equals `balance_after`. The adjustment has `id`, `customer_id`, `internal_id`, `action`, `amount`, `note`, `created_at`, `created_by`, `balance_before` and `balance_after`. If you did not send `note`, it is `null`."
+    }
+  },
+  "export_customers": {
+    "summary": "Returns every customer except deleted ones as an XLSX spreadsheet; parameters choose the columns.",
+    "description": "Returns an XLSX spreadsheet of your customers. The file always contains every customer except deleted ones, whatever parameters you send. The parameters choose which columns appear, not which customers. To keep a column, leave its parameter out or send `1`, `true`, `on` or `yes`. Any other value removes the column. For example, `status=active` removes the status column and still exports every customer. With no parameters, the file has 21 columns. `Customer Id`, `Gender` and `Email` are always included. The API ignores unknown parameters instead of rejecting them. To get only the customers that match a filter, use [List customers](/api-reference/customers/list-customers). Do not upload an export file to [Import customers](/api-reference/customers/import-customers) unchanged. Every row has a `Customer Id`, so the import updates every customer in the file, which is every customer in your store. Build import files that contain only the customers you want to create or change.",
+    "parameters": {
+      "firstName": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the first name column. Any other value removes it.",
+      "lastName": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the last name column. Any other value removes it.",
+      "customerType": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the customer type column. Any other value removes it.",
+      "addressLine1": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the address line 1 column. Any other value removes it.",
+      "addressLine2": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the address line 2 column. Any other value removes it.",
+      "city": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the city column. Any other value removes it.",
+      "country": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the country column. Any other value removes it.",
+      "state": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the state column. Any other value removes it.",
+      "postCode": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the post code column. Any other value removes it.",
+      "phone": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the phone column. Any other value removes it.",
+      "mobile": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the mobile column. Any other value removes it.",
+      "fax": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the fax column. Any other value removes it.",
+      "status": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the status column. Any other value removes it. This parameter does not filter customers: `status=active` removes the column and still exports every customer.",
+      "abn": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the ABN column. Any other value removes it.",
+      "storeCredit": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the store credit column. Any other value removes it.",
+      "groups": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the groups column. Any other value removes it.",
+      "parentGroup": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the parent group column. Any other value removes it.",
+      "companyName": "Leave out, or send `1`, `true`, `on` or `yes`, to keep the company name column. Any other value removes it."
+    },
+    "responses": {
+      "200": "The spreadsheet as a binary XLSX file with content type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`. The body is not JSON; save it to a file as binary data."
+    }
+  },
+  "create_customer": {
+    "summary": "Creates a customer and returns it, including the `customer_id` you use in later calls.",
+    "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id`, not its `internal_id`, in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` share one `id`, so they are one saved address.",
+    "parameters": {},
+    "responses": {
+      "201": "The customer was created. Returns the new customer in `customer`, including its `customer_id`.",
+      "400": "The request is invalid. For example, a missing `first_name` returns the message `Customer name is required`.",
+      "409": "Another customer already uses this email address. This includes deleted customers. The message is `Provided email already registered`."
+    }
+  },
+  "update_customer": {
+    "summary": "Changes only the fields you send and returns the updated customer.",
+    "description": "Updates a customer and returns `200` with the updated customer. Inside the `customer` object, send only the fields you want to change. Fields you leave out keep their current values. Sending `custom_properties` replaces the customer's whole list, so include every entry you want to keep. Leave `custom_properties` out to keep the list unchanged. Send each entry as `{label, description}`. The API also accepts `{name, value}`, but the response always uses `label` and `description`. An entry keeps its `id` while its `label` and `description` stay the same; new text gets a new `id`. You can set `store_credit` directly, but the API does not record the change in the customer's store credit history. The balance can then differ from the total of the recorded adjustments. To record a change, use [Adjust store credit](/api-reference/customers/adjust-store-credit).",
+    "parameters": {
+      "customer_id": "The `customer_id` of the customer to update. Do not send its `internal_id`: that number can also be another customer's `customer_id`, so the call can update the wrong customer."
+    },
+    "responses": {
+      "200": "The customer was updated. Returns the updated customer in `customer`.",
+      "404": "No customer has that `customer_id`."
+    }
+  },
+  "delete_customer": {
+    "summary": "Moves a customer to the trash; the API cannot restore it.",
+    "description": "Deletes a customer and returns `204` with no body. The API moves the customer to the trash; it does not erase the record. [Retrieve a customer](/api-reference/customers/retrieve-a-customer) still returns it, with `is_in_trash: true`. Its email address stays registered: [Create a customer](/api-reference/customers/create-a-customer) rejects that address with `409`, and [Check an email address](/api-reference/customers/check-an-email-address) returns `exists: true` for it. [Export customers](/api-reference/customers/export-customers) leaves deleted customers out. You cannot restore a deleted customer through the API; use the WebCommander admin interface. Deleting the same customer again returns `404` with the message `Customer already in trash`.",
+    "parameters": {
+      "customer_id": "The `customer_id` of the customer to delete. Do not send its `internal_id`: that number can also be another customer's `customer_id`, so the call can delete the wrong customer."
+    },
+    "responses": {
+      "204": "The customer is now in the trash. The response has no body.",
+      "404": "No customer has that `customer_id`, or the customer is already in the trash. In the second case, the message is `Customer already in trash`."
+    }
+  },
+  "list_customers": {
+    "summary": "Returns up to 20 customers per call, with the total count and the next page's URL.",
+    "description": "Returns up to 20 customers per call in `customers`. `pagination` gives you `total`, the number of customers across all pages; `has_next`, which is `true` when there is another page; and `next_page`, the URL of that page. Parameter names are case-sensitive. An unknown or wrongly cased name, such as `firstName`, `max` or `postcode`, is rejected with `400 unknown_parameter`, and `errors[0]` in the response names the parameter. `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo` are accepted but ignored: they do not narrow the results. Listed customers do not include `custom_properties`; to get them, use [Retrieve a customer](/api-reference/customers/retrieve-a-customer).",
+    "parameters": {
+      "limit": "Number of customers per page, up to `20`. A larger value is treated as `20`; `pagination.limit` shows the value used.",
+      "offset": "Number of customers to skip. If you send both `offset` and `page`, `offset` is used.",
+      "page": "Page number, starting at `1`. Each page holds `limit` customers.",
+      "search": "Free-text search. You can also send it as `searchText`, `query` or `keyword`.",
+      "email": "Filters customers by email address.",
+      "companyName": "Filters customers by company name.",
+      "phone": "Filters customers by phone number.",
+      "mobile": "Filters customers by mobile number.",
+      "country": "Filters customers by country.",
+      "state": "Filters customers by state.",
+      "city": "Filters customers by city.",
+      "postCode": "Filters customers by post code. The name is case-sensitive: `postcode` is rejected with `400 unknown_parameter`.",
+      "customerGroup": "Filters customers by customer group.",
+      "status": "Returns only customers with this status: `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. Letter case does not matter. Any other value is rejected with `400`, and the error message lists the allowed values.",
+      "sort": "Field to sort the results by. An unknown field is rejected with `400 invalid_sort_field`."
+    },
+    "responses": {
+      "200": "`customers` holds up to `limit` customers, and `pagination` holds `total`, `has_next` and `next_page`.",
+      "400": "Rejected because a parameter name is unknown or wrongly cased (`unknown_parameter`), the `sort` field is unknown (`invalid_sort_field`), or `status` is not one of the five allowed values."
+    }
+  },
+  "get_customer": {
+    "summary": "Returns one customer, with its addresses and custom properties, by `customer_id`.",
+    "description": "Returns the customer in `customer`, including its `addresses` and `custom_properties`. Send the `customer_id` you got from List customers, Check an email address or Create a customer, not the `internal_id`. If you send an `internal_id`, you get `404`, or `200` with a different customer when that number is also another customer's `customer_id`. Check that the `customer_id` in the response matches the one you sent. Deleted customers stay in the trash: this call still returns them, with `is_in_trash` set to `true`.",
+    "parameters": {
+      "customer_id": "The customer's `customer_id`, as returned by List customers, Check an email address or Create a customer. Not the `internal_id`."
+    },
+    "responses": {
+      "200": "`customer` holds the customer with that `customer_id`.",
+      "404": "No customer has that `customer_id`."
+    }
+  },
+  "count_customers": {
+    "summary": "Returns the number of customers, or the number that match the filters you send.",
+    "description": "Returns one field, `total`: the number of customers that match the filters you send, or all customers when you send none. These parameters narrow the count: `search` (also `searchText`), `email`, `status`, `companyName`, `phone`, `city`, `state` and `customerGroup`. These are accepted but ignored, so they do not change the count: `country`, `limit`, `offset`, `page`, `sort`, `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo`. An unknown parameter name, such as `max`, is rejected with `400 unknown_parameter`.",
+    "parameters": {
+      "search": "Counts only customers that match this free text. `searchText` works the same way.",
+      "email": "Narrows the count by email address.",
+      "companyName": "Narrows the count by company name.",
+      "phone": "Narrows the count by phone number.",
+      "state": "Narrows the count by state.",
+      "city": "Narrows the count by city.",
+      "customerGroup": "Narrows the count by customer group.",
+      "status": "Counts only customers with this status: `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. Letter case does not matter. Any other value is rejected with `400`, and the error message lists the allowed values."
+    },
+    "responses": {
+      "200": "`total` holds the number of matching customers."
+    }
+  },
+  "check_email": {
+    "summary": "Checks whether an email address already belongs to a customer, and returns that customer's ids.",
+    "description": "Returns `exists`: `true` if a customer already has this email address, `false` if not. When the address is taken, the response also includes that customer's `customer_id` and `internal_id`. When it is free, `exists` is the only field, so read `exists` before you look for an id. Use the `customer_id` with the other customer endpoints. Deleted customers still count: a deleted customer's address returns `exists: true`, and creating a new customer with that address is rejected with `409`.",
+    "parameters": {
+      "email": "The email address to check. Required."
+    },
+    "responses": {
+      "200": "`exists` is `true`, with the customer's `customer_id` and `internal_id`, when the address is taken, or `false` on its own when it is free."
+    }
+  }
+}

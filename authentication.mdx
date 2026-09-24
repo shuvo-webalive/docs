@@ -5,7 +5,7 @@ description: "Give the client your store's credentials once; it gets, caches and
 
 import ClientSetup from '/snippets/client-setup.mdx';
 
-Every call to the API carries an access token. The SDKs get that token for you from your store's
+Every call to the API must include an access token. The SDKs get that token for you from your store's
 credentials, cache it and renew it before it expires. With cURL, or any HTTP client, you request the
 token yourself and send it with each call.
 
@@ -32,25 +32,27 @@ them from environment variables named `WC_BASE_URL`, `WC_CLIENT_ID`, `WC_CLIENT_
 
 <ClientSetup />
 
-Each setup also turns on raising or throwing on failure, so a failed call cannot pass unnoticed. A
-`200` whose body says `"isSuccess": false` counts as a failure too: the API answers that way for a
-path it cannot route.
+Each setup also turns on the raise-on-error option (`raise_on_error=True` in Python), so a failed
+call raises an exception or throws an error instead of going unnoticed. A `200` whose body contains
+`"isSuccess": false` also counts as a failure: the API returns that for a URL it cannot route, such
+as `/api/v4/admin/customerz`.
 
 ## What the SDKs handle
 
 <CardGroup cols={2}>
   <Card title="Getting the token" icon="key">
-    The first call exchanges your credentials for an access token.
+    On the first call, the SDK exchanges your credentials for an access token.
   </Card>
   <Card title="Caching and renewal" icon="rotate">
-    The token is cached and renewed before it expires, using the refresh token first.
+    The SDK caches the token and renews it before it expires, trying the refresh token first.
   </Card>
   <Card title="An expired token" icon="clock-rotate-left">
-    A `401` for a stale token is refreshed once and the call is sent again.
+    If a call returns `401` because the token has expired, the SDK refreshes the token once and sends
+    the call again.
   </Card>
   <Card title="A real refusal" icon="ban">
-    Any other `401`, such as a wrong password on change-password, is returned as it is and not
-    retried, so a write is never sent twice.
+    Any other `401`, such as a wrong `old_password` when you change a password, is returned to you
+    and not retried, so a write is never sent twice.
   </Card>
 </CardGroup>
 
@@ -58,7 +60,7 @@ path it cannot route.
 
 Request a token from `POST /api/v4/oauth2/token` with a JSON body of `grant_type`
 (`client_credentials`), `client_id`, `client_secret`, `redirect_uri` and `auth_string`. The cURL tab
-under [Set up a client](#set-up-a-client) shows the full request. It answers `201 Created`:
+under [Set up a client](#set-up-a-client) shows the full request. A successful request returns `201 Created` with these fields:
 
 | Field | Meaning |
 | --- | --- |
@@ -66,7 +68,7 @@ under [Set up a client](#set-up-a-client) shows the full request. It answers `20
 | `expires_in` | Seconds until the token expires. |
 | `refresh_token` | Exchanged for a new access token when this one expires. |
 
-Send the token on every call:
+Send the access token in the `Authorization` header on every call:
 
 ```bash
 curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \

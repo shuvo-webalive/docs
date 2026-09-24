@@ -8,7 +8,7 @@ and you install it by cloning that repository and pointing your project at the c
 
 <Note>
   You need read access to the SDK repositories on Bitbucket. Clone the `development` branch: it is
-  the main branch, and the repository's default branch does not carry the SDK.
+  the main branch, and the repository's default branch does not contain the SDK.
 </Note>
 
 Keep the clone next to your project, because the paths below are relative:
@@ -24,7 +24,7 @@ projects/
 <Tabs>
   <Tab title="Python">
     Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.8.4 or newer and `git`.
-    uv provides Python 3.10 to 3.13 itself.
+    You do not need to install Python first: uv provides Python 3.10 to 3.13.
 
     <Steps>
       <Step title="Clone and sync">
@@ -239,8 +239,8 @@ projects/
 
 ## Updating
 
-Run `git pull` in the clone. Python, JavaScript, PHP, Dart and Go read the clone directly, so the
-change is live in your project at once. Java and .NET use a built copy, so rebuild after pulling:
+Run `git pull` in the clone. Python, JavaScript, PHP, Dart and Go read the clone directly, so your
+project uses the new code straight away. Java and .NET use a built copy, so rebuild after pulling:
 
 - **Java:** run `mvn install -DskipTests` in the clone again.
 - **.NET:** run `dotnet pack` in the clone again. NuGet caches a package by its version number, so

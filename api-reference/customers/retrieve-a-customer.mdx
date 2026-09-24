@@ -1,9 +1,21 @@
 ---
 title: "Retrieve a customer"
-description: "One customer by `customer_id`."
+description: "Returns one customer, with its addresses and custom properties, by `customer_id`."
 openapi: "GET /admin/customers/{customer_id}"
 ---
 
-Returns one customer. Use the `customer_id` from a listing. `internal_id` is a second id space over the same records: sending it can return a different customer with a `200` rather than a `404`, so check the record you get back is the one you asked for.
+Returns the customer in `customer`, including its `addresses` and `custom_properties`. Send the `customer_id` you got from List customers, Check an email address or Create a customer, not the `internal_id`. If you send an `internal_id`, you get `404`, or `200` with a different customer when that number is also another customer's `customer_id`. Check that the `customer_id` in the response matches the one you sent. Deleted customers stay in the trash: this call still returns them, with `is_in_trash` set to `true`.
 
-<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.admin_customers.get_customer()` |
+| JavaScript | `client.adminCustomers.getCustomer()` |
+| PHP | `AdminCustomers::getCustomer()` |
+| Java | `client.adminCustomers().getCustomer()` |
+| .NET | `client.AdminCustomers.GetCustomerAsync()` |
+| Dart | `client.adminCustomers.getCustomer()` |
+| Go | `client.AdminCustomers().GetCustomer()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>

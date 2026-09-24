@@ -117,7 +117,18 @@ def spec(snippets):
     }
 
 
-def page(endpoint):
+def sdk_call(snippet):
+    found = re.search(
+        r"([A-Za-z_$][\w$]*(?:\(\))?(?:\s*(?:\.|::|->)\s*[A-Za-z_$][\w$]*(?:\(\))?)*)\s*(\.|::|->)\s*"
+        + re.escape(snippet["function"]) + r"\s*\(", snippet["code"])
+    if not found:
+        raise SystemExit("cannot find the %s call in its sample" % snippet["function"])
+    return re.sub(r"\s+", "", found.group(1)) + found.group(2) + snippet["function"] + "()"
+
+
+def page(endpoint, snippets):
+    rows = ["| %s | `%s` |" % (label, sdk_call(snippets[sdk]["endpoints"][endpoint["key"]]))
+            for sdk, _, label in SDKS]
     return "\n".join([
         "---",
         "title: \"%s\"" % endpoint["title"],
@@ -127,7 +138,13 @@ def page(endpoint):
         "",
         endpoint["description"],
         "",
-        "<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>",
+        "## SDK method",
+        "",
+        "| SDK | Call |",
+        "| --- | --- |",
+    ] + rows + [
+        "",
+        "<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>",
         "",
     ])
 
@@ -171,12 +188,13 @@ def overview():
         "description: \"Read, create, update and remove customers, and manage their addresses, passwords and store credit.\"",
         "---",
         "",
-        "Fifteen endpoints, available in all seven SDKs. Every path is under `/api/v4/admin/customers`.",
+        "The Customers API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/customers`.",
         "",
         "<Warning>",
-        "  Paths take the customer's `customer_id`. A customer also carries an `internal_id`, which is a",
-        "  second id space over the same records: sending it by mistake can return a **different customer",
-        "  with a `200`** rather than a `404`. Check the record you get back is the one you asked for.",
+        "  Paths take the customer's `customer_id`. Each customer also has an `internal_id`, a separate",
+        "  number that no path takes. If you send an `internal_id` by mistake and it matches another",
+        "  customer's `customer_id`, you get **that other customer with a `200`** instead of a `404`.",
+        "  Check that the customer you get back is the one you asked for.",
         "</Warning>",
         "",
         "## At a glance",
@@ -188,18 +206,24 @@ def overview():
         "## Before you call",
         "",
         "Set up a client once with your store's credentials, as shown in [Authentication](/authentication).",
-        "Every sample on these pages starts from that client. With cURL, send the access token as",
-        "`Authorization: Bearer $ACCESS_TOKEN`.",
+        "The SDK samples on these pages use that client. With cURL, send the access token in an",
+        "`Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.",
         "",
         "## Things to know",
         "",
-        "- **Listings are capped at 20 rows a page.** A larger `limit` is accepted and the cap is echoed back",
-        "  in `pagination.limit`. Page with `page` or `offset`.",
-        "- **A new customer cannot sign in until it is active.** Without `status: \"active\"` a customer is",
-        "  created `awaiting_verification`, and change-password answers `401` for it.",
-        "- **The export is every customer.** Its parameters switch columns on and off; they do not filter rows.",
-        "- **Errors share one shape:** `status`, `code` and `message`, plus `error` and a per-field `errors`",
-        "  list when the API gives them.",
+        "- **A listing returns at most 20 records per call.** A larger `limit` is not rejected, but you",
+        "  still get at most 20, and `pagination.limit` shows `20`. To get more, send the next `page`",
+        "  number or a higher `offset` for as long as `pagination.has_next` is `true`.",
+        "- **A new customer cannot sign in until it is active.** If you create a customer without",
+        "  `status: \"active\"`, it is created as `awaiting_verification` with no usable login, even if you",
+        "  send a `password`, and changing its password fails with `401`. Send `status: \"active\"` with a",
+        "  `password` to create a customer who can sign in.",
+        "- **An export always contains every customer.** Its parameters choose columns, not customers: a",
+        "  column is removed when its parameter is anything other than `1`, `true`, `on` or `yes`, so",
+        "  `status=active` exports everyone and removes the `Status` column. Importing an export rewrites",
+        "  every customer in the store, so build import files from only the customers you want to change.",
+        "- **Every error response has the same fields:** `status`, `code` and `message`, plus `error` (a",
+        "  machine-readable reason) and `errors` (one entry per rejected field) when the API provides them.",
         "",
     ])
 
@@ -224,7 +248,7 @@ def main():
     (OUT / "customers").mkdir(parents=True, exist_ok=True)
     (OUT / "openapi.json").write_text(document + "\n", encoding="utf-8")
     for endpoint in customers.ENDPOINTS:
-        (OUT / "customers" / (endpoint["slug"] + ".mdx")).write_text(page(endpoint), encoding="utf-8")
+        (OUT / "customers" / (endpoint["slug"] + ".mdx")).write_text(page(endpoint, snippets), encoding="utf-8")
     (DOCS / "customers.mdx").write_text(overview(), encoding="utf-8")
     (DOCS / "snippets").mkdir(exist_ok=True)
     (DOCS / "snippets" / "client-setup.mdx").write_text(client_setup(snippets), encoding="utf-8")

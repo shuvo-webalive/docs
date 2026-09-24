@@ -1,9 +1,21 @@
 ---
 title: "Add addresses"
-description: "Add shipping, billing or primary addresses to a customer."
+description: "Adds primary, shipping or billing addresses to a customer and returns the updated customer."
 openapi: "POST /admin/customers/{customer_id}/addresses"
 ---
 
-Adds one or more addresses. `type` is `primary`, `shipping` or `billing`; any other value is refused with `400 invalid_enum`. A `state` that is not in the `country` is refused with `400 state_country_mismatch`.
+Adds one or more addresses to a customer. Send them as a list in `customer.addresses`, and give each one a `type` of `primary`, `shipping` or `billing`. [Create a customer](/api-reference/customers/create-a-customer) discards any address fields you send it, so use this call to add addresses. Any other `type` is rejected with `400 invalid_enum`. A `state` that is not in the address's `country` is rejected with `400 state_country_mismatch`, and the error names the field `addresses[0].state_id`, not `state`. On success you get `201` and the customer, including its updated `addresses` list.
 
-<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.admin_customers.create_customer_addresses()` |
+| JavaScript | `client.adminCustomers.createCustomerAddresses()` |
+| PHP | `AdminCustomers::createCustomerAddresses()` |
+| Java | `client.adminCustomers().createCustomerAddresses()` |
+| .NET | `client.AdminCustomers.CreateCustomerAddressesAsync()` |
+| Dart | `client.adminCustomers.createCustomerAddresses()` |
+| Go | `client.AdminCustomers().CreateCustomerAddresses()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>

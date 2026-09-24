@@ -1,9 +1,21 @@
 ---
 title: "List store credit adjustments"
-description: "A customer's store credit movements, newest first."
+description: "Returns a customer's store credit adjustments, newest first, up to 20 at a time."
 openapi: "GET /admin/customers/{customer_id}/store-credit/adjustments"
 ---
 
-Returns the customer's store credit adjustments one page at a time, newest first. Only the paging parameters apply: other parameters, including `sort` and a filter on `action`, are accepted and ignored.
+To get the next page, send the response's `pagination.next_page` as `page`; it is `null` when there are no more pages. Only `limit`, `offset` and `page` change the result: `sort`, an `action` filter and unknown parameters are ignored, not rejected. Entries do not include `balance_before` or `balance_after`, so save them from the [Adjust store credit](/api-reference/customers/adjust-store-credit) response each time you make an adjustment. You cannot rebuild a customer's balance from this list, because setting `store_credit` with [Update a customer](/api-reference/customers/update-a-customer) changes the balance without adding an entry.
 
-<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.admin_customers.get_customer_store_credit_adjustments()` |
+| JavaScript | `client.adminCustomers.getCustomerStoreCreditAdjustments()` |
+| PHP | `AdminCustomers::getCustomerStoreCreditAdjustments()` |
+| Java | `client.adminCustomers().getCustomerStoreCreditAdjustments()` |
+| .NET | `client.AdminCustomers.GetCustomerStoreCreditAdjustmentsAsync()` |
+| Dart | `client.adminCustomers.getCustomerStoreCreditAdjustments()` |
+| Go | `client.AdminCustomers().GetCustomerStoreCreditAdjustments()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>

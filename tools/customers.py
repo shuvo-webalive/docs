@@ -63,7 +63,8 @@ SAMPLE_CUSTOMER = {
 
 SAMPLE_PAGINATION = {
     "total": 42, "limit": 20, "offset": 0, "count": 20, "current_page": 1, "total_pages": 3,
-    "has_next": True, "has_previous": False, "previous_page": None, "next_page": "2",
+    "has_next": True, "has_previous": False, "previous_page": None,
+    "next_page": "https://your-store.example.com/api/v4/admin/customers?limit=20&offset=20",
 }
 
 ENDPOINTS = [
@@ -340,7 +341,8 @@ SCHEMAS = {
         "total": {"type": "integer"}, "limit": {"type": "integer"}, "offset": {"type": "integer"},
         "count": {"type": "integer"}, "current_page": {"type": "integer"}, "total_pages": {"type": "integer"},
         "has_next": {"type": "boolean"}, "has_previous": {"type": "boolean"},
-        "previous_page": {"type": "string"}, "next_page": {"type": "string"},
+        "previous_page": {"type": "string", "description": "URL of the previous page, when there is one."},
+        "next_page": {"type": "string", "description": "URL of the next page, when there is one; check `has_next`."},
     }},
     "Message": {"type": "object", "properties": {"message": {"type": "string"}, "status": {"type": "string"}}},
     "Error": {"type": "object", "properties": {
@@ -349,3 +351,22 @@ SCHEMAS = {
         "errors": {"type": "array", "description": "One entry per rejected field, when the API gives them.", "items": {"type": "object", "properties": {"field": {"type": "string"}, "code": {"type": "string"}, "message": {"type": "string"}}}},
     }},
 }
+
+
+def _apply_copy():
+    import copy
+    import json
+    import pathlib
+
+    text = json.loads((pathlib.Path(__file__).with_name("customers_copy.json")).read_text(encoding="utf-8"))
+    for endpoint in ENDPOINTS:
+        words = text[endpoint["key"]]
+        endpoint["summary"] = words["summary"]
+        endpoint["description"] = words["description"]
+        endpoint["parameters"] = [dict(copy.deepcopy(p), description=words["parameters"][p["name"]])
+                                  for p in endpoint.get("parameters", [])]
+        for status, response in endpoint["responses"].items():
+            response["description"] = words["responses"][status]
+
+
+_apply_copy()

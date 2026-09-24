@@ -1,9 +1,21 @@
 ---
 title: "List customers"
-description: "A page of customers, with a `pagination` block for the next page."
+description: "Returns up to 20 customers per call, with the total count and the next page's URL."
 openapi: "GET /admin/customers"
 ---
 
-Returns customers one page at a time. Filters narrow the page; `sort` reorders it and must name a real field, or the call is refused with `400 invalid_sort_field`. Parameter names are case-sensitive and an unknown one is refused with `400 unknown_parameter`. The date-range parameters `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo` are accepted but not applied.
+Returns up to 20 customers per call in `customers`. `pagination` gives you `total`, the number of customers across all pages; `has_next`, which is `true` when there is another page; and `next_page`, the URL of that page. Parameter names are case-sensitive. An unknown or wrongly cased name, such as `firstName`, `max` or `postcode`, is rejected with `400 unknown_parameter`, and `errors[0]` in the response names the parameter. `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo` are accepted but ignored: they do not narrow the results. Listed customers do not include `custom_properties`; to get them, use [Retrieve a customer](/api-reference/customers/retrieve-a-customer).
 
-<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.admin_customers.get_customers()` |
+| JavaScript | `client.adminCustomers.getCustomers()` |
+| PHP | `AdminCustomers::getCustomers()` |
+| Java | `client.adminCustomers().getCustomers()` |
+| .NET | `client.AdminCustomers.GetCustomersAsync()` |
+| Dart | `client.adminCustomers.getCustomers()` |
+| Go | `client.AdminCustomers().GetCustomers()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
