@@ -1,0 +1,9 @@
+---
+title: "Delete a tax code"
+description: "Deletes a tax code permanently and returns `204` with no body."
+openapi: "DELETE /admin/tax_codes/{tax_code_id}"
+---
+
+Deletes the tax code permanently and returns `204` with no body. The tax code leaves the listing, and retrieving it returns `404`. If the request just before the delete was rejected, the delete returns that same rejection and deletes nothing, so retrieve the tax code afterwards to confirm it is gone.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

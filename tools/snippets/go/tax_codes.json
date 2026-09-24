@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "tax_codes",
+  "endpoints": {
+    "list_tax_codes": {
+      "function": "ListTaxCodes",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().ListTaxCodes(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_codes\"].([]any) {\n\ttaxCode := row.(map[string]any)\n\tfmt.Println(taxCode[\"id\"], taxCode[\"name\"], taxCode[\"rate\"])\n}"
+    },
+    "head_tax_codes": {
+      "function": "HeadTaxCodes",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().HeadTaxCodes(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_tax_code": {
+      "function": "CreateTaxCode",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().CreateTaxCode(ctx, map[string]any{\n\t\"tax_code\": map[string]any{\n\t\t\"name\": \"LUXURY\", \"label\": \"Luxury goods\", \"description\": \"Higher rate for luxury goods\",\n\t\t\"rate\": 15.0, \"resolver_type\": \"flat\", \"priority\": 1,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxCode := resp.Map().(map[string]any)[\"tax_code\"].(map[string]any)\nfmt.Println(taxCode[\"id\"], taxCode[\"name\"], taxCode[\"rate\"])"
+    },
+    "get_tax_code": {
+      "function": "GetTaxCode",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().GetTaxCode(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxCode := resp.Map().(map[string]any)[\"tax_code\"].(map[string]any)\nfmt.Println(taxCode[\"name\"], taxCode[\"rate\"], taxCode[\"default\"])"
+    },
+    "head_tax_code": {
+      "function": "HeadTaxCode",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().HeadTaxCode(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_tax_code": {
+      "function": "UpdateTaxCode",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().UpdateTaxCode(ctx, 105, map[string]any{\n\t\"tax_code\": map[string]any{\"label\": \"Luxury items\", \"priority\": 1, \"resolver_type\": \"flat\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxCode := resp.Map().(map[string]any)[\"tax_code\"].(map[string]any)\nfmt.Println(taxCode[\"label\"], taxCode[\"priority\"], taxCode[\"resolver_type\"])"
+    },
+    "delete_tax_code": {
+      "function": "DeleteTaxCode",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCodes().DeleteTaxCode(ctx, 105, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

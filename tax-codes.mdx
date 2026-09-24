@@ -1,0 +1,57 @@
+---
+title: "Tax codes"
+sidebarTitle: "Overview"
+description: "List, create, retrieve, update and delete your store's tax codes."
+---
+
+The Tax codes API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_codes`.
+
+<Warning>
+  **An update sets `priority` to `0` and `resolver_type` to `flat` when you leave them out.**
+  `name`, `label`, `description` and `rate` keep their stored values when you leave them out,
+  but these two do not. Send the tax code's current `priority` and `resolver_type` in every
+  [update](/api-reference/tax-codes/update-a-tax-code), even when you only change its name.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List tax codes](/api-reference/tax-codes/list-tax-codes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_codes` | Returns up to 20 tax codes per call, and how many the store has in `pagination.total`. |
+| [Check the tax codes list](/api-reference/tax-codes/check-the-tax-codes-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_codes` | Checks that the tax codes list is reachable. Returns headers only, with no body. |
+| [Create a tax code](/api-reference/tax-codes/create-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_codes` | Creates a tax code and returns it with its `id`, which other calls take as `tax_code_id`. |
+| [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_codes/{tax_code_id}` | Returns the tax code whose `id` you pass as `tax_code_id`. |
+| [Check a tax code](/api-reference/tax-codes/check-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_codes/{tax_code_id}` | Returns headers only, with `200` even when no tax code has the `tax_code_id` you send. |
+| [Update a tax code](/api-reference/tax-codes/update-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/tax_codes/{tax_code_id}` | Changes a tax code and returns it. Send `priority` and `resolver_type` every time. |
+| [Delete a tax code](/api-reference/tax-codes/delete-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tax_codes/{tax_code_id}` | Deletes a tax code permanently and returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every write wraps the tax code in `tax_code`.** Send `{"tax_code": {"name": "LUXURY", "rate": 15.0}}`
+  to create a tax code. A bare record, or the plural `tax_codes` key, is rejected with `400` and
+  the message `tax_code missing`. `name` is the only field a create requires: a create without
+  it is rejected with `500`, not `400`.
+- **`default` is read-only, and more than one tax code can have it.** `default: true` marks a tax
+  code the store built. A create or an update that sends `default: true` stores `false`.
+- **A listing returns at most 20 tax codes per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get every tax code, raise `offset` by the number of tax codes
+  each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted
+  and ignored: `q` does not filter the listing, and `field_metadata` returns no field descriptions.
+- **A rejected request can make the next request on the same connection fail too.** Straight after
+  a `404`, the next retrieve returns `404`, even for a tax code that exists. A retrieve from another
+  tax collection returns `404` with that collection's own message, such as `Profile not found`.
+  Straight after a `400` `invalid_pagination`, the next listing returns the same `400`, even on
+  another tax collection. The request after that works normally. A delete sent straight after a
+  `404` returns that `404` and deletes nothing, so retrieve the tax code afterwards to confirm it is
+  gone.
+- **A `200` does not prove that a call did anything.** `PATCH` on a tax code, `POST` to a tax
+  code's path and `OPTIONS` on the list return `200` with
+  `{"isSuccess": false, "message": "Invalid API Request"}` and change nothing. A `HEAD` returns
+  `200` even when no tax code has the `tax_code_id` you send. Use `PUT` to update a tax code, and
+  [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code) to check that one exists.
