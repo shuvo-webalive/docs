@@ -1,0 +1,9 @@
+---
+title: "Create a shipping class"
+description: "Creates a shipping class and returns it with its `id`, which other calls take as `shipping_class_id`."
+openapi: "POST /admin/shipping_classes"
+---
+
+Creates a shipping class and returns it with the `id` the store assigned. Pass that `id` as `shipping_class_id` to retrieve, update, delete or make the class the default. Wrap the fields in `shipping_class`; the store reads only `name` and `description`, and saves `null` for a `description` you leave out. A new class has `is_default` set to `false`, and any `id` or `is_default` you send inside `shipping_class` is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

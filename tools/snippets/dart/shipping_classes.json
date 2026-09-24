@@ -1,0 +1,42 @@
+{
+  "sdk": "dart",
+  "module": "shipping_classes",
+  "endpoints": {
+    "list_shipping_classes": {
+      "function": "listShippingClasses",
+      "code": "final response = await client.shippingClasses\n    .listShippingClasses(queryParams: {'limit': 20});\nfinal shippingClasses = (response.map as Map)['shipping_classes'] as List;\nfor (final shippingClass in shippingClasses) {\n  print('${(shippingClass as Map)['id']} ${shippingClass['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
+    },
+    "head_shipping_classes": {
+      "function": "headShippingClasses",
+      "code": "final response = await client.shippingClasses.headShippingClasses();\nprint(response.statusCode);"
+    },
+    "count_shipping_classes": {
+      "function": "countShippingClasses",
+      "code": "final response = await client.shippingClasses.countShippingClasses();\nfinal shippingClasses = (response.map as Map)['shipping_classes'] as Map;\nprint(shippingClasses['count']);"
+    },
+    "create_shipping_class": {
+      "function": "createShippingClass",
+      "code": "final response = await client.shippingClasses.createShippingClass({\n  'shipping_class': {\n    'name': 'Bulky Goods',\n    'description': 'Items over 20kg',\n  },\n});\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint(shippingClass['id']);"
+    },
+    "get_shipping_class": {
+      "function": "getShippingClass",
+      "code": "final response = await client.shippingClasses.getShippingClass(2);\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['is_default']}');"
+    },
+    "head_shipping_class": {
+      "function": "headShippingClass",
+      "code": "final response = await client.shippingClasses.headShippingClass(2);\nprint(response.statusCode);"
+    },
+    "update_shipping_class": {
+      "function": "updateShippingClass",
+      "code": "final response = await client.shippingClasses.updateShippingClass(3, {\n  'shipping_class': {\n    'name': 'Bulky Goods',\n    'description': 'Items over 25kg',\n  },\n});\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['description']}');"
+    },
+    "delete_shipping_class": {
+      "function": "deleteShippingClass",
+      "code": "final response = await client.shippingClasses.deleteShippingClass(3);\nprint(response.statusCode);"
+    },
+    "set_shipping_class_default": {
+      "function": "setShippingClassDefault",
+      "code": "final response = await client.shippingClasses.setShippingClassDefault(2);\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['is_default']}');"
+    }
+  }
+}

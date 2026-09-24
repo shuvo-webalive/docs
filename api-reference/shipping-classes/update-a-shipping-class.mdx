@@ -1,0 +1,9 @@
+---
+title: "Update a shipping class"
+description: "Replaces a shipping class's `name` and `description` and returns the updated class."
+openapi: "PUT /admin/shipping_classes/{shipping_class_id}"
+---
+
+Replaces the `name` and `description` of the class whose `shipping_class_id` you pass, and returns the class. Wrap the change in `shipping_class`; `name` is required and follows the same rules as on create. A `description` you leave out is saved as `null`, so send it again to keep it. Any `id` or `is_default` you send inside `shipping_class` is ignored: to change the default, use [Set the default shipping class](/api-reference/shipping-classes/set-the-default-shipping-class).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

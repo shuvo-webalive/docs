@@ -1,0 +1,56 @@
+---
+title: "Shipping classes"
+sidebarTitle: "Overview"
+description: "List, count, create, update and delete shipping classes, and choose which one is the default."
+---
+
+The Shipping classes API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_classes`.
+
+<Warning>
+  **Updating a shipping class replaces both its `name` and its `description`.** If your `PUT` sends
+  only `name`, the store sets the class's `description` to `null`. To keep the description, send it
+  again in the same call: `{"shipping_class": {"name": "Bulky Goods", "description": "Items over 20kg"}}`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping classes](/api-reference/shipping-classes/list-shipping-classes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_classes` | Returns up to 20 shipping classes per call, with classes you create listed first. |
+| [Check the shipping classes list](/api-reference/shipping-classes/check-the-shipping-classes-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_classes` | Checks that the shipping classes list is reachable. Returns headers only, with no body. |
+| [Count shipping classes](/api-reference/shipping-classes/count-shipping-classes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_classes/count` | Returns the number of shipping classes in the store. |
+| [Create a shipping class](/api-reference/shipping-classes/create-a-shipping-class) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_classes` | Creates a shipping class and returns it with its `id`, which other calls take as `shipping_class_id`. |
+| [Retrieve a shipping class](/api-reference/shipping-classes/retrieve-a-shipping-class) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_classes/{shipping_class_id}` | Returns the shipping class whose `id` you pass as `shipping_class_id`. |
+| [Check a shipping class](/api-reference/shipping-classes/check-a-shipping-class) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_classes/{shipping_class_id}` | Returns `200` and headers only, even when no class has the `shipping_class_id` you pass. |
+| [Update a shipping class](/api-reference/shipping-classes/update-a-shipping-class) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_classes/{shipping_class_id}` | Replaces a shipping class's `name` and `description` and returns the updated class. |
+| [Delete a shipping class](/api-reference/shipping-classes/delete-a-shipping-class) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_classes/{shipping_class_id}` | Deletes a shipping class permanently. You cannot delete the default class. |
+| [Set the default shipping class](/api-reference/shipping-classes/set-the-default-shipping-class) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_classes/{shipping_class_id}/default` | Makes a shipping class the default and sets `is_default` to `false` on the previous default. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create and update wrap the class in `shipping_class`.** Send
+  `{"shipping_class": {"name": "Bulky Goods", "description": "Items over 20kg"}}` to create or
+  update a class. A body that sends the fields without the wrapper, or wraps them in the plural
+  `shipping_classes` key, is rejected with `400` and the message `shipping_class missing`.
+- **`name` and `description` are the only fields you can write.** `name` is required, at most 50
+  characters, and must be unique: a name another class already has is rejected with `409`.
+  `description` is optional and at most 100 characters. If you leave it out, the store saves
+  `null`; an empty string is saved as an empty string. The store ignores an `id`, an `is_default`
+  and any unknown field you send inside `shipping_class`.
+- **Only one class is the default, and only one call changes it.**
+  [Set the default shipping class](/api-reference/shipping-classes/set-the-default-shipping-class) sets `is_default` to `true` on the class
+  whose `shipping_class_id` you pass, and to `false` on the class that was the default. You cannot
+  delete the default class: make another class the default first, or the delete is rejected with `409`.
+- **A listing returns at most 20 classes per call, and the classes you create are listed first.** A
+  larger `limit` is capped at `20`, and `pagination.limit` shows `20`. New classes go ahead of the
+  classes already there, newest first, so the default class can be past the first page. To get
+  more, send the next `page` or a higher `offset` while `pagination.has_next` is `true`.
+- **`PATCH` does not change a class.** A `PATCH` on a class returns `200` with
+  `{"isSuccess": false, "message": "Invalid API Request"}` and changes nothing. Use `PUT` to
+  update a class.

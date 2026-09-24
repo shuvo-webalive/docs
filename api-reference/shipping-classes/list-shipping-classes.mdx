@@ -1,0 +1,9 @@
+---
+title: "List shipping classes"
+description: "Returns up to 20 shipping classes per call, with classes you create listed first."
+openapi: "GET /admin/shipping_classes"
+---
+
+Returns up to 20 shipping classes under `shipping_classes`, and a `pagination` object with the total and whether another page follows. The classes you create are listed ahead of the classes already there, newest first, and the default class is not moved to the top. Only `limit`, `offset`, `page` and `field_metadata` are accepted; any other parameter, such as `sort` or `q`, is rejected with `400`. After a rejected `limit` or `offset`, such as `limit=0`, your next listing call on the same client is rejected the same way, even with `limit=20`. A call that takes no `limit`, such as [Retrieve a shipping class](/api-reference/shipping-classes/retrieve-a-shipping-class), runs normally.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

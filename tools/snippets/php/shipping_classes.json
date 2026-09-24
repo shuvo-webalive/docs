@@ -1,0 +1,42 @@
+{
+  "sdk": "php",
+  "module": "shipping_classes",
+  "endpoints": {
+    "list_shipping_classes": {
+      "function": "listShippingClasses",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::listShippingClasses($client, ['limit' => 20]);\n\nforeach ($response->map['shipping_classes'] as $class) {\n    echo $class['id'], ' ', $class['name'], $class['is_default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' shipping classes in total', PHP_EOL;"
+    },
+    "head_shipping_classes": {
+      "function": "headShippingClasses",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::headShippingClasses($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_shipping_classes": {
+      "function": "countShippingClasses",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::countShippingClasses($client);\n\necho $response->map['shipping_classes']['count'], PHP_EOL;"
+    },
+    "create_shipping_class": {
+      "function": "createShippingClass",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::createShippingClass($client, [\n    'shipping_class' => ['name' => 'Bulky Goods', 'description' => 'Items over 20kg'],\n]);\n\necho $response->map['shipping_class']['id'], PHP_EOL;"
+    },
+    "get_shipping_class": {
+      "function": "getShippingClass",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::getShippingClass($client, 2);\n\n$class = $response->map['shipping_class'];\necho $class['name'], ': ', $class['description'], PHP_EOL;"
+    },
+    "head_shipping_class": {
+      "function": "headShippingClass",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::headShippingClass($client, 2);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_shipping_class": {
+      "function": "updateShippingClass",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::updateShippingClass($client, 3, [\n    'shipping_class' => ['name' => 'Bulky Goods', 'description' => 'Items over 25kg'],\n]);\n\necho $response->map['shipping_class']['description'], PHP_EOL;"
+    },
+    "delete_shipping_class": {
+      "function": "deleteShippingClass",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::deleteShippingClass($client, 3);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "set_shipping_class_default": {
+      "function": "setShippingClassDefault",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::setShippingClassDefault($client, 2);\n\necho $response->map['shipping_class']['is_default'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}

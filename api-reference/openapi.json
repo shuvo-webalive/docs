@@ -73,6 +73,9 @@
       "name": "Shipping methods"
     },
     {
+      "name": "Shipping classes"
+    },
+    {
       "name": "Tax codes"
     },
     {
@@ -16934,6 +16937,975 @@
         ]
       }
     },
+    "/admin/shipping_classes": {
+      "get": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "List shipping classes",
+        "operationId": "list_shipping_classes",
+        "description": "Returns up to 20 shipping classes under `shipping_classes`, and a `pagination` object with the total and whether another page follows. The classes you create are listed ahead of the classes already there, newest first, and the default class is not moved to the top. Only `limit`, `offset`, `page` and `field_metadata` are accepted; any other parameter, such as `sort` or `q`, is rejected with `400`. After a rejected `limit` or `offset`, such as `limit=0`, your next listing call on the same client is rejected the same way, even with `limit=20`. A call that takes no `limit`, such as [Retrieve a shipping class](/api-reference/shipping-classes/retrieve-a-shipping-class), runs normally.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Shipping classes per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. `0` is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of shipping classes to skip. When you send both `offset` and `page`, `offset` wins. `-1` is rejected with `400` and the message `'offset' must be a non-negative integer`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit` against the limit the store applied. `page=2` alone skips 20 classes; `limit=2&page=2` skips 2.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key that describes each of the class's four fields, `id`, `name`, `description` and `is_default`: its type, whether you can write it and a short description, and for `name` and `description`, whether it is required and its maximum length.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shipping classes on this page under `shipping_classes`, and `pagination` with the total, the page size and whether another page follows. With `field_metadata=true`, the response also has a `field_metadata` key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_classes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ShippingClass"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/ShippingClassPagination"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ShippingClassFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_classes": [
+                    {
+                      "id": 3,
+                      "name": "Bulky Goods",
+                      "description": "Items over 20kg",
+                      "is_default": false
+                    },
+                    {
+                      "id": 1,
+                      "name": "Standard",
+                      "description": "Standard",
+                      "is_default": true
+                    },
+                    {
+                      "id": 2,
+                      "name": "Express",
+                      "description": "Express",
+                      "is_default": false
+                    }
+                  ],
+                  "pagination": {
+                    "total": 3,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 3,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a parameter the listing does not accept: the `code` is `invalid_request`, the message is `unknown query parameter(s): <name>`, `details[0].code` is `unknown_parameter` and `details[0].field` names the parameter. Or you sent `limit=0`: the message is `'limit' must be a positive integer` and `details[0].code` is `out_of_range`. Or you sent `offset=-1`: the message is `'offset' must be a non-negative integer` and `details[0].code` is `invalid_integer`. A rejected `sort` still changes the next listing on the same client: after `sort=name` it comes back in descending `name` order, and after `sort=-id`, a sort on the class's `id`, it returns `500`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "unknown query parameter(s): sort",
+                    "details": [
+                      {
+                        "field": "sort",
+                        "code": "unknown_parameter",
+                        "message": null
+                      }
+                    ],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/shipping_classes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.list_shipping_classes({\"limit\": 20})\nfor shipping_class in response.map[\"shipping_classes\"]:\n    print(shipping_class[\"id\"], shipping_class[\"name\"], shipping_class[\"is_default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.listShippingClasses(client, {limit: 20});\nfor (const shippingClass of response.map.shipping_classes) {\n    console.log(shippingClass.id, shippingClass.name, shippingClass.is_default);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::listShippingClasses($client, ['limit' => 20]);\n\nforeach ($response->map['shipping_classes'] as $class) {\n    echo $class['id'], ' ', $class['name'], $class['is_default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' shipping classes in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().listShippingClasses(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_classes\")) {\n    Map<?, ?> shippingClass = (Map<?, ?>) row;\n    System.out.println(shippingClass.get(\"id\") + \" \" + shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.ListShippingClassesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var shippingClass in ((IReadOnlyList<object?>)body[\"shipping_classes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{shippingClass[\"id\"]} {shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses\n    .listShippingClasses(queryParams: {'limit': 20});\nfinal shippingClasses = (response.map as Map)['shipping_classes'] as List;\nfor (final shippingClass in shippingClasses) {\n  print('${(shippingClass as Map)['id']} ${shippingClass['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().ListShippingClasses(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"shipping_classes\"].([]any) {\n\tshippingClass := row.(map[string]any)\n\tfmt.Println(shippingClass[\"id\"], shippingClass[\"name\"], shippingClass[\"is_default\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Check the shipping classes list",
+        "operationId": "head_shipping_classes",
+        "description": "Returns `200` with headers only and no body. Neither this response nor the listing has an `ETag` or a `Last-Modified` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/shipping_classes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.head_shipping_classes()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.headShippingClasses(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::headShippingClasses($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().headShippingClasses();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.HeadShippingClassesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.headShippingClasses();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().HeadShippingClasses(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Create a shipping class",
+        "operationId": "create_shipping_class",
+        "description": "Creates a shipping class and returns it with the `id` the store assigned. Pass that `id` as `shipping_class_id` to retrieve, update, delete or make the class the default. Wrap the fields in `shipping_class`; the store reads only `name` and `description`, and saves `null` for a `description` you leave out. A new class has `is_default` set to `false`, and any `id` or `is_default` you send inside `shipping_class` is ignored.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new shipping class under `shipping_class`: its `id`, the `name` and `description` you sent, and `is_default` set to `false`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_class": {
+                      "$ref": "#/components/schemas/ShippingClass"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_class": {
+                    "id": 3,
+                    "name": "Bulky Goods",
+                    "description": "Items over 20kg",
+                    "is_default": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `shipping_class` (`shipping_class missing`), `name` is missing (`name is required`), `name` is longer than 50 characters (`name must be 50 characters or fewer`), or `description` is longer than 100 characters (`description must be 100 characters or fewer`). The `code` is `invalid_request`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "name is required",
+                    "details": [],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another shipping class already has that `name`. The `code` is `conflict`, the message is `a shipping class named '<name>' already exists` and `details[0].code` is `duplicate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "a shipping class named 'Bulky Goods' already exists",
+                    "details": [
+                      {
+                        "code": "duplicate"
+                      }
+                    ],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/shipping_classes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_class\": {\n      \"name\": \"Bulky Goods\",\n      \"description\": \"Items over 20kg\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.create_shipping_class({\n    \"shipping_class\": {\"name\": \"Bulky Goods\", \"description\": \"Items over 20kg\"},\n})\nprint(response.map[\"shipping_class\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.createShippingClass(client, {\n    shipping_class: {name: 'Bulky Goods', description: 'Items over 20kg'},\n});\nconsole.log(response.map.shipping_class.id, response.map.shipping_class.is_default);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::createShippingClass($client, [\n    'shipping_class' => ['name' => 'Bulky Goods', 'description' => 'Items over 20kg'],\n]);\n\necho $response->map['shipping_class']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().createShippingClass(\n        Map.of(\"shipping_class\", Map.of(\"name\", \"Bulky Goods\", \"description\", \"Items over 20kg\")));\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"id\") + \" \" + shippingClass.get(\"name\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.CreateShippingClassAsync(new Dictionary<string, object?>\n{\n    [\"shipping_class\"] = new Dictionary<string, object?> { [\"name\"] = \"Bulky Goods\", [\"description\"] = \"Items over 20kg\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine(shippingClass[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.createShippingClass({\n  'shipping_class': {\n    'name': 'Bulky Goods',\n    'description': 'Items over 20kg',\n  },\n});\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint(shippingClass['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().CreateShippingClass(ctx, map[string]any{\n\t\"shipping_class\": map[string]any{\"name\": \"Bulky Goods\", \"description\": \"Items over 20kg\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"id\"], shippingClass[\"name\"], shippingClass[\"is_default\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "shipping_class"
+                ],
+                "properties": {
+                  "shipping_class": {
+                    "$ref": "#/components/schemas/ShippingClassInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/shipping_classes/count": {
+      "get": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Count shipping classes",
+        "operationId": "count_shipping_classes",
+        "description": "Returns the number of shipping classes as `count`, inside a `shipping_classes` object. The number matches `pagination.total` from the listing. Query parameters are accepted and ignored, so nothing narrows the count, and `field_metadata=true` adds no `field_metadata` key.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The number of shipping classes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_classes": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_classes": {
+                    "count": 3
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/shipping_classes/count\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.count_shipping_classes()\nprint(response.map[\"shipping_classes\"][\"count\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.countShippingClasses(client);\nconsole.log(response.map.shipping_classes.count);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::countShippingClasses($client);\n\necho $response->map['shipping_classes']['count'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().countShippingClasses();\nMap<?, ?> shippingClasses = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_classes\");\nSystem.out.println(shippingClasses.get(\"count\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.CountShippingClassesAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClasses = (IReadOnlyDictionary<string, object?>)body[\"shipping_classes\"]!;\nConsole.WriteLine(shippingClasses[\"count\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.countShippingClasses();\nfinal shippingClasses = (response.map as Map)['shipping_classes'] as Map;\nprint(shippingClasses['count']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().CountShippingClasses(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_classes\"].(map[string]any)[\"count\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/shipping_classes/{shipping_class_id}": {
+      "get": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Retrieve a shipping class",
+        "operationId": "get_shipping_class",
+        "description": "Returns one shipping class under the `shipping_class` key, with the same four fields a listing row has: `id`, `name`, `description` and `is_default`. Send `field_metadata=true` to add a description of each field beside the class. Unknown query parameters are ignored. The response has no `ETag` header. If the request just before this one on the same client was rejected with `404` for a `shipping_class_id` that no shipping class has, the store handles this call with that rejected `shipping_class_id`: it returns `404` even for a class that exists. Send the call again.",
+        "parameters": [
+          {
+            "name": "shipping_class_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping class's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key that describes each of the class's four fields, `id`, `name`, `description` and `is_default`: its type, whether you can write it and a short description, and for `name` and `description`, whether it is required and its maximum length.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shipping class under `shipping_class`. With `field_metadata=true`, the response also has a `field_metadata` key beside it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_class": {
+                      "$ref": "#/components/schemas/ShippingClass"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ShippingClassFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_class": {
+                    "id": 2,
+                    "name": "Express",
+                    "description": "Express",
+                    "is_default": false
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No shipping class has the `shipping_class_id` you passed, or it is not a number. The `code` is `not_found` and the message is `Shipping class not found`. You also get this `404` for a class that exists when the request just before it on the same client was rejected with `404` for a `shipping_class_id` that no shipping class has.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Shipping class not found",
+                    "details": [],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/shipping_classes/2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.get_shipping_class(2)\nshipping_class = response.map[\"shipping_class\"]\nprint(shipping_class[\"name\"], shipping_class[\"is_default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.getShippingClass(client, 2);\nconst shippingClass = response.map.shipping_class;\nconsole.log(shippingClass.name, shippingClass.description, shippingClass.is_default);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::getShippingClass($client, 2);\n\n$class = $response->map['shipping_class'];\necho $class['name'], ': ', $class['description'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().getShippingClass(2);\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.GetShippingClassAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.getShippingClass(2);\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['is_default']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().GetShippingClass(ctx, 2, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"description\"], shippingClass[\"is_default\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Check a shipping class",
+        "operationId": "head_shipping_class",
+        "description": "Returns `200` with headers only: no body and no `ETag`. It returns `200` even when no shipping class has the `shipping_class_id` you pass, so it does not tell you whether the class exists. To check that, use [Retrieve a shipping class](/api-reference/shipping-classes/retrieve-a-shipping-class), which returns `404` when no class has that `shipping_class_id`.",
+        "parameters": [
+          {
+            "name": "shipping_class_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping class's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body. Returned even when no shipping class has the `shipping_class_id` you passed."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/shipping_classes/2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.head_shipping_class(2)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.headShippingClass(client, 2);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::headShippingClass($client, 2);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().headShippingClass(2);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.HeadShippingClassAsync(2);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.headShippingClass(2);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().HeadShippingClass(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Update a shipping class",
+        "operationId": "update_shipping_class",
+        "description": "Replaces the `name` and `description` of the class whose `shipping_class_id` you pass, and returns the class. Wrap the change in `shipping_class`; `name` is required and follows the same rules as on create. A `description` you leave out is saved as `null`, so send it again to keep it. Any `id` or `is_default` you send inside `shipping_class` is ignored: to change the default, use [Set the default shipping class](/api-reference/shipping-classes/set-the-default-shipping-class).",
+        "parameters": [
+          {
+            "name": "shipping_class_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping class's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated shipping class under `shipping_class`, with the `name` and `description` you sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_class": {
+                      "$ref": "#/components/schemas/ShippingClass"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_class": {
+                    "id": 3,
+                    "name": "Bulky Goods",
+                    "description": "Items over 25kg",
+                    "is_default": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `shipping_class` (`shipping_class missing`), `name` is missing (`name is required`), `name` is longer than 50 characters (`name must be 50 characters or fewer`), or `description` is longer than 100 characters (`description must be 100 characters or fewer`). The `code` is `invalid_request`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "name is required",
+                    "details": [],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another shipping class already has that `name`. The `code` is `conflict`, the message is `a shipping class named '<name>' already exists` and `details[0].code` is `duplicate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "a shipping class named 'Bulky Goods' already exists",
+                    "details": [
+                      {
+                        "code": "duplicate"
+                      }
+                    ],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/shipping_classes/3\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_class\": {\n      \"name\": \"Bulky Goods\",\n      \"description\": \"Items over 25kg\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.update_shipping_class(3, {\n    \"shipping_class\": {\"name\": \"Bulky Goods\", \"description\": \"Items over 25kg\"},\n})\nshipping_class = response.map[\"shipping_class\"]\nprint(shipping_class[\"name\"], shipping_class[\"description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.updateShippingClass(client, 3, {\n    shipping_class: {name: 'Bulky Goods', description: 'Items over 25kg'},\n});\nconsole.log(response.map.shipping_class.name, response.map.shipping_class.description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::updateShippingClass($client, 3, [\n    'shipping_class' => ['name' => 'Bulky Goods', 'description' => 'Items over 25kg'],\n]);\n\necho $response->map['shipping_class']['description'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().updateShippingClass(3,\n        Map.of(\"shipping_class\", Map.of(\"name\", \"Bulky Goods\", \"description\", \"Items over 25kg\")));\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.UpdateShippingClassAsync(3, new Dictionary<string, object?>\n{\n    [\"shipping_class\"] = new Dictionary<string, object?> { [\"name\"] = \"Bulky Goods\", [\"description\"] = \"Items over 25kg\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"description\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.updateShippingClass(3, {\n  'shipping_class': {\n    'name': 'Bulky Goods',\n    'description': 'Items over 25kg',\n  },\n});\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['description']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().UpdateShippingClass(ctx, 3, map[string]any{\n\t\"shipping_class\": map[string]any{\"name\": \"Bulky Goods\", \"description\": \"Items over 25kg\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "shipping_class"
+                ],
+                "properties": {
+                  "shipping_class": {
+                    "$ref": "#/components/schemas/ShippingClassInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Delete a shipping class",
+        "operationId": "delete_shipping_class",
+        "description": "Deletes the shipping class whose `shipping_class_id` you pass, permanently, and returns `204` with no body. The class leaves the listing and the count goes down by one. You cannot delete the default class: make another class the default first, or the call is rejected with `409`.",
+        "parameters": [
+          {
+            "name": "shipping_class_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping class's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The class is deleted. No body."
+          },
+          "404": {
+            "description": "No shipping class has the `shipping_class_id` you passed, including a class you already deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Shipping class not found",
+                    "details": [],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The class is the default. The `code` is `conflict`, the message is `cannot delete the default shipping class; set another as default first` and `details[0].code` is `default_in_use`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingClassError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "cannot delete the default shipping class; set another as default first",
+                    "details": [
+                      {
+                        "code": "default_in_use"
+                      }
+                    ],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/shipping_classes/3\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.delete_shipping_class(3)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.deleteShippingClass(client, 3);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::deleteShippingClass($client, 3);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().deleteShippingClass(3);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.DeleteShippingClassAsync(3);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.deleteShippingClass(3);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().DeleteShippingClass(ctx, 3, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/shipping_classes/{shipping_class_id}/default": {
+      "put": {
+        "tags": [
+          "Shipping classes"
+        ],
+        "summary": "Set the default shipping class",
+        "operationId": "set_shipping_class_default",
+        "description": "Makes the class whose `shipping_class_id` you pass the default, and returns it with `is_default` set to `true`. The class that was the default now has `is_default` set to `false`. The call reads no body, so anything you send is ignored. Calling it on the class that is already the default also returns `200`.",
+        "parameters": [
+          {
+            "name": "shipping_class_id",
+            "in": "path",
+            "required": true,
+            "description": "The shipping class's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The shipping class, now the default.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_class": {
+                      "$ref": "#/components/schemas/ShippingClass"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_class": {
+                    "id": 2,
+                    "name": "Express",
+                    "description": "Express",
+                    "is_default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/shipping_classes/2/default\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_classes.set_shipping_class_default(2)\nshipping_class = response.map[\"shipping_class\"]\nprint(shipping_class[\"name\"], shipping_class[\"is_default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.setShippingClassDefault(client, 2);\nconsole.log(response.map.shipping_class.name, response.map.shipping_class.is_default);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\ShippingClasses\\ShippingClasses;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingClasses::setShippingClassDefault($client, 2);\n\necho $response->map['shipping_class']['is_default'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingClasses().setShippingClassDefault(2);\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingClasses.SetShippingClassDefaultAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingClasses.setShippingClassDefault(2);\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['is_default']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingClasses().SetShippingClassDefault(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"is_default\"])\n"
+          }
+        ]
+      }
+    },
     "/admin/tax_codes": {
       "get": {
         "tags": [
@@ -30735,6 +31707,194 @@
                   "properties": {
                     "code": {
                       "type": "string"
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ShippingClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The shipping class's `id`, assigned by the store. Pass it as `shipping_class_id` in a path."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Unique across the store's shipping classes. At most 50 characters."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100,
+            "description": "At most 100 characters. `null` when the last create or update left it out."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "`true` on the one default class. Only `PUT /admin/shipping_classes/{shipping_class_id}/default` changes it."
+          }
+        }
+      },
+      "ShippingClassInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Required. At most 50 characters, and no other class may have the same name."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Optional. At most 100 characters. If you leave it out, the store saves `null`, on an update too. An empty string is saved as an empty string."
+          }
+        }
+      },
+      "ShippingClassFieldDescription": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The field's value type: `integer`, `string` or `boolean`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether a create or update can set this field: `true` for `name` and `description`, `false` for `id` and `is_default`."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "Only on `id` and `is_default`, where it is `true`. Only `PUT /admin/shipping_classes/{shipping_class_id}/default` changes `is_default`."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Only on `name` and `description`. Whether a create or update must send this field: `true` for `name`, `false` for `description`."
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "Only on `name` and `description`. The longest value accepted: `50` for `name`, `100` for `description`."
+          },
+          "description": {
+            "type": "string",
+            "description": "A short description of the field."
+          }
+        }
+      },
+      "ShippingClassFieldMetadata": {
+        "type": "object",
+        "description": "Describes each of the shipping class's four fields, `id`, `name`, `description` and `is_default`, keyed by field name. Returned only when you send `field_metadata=true`.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ShippingClassFieldDescription"
+          },
+          "name": {
+            "$ref": "#/components/schemas/ShippingClassFieldDescription"
+          },
+          "description": {
+            "$ref": "#/components/schemas/ShippingClassFieldDescription"
+          },
+          "is_default": {
+            "$ref": "#/components/schemas/ShippingClassFieldDescription"
+          }
+        }
+      },
+      "ShippingClassPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of shipping classes in the store."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. At most `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of shipping classes skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of shipping classes on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The page that `offset` falls in: `limit=1&offset=1` gives `2`. A `page` past the last class gives `1`."
+          },
+          "total_pages": {
+            "type": "integer"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_previous": {
+            "type": "boolean"
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The previous page, or `null` on the first page."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The next page, or `null` on the last page. Check `has_next` before you request it."
+          }
+        }
+      },
+      "ShippingClassError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "Extra detail, or an empty list. On some errors the first entry's `code` gives the reason: `duplicate`, `default_in_use`, `unknown_parameter`, `out_of_range` or `invalid_integer`.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The query parameter that was rejected, such as `sort`, `limit` or `offset`."
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "value": {
+                      "type": [
+                        "integer",
+                        "string"
+                      ],
+                      "description": "The value you sent. On the `out_of_range` error for `limit=0` it is the number `0`. On the `invalid_integer` error for `offset=-1` it is the string `\"-1\"`."
                     }
                   }
                 }
