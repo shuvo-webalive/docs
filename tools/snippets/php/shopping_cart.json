@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "getShoppingCart",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$response = ShoppingCart::getShoppingCart($client);\n\n$settings = $response->map['shopping_cart'];\necho 'Cart page thumbnails: ', $settings['cart_page']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;\necho 'Flying cart: ', $settings['flying_cart']['enabled'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "patch_shopping_cart": {
+      "function": "patchShoppingCart",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$response = ShoppingCart::patchShoppingCart($client, [\n    'shopping_cart' => [\n        'cart_page' => ['show_product_thumbnail' => true],\n        'flying_cart' => ['save_cart' => true],\n    ],\n]);\n\n$settings = $response->map['shopping_cart'];\necho $settings['cart_page']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;\necho $settings['flying_cart']['save_cart'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_shopping_cart": {
+      "function": "headShoppingCart",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$response = ShoppingCart::headShoppingCart($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_shopping_cart_section": {
+      "function": "getShoppingCartSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$response = ShoppingCart::getShoppingCartSection($client, 'cart_page');\n\nforeach ($response->map['cart_page'] as $field => $value) {\n    echo $field, ': ', $value ? 'true' : 'false', PHP_EOL;\n}"
+    },
+    "patch_shopping_cart_section": {
+      "function": "patchShoppingCartSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$response = ShoppingCart::patchShoppingCartSection($client, 'cart_page', [\n    'cart_page' => ['show_product_thumbnail' => true],\n]);\n\necho $response->map['cart_page']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}

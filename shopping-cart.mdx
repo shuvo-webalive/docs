@@ -1,0 +1,57 @@
+---
+title: "Shopping cart"
+sidebarTitle: "Overview"
+description: "Read and change what your store's cart page and slide-out flying cart offer shoppers."
+---
+
+The Shopping cart API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/shopping_cart`.
+
+<Warning>
+  Every write body must be wrapped in a key, and the key depends on the path. On `/shopping_cart`,
+  wrap the fields in `shopping_cart` and then in the section name. On `/shopping_cart/{section}`,
+  wrap them in the section's own name only, such as `cart_page`: a body wrapped in
+  `shopping_cart`, or not wrapped at all, is rejected with `400 invalid_request`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get shopping cart settings](/api-reference/shopping-cart/get-shopping-cart-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shopping_cart` | Returns both shopping cart sections and a `group_meta` block describing each one. |
+| [Update shopping cart settings](/api-reference/shopping-cart/update-shopping-cart-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shopping_cart` | Changes the fields you send in one or both sections and returns all settings. |
+| [Check the shopping cart settings](/api-reference/shopping-cart/check-the-shopping-cart-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shopping_cart` | Returns the headers for the shopping cart settings, including an `ETag`, with no body. |
+| [Get a shopping cart section](/api-reference/shopping-cart/get-a-shopping-cart-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shopping_cart/{section}` | Returns one section, `cart_page` or `flying_cart`, under the section's own key. |
+| [Update a shopping cart section](/api-reference/shopping-cart/update-a-shopping-cart-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shopping_cart/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into two sections.** `cart_page` controls the cart page: product
+  images, the empty cart button and the Save cart button. `flying_cart` turns the slide-out flying
+  cart on or off and controls its empty cart button and Save cart action. Read or write both
+  through `/shopping_cart`, or one through `/shopping_cart/{section}`. An unknown section returns
+  `404 not_found`.
+- **`PATCH` is the only way to write.** `PUT`, `POST` and `DELETE` are rejected on `/shopping_cart`
+  and on both section paths with `405 method_not_allowed` and an `Allow: GET, HEAD, PATCH, OPTIONS`
+  header. On `/shopping_cart`, only the fields you send change, and one body can change both
+  sections.
+- **Add `field_metadata=true` to a read to get a description of every field.** The settings are
+  still returned with it. Each entry gives the field's `ui_label`, `description`, `type` and
+  `default`, and every field is a `boolean`. The two `save_cart` fields also have
+  `plugin: "save-cart"`, and `flying_cart.enable_clear_cart` and `flying_cart.save_cart` have
+  `requires: "enabled"`. Setting `flying_cart.enabled` to `false` leaves those two fields' stored
+  values as they are. On `/shopping_cart` the block is keyed by section; on a section it is keyed
+  by field name.
+- **All shopping cart writes share one rate limit.** If you send eleven writes within about 1.3
+  seconds, the eleventh is rejected with `429` and a `Retry-After` header that counts down the time
+  left before writes are accepted again. Until then, writes to either section and to
+  `/shopping_cart` are all rejected, while reads still return `200`. A retry before then counts as
+  another write, so wait until `Retry-After` has passed before you write again.
+- **After a rejected write, the next write on the same client returns that rejection again.** It
+  comes back under a new `request_id`, even when the second write is correct and goes to the other
+  section. The write after that succeeds.

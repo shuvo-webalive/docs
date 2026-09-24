@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "get_shopping_cart",
+      "code": "response = client.shopping_cart.get_shopping_cart()\ncart_page = response.map[\"shopping_cart\"][\"cart_page\"]\nflying_cart = response.map[\"shopping_cart\"][\"flying_cart\"]\nprint(cart_page[\"show_product_thumbnail\"], cart_page[\"save_cart\"])\nprint(flying_cart[\"enabled\"], flying_cart[\"save_cart\"])\n"
+    },
+    "patch_shopping_cart": {
+      "function": "patch_shopping_cart",
+      "code": "response = client.shopping_cart.patch_shopping_cart({\n    \"shopping_cart\": {\n        \"cart_page\": {\"show_product_thumbnail\": True},\n        \"flying_cart\": {\"save_cart\": True},\n    },\n})\nsettings = response.map[\"shopping_cart\"]\nprint(settings[\"cart_page\"][\"show_product_thumbnail\"])\nprint(settings[\"flying_cart\"][\"save_cart\"])\n"
+    },
+    "head_shopping_cart": {
+      "function": "head_shopping_cart",
+      "code": "response = client.shopping_cart.head_shopping_cart()\nprint(response.status_code)\n"
+    },
+    "get_shopping_cart_section": {
+      "function": "get_shopping_cart_section",
+      "code": "response = client.shopping_cart.get_shopping_cart_section(\"cart_page\")\ncart_page = response.map[\"cart_page\"]\nprint(cart_page[\"show_product_thumbnail\"], cart_page[\"enable_clear_cart\"])\nprint(cart_page[\"save_cart\"])\n"
+    },
+    "patch_shopping_cart_section": {
+      "function": "patch_shopping_cart_section",
+      "code": "response = client.shopping_cart.patch_shopping_cart_section(\n    \"cart_page\", {\"cart_page\": {\"show_product_thumbnail\": True}}\n)\nprint(response.map[\"cart_page\"][\"show_product_thumbnail\"])\n"
+    }
+  }
+}

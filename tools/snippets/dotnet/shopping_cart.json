@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "GetShoppingCartAsync",
+      "code": "var response = await client.ShoppingCart.GetShoppingCartAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shoppingCart = (IReadOnlyDictionary<string, object?>)body[\"shopping_cart\"]!;\nvar cartPage = (IReadOnlyDictionary<string, object?>)shoppingCart[\"cart_page\"]!;\nConsole.WriteLine(cartPage[\"show_product_thumbnail\"]);"
+    },
+    "patch_shopping_cart": {
+      "function": "PatchShoppingCartAsync",
+      "code": "var response = await client.ShoppingCart.PatchShoppingCartAsync(new Dictionary<string, object?>\n{\n    [\"shopping_cart\"] = new Dictionary<string, object?>\n    {\n        [\"cart_page\"] = new Dictionary<string, object?> { [\"show_product_thumbnail\"] = true },\n        [\"flying_cart\"] = new Dictionary<string, object?> { [\"save_cart\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shoppingCart = (IReadOnlyDictionary<string, object?>)body[\"shopping_cart\"]!;\nvar flyingCart = (IReadOnlyDictionary<string, object?>)shoppingCart[\"flying_cart\"]!;\nConsole.WriteLine(flyingCart[\"save_cart\"]);"
+    },
+    "head_shopping_cart": {
+      "function": "HeadShoppingCartAsync",
+      "code": "var response = await client.ShoppingCart.HeadShoppingCartAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_shopping_cart_section": {
+      "function": "GetShoppingCartSectionAsync",
+      "code": "var response = await client.ShoppingCart.GetShoppingCartSectionAsync(\"cart_page\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cartPage = (IReadOnlyDictionary<string, object?>)body[\"cart_page\"]!;\nConsole.WriteLine(cartPage[\"show_product_thumbnail\"]);"
+    },
+    "patch_shopping_cart_section": {
+      "function": "PatchShoppingCartSectionAsync",
+      "code": "var response = await client.ShoppingCart.PatchShoppingCartSectionAsync(\"cart_page\", new Dictionary<string, object?>\n{\n    [\"cart_page\"] = new Dictionary<string, object?> { [\"show_product_thumbnail\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cartPage = (IReadOnlyDictionary<string, object?>)body[\"cart_page\"]!;\nConsole.WriteLine(cartPage[\"show_product_thumbnail\"]);"
+    }
+  }
+}

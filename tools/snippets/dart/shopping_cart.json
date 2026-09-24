@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "getShoppingCart",
+      "code": "final response = await client.shoppingCart.getShoppingCart();\nfinal shoppingCart = (response.map as Map)['shopping_cart'] as Map;\nprint(shoppingCart['cart_page']);\nprint(shoppingCart['flying_cart']);"
+    },
+    "patch_shopping_cart": {
+      "function": "patchShoppingCart",
+      "code": "final response = await client.shoppingCart.patchShoppingCart({\n  'shopping_cart': {\n    'cart_page': {'show_product_thumbnail': true},\n    'flying_cart': {'save_cart': true},\n  },\n});\nfinal shoppingCart = (response.map as Map)['shopping_cart'] as Map;\nprint(shoppingCart['cart_page']);\nprint(shoppingCart['flying_cart']);"
+    },
+    "head_shopping_cart": {
+      "function": "headShoppingCart",
+      "code": "final response = await client.shoppingCart.headShoppingCart();\nprint(response.statusCode);"
+    },
+    "get_shopping_cart_section": {
+      "function": "getShoppingCartSection",
+      "code": "final response =\n    await client.shoppingCart.getShoppingCartSection('cart_page');\nfinal section = (response.map as Map)['cart_page'] as Map;\nprint(section['show_product_thumbnail']);\nprint(section['save_cart']);"
+    },
+    "patch_shopping_cart_section": {
+      "function": "patchShoppingCartSection",
+      "code": "final response =\n    await client.shoppingCart.patchShoppingCartSection('cart_page', {\n  'cart_page': {'show_product_thumbnail': true},\n});\nfinal section = (response.map as Map)['cart_page'] as Map;\nprint(section['show_product_thumbnail']);"
+    }
+  }
+}

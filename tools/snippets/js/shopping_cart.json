@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "getShoppingCart",
+      "code": "const response = await client.shoppingCart.getShoppingCart();\nconst settings = response.map.shopping_cart;\nconsole.log(settings.cart_page.show_product_thumbnail, settings.cart_page.save_cart);\nconsole.log(settings.flying_cart.enabled, settings.flying_cart.save_cart);\n"
+    },
+    "patch_shopping_cart": {
+      "function": "patchShoppingCart",
+      "code": "const response = await client.shoppingCart.patchShoppingCart({\n    shopping_cart: {cart_page: {show_product_thumbnail: true}, flying_cart: {save_cart: true}},\n});\nconst settings = response.map.shopping_cart;\nconsole.log(settings.cart_page.show_product_thumbnail, settings.flying_cart.save_cart);\n"
+    },
+    "head_shopping_cart": {
+      "function": "headShoppingCart",
+      "code": "const response = await client.shoppingCart.headShoppingCart();\nconsole.log(response.statusCode);\n"
+    },
+    "get_shopping_cart_section": {
+      "function": "getShoppingCartSection",
+      "code": "const response = await client.shoppingCart.getShoppingCartSection('cart_page');\nconst cartPage = response.map.cart_page;\nconsole.log(cartPage.show_product_thumbnail, cartPage.enable_clear_cart, cartPage.save_cart);\n"
+    },
+    "patch_shopping_cart_section": {
+      "function": "patchShoppingCartSection",
+      "code": "const response = await client.shoppingCart.patchShoppingCartSection('cart_page', {\n    cart_page: {show_product_thumbnail: true},\n});\nconsole.log(response.map.cart_page.show_product_thumbnail);\n"
+    }
+  }
+}
