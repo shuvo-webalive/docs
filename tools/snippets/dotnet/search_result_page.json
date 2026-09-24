@@ -1,0 +1,50 @@
+{
+  "sdk": "dotnet",
+  "module": "search_result_page",
+  "endpoints": {
+    "get_search_result_page": {
+      "function": "GetSearchResultPageAsync",
+      "code": "var response = await client.SearchResultPage.GetSearchResultPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);"
+    },
+    "patch_search_result_page": {
+      "function": "PatchSearchResultPageAsync",
+      "code": "var response = await client.SearchResultPage.PatchSearchResultPageAsync(new Dictionary<string, object?>\n{\n    [\"search_result_page\"] = new Dictionary<string, object?>\n    {\n        [\"product_information\"] = new Dictionary<string, object?> { [\"display_short_description\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);"
+    },
+    "head_search_result_page": {
+      "function": "HeadSearchResultPageAsync",
+      "code": "var response = await client.SearchResultPage.HeadSearchResultPageAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_search_result_page_section": {
+      "function": "GetSearchResultPageSectionAsync",
+      "code": "var response = await client.SearchResultPage.GetSearchResultPageSectionAsync(\"product_information\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);"
+    },
+    "patch_search_result_page_section": {
+      "function": "PatchSearchResultPageSectionAsync",
+      "code": "var response = await client.SearchResultPage.PatchSearchResultPageSectionAsync(\"product_information\", new Dictionary<string, object?>\n{\n    [\"product_information\"] = new Dictionary<string, object?> { [\"display_short_description\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);"
+    },
+    "get_search_result_page_product_promotions": {
+      "function": "GetSearchResultPageProductPromotionsAsync",
+      "code": "var response = await client.SearchResultPage.GetSearchResultPageProductPromotionsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var productPromotion in ((IReadOnlyList<object?>)body[\"product_promotions\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{productPromotion[\"id\"]} {productPromotion[\"name\"]} {productPromotion[\"is_active\"]}\");"
+    },
+    "create_search_result_page_product_promotion": {
+      "function": "CreateSearchResultPageProductPromotionAsync",
+      "code": "var response = await client.SearchResultPage.CreateSearchResultPageProductPromotionAsync(new Dictionary<string, object?>\n{\n    [\"product_promotion\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Spring campaign\", [\"rule\"] = \"all_search_result\", [\"position\"] = \"top\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine(productPromotion[\"id\"]);"
+    },
+    "get_search_result_page_product_promotion": {
+      "function": "GetSearchResultPageProductPromotionAsync",
+      "code": "var response = await client.SearchResultPage.GetSearchResultPageProductPromotionAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine($\"{productPromotion[\"name\"]} {productPromotion[\"position\"]}\");"
+    },
+    "patch_search_result_page_product_promotion": {
+      "function": "PatchSearchResultPageProductPromotionAsync",
+      "code": "var response = await client.SearchResultPage.PatchSearchResultPageProductPromotionAsync(6, new Dictionary<string, object?>\n{\n    [\"product_promotion\"] = new Dictionary<string, object?> { [\"position\"] = \"bottom\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine(productPromotion[\"position\"]);"
+    },
+    "patch_search_result_page_product_promotion_active": {
+      "function": "PatchSearchResultPageProductPromotionActiveAsync",
+      "code": "var response = await client.SearchResultPage.PatchSearchResultPageProductPromotionActiveAsync(6, new Dictionary<string, object?>\n{\n    [\"product_promotion\"] = new Dictionary<string, object?> { [\"is_active\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine(productPromotion[\"is_active\"]);"
+    },
+    "delete_search_result_page_product_promotion": {
+      "function": "DeleteSearchResultPageProductPromotionAsync",
+      "code": "var response = await client.SearchResultPage.DeleteSearchResultPageProductPromotionAsync(6);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "sdk": "go",
+  "module": "search_result_page",
+  "endpoints": {
+    "get_search_result_page": {
+      "function": "GetSearchResultPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nperResult := information[\"number_of_searches_per_result\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"], perResult[\"items_per_page\"], information[\"label_for_price\"])"
+    },
+    "patch_search_result_page": {
+      "function": "PatchSearchResultPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPage(ctx, map[string]any{\n\t\"search_result_page\": map[string]any{\n\t\t\"product_information\": map[string]any{\"display_short_description\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"])"
+    },
+    "head_search_result_page": {
+      "function": "HeadSearchResultPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().HeadSearchResultPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_search_result_page_section": {
+      "function": "GetSearchResultPageSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageSection(ctx, \"product_information\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"], information[\"display_loyalty_points\"], information[\"label_for_price\"])"
+    },
+    "patch_search_result_page_section": {
+      "function": "PatchSearchResultPageSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPageSection(ctx, \"product_information\", map[string]any{\n\t\"product_information\": map[string]any{\"display_short_description\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"])"
+    },
+    "get_search_result_page_product_promotions": {
+      "function": "GetSearchResultPageProductPromotions",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageProductPromotions(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"product_promotions\"].([]any) {\n\tpromotion := row.(map[string]any)\n\tfmt.Println(promotion[\"id\"], promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"], promotion[\"is_active\"])\n}"
+    },
+    "create_search_result_page_product_promotion": {
+      "function": "CreateSearchResultPageProductPromotion",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().CreateSearchResultPageProductPromotion(ctx, map[string]any{\n\t\"product_promotion\": map[string]any{\"name\": \"Spring campaign\", \"rule\": \"all_search_result\", \"position\": \"top\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"id\"], promotion[\"name\"], promotion[\"is_active\"])"
+    },
+    "get_search_result_page_product_promotion": {
+      "function": "GetSearchResultPageProductPromotion",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageProductPromotion(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"], promotion[\"product_ids\"])"
+    },
+    "patch_search_result_page_product_promotion": {
+      "function": "PatchSearchResultPageProductPromotion",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPageProductPromotion(ctx, 6, map[string]any{\n\t\"product_promotion\": map[string]any{\"position\": \"bottom\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"position\"])"
+    },
+    "patch_search_result_page_product_promotion_active": {
+      "function": "PatchSearchResultPageProductPromotionActive",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPageProductPromotionActive(ctx, 6, map[string]any{\n\t\"product_promotion\": map[string]any{\"is_active\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"is_active\"])"
+    },
+    "delete_search_result_page_product_promotion": {
+      "function": "DeleteSearchResultPageProductPromotion",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().DeleteSearchResultPageProductPromotion(ctx, 6, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Update a settings section"
+description: "Changes the fields you send in `product_information` and returns the whole section."
+openapi: "PATCH /admin/settings/page_settings/search_result_page/{section}"
+---
+
+Send the fields to change wrapped in the section's own key, `product_information`. A body wrapped in `search_result_page` and then `product_information` is accepted too. Only the fields you send change, and the response is the whole section after the change, inside `search_result_page` and without `group_meta`. `seo` and `reinitialise` cannot be written: a write to either is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

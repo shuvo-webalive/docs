@@ -1,0 +1,50 @@
+{
+  "sdk": "java",
+  "module": "search_result_page",
+  "endpoints": {
+    "get_search_result_page": {
+      "function": "getSearchResultPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().getSearchResultPage();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\") + \" \" + productInformation.get(\"label_for_price\"));\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"seo\")).get(\"href\"));"
+    },
+    "patch_search_result_page": {
+      "function": "patchSearchResultPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().patchSearchResultPage(Map.of(\"search_result_page\",\n        Map.of(\"product_information\", Map.of(\"display_short_description\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\"));"
+    },
+    "head_search_result_page": {
+      "function": "headSearchResultPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.searchResultPage().headSearchResultPage();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_search_result_page_section": {
+      "function": "getSearchResultPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().getSearchResultPageSection(\"product_information\");\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\") + \" \" + productInformation.get(\"label_for_price\"));\nSystem.out.println(((Map<?, ?>) productInformation.get(\"number_of_searches_per_result\")).get(\"items_per_page\"));"
+    },
+    "patch_search_result_page_section": {
+      "function": "patchSearchResultPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().patchSearchResultPageSection(\"product_information\",\n        Map.of(\"product_information\", Map.of(\"display_short_description\", true)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\"));"
+    },
+    "get_search_result_page_product_promotions": {
+      "function": "getSearchResultPageProductPromotions",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().getSearchResultPageProductPromotions();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"product_promotions\")) {\n    Map<?, ?> promotion = (Map<?, ?>) row;\n    System.out.println(promotion.get(\"id\") + \" \" + promotion.get(\"name\") + \" \" + promotion.get(\"position\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "create_search_result_page_product_promotion": {
+      "function": "createSearchResultPageProductPromotion",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().createSearchResultPageProductPromotion(Map.of(\n        \"product_promotion\", Map.of(\"name\", \"Spring campaign\", \"rule\", \"all_search_result\", \"position\", \"top\")));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"id\") + \" \" + promotion.get(\"name\") + \" \" + promotion.get(\"is_active\"));"
+    },
+    "get_search_result_page_product_promotion": {
+      "function": "getSearchResultPageProductPromotion",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().getSearchResultPageProductPromotion(4);\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"rule\") + \" \" + promotion.get(\"position\"));\nSystem.out.println(promotion.get(\"product_ids\"));"
+    },
+    "patch_search_result_page_product_promotion": {
+      "function": "patchSearchResultPageProductPromotion",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().patchSearchResultPageProductPromotion(6,\n        Map.of(\"product_promotion\", Map.of(\"position\", \"bottom\")));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"position\"));"
+    },
+    "patch_search_result_page_product_promotion_active": {
+      "function": "patchSearchResultPageProductPromotionActive",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().patchSearchResultPageProductPromotionActive(6,\n        Map.of(\"product_promotion\", Map.of(\"is_active\", false)));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"is_active\"));"
+    },
+    "delete_search_result_page_product_promotion": {
+      "function": "deleteSearchResultPageProductPromotion",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.searchResultPage().deleteSearchResultPageProductPromotion(6);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

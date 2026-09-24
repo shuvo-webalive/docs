@@ -37,6 +37,9 @@
       "name": "Product page"
     },
     {
+      "name": "Search result page"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -4814,6 +4817,1526 @@
         }
       }
     },
+    "/admin/settings/page_settings/search_result_page": {
+      "get": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Get search result page settings",
+        "operationId": "get_search_result_page",
+        "description": "Returns the settings under `search_result_page`: the `product_information`, `seo` and `reinitialise` sections. The promotions are not included: `product_promotion` holds only `{\"read_only\": true}`, so use [List product promotions](/api-reference/search-result-page/list-product-promotions) to get them. Beside the settings, `group_meta` has one entry for each section and one for the promotions, each with a `kind`, a `writable` flag, a `ui_label` and the `href` where it is managed. Add `field_metadata=true` to also get a description of every field, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field, keyed by section: `product_information`, `seo` and `reinitialise`. The settings and `group_meta` are still returned. It does not describe the promotion fields: send `field_metadata=true` to the promotions listing for those.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings and `group_meta`. With `field_metadata=true`, a `field_metadata` key is added beside them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "search_result_page": {
+                      "$ref": "#/components/schemas/SearchResultPageSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/SearchResultGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/SearchResultFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section: `product_information`, `seo` and `reinitialise`."
+                    }
+                  }
+                },
+                "example": {
+                  "search_result_page": {
+                    "product_information": {
+                      "use_default_product_listing_configurations": false,
+                      "product_interaction_buttons": {
+                        "enabled": false,
+                        "display_add_to_cart_button": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true,
+                        "display_view_details_button": false,
+                        "display_on_hover": false,
+                        "display_quick_view_button": false
+                      },
+                      "display_content_page": true,
+                      "number_of_searches_per_result": {
+                        "enabled": true,
+                        "items_per_page": 16
+                      },
+                      "display_short_description": false,
+                      "display_variations_combination": false,
+                      "set_product_display_preferences": {
+                        "enabled": true,
+                        "display_mode": "pagination",
+                        "select_pagination_position": "bottom",
+                        "number_of_products_per_page": 5,
+                        "allow_users_to_select_number_of_products": false,
+                        "number_of_products_per_load": 10
+                      },
+                      "set_product_sorting": {
+                        "enabled": false,
+                        "default_sort": "alpha_asc"
+                      },
+                      "configure_sorting_options": {
+                        "enabled": false,
+                        "alphabetical": false,
+                        "featured": false,
+                        "new": false,
+                        "top_selling": false,
+                        "price": false,
+                        "created_date": false
+                      },
+                      "display_loyalty_points": true,
+                      "display_price": {
+                        "enabled": true,
+                        "display_expect_to_pay_price": false,
+                        "show_tax_with_the_expect_to_pay_price": false
+                      },
+                      "label_for_price": "Price"
+                    },
+                    "seo": {
+                      "read_only": true,
+                      "page_kind": "search_result"
+                    },
+                    "product_promotion": {
+                      "read_only": true
+                    },
+                    "reinitialise": {
+                      "action": "POST"
+                    }
+                  },
+                  "group_meta": {
+                    "product_information": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Information",
+                      "href": "/api/v4/admin/settings/page_settings/search_result_page/product_information"
+                    },
+                    "seo": {
+                      "kind": "setting",
+                      "writable": false,
+                      "ui_label": "SEO",
+                      "href": "/api/v4/admin/seo-settings"
+                    },
+                    "product_promotion": {
+                      "kind": "resource",
+                      "writable": true,
+                      "ui_label": "Product Promotion",
+                      "href": "/api/v4/admin/settings/page_settings/search_result_page/product_promotion"
+                    },
+                    "reinitialise": {
+                      "kind": "action",
+                      "writable": false,
+                      "ui_label": "Reinitialise",
+                      "href": "/api/v4/admin/search/reindex"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.get_search_result_page()\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"number_of_searches_per_result\"][\"items_per_page\"])\nprint(information[\"set_product_display_preferences\"][\"display_mode\"])\nprint(response.map[\"group_meta\"][\"seo\"][\"writable\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPage(client);\nconst information = response.map.search_result_page.product_information;\nconsole.log(information.display_short_description, information.number_of_searches_per_result.items_per_page);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::getSearchResultPage($client);\n\n$information = $response->map['search_result_page']['product_information'];\necho $information['set_product_display_preferences']['number_of_products_per_page'], ' products per page', PHP_EOL;\necho 'Default sort: ', $information['set_product_sorting']['default_sort'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().getSearchResultPage();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\") + \" \" + productInformation.get(\"label_for_price\"));\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"seo\")).get(\"href\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.GetSearchResultPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage.getSearchResultPage();\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal productInformation = settings['product_information'] as Map;\nprint(productInformation['display_short_description']);\nprint(productInformation['set_product_display_preferences']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nperResult := information[\"number_of_searches_per_result\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"], perResult[\"items_per_page\"], information[\"label_for_price\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Update search result page settings",
+        "operationId": "patch_search_result_page",
+        "description": "Send the fields to change inside `search_result_page` and then `product_information`, the only section you can write. Fields you leave out keep their stored values, even inside a nested block such as `product_interaction_buttons`. Returns all the settings after the change, with `group_meta`. A body that is not wrapped in `search_result_page` is rejected with `400 invalid_request`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "search_result_page": {
+                      "$ref": "#/components/schemas/SearchResultPageSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/SearchResultGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "search_result_page": {
+                    "product_information": {
+                      "use_default_product_listing_configurations": false,
+                      "product_interaction_buttons": {
+                        "enabled": false,
+                        "display_add_to_cart_button": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true,
+                        "display_view_details_button": false,
+                        "display_on_hover": false,
+                        "display_quick_view_button": false
+                      },
+                      "display_content_page": true,
+                      "number_of_searches_per_result": {
+                        "enabled": true,
+                        "items_per_page": 16
+                      },
+                      "display_short_description": true,
+                      "display_variations_combination": false,
+                      "set_product_display_preferences": {
+                        "enabled": true,
+                        "display_mode": "pagination",
+                        "select_pagination_position": "bottom",
+                        "number_of_products_per_page": 5,
+                        "allow_users_to_select_number_of_products": false,
+                        "number_of_products_per_load": 10
+                      },
+                      "set_product_sorting": {
+                        "enabled": false,
+                        "default_sort": "alpha_asc"
+                      },
+                      "configure_sorting_options": {
+                        "enabled": false,
+                        "alphabetical": false,
+                        "featured": false,
+                        "new": false,
+                        "top_selling": false,
+                        "price": false,
+                        "created_date": false
+                      },
+                      "display_loyalty_points": true,
+                      "display_price": {
+                        "enabled": true,
+                        "display_expect_to_pay_price": false,
+                        "show_tax_with_the_expect_to_pay_price": false
+                      },
+                      "label_for_price": "Price"
+                    },
+                    "seo": {
+                      "read_only": true,
+                      "page_kind": "search_result"
+                    },
+                    "product_promotion": {
+                      "read_only": true
+                    },
+                    "reinitialise": {
+                      "action": "POST"
+                    }
+                  },
+                  "group_meta": {
+                    "product_information": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Information",
+                      "href": "/api/v4/admin/settings/page_settings/search_result_page/product_information"
+                    },
+                    "seo": {
+                      "kind": "setting",
+                      "writable": false,
+                      "ui_label": "SEO",
+                      "href": "/api/v4/admin/seo-settings"
+                    },
+                    "product_promotion": {
+                      "kind": "resource",
+                      "writable": true,
+                      "ui_label": "Product Promotion",
+                      "href": "/api/v4/admin/settings/page_settings/search_result_page/product_promotion"
+                    },
+                    "reinitialise": {
+                      "kind": "action",
+                      "writable": false,
+                      "ui_label": "Reinitialise",
+                      "href": "/api/v4/admin/search/reindex"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `search_result_page`. The code is `invalid_request`, and the error names `search_result_page`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many settings writes in a short time. Writes to the settings and to each section share one limit. The code is `rate_limited`, and the `Retry-After` header counts down the time left before writes are accepted again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"search_result_page\": {\n      \"product_information\": {\n        \"display_short_description\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.patch_search_result_page({\n    \"search_result_page\": {\n        \"product_information\": {\"display_short_description\": True},\n    },\n})\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"display_short_description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPage(client, {\n    search_result_page: {product_information: {display_short_description: true}},\n});\nconsole.log(response.map.search_result_page.product_information.display_short_description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::patchSearchResultPage($client, [\n    'search_result_page' => [\n        'product_information' => ['display_short_description' => true],\n    ],\n]);\n\necho $response->map['search_result_page']['product_information']['display_short_description'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().patchSearchResultPage(Map.of(\"search_result_page\",\n        Map.of(\"product_information\", Map.of(\"display_short_description\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.PatchSearchResultPageAsync(new Dictionary<string, object?>\n{\n    [\"search_result_page\"] = new Dictionary<string, object?>\n    {\n        [\"product_information\"] = new Dictionary<string, object?> { [\"display_short_description\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage.patchSearchResultPage({\n  'search_result_page': {\n    'product_information': {'display_short_description': true},\n  },\n});\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal productInformation = settings['product_information'] as Map;\nprint(productInformation['display_short_description']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPage(ctx, map[string]any{\n\t\"search_result_page\": map[string]any{\n\t\t\"product_information\": map[string]any{\"display_short_description\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "search_result_page"
+                ],
+                "properties": {
+                  "search_result_page": {
+                    "type": "object",
+                    "description": "The fields to change, inside `product_information`. Send only the fields that change.",
+                    "properties": {
+                      "product_information": {
+                        "$ref": "#/components/schemas/SearchResultProductInformation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Get search result page settings headers",
+        "operationId": "head_search_result_page",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.head_search_result_page()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.headSearchResultPage(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::headSearchResultPage($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().headSearchResultPage();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.HeadSearchResultPageAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage.headSearchResultPage();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().HeadSearchResultPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/page_settings/search_result_page/{section}": {
+      "get": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Get a settings section",
+        "operationId": "get_search_result_page_section",
+        "description": "Returns one section inside the `search_result_page` key, not under the section's own key: a read of `seo` returns `{\"search_result_page\": {\"seo\": {\"read_only\": true, \"page_kind\": \"search_result\"}}}`. The response has no `group_meta`. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read: `product_information`, `seo` or `reinitialise`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "product_information",
+                "seo",
+                "reinitialise"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields, keyed by field name. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section inside `search_result_page`. With `field_metadata=true`, a `field_metadata` key is added beside it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "search_result_page": {
+                      "type": "object",
+                      "description": "Holds only the section in the path.",
+                      "properties": {
+                        "product_information": {
+                          "$ref": "#/components/schemas/SearchResultProductInformation"
+                        },
+                        "seo": {
+                          "$ref": "#/components/schemas/SearchResultSeo"
+                        },
+                        "reinitialise": {
+                          "$ref": "#/components/schemas/SearchResultReinitialise"
+                        }
+                      }
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/SearchResultFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "search_result_page": {
+                    "product_information": {
+                      "use_default_product_listing_configurations": false,
+                      "product_interaction_buttons": {
+                        "enabled": false,
+                        "display_add_to_cart_button": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true,
+                        "display_view_details_button": false,
+                        "display_on_hover": false,
+                        "display_quick_view_button": false
+                      },
+                      "display_content_page": true,
+                      "number_of_searches_per_result": {
+                        "enabled": true,
+                        "items_per_page": 16
+                      },
+                      "display_short_description": false,
+                      "display_variations_combination": false,
+                      "set_product_display_preferences": {
+                        "enabled": true,
+                        "display_mode": "pagination",
+                        "select_pagination_position": "bottom",
+                        "number_of_products_per_page": 5,
+                        "allow_users_to_select_number_of_products": false,
+                        "number_of_products_per_load": 10
+                      },
+                      "set_product_sorting": {
+                        "enabled": false,
+                        "default_sort": "alpha_asc"
+                      },
+                      "configure_sorting_options": {
+                        "enabled": false,
+                        "alphabetical": false,
+                        "featured": false,
+                        "new": false,
+                        "top_selling": false,
+                        "price": false,
+                        "created_date": false
+                      },
+                      "display_loyalty_points": true,
+                      "display_price": {
+                        "enabled": true,
+                        "display_expect_to_pay_price": false,
+                        "show_tax_with_the_expect_to_pay_price": false
+                      },
+                      "label_for_price": "Price"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The message is `Unknown page-settings section: search_result_page/<section>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown page-settings section: search_result_page/bogus",
+                    "details": [],
+                    "request_id": "3f6b2a91-7c4d-4e58-9a1f-2d8c5b7e6a14"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.get_search_result_page_section(\n    \"product_information\"\n)\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"display_short_description\"], information[\"label_for_price\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPageSection(client, 'product_information');\nconst information = response.map.search_result_page.product_information;\nconsole.log(information.display_short_description, information.set_product_display_preferences.display_mode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::getSearchResultPageSection($client, 'product_information');\n\n$information = $response->map['search_result_page']['product_information'];\necho $information['set_product_display_preferences']['display_mode'], PHP_EOL;\necho $information['label_for_price'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().getSearchResultPageSection(\"product_information\");\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\") + \" \" + productInformation.get(\"label_for_price\"));\nSystem.out.println(((Map<?, ?>) productInformation.get(\"number_of_searches_per_result\")).get(\"items_per_page\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.GetSearchResultPageSectionAsync(\"product_information\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage\n    .getSearchResultPageSection('product_information');\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal section = settings['product_information'] as Map;\nprint(section['display_short_description']);\nprint(section['number_of_searches_per_result']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageSection(ctx, \"product_information\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"], information[\"display_loyalty_points\"], information[\"label_for_price\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Update a settings section",
+        "operationId": "patch_search_result_page_section",
+        "description": "Send the fields to change wrapped in the section's own key, `product_information`. A body wrapped in `search_result_page` and then `product_information` is accepted too. Only the fields you send change, and the response is the whole section after the change, inside `search_result_page` and without `group_meta`. `seo` and `reinitialise` cannot be written: a write to either is rejected with `400`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to write. Only `product_information` accepts a write: a write to `seo` or `reinitialise` is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "product_information",
+                "seo",
+                "reinitialise"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, inside `search_result_page`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "search_result_page": {
+                      "type": "object",
+                      "description": "Holds only the section in the path.",
+                      "properties": {
+                        "product_information": {
+                          "$ref": "#/components/schemas/SearchResultProductInformation"
+                        },
+                        "seo": {
+                          "$ref": "#/components/schemas/SearchResultSeo"
+                        },
+                        "reinitialise": {
+                          "$ref": "#/components/schemas/SearchResultReinitialise"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "search_result_page": {
+                    "product_information": {
+                      "use_default_product_listing_configurations": false,
+                      "product_interaction_buttons": {
+                        "enabled": false,
+                        "display_add_to_cart_button": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true,
+                        "display_view_details_button": false,
+                        "display_on_hover": false,
+                        "display_quick_view_button": false
+                      },
+                      "display_content_page": true,
+                      "number_of_searches_per_result": {
+                        "enabled": true,
+                        "items_per_page": 16
+                      },
+                      "display_short_description": true,
+                      "display_variations_combination": false,
+                      "set_product_display_preferences": {
+                        "enabled": true,
+                        "display_mode": "pagination",
+                        "select_pagination_position": "bottom",
+                        "number_of_products_per_page": 5,
+                        "allow_users_to_select_number_of_products": false,
+                        "number_of_products_per_load": 10
+                      },
+                      "set_product_sorting": {
+                        "enabled": false,
+                        "default_sort": "alpha_asc"
+                      },
+                      "configure_sorting_options": {
+                        "enabled": false,
+                        "alphabetical": false,
+                        "featured": false,
+                        "new": false,
+                        "top_selling": false,
+                        "price": false,
+                        "created_date": false
+                      },
+                      "display_loyalty_points": true,
+                      "display_price": {
+                        "enabled": true,
+                        "display_expect_to_pay_price": false,
+                        "show_tax_with_the_expect_to_pay_price": false
+                      },
+                      "label_for_price": "Price"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in the section's key: the code is `invalid_request`, and the error names the section with the code `required`. Or the section is `seo` (`seo is a read-only section`) or `reinitialise` (`reinitialise is not a writable setting`). Or a field or value is not accepted, for example `unknown field`, `must be a boolean`, `invalid enum value for display_mode` or `items_per_page must be >= 5`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "seo is a read-only section",
+                    "details": [],
+                    "request_id": "8d2e4c17-5b9a-4f63-b0e2-7a1c9d3f5e28"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many settings writes in a short time. Writes to the settings and to each section share one limit. The code is `rate_limited`, and the `Retry-After` header counts down the time left before writes are accepted again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_information\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_information\": {\n      \"display_short_description\": true\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.patch_search_result_page_section(\n    \"product_information\", {\"product_information\": {\"display_short_description\": True}}\n)\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"display_short_description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPageSection(client, 'product_information', {\n    product_information: {display_short_description: true},\n});\nconsole.log(response.map.search_result_page.product_information.display_short_description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::patchSearchResultPageSection($client, 'product_information', [\n    'product_information' => ['display_short_description' => true],\n]);\n\necho $response->map['search_result_page']['product_information']['display_short_description'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().patchSearchResultPageSection(\"product_information\",\n        Map.of(\"product_information\", Map.of(\"display_short_description\", true)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_result_page\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(productInformation.get(\"display_short_description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.PatchSearchResultPageSectionAsync(\"product_information\", new Dictionary<string, object?>\n{\n    [\"product_information\"] = new Dictionary<string, object?> { [\"display_short_description\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchResultPage = (IReadOnlyDictionary<string, object?>)body[\"search_result_page\"]!;\nvar productInformation = (IReadOnlyDictionary<string, object?>)searchResultPage[\"product_information\"]!;\nConsole.WriteLine(productInformation[\"display_short_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage\n    .patchSearchResultPageSection('product_information', {\n  'product_information': {'display_short_description': true},\n});\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal section = settings['product_information'] as Map;\nprint(section['display_short_description']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPageSection(ctx, \"product_information\", map[string]any{\n\t\"product_information\": map[string]any{\"display_short_description\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"search_result_page\"].(map[string]any)[\"product_information\"].(map[string]any)\nfmt.Println(information[\"display_short_description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in `product_information`, or in `search_result_page` and then `product_information`.",
+                "properties": {
+                  "product_information": {
+                    "$ref": "#/components/schemas/SearchResultProductInformation"
+                  },
+                  "search_result_page": {
+                    "type": "object",
+                    "properties": {
+                      "product_information": {
+                        "$ref": "#/components/schemas/SearchResultProductInformation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/settings/page_settings/search_result_page/product_promotion": {
+      "get": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "List product promotions",
+        "operationId": "get_search_result_page_product_promotions",
+        "description": "Returns the product promotions as a list under `product_promotions`, with a `pagination` block that gives the `total` and the `offset` you sent. Send `offset` to skip promotions. `limit` is not applied: you get the same promotions whatever `limit` you send, and `pagination.limit` shows the collection's own limit. Add `field_metadata=true` to also get a description of each promotion field, the values `rule` and `position` accept, and the most promotions the collection holds, as `max_items`.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of promotions to skip before the first one returned. `pagination.offset` shows the value you sent.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Not applied. The listing returns the same promotions whatever `limit` you send, and `pagination.limit` shows the collection's own limit, such as `20`, not the value you sent.",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata` with two keys. `fields` describes each promotion field, including the values `rule` and `position` accept. `group_meta.product_promotion.max_items` is the most promotions the collection holds.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The promotions and the `pagination` block. With `field_metadata=true`, a `field_metadata` key is added beside them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_promotions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductPromotion"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/ProductPromotionPagination"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ProductPromotionFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "product_promotions": [
+                    {
+                      "id": 4,
+                      "name": "Winter campaign",
+                      "rule": "all_search_result",
+                      "position": "top",
+                      "specific_keywords": "",
+                      "is_active": true,
+                      "is_always_available": true,
+                      "available_from_date": null,
+                      "available_to_date": null,
+                      "product_ids": [
+                        829
+                      ],
+                      "created": "2026-08-20T01:02:52Z",
+                      "updated": "2026-08-20T01:02:52Z"
+                    },
+                    {
+                      "id": 5,
+                      "name": "Boots search",
+                      "rule": "if_matches_specific_keywords",
+                      "position": "bottom",
+                      "specific_keywords": "boots",
+                      "is_active": true,
+                      "is_always_available": true,
+                      "available_from_date": null,
+                      "available_to_date": null,
+                      "product_ids": [
+                        412,
+                        413
+                      ],
+                      "created": "2026-09-02T04:10:00Z",
+                      "updated": "2026-09-02T04:10:00Z"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_promotion\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.get_search_result_page_product_promotions()\nfor promotion in response.map[\"product_promotions\"]:\n    print(promotion[\"id\"], promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPageProductPromotions(client);\nfor (const promotion of response.map.product_promotions) {\n    console.log(promotion.id, promotion.name, promotion.position, promotion.is_active);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::getSearchResultPageProductPromotions($client);\n\nforeach ($response->map['product_promotions'] as $promotion) {\n    echo $promotion['id'], ' ', $promotion['name'], ' (', $promotion['position'], ')', $promotion['is_active'] ? '' : ' inactive', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().getSearchResultPageProductPromotions();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"product_promotions\")) {\n    Map<?, ?> promotion = (Map<?, ?>) row;\n    System.out.println(promotion.get(\"id\") + \" \" + promotion.get(\"name\") + \" \" + promotion.get(\"position\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.GetSearchResultPageProductPromotionsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var productPromotion in ((IReadOnlyList<object?>)body[\"product_promotions\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{productPromotion[\"id\"]} {productPromotion[\"name\"]} {productPromotion[\"is_active\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.searchResultPage.getSearchResultPageProductPromotions();\nfinal productPromotions = (response.map as Map)['product_promotions'] as List;\nfor (final productPromotion in productPromotions) {\n  print('${(productPromotion as Map)['id']} ${productPromotion['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageProductPromotions(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"product_promotions\"].([]any) {\n\tpromotion := row.(map[string]any)\n\tfmt.Println(promotion[\"id\"], promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"], promotion[\"is_active\"])\n}\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Create a product promotion",
+        "operationId": "create_search_result_page_product_promotion",
+        "description": "Creates a promotion from a body wrapped in `product_promotion`, in which `name`, `rule` and `position` are required. Returns `201` with the new promotion, including the `id` the other promotion calls take as `promotion_id`. Fields you leave out get their defaults: `is_active` and `is_always_available` both default to `true`. The response has no `Location` header.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new promotion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_promotion": {
+                      "$ref": "#/components/schemas/ProductPromotion"
+                    }
+                  }
+                },
+                "example": {
+                  "product_promotion": {
+                    "id": 6,
+                    "name": "Spring campaign",
+                    "rule": "all_search_result",
+                    "position": "top",
+                    "specific_keywords": "",
+                    "is_active": true,
+                    "is_always_available": true,
+                    "available_from_date": null,
+                    "available_to_date": null,
+                    "product_ids": [],
+                    "created": "2026-09-19T03:15:00Z",
+                    "updated": "2026-09-19T03:15:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `product_promotion`, or leaves out `name`, `rule` or `position` (for example `name is required`). Or a value is not accepted: `invalid enum value for rule`, `invalid enum value for position`, `keywords are required when rule is keywords` (`rule` is `if_matches_specific_keywords` and `specific_keywords` is missing), `product_ids must be an array of integers`, or `unknown product id` when a product `id` in `product_ids` matches no product in your store.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "name is required",
+                    "details": [],
+                    "request_id": "c5a19e3b-2f7d-4b86-9c40-1e6d8a2b7f53"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_promotion\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_promotion\": {\n      \"name\": \"Spring campaign\",\n      \"rule\": \"all_search_result\",\n      \"position\": \"top\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.create_search_result_page_product_promotion({\n    \"product_promotion\": {\n        \"name\": \"Spring campaign\",\n        \"rule\": \"all_search_result\",\n        \"position\": \"top\",\n    },\n})\npromotion = response.map[\"product_promotion\"]\nprint(promotion[\"id\"], promotion[\"is_active\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.createSearchResultPageProductPromotion(client, {\n    product_promotion: {name: 'Spring campaign', rule: 'all_search_result', position: 'top'},\n});\nconsole.log(response.map.product_promotion.id);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::createSearchResultPageProductPromotion($client, [\n    'product_promotion' => ['name' => 'Spring campaign', 'rule' => 'all_search_result', 'position' => 'top'],\n]);\n\necho $response->map['product_promotion']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().createSearchResultPageProductPromotion(Map.of(\n        \"product_promotion\", Map.of(\"name\", \"Spring campaign\", \"rule\", \"all_search_result\", \"position\", \"top\")));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"id\") + \" \" + promotion.get(\"name\") + \" \" + promotion.get(\"is_active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.CreateSearchResultPageProductPromotionAsync(new Dictionary<string, object?>\n{\n    [\"product_promotion\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Spring campaign\", [\"rule\"] = \"all_search_result\", [\"position\"] = \"top\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine(productPromotion[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.searchResultPage.createSearchResultPageProductPromotion({\n  'product_promotion': {\n    'name': 'Spring campaign',\n    'rule': 'all_search_result',\n    'position': 'top',\n  },\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().CreateSearchResultPageProductPromotion(ctx, map[string]any{\n\t\"product_promotion\": map[string]any{\"name\": \"Spring campaign\", \"rule\": \"all_search_result\", \"position\": \"top\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"id\"], promotion[\"name\"], promotion[\"is_active\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_promotion"
+                ],
+                "properties": {
+                  "product_promotion": {
+                    "$ref": "#/components/schemas/ProductPromotionInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}": {
+      "get": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Retrieve a product promotion",
+        "operationId": "get_search_result_page_product_promotion",
+        "description": "Returns one promotion under the `product_promotion` key, with the same fields as a listing row. Returns `404 not_found` when no promotion has that `promotion_id`, including a promotion you deleted.",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "description": "The product promotion's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The promotion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_promotion": {
+                      "$ref": "#/components/schemas/ProductPromotion"
+                    }
+                  }
+                },
+                "example": {
+                  "product_promotion": {
+                    "id": 4,
+                    "name": "Winter campaign",
+                    "rule": "all_search_result",
+                    "position": "top",
+                    "specific_keywords": "",
+                    "is_active": true,
+                    "is_always_available": true,
+                    "available_from_date": null,
+                    "available_to_date": null,
+                    "product_ids": [
+                      829
+                    ],
+                    "created": "2026-08-20T01:02:52Z",
+                    "updated": "2026-08-20T01:02:52Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No promotion has that `promotion_id`. The message is `Product promotion not found: <promotion_id>`, ending with the `promotion_id` you sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Product promotion not found: 6",
+                    "details": [],
+                    "request_id": "9b4c7e21-5d8a-4f36-a0e9-2c7b1f6d3a85"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_promotion/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.get_search_result_page_product_promotion(4)\npromotion = response.map[\"product_promotion\"]\nprint(promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"])\nprint(promotion[\"product_ids\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPageProductPromotion(client, 4);\nconst promotion = response.map.product_promotion;\nconsole.log(promotion.name, promotion.rule, promotion.position, promotion.is_active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::getSearchResultPageProductPromotion($client, 4);\n\necho $response->map['product_promotion']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().getSearchResultPageProductPromotion(4);\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"rule\") + \" \" + promotion.get(\"position\"));\nSystem.out.println(promotion.get(\"product_ids\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.GetSearchResultPageProductPromotionAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine($\"{productPromotion[\"name\"]} {productPromotion[\"position\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.searchResultPage.getSearchResultPageProductPromotion(4);\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint('${productPromotion['name']} ${productPromotion['position']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageProductPromotion(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"], promotion[\"product_ids\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Update a product promotion",
+        "operationId": "patch_search_result_page_product_promotion",
+        "description": "Send the fields to change wrapped in `product_promotion`, as on create. Only the fields you send change; the others keep their stored values. Returns the whole promotion after the change.",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "description": "The product promotion's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole promotion after the change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_promotion": {
+                      "$ref": "#/components/schemas/ProductPromotion"
+                    }
+                  }
+                },
+                "example": {
+                  "product_promotion": {
+                    "id": 6,
+                    "name": "Spring campaign",
+                    "rule": "all_search_result",
+                    "position": "bottom",
+                    "specific_keywords": "",
+                    "is_active": true,
+                    "is_always_available": true,
+                    "available_from_date": null,
+                    "available_to_date": null,
+                    "product_ids": [],
+                    "created": "2026-09-19T03:15:00Z",
+                    "updated": "2026-09-19T03:20:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_promotion/6\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_promotion\": {\n      \"position\": \"bottom\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.patch_search_result_page_product_promotion(\n    6, {\"product_promotion\": {\"position\": \"bottom\"}}\n)\nprint(response.map[\"product_promotion\"][\"position\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPageProductPromotion(client, 6, {\n    product_promotion: {position: 'bottom'},\n});\nconsole.log(response.map.product_promotion.position);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::patchSearchResultPageProductPromotion($client, 6, [\n    'product_promotion' => ['position' => 'bottom'],\n]);\n\necho $response->map['product_promotion']['position'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().patchSearchResultPageProductPromotion(6,\n        Map.of(\"product_promotion\", Map.of(\"position\", \"bottom\")));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"position\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.PatchSearchResultPageProductPromotionAsync(6, new Dictionary<string, object?>\n{\n    [\"product_promotion\"] = new Dictionary<string, object?> { [\"position\"] = \"bottom\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine(productPromotion[\"position\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.searchResultPage.patchSearchResultPageProductPromotion(6, {\n  'product_promotion': {'position': 'bottom'},\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['position']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPageProductPromotion(ctx, 6, map[string]any{\n\t\"product_promotion\": map[string]any{\"position\": \"bottom\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"position\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_promotion"
+                ],
+                "properties": {
+                  "product_promotion": {
+                    "$ref": "#/components/schemas/ProductPromotionUpdate"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Delete a product promotion",
+        "operationId": "delete_search_result_page_product_promotion",
+        "description": "Deletes the promotion permanently and returns `204` with no body. The promotion leaves the listing, and retrieving the same `promotion_id` then returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "description": "The product promotion's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No promotion has that `promotion_id`. The message is `Product promotion not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Product promotion not found",
+                    "details": [],
+                    "request_id": "6e0d8b42-9a3c-4d17-8f5b-3c2a7e1d9b60"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_promotion/6\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.delete_search_result_page_product_promotion(6)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.deleteSearchResultPageProductPromotion(client, 6);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::deleteSearchResultPageProductPromotion($client, 6);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().deleteSearchResultPageProductPromotion(6);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.DeleteSearchResultPageProductPromotionAsync(6);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.searchResultPage.deleteSearchResultPageProductPromotion(6);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().DeleteSearchResultPageProductPromotion(ctx, 6, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}/active": {
+      "patch": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Turn a product promotion on or off",
+        "operationId": "patch_search_result_page_product_promotion_active",
+        "description": "Send `{\"product_promotion\": {\"is_active\": false}}` to turn the promotion off, or `true` to turn it on; `is_active` is required. Every other field in the body is ignored. Returns the whole promotion after the change. This path takes only `PATCH`: a `GET` of it is rejected with `405 method_not_allowed`.",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "description": "The product promotion's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole promotion after the change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_promotion": {
+                      "$ref": "#/components/schemas/ProductPromotion"
+                    }
+                  }
+                },
+                "example": {
+                  "product_promotion": {
+                    "id": 6,
+                    "name": "Spring campaign",
+                    "rule": "all_search_result",
+                    "position": "bottom",
+                    "specific_keywords": "",
+                    "is_active": false,
+                    "is_always_available": true,
+                    "available_from_date": null,
+                    "available_to_date": null,
+                    "product_ids": [],
+                    "created": "2026-09-19T03:15:00Z",
+                    "updated": "2026-09-19T03:25:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/search_result_page/product_promotion/6/active\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_promotion\": {\n      \"is_active\": false\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.patch_search_result_page_product_promotion_active(\n    6, {\"product_promotion\": {\"is_active\": False}}\n)\nprint(response.map[\"product_promotion\"][\"is_active\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPageProductPromotionActive(client, 6, {\n    product_promotion: {is_active: false},\n});\nconsole.log(response.map.product_promotion.is_active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::patchSearchResultPageProductPromotionActive($client, 6, [\n    'product_promotion' => ['is_active' => false],\n]);\n\necho $response->map['product_promotion']['is_active'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().patchSearchResultPageProductPromotionActive(6,\n        Map.of(\"product_promotion\", Map.of(\"is_active\", false)));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"is_active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.PatchSearchResultPageProductPromotionActiveAsync(6, new Dictionary<string, object?>\n{\n    [\"product_promotion\"] = new Dictionary<string, object?> { [\"is_active\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPromotion = (IReadOnlyDictionary<string, object?>)body[\"product_promotion\"]!;\nConsole.WriteLine(productPromotion[\"is_active\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage\n    .patchSearchResultPageProductPromotionActive(6, {\n  'product_promotion': {'is_active': false},\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['is_active']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().PatchSearchResultPageProductPromotionActive(ctx, 6, map[string]any{\n\t\"product_promotion\": map[string]any{\"is_active\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"is_active\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_promotion"
+                ],
+                "properties": {
+                  "product_promotion": {
+                    "type": "object",
+                    "required": [
+                      "is_active"
+                    ],
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean",
+                        "description": "`true` to turn the promotion on, `false` to turn it off. Any other field you send is ignored."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -7925,6 +9448,586 @@
               "request_id": {
                 "type": "string",
                 "description": "The identifier the store gives this request."
+              }
+            }
+          }
+        }
+      },
+      "SearchResultPageSettings": {
+        "type": "object",
+        "properties": {
+          "product_information": {
+            "$ref": "#/components/schemas/SearchResultProductInformation"
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SearchResultSeo"
+          },
+          "product_promotion": {
+            "$ref": "#/components/schemas/SearchResultPromotionMarker"
+          },
+          "reinitialise": {
+            "$ref": "#/components/schemas/SearchResultReinitialise"
+          }
+        }
+      },
+      "SearchResultProductInformation": {
+        "type": "object",
+        "description": "Each search result, and how the result list displays, pages and sorts. The only section you can write.",
+        "properties": {
+          "use_default_product_listing_configurations": {
+            "type": "boolean",
+            "description": "Use the store's default product listing settings for the search result page."
+          },
+          "product_interaction_buttons": {
+            "$ref": "#/components/schemas/SearchResultInteractionButtons"
+          },
+          "display_content_page": {
+            "type": "boolean",
+            "description": "Show content pages on the search result page."
+          },
+          "number_of_searches_per_result": {
+            "$ref": "#/components/schemas/SearchResultItemsPerPage"
+          },
+          "display_short_description": {
+            "type": "boolean",
+            "description": "Show each product's short description."
+          },
+          "display_variations_combination": {
+            "type": "boolean",
+            "description": "Show each product's variation combinations."
+          },
+          "set_product_display_preferences": {
+            "$ref": "#/components/schemas/SearchResultDisplayPreferences"
+          },
+          "set_product_sorting": {
+            "$ref": "#/components/schemas/SearchResultDefaultSorting"
+          },
+          "configure_sorting_options": {
+            "$ref": "#/components/schemas/SearchResultSortingOptions"
+          },
+          "display_loyalty_points": {
+            "type": "boolean",
+            "description": "Show loyalty points on each result."
+          },
+          "display_price": {
+            "$ref": "#/components/schemas/SearchResultDisplayPrice"
+          },
+          "label_for_price": {
+            "type": "string",
+            "description": "The label for the price."
+          }
+        }
+      },
+      "SearchResultInteractionButtons": {
+        "type": "object",
+        "description": "The buttons each search result shows.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show the interaction buttons."
+          },
+          "display_add_to_cart_button": {
+            "type": "boolean",
+            "description": "Show the Add to Cart button."
+          },
+          "display_add_to_compare_button": {
+            "type": "boolean",
+            "description": "Show the Add to Compare button."
+          },
+          "display_add_to_wishlist_button": {
+            "type": "boolean",
+            "description": "Show the Add to Wishlist button."
+          },
+          "display_view_details_button": {
+            "type": "boolean",
+            "description": "Show the View Details button."
+          },
+          "display_on_hover": {
+            "type": "boolean",
+            "description": "Show the buttons on hover."
+          },
+          "display_quick_view_button": {
+            "type": "boolean",
+            "description": "Show the Quick View button."
+          }
+        }
+      },
+      "SearchResultItemsPerPage": {
+        "type": "object",
+        "description": "Whether the results are paged, and how many items a page shows.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Page the search results."
+          },
+          "items_per_page": {
+            "type": "integer",
+            "minimum": 5,
+            "description": "Items per page. At least `5`: a lower value is rejected with `400` and `items_per_page must be >= 5`, and a number with a fraction with `400` and `must be an integer`."
+          }
+        }
+      },
+      "SearchResultDisplayPreferences": {
+        "type": "object",
+        "description": "How the results load, and where the pagination control shows.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Apply the display preferences in this block."
+          },
+          "display_mode": {
+            "type": "string",
+            "description": "How the results load, such as `pagination`. A value the store does not accept is rejected with `400` and `invalid enum value for display_mode`."
+          },
+          "select_pagination_position": {
+            "type": "string",
+            "description": "Where the pagination control shows, such as `bottom`. A value the store does not accept is rejected with `400` and `invalid enum value for select_pagination_position`."
+          },
+          "number_of_products_per_page": {
+            "type": "integer",
+            "description": "Products per page."
+          },
+          "allow_users_to_select_number_of_products": {
+            "type": "boolean",
+            "description": "Let shoppers choose how many products a page shows."
+          },
+          "number_of_products_per_load": {
+            "type": "integer",
+            "description": "Products added each time a shopper loads more."
+          }
+        }
+      },
+      "SearchResultDefaultSorting": {
+        "type": "object",
+        "description": "Whether a default sort order applies, and which one.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Apply a default sort order."
+          },
+          "default_sort": {
+            "type": "string",
+            "description": "The default sort order, such as `alpha_asc`. A value the store does not accept is rejected with `400` and `invalid enum value for default_sort`."
+          }
+        }
+      },
+      "SearchResultSortingOptions": {
+        "type": "object",
+        "description": "The sort orders a shopper can switch to.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show the sort options."
+          },
+          "alphabetical": {
+            "type": "boolean",
+            "description": "Offer alphabetical sorting."
+          },
+          "featured": {
+            "type": "boolean",
+            "description": "Offer featured sorting."
+          },
+          "new": {
+            "type": "boolean",
+            "description": "Offer sorting by new products."
+          },
+          "top_selling": {
+            "type": "boolean",
+            "description": "Offer top selling sorting."
+          },
+          "price": {
+            "type": "boolean",
+            "description": "Offer price sorting."
+          },
+          "created_date": {
+            "type": "boolean",
+            "description": "Offer created date sorting."
+          }
+        }
+      },
+      "SearchResultDisplayPrice": {
+        "type": "object",
+        "description": "Whether a result shows a price, and which price.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show the price."
+          },
+          "display_expect_to_pay_price": {
+            "type": "boolean",
+            "description": "Show the expect to pay price."
+          },
+          "show_tax_with_the_expect_to_pay_price": {
+            "type": "boolean",
+            "description": "Include tax in the expect to pay price."
+          }
+        }
+      },
+      "SearchResultSeo": {
+        "type": "object",
+        "description": "Read-only. This page's SEO is managed at `/api/v4/admin/seo-settings`, the `href` in `group_meta.seo`.",
+        "properties": {
+          "read_only": {
+            "type": "boolean",
+            "description": "`true`: you cannot write this section."
+          },
+          "page_kind": {
+            "type": "string",
+            "description": "The kind of page: `search_result`."
+          }
+        }
+      },
+      "SearchResultReinitialise": {
+        "type": "object",
+        "description": "Read-only. It describes the search reindex action at `/api/v4/admin/search/reindex`, the `href` in `group_meta.reinitialise`.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Returned as `POST`."
+          }
+        }
+      },
+      "SearchResultPromotionMarker": {
+        "type": "object",
+        "description": "Returned in place of the promotions, which the settings do not include. Use [List product promotions](/api-reference/search-result-page/list-product-promotions) to get them.",
+        "properties": {
+          "read_only": {
+            "type": "boolean",
+            "description": "Returned as `true`."
+          }
+        }
+      },
+      "SearchResultGroupMeta": {
+        "type": "object",
+        "description": "One entry per section, plus one for the promotions. Only [Get search result page settings](/api-reference/search-result-page/get-search-result-page-settings) and [Update search result page settings](/api-reference/search-result-page/update-search-result-page-settings) return it.",
+        "properties": {
+          "product_information": {
+            "$ref": "#/components/schemas/SearchResultSectionMeta"
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SearchResultSectionMeta"
+          },
+          "product_promotion": {
+            "$ref": "#/components/schemas/SearchResultSectionMeta"
+          },
+          "reinitialise": {
+            "$ref": "#/components/schemas/SearchResultSectionMeta"
+          }
+        }
+      },
+      "SearchResultSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the entry is: `setting` for `product_information` and `seo`, `resource` for `product_promotion`, and `action` for `reinitialise`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write it: `true` for `product_information` and `product_promotion`, `false` for `seo` and `reinitialise`."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The entry's label, such as `Product Information`."
+          },
+          "href": {
+            "type": "string",
+            "description": "Where it is managed. For `seo` this is `/api/v4/admin/seo-settings`, and for `reinitialise` it is `/api/v4/admin/search/reindex`. The other two point to their own paths here."
+          }
+        }
+      },
+      "SearchResultFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Describes each field. Returned only when you send `field_metadata=true`."
+      },
+      "ProductPromotion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The product promotion's `id`, assigned by the store. The other promotion calls take it as `promotion_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The promotion's name."
+          },
+          "rule": {
+            "type": "string",
+            "description": "Which searches show the promotion, such as `all_search_result`, or `if_matches_specific_keywords` to match the promotion's `specific_keywords`. Required on create. The listing's `field_metadata` gives every accepted value in `allowed_values`. A create with any other value is rejected with `400` and `invalid enum value for rule`."
+          },
+          "position": {
+            "type": "string",
+            "description": "Where the promotion shows on the search result page, such as `top` or `bottom`. Required on create. The listing's `field_metadata` gives every accepted value in `allowed_values`. A create with any other value is rejected with `400` and `invalid enum value for position`."
+          },
+          "specific_keywords": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The keywords for the `if_matches_specific_keywords` rule, which requires them. An empty string or `null` when not set."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Whether the promotion is on. Defaults to `true` on create."
+          },
+          "is_always_available": {
+            "type": "boolean",
+            "description": "Whether the promotion is always available. Defaults to `true` on create. When it is `false`, the listing's `field_metadata` marks `available_from_date` and `available_to_date` as required."
+          },
+          "available_from_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The start of the promotion's availability, or `null`."
+          },
+          "available_to_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the promotion's availability, or `null`."
+          },
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The products in the promotion, as a list of product `id`s. On create, a value that is not a list of integers is rejected with `400` and `product_ids must be an array of integers`, and a product `id` that matches no product in your store with `400` and `unknown product id`."
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the promotion was created."
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the promotion was last changed."
+          }
+        }
+      },
+      "ProductPromotionInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "rule",
+          "position"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The promotion's name."
+          },
+          "rule": {
+            "type": "string",
+            "description": "Which searches show the promotion, such as `all_search_result`, or `if_matches_specific_keywords` to match the promotion's `specific_keywords`. Required on create. The listing's `field_metadata` gives every accepted value in `allowed_values`. A create with any other value is rejected with `400` and `invalid enum value for rule`."
+          },
+          "position": {
+            "type": "string",
+            "description": "Where the promotion shows on the search result page, such as `top` or `bottom`. Required on create. The listing's `field_metadata` gives every accepted value in `allowed_values`. A create with any other value is rejected with `400` and `invalid enum value for position`."
+          },
+          "specific_keywords": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The keywords for the `if_matches_specific_keywords` rule, which requires them. An empty string or `null` when not set."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Whether the promotion is on. Defaults to `true` on create."
+          },
+          "is_always_available": {
+            "type": "boolean",
+            "description": "Whether the promotion is always available. Defaults to `true` on create. When it is `false`, the listing's `field_metadata` marks `available_from_date` and `available_to_date` as required."
+          },
+          "available_from_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The start of the promotion's availability, or `null`."
+          },
+          "available_to_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the promotion's availability, or `null`."
+          },
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The products in the promotion, as a list of product `id`s. On create, a value that is not a list of integers is rejected with `400` and `product_ids must be an array of integers`, and a product `id` that matches no product in your store with `400` and `unknown product id`."
+          }
+        }
+      },
+      "ProductPromotionUpdate": {
+        "type": "object",
+        "description": "Send only the fields that change.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The promotion's name."
+          },
+          "rule": {
+            "type": "string",
+            "description": "Which searches show the promotion, such as `all_search_result`, or `if_matches_specific_keywords` to match the promotion's `specific_keywords`. Required on create. The listing's `field_metadata` gives every accepted value in `allowed_values`. A create with any other value is rejected with `400` and `invalid enum value for rule`."
+          },
+          "position": {
+            "type": "string",
+            "description": "Where the promotion shows on the search result page, such as `top` or `bottom`. Required on create. The listing's `field_metadata` gives every accepted value in `allowed_values`. A create with any other value is rejected with `400` and `invalid enum value for position`."
+          },
+          "specific_keywords": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The keywords for the `if_matches_specific_keywords` rule, which requires them. An empty string or `null` when not set."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Whether the promotion is on. Defaults to `true` on create."
+          },
+          "is_always_available": {
+            "type": "boolean",
+            "description": "Whether the promotion is always available. Defaults to `true` on create. When it is `false`, the listing's `field_metadata` marks `available_from_date` and `available_to_date` as required."
+          },
+          "available_from_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The start of the promotion's availability, or `null`."
+          },
+          "available_to_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the promotion's availability, or `null`."
+          },
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The products in the promotion, as a list of product `id`s. On create, a value that is not a list of integers is rejected with `400` and `product_ids must be an array of integers`, and a product `id` that matches no product in your store with `400` and `unknown product id`."
+          }
+        }
+      },
+      "ProductPromotionFieldMetadata": {
+        "type": "object",
+        "description": "Returned only when you send `field_metadata=true`.",
+        "properties": {
+          "fields": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "One entry per promotion field, keyed by field name: every field except the promotion's `id`, `created` and `updated`. The entries for `rule` and `position` list the values they accept in `allowed_values`."
+          },
+          "group_meta": {
+            "type": "object",
+            "properties": {
+              "product_promotion": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "description": "What the entry is: `resource`."
+                  },
+                  "writable": {
+                    "type": "boolean",
+                    "description": "Whether you can write the promotions: `true`."
+                  },
+                  "max_items": {
+                    "type": "integer",
+                    "description": "The most promotions the collection holds. The `group_meta` returned with the settings does not include it."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProductPromotionPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of promotions in the collection."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The collection's own limit, such as `20`. It does not change with the `limit` you send."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of promotions skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of promotions on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The current page number."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "The number of pages."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "Whether there is a next page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "Whether there is a previous page."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the previous page, or `null` when `has_previous` is `false`."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The next page, or `null` on the last page."
+          }
+        }
+      },
+      "SearchResultPageError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found`, `method_not_allowed` or `rate_limited`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `seo is a read-only section`."
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "More detail, or an empty list."
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
               }
             }
           }

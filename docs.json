@@ -103,6 +103,24 @@
                   "api-reference/product-page/get-a-product-page-section",
                   "api-reference/product-page/update-a-product-page-section"
                 ]
+              },
+              {
+                "group": "Search result page",
+                "expanded": false,
+                "pages": [
+                  "search-result-page",
+                  "api-reference/search-result-page/get-search-result-page-settings",
+                  "api-reference/search-result-page/update-search-result-page-settings",
+                  "api-reference/search-result-page/get-search-result-page-settings-headers",
+                  "api-reference/search-result-page/get-a-settings-section",
+                  "api-reference/search-result-page/update-a-settings-section",
+                  "api-reference/search-result-page/list-product-promotions",
+                  "api-reference/search-result-page/create-a-product-promotion",
+                  "api-reference/search-result-page/retrieve-a-product-promotion",
+                  "api-reference/search-result-page/update-a-product-promotion",
+                  "api-reference/search-result-page/turn-a-product-promotion-on-or-off",
+                  "api-reference/search-result-page/delete-a-product-promotion"
+                ]
               }
             ]
           },

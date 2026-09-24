@@ -1,0 +1,50 @@
+{
+  "sdk": "php",
+  "module": "search_result_page",
+  "endpoints": {
+    "get_search_result_page": {
+      "function": "getSearchResultPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::getSearchResultPage($client);\n\n$information = $response->map['search_result_page']['product_information'];\necho $information['set_product_display_preferences']['number_of_products_per_page'], ' products per page', PHP_EOL;\necho 'Default sort: ', $information['set_product_sorting']['default_sort'], PHP_EOL;"
+    },
+    "patch_search_result_page": {
+      "function": "patchSearchResultPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::patchSearchResultPage($client, [\n    'search_result_page' => [\n        'product_information' => ['display_short_description' => true],\n    ],\n]);\n\necho $response->map['search_result_page']['product_information']['display_short_description'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_search_result_page": {
+      "function": "headSearchResultPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::headSearchResultPage($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_search_result_page_section": {
+      "function": "getSearchResultPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::getSearchResultPageSection($client, 'product_information');\n\n$information = $response->map['search_result_page']['product_information'];\necho $information['set_product_display_preferences']['display_mode'], PHP_EOL;\necho $information['label_for_price'], PHP_EOL;"
+    },
+    "patch_search_result_page_section": {
+      "function": "patchSearchResultPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::patchSearchResultPageSection($client, 'product_information', [\n    'product_information' => ['display_short_description' => true],\n]);\n\necho $response->map['search_result_page']['product_information']['display_short_description'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "get_search_result_page_product_promotions": {
+      "function": "getSearchResultPageProductPromotions",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::getSearchResultPageProductPromotions($client);\n\nforeach ($response->map['product_promotions'] as $promotion) {\n    echo $promotion['id'], ' ', $promotion['name'], ' (', $promotion['position'], ')', $promotion['is_active'] ? '' : ' inactive', PHP_EOL;\n}"
+    },
+    "create_search_result_page_product_promotion": {
+      "function": "createSearchResultPageProductPromotion",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::createSearchResultPageProductPromotion($client, [\n    'product_promotion' => ['name' => 'Spring campaign', 'rule' => 'all_search_result', 'position' => 'top'],\n]);\n\necho $response->map['product_promotion']['id'], PHP_EOL;"
+    },
+    "get_search_result_page_product_promotion": {
+      "function": "getSearchResultPageProductPromotion",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::getSearchResultPageProductPromotion($client, 4);\n\necho $response->map['product_promotion']['name'], PHP_EOL;"
+    },
+    "patch_search_result_page_product_promotion": {
+      "function": "patchSearchResultPageProductPromotion",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::patchSearchResultPageProductPromotion($client, 6, [\n    'product_promotion' => ['position' => 'bottom'],\n]);\n\necho $response->map['product_promotion']['position'], PHP_EOL;"
+    },
+    "patch_search_result_page_product_promotion_active": {
+      "function": "patchSearchResultPageProductPromotionActive",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::patchSearchResultPageProductPromotionActive($client, 6, [\n    'product_promotion' => ['is_active' => false],\n]);\n\necho $response->map['product_promotion']['is_active'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "delete_search_result_page_product_promotion": {
+      "function": "deleteSearchResultPageProductPromotion",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::deleteSearchResultPageProductPromotion($client, 6);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

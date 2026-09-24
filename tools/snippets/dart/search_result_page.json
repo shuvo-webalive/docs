@@ -1,0 +1,50 @@
+{
+  "sdk": "dart",
+  "module": "search_result_page",
+  "endpoints": {
+    "get_search_result_page": {
+      "function": "getSearchResultPage",
+      "code": "final response = await client.searchResultPage.getSearchResultPage();\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal productInformation = settings['product_information'] as Map;\nprint(productInformation['display_short_description']);\nprint(productInformation['set_product_display_preferences']);"
+    },
+    "patch_search_result_page": {
+      "function": "patchSearchResultPage",
+      "code": "final response = await client.searchResultPage.patchSearchResultPage({\n  'search_result_page': {\n    'product_information': {'display_short_description': true},\n  },\n});\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal productInformation = settings['product_information'] as Map;\nprint(productInformation['display_short_description']);"
+    },
+    "head_search_result_page": {
+      "function": "headSearchResultPage",
+      "code": "final response = await client.searchResultPage.headSearchResultPage();\nprint(response.statusCode);"
+    },
+    "get_search_result_page_section": {
+      "function": "getSearchResultPageSection",
+      "code": "final response = await client.searchResultPage\n    .getSearchResultPageSection('product_information');\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal section = settings['product_information'] as Map;\nprint(section['display_short_description']);\nprint(section['number_of_searches_per_result']);"
+    },
+    "patch_search_result_page_section": {
+      "function": "patchSearchResultPageSection",
+      "code": "final response = await client.searchResultPage\n    .patchSearchResultPageSection('product_information', {\n  'product_information': {'display_short_description': true},\n});\nfinal settings = (response.map as Map)['search_result_page'] as Map;\nfinal section = settings['product_information'] as Map;\nprint(section['display_short_description']);"
+    },
+    "get_search_result_page_product_promotions": {
+      "function": "getSearchResultPageProductPromotions",
+      "code": "final response =\n    await client.searchResultPage.getSearchResultPageProductPromotions();\nfinal productPromotions = (response.map as Map)['product_promotions'] as List;\nfor (final productPromotion in productPromotions) {\n  print('${(productPromotion as Map)['id']} ${productPromotion['name']}');\n}"
+    },
+    "create_search_result_page_product_promotion": {
+      "function": "createSearchResultPageProductPromotion",
+      "code": "final response =\n    await client.searchResultPage.createSearchResultPageProductPromotion({\n  'product_promotion': {\n    'name': 'Spring campaign',\n    'rule': 'all_search_result',\n    'position': 'top',\n  },\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['id']);"
+    },
+    "get_search_result_page_product_promotion": {
+      "function": "getSearchResultPageProductPromotion",
+      "code": "final response =\n    await client.searchResultPage.getSearchResultPageProductPromotion(4);\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint('${productPromotion['name']} ${productPromotion['position']}');"
+    },
+    "patch_search_result_page_product_promotion": {
+      "function": "patchSearchResultPageProductPromotion",
+      "code": "final response =\n    await client.searchResultPage.patchSearchResultPageProductPromotion(6, {\n  'product_promotion': {'position': 'bottom'},\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['position']);"
+    },
+    "patch_search_result_page_product_promotion_active": {
+      "function": "patchSearchResultPageProductPromotionActive",
+      "code": "final response = await client.searchResultPage\n    .patchSearchResultPageProductPromotionActive(6, {\n  'product_promotion': {'is_active': false},\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['is_active']);"
+    },
+    "delete_search_result_page_product_promotion": {
+      "function": "deleteSearchResultPageProductPromotion",
+      "code": "final response =\n    await client.searchResultPage.deleteSearchResultPageProductPromotion(6);\nprint(response.statusCode);"
+    }
+  }
+}
