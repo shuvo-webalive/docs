@@ -12,10 +12,10 @@ RETRIEVE_PAGE = "/api-reference/shipping-methods/retrieve-a-shipping-method"
 DEFAULT_PAGE = "/api-reference/shipping-methods/set-the-default-shipping-method"
 
 WARNING = (
-    "**A `HEAD` request for one shipping method returns `200` even for an `id` that no method has**,\n"
+    "**A `HEAD` request for one shipping method returns `200` even when no method has the `shipping_method_id` you send**,\n"
     "  so it does not tell you whether the method exists. To check that, call\n"
     "  [Retrieve a shipping method](" + RETRIEVE_PAGE + ") instead: it returns `404` when no method\n"
-    "  has that `id`."
+    "  has that `shipping_method_id`."
 )
 
 NOTES = [
@@ -23,8 +23,8 @@ NOTES = [
     "  to create or rename a method. A bare record, or the plural `shipping_methods` key, is rejected\n"
     "  with `400` and the message `shipping_method missing`.",
     "**`name` is the only field you can write.** It is required, at most 100 characters, and must be\n"
-    "  unique: a name another method already has is rejected with `409`. The store ignores any `id` or\n"
-    "  `is_default` you send in a write.",
+    "  unique: a name another method already has is rejected with `409`. The store ignores `id` and\n"
+    "  `is_default` if you send them inside `shipping_method`.",
     "**Only one method is the default, and only one call changes it.**\n"
     "  [Set the default shipping method](" + DEFAULT_PAGE + ") gives the flag to the method you name and\n"
     "  takes it from the method that had it. You cannot delete the default method: make another method\n"
@@ -42,7 +42,7 @@ SHIPPING_METHOD_ID = {
     "name": "shipping_method_id",
     "in": "path",
     "required": True,
-    "description": "The method's `id`, as returned by the listing.",
+    "description": "The shipping method's `id`, from a listing or from the response to creating it.",
     "schema": {"type": "integer", "example": 2},
 }
 
@@ -91,7 +91,7 @@ ENDPOINTS = [
         "title": "List shipping methods",
         "method": "GET",
         "path": BASE,
-        "summary": "Returns up to 20 shipping methods per call, sorted by `id`, with paging details.",
+        "summary": "Returns up to 20 shipping methods per call, in `id` order, with paging details.",
         "description": "Returns the shipping methods in ascending `id` order, up to 20 per call, with a `pagination` block. The default method is not moved to the top. Only `limit`, `offset`, `page` and `field_metadata` are accepted; any other parameter, such as `sort` or `q`, is rejected with `400`. After a rejected `limit=0`, the next request on the same client returns that rejection's body instead of its own.",
         "parameters": [LIMIT, OFFSET, PAGE, FIELD_METADATA],
         "responses": {
@@ -148,8 +148,8 @@ ENDPOINTS = [
         "title": "Create a shipping method",
         "method": "POST",
         "path": BASE,
-        "summary": "Creates a shipping method from a `name` and returns it with its new `id`.",
-        "description": "Creates a shipping method and returns it with the `id` the store assigned. Wrap the record in `shipping_method`; `name` is the only field the store reads. A new method always has `is_default` set to `false`, and any `id` or `is_default` you send is ignored.",
+        "summary": "Creates a shipping method from a `name` and returns it with its `id`, which the other calls take as `shipping_method_id`.",
+        "description": "Creates a shipping method and returns it with the `id` the store assigned. Pass that `id` as `shipping_method_id` to retrieve, rename, delete or make the method the default. Wrap the record in `shipping_method`; `name` is the only field the store reads. A new method always has `is_default` set to `false`, and any `id` or `is_default` you send inside `shipping_method` is ignored.",
         "body": {"schema": WRITE_BODY, "example": {"shipping_method": {"name": "Express Post"}}},
         "responses": {
             "201": {
@@ -168,7 +168,7 @@ ENDPOINTS = [
         "title": "Retrieve a shipping method",
         "method": "GET",
         "path": BASE + "/{shipping_method_id}",
-        "summary": "Returns one shipping method by its `id`.",
+        "summary": "Returns the shipping method whose `id` you pass as `shipping_method_id`.",
         "description": "Returns one shipping method under the `shipping_method` key, with the same three fields a listing row has: `id`, `name` and `is_default`. Send `field_metadata=true` to add a description of each field. Unknown query parameters are ignored.",
         "parameters": [SHIPPING_METHOD_ID, FIELD_METADATA],
         "responses": {
@@ -177,7 +177,7 @@ ENDPOINTS = [
                 "schema": {"type": "object", "properties": {"shipping_method": ROW_REF, "field_metadata": {"$ref": "#/components/schemas/FieldMetadata"}}},
                 "example": {"shipping_method": SAMPLE_ROWS[1]},
             },
-            "404": {"description": "No method has that `id`, or the `id` is not a number.", "schema": ERROR_REF, "example": NOT_FOUND},
+            "404": {"description": "No method has that `shipping_method_id`, or it is not a number.", "schema": ERROR_REF, "example": NOT_FOUND},
         },
         "example_call": {"path": {"shipping_method_id": 2}},
     },
@@ -187,11 +187,11 @@ ENDPOINTS = [
         "title": "Check a shipping method",
         "method": "HEAD",
         "path": BASE + "/{shipping_method_id}",
-        "summary": "Returns headers only, and `200` even when no method has that `id`.",
-        "description": "Returns `200` with headers only and no body. It returns `200` even for an `id` that no method has, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](" + RETRIEVE_PAGE + "), which returns `404` for a missing `id`.",
+        "summary": "Returns headers only, and `200` even when no method has that `shipping_method_id`.",
+        "description": "Returns `200` with headers only and no body. It returns `200` even when no method has that `shipping_method_id`, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](" + RETRIEVE_PAGE + "), which returns `404` when no method has it.",
         "parameters": [SHIPPING_METHOD_ID],
         "responses": {
-            "200": {"description": "Headers only, no body. Returned even when no method has that `id`."},
+            "200": {"description": "Headers only, no body. Returned even when no method has that `shipping_method_id`."},
         },
         "example_call": {"path": {"shipping_method_id": 2}},
     },
@@ -202,7 +202,7 @@ ENDPOINTS = [
         "method": "PUT",
         "path": BASE + "/{shipping_method_id}",
         "summary": "Changes a shipping method's `name` and returns the updated method.",
-        "description": "Changes the method's `name` and returns the method. Wrap the change in `shipping_method`; `name` is required and follows the same rules as on create. Any `id` or `is_default` you send is ignored. To change the default, use [Set the default shipping method](" + DEFAULT_PAGE + ").",
+        "description": "Changes the method's `name` and returns the method. Wrap the change in `shipping_method`; `name` is required and follows the same rules as on create. Any `id` or `is_default` you send inside `shipping_method` is ignored. To change the default, use [Set the default shipping method](" + DEFAULT_PAGE + ").",
         "parameters": [SHIPPING_METHOD_ID],
         "body": {"schema": WRITE_BODY, "example": {"shipping_method": {"name": "Express Post Next Day"}}},
         "responses": {
@@ -227,7 +227,7 @@ ENDPOINTS = [
         "parameters": [SHIPPING_METHOD_ID],
         "responses": {
             "204": {"description": "Deleted. No body."},
-            "404": {"description": "No method has that `id`, including a method you already deleted.", "schema": ERROR_REF, "example": NOT_FOUND},
+            "404": {"description": "No method has that `shipping_method_id`, including a method you already deleted.", "schema": ERROR_REF, "example": NOT_FOUND},
             "409": {
                 "description": "The method is the default. The message is `cannot delete the default shipping method; set another as default first` and `details[0].code` is `default_in_use`.",
                 "schema": ERROR_REF,
@@ -267,7 +267,7 @@ FIELD_DESCRIPTION = {"type": "object", "properties": {
 
 SCHEMAS = {
     "ShippingMethod": {"type": "object", "properties": {
-        "id": {"type": "integer", "description": "Assigned by the store. The id every `{shipping_method_id}` path takes."},
+        "id": {"type": "integer", "description": "The shipping method's id, assigned by the store. Pass it as `shipping_method_id` in a path."},
         "name": {"type": "string", "maxLength": 100, "description": "Unique across the store's methods."},
         "is_default": {"type": "boolean", "description": "`true` on the one default method. Only `PUT /admin/shipping_methods/{shipping_method_id}/default` changes it."},
     }},

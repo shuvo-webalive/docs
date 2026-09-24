@@ -4,6 +4,6 @@ description: "Changes a shipping method's `name` and returns the updated method.
 openapi: "PUT /admin/shipping_methods/{shipping_method_id}"
 ---
 
-Changes the method's `name` and returns the method. Wrap the change in `shipping_method`; `name` is required and follows the same rules as on create. Any `id` or `is_default` you send is ignored. To change the default, use [Set the default shipping method](/api-reference/shipping-methods/set-the-default-shipping-method).
+Changes the method's `name` and returns the method. Wrap the change in `shipping_method`; `name` is required and follows the same rules as on create. Any `id` or `is_default` you send inside `shipping_method` is ignored. To change the default, use [Set the default shipping method](/api-reference/shipping-methods/set-the-default-shipping-method).
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

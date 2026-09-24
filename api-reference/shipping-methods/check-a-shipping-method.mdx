@@ -1,9 +1,9 @@
 ---
 title: "Check a shipping method"
-description: "Returns headers only, and `200` even when no method has that `id`."
+description: "Returns headers only, and `200` even when no method has that `shipping_method_id`."
 openapi: "HEAD /admin/shipping_methods/{shipping_method_id}"
 ---
 
-Returns `200` with headers only and no body. It returns `200` even for an `id` that no method has, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method), which returns `404` for a missing `id`.
+Returns `200` with headers only and no body. It returns `200` even when no method has that `shipping_method_id`, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method), which returns `404` when no method has it.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

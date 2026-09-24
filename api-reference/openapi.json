@@ -403,7 +403,7 @@
         ],
         "summary": "Create a customer",
         "operationId": "create_customer",
-        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id`, not its `internal_id`, in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` share one `id`, so they are one saved address.",
+        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id`, not its `internal_id`, in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address.",
         "parameters": [],
         "responses": {
           "201": {
@@ -659,7 +659,7 @@
         ],
         "summary": "Update a customer",
         "operationId": "update_customer",
-        "description": "Updates a customer and returns `200` with the updated customer. Inside the `customer` object, send only the fields you want to change. Fields you leave out keep their current values. Sending `custom_properties` replaces the customer's whole list, so include every entry you want to keep. Leave `custom_properties` out to keep the list unchanged. Send each entry as `{label, description}`. The API also accepts `{name, value}`, but the response always uses `label` and `description`. An entry keeps its `id` while its `label` and `description` stay the same; new text gets a new `id`. You can set `store_credit` directly, but the API does not record the change in the customer's store credit history. The balance can then differ from the total of the recorded adjustments. To record a change, use [Adjust store credit](/api-reference/customers/adjust-store-credit).",
+        "description": "Updates a customer and returns `200` with the updated customer. Inside the `customer` object, send only the fields you want to change. Fields you leave out keep their current values. Sending `custom_properties` replaces the customer's whole list, so include every entry you want to keep. Leave `custom_properties` out to keep the list unchanged. Send each entry as `{label, description}`. The API also accepts `{name, value}`, but the response always uses `label` and `description`. An entry keeps its own `id` (the entry's, not the customer's) while its `label` and `description` stay the same; new text gets a new entry `id`. You can set `store_credit` directly, but the API does not record the change in the customer's store credit history. The balance can then differ from the total of the recorded adjustments. To record a change, use [Adjust store credit](/api-reference/customers/adjust-store-credit).",
         "parameters": [
           {
             "name": "customer_id",
@@ -3221,7 +3221,7 @@
         ],
         "summary": "Create a shipping method",
         "operationId": "create_shipping_method",
-        "description": "Creates a shipping method and returns it with the `id` the store assigned. Wrap the record in `shipping_method`; `name` is the only field the store reads. A new method always has `is_default` set to `false`, and any `id` or `is_default` you send is ignored.",
+        "description": "Creates a shipping method and returns it with the `id` the store assigned. Pass that `id` as `shipping_method_id` to retrieve, rename, delete or make the method the default. Wrap the record in `shipping_method`; `name` is the only field the store reads. A new method always has `is_default` set to `false`, and any `id` or `is_default` you send inside `shipping_method` is ignored.",
         "parameters": [],
         "responses": {
           "201": {
@@ -3442,7 +3442,7 @@
             "name": "shipping_method_id",
             "in": "path",
             "required": true,
-            "description": "The method's `id`, as returned by the listing.",
+            "description": "The shipping method's `id`, from a listing or from the response to creating it.",
             "schema": {
               "type": "integer"
             }
@@ -3484,7 +3484,7 @@
             }
           },
           "404": {
-            "description": "No method has that `id`, or the `id` is not a number.",
+            "description": "No method has that `shipping_method_id`, or it is not a number.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3551,13 +3551,13 @@
         ],
         "summary": "Check a shipping method",
         "operationId": "head_shipping_method",
-        "description": "Returns `200` with headers only and no body. It returns `200` even for an `id` that no method has, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method), which returns `404` for a missing `id`.",
+        "description": "Returns `200` with headers only and no body. It returns `200` even when no method has that `shipping_method_id`, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method), which returns `404` when no method has it.",
         "parameters": [
           {
             "name": "shipping_method_id",
             "in": "path",
             "required": true,
-            "description": "The method's `id`, as returned by the listing.",
+            "description": "The shipping method's `id`, from a listing or from the response to creating it.",
             "schema": {
               "type": "integer"
             }
@@ -3565,7 +3565,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Headers only, no body. Returned even when no method has that `id`."
+            "description": "Headers only, no body. Returned even when no method has that `shipping_method_id`."
           }
         },
         "x-codeSamples": [
@@ -3617,13 +3617,13 @@
         ],
         "summary": "Rename a shipping method",
         "operationId": "update_shipping_method",
-        "description": "Changes the method's `name` and returns the method. Wrap the change in `shipping_method`; `name` is required and follows the same rules as on create. Any `id` or `is_default` you send is ignored. To change the default, use [Set the default shipping method](/api-reference/shipping-methods/set-the-default-shipping-method).",
+        "description": "Changes the method's `name` and returns the method. Wrap the change in `shipping_method`; `name` is required and follows the same rules as on create. Any `id` or `is_default` you send inside `shipping_method` is ignored. To change the default, use [Set the default shipping method](/api-reference/shipping-methods/set-the-default-shipping-method).",
         "parameters": [
           {
             "name": "shipping_method_id",
             "in": "path",
             "required": true,
-            "description": "The method's `id`, as returned by the listing.",
+            "description": "The shipping method's `id`, from a listing or from the response to creating it.",
             "schema": {
               "type": "integer"
             }
@@ -3766,7 +3766,7 @@
             "name": "shipping_method_id",
             "in": "path",
             "required": true,
-            "description": "The method's `id`, as returned by the listing.",
+            "description": "The shipping method's `id`, from a listing or from the response to creating it.",
             "schema": {
               "type": "integer"
             }
@@ -3777,7 +3777,7 @@
             "description": "Deleted. No body."
           },
           "404": {
-            "description": "No method has that `id`, including a method you already deleted.",
+            "description": "No method has that `shipping_method_id`, including a method you already deleted.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3874,7 +3874,7 @@
             "name": "shipping_method_id",
             "in": "path",
             "required": true,
-            "description": "The method's `id`, as returned by the listing.",
+            "description": "The shipping method's `id`, from a listing or from the response to creating it.",
             "schema": {
               "type": "integer"
             }
@@ -4939,7 +4939,7 @@
         "properties": {
           "id": {
             "type": "integer",
-            "description": "Assigned by the store. The id every `{shipping_method_id}` path takes."
+            "description": "The shipping method's id, assigned by the store. Pass it as `shipping_method_id` in a path."
           },
           "name": {
             "type": "string",
