@@ -57,6 +57,7 @@
                     "enum": [
                       "client_credentials"
                     ],
+                    "default": "client_credentials",
                     "description": "Always `client_credentials`."
                   },
                   "client_id": {

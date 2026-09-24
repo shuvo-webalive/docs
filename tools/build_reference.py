@@ -116,7 +116,7 @@ def token_operation():
         "security": [],
         "requestBody": {"required": True, "content": {"application/json": {
             "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret", "redirect_uri", "auth_string"], "properties": {
-                "grant_type": {"type": "string", "enum": ["client_credentials"], "description": "Always `client_credentials`."},
+                "grant_type": {"type": "string", "enum": ["client_credentials"], "default": "client_credentials", "description": "Always `client_credentials`."},
                 "client_id": {"type": "string", "description": "Your integration's client ID."},
                 "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
                 "redirect_uri": {"type": "string", "description": "The redirect URI registered for your integration."},
