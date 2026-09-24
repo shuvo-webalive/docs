@@ -1,0 +1,18 @@
+{
+  "sdk": "python",
+  "module": "shipping_settings",
+  "endpoints": {
+    "get_shipping_settings": {
+      "function": "get_shipping_settings",
+      "code": "response = client.shipping_settings.get_shipping_settings()\nsettings = response.map[\"shipping_settings\"]\nprint(settings[\"default_shipping_profile\"], settings[\"shipping_tax_profile\"])\nprint(settings[\"enable_shipping_class\"], settings[\"enable_flat_view_class\"])\n"
+    },
+    "patch_shipping_settings": {
+      "function": "patch_shipping_settings",
+      "code": "response = client.shipping_settings.patch_shipping_settings({\n    \"shipping_settings\": {\"enable_shipping_default_tax\": True},\n})\nprint(response.map[\"shipping_settings\"][\"enable_shipping_default_tax\"])\n"
+    },
+    "head_shipping_settings": {
+      "function": "head_shipping_settings",
+      "code": "response = client.shipping_settings.head_shipping_settings()\nprint(response.status_code)\n"
+    }
+  }
+}

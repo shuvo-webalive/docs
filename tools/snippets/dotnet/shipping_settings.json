@@ -1,0 +1,18 @@
+{
+  "sdk": "dotnet",
+  "module": "shipping_settings",
+  "endpoints": {
+    "get_shipping_settings": {
+      "function": "GetShippingSettingsAsync",
+      "code": "var response = await client.ShippingSettings.GetShippingSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine($\"{shippingSettings[\"enable_shipping_default_tax\"]} {shippingSettings[\"enable_shipping_class\"]}\");"
+    },
+    "patch_shipping_settings": {
+      "function": "PatchShippingSettingsAsync",
+      "code": "var response = await client.ShippingSettings.PatchShippingSettingsAsync(new Dictionary<string, object?>\n{\n    [\"shipping_settings\"] = new Dictionary<string, object?> { [\"enable_shipping_default_tax\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine(shippingSettings[\"enable_shipping_default_tax\"]);"
+    },
+    "head_shipping_settings": {
+      "function": "HeadShippingSettingsAsync",
+      "code": "var response = await client.ShippingSettings.HeadShippingSettingsAsync();\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

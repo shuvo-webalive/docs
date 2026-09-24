@@ -1,0 +1,18 @@
+{
+  "sdk": "php",
+  "module": "shipping_settings",
+  "endpoints": {
+    "get_shipping_settings": {
+      "function": "getShippingSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$response = ShippingSettings::getShippingSettings($client);\n\n$settings = $response->map['shipping_settings'];\necho 'default shipping: ', $settings['default_shipping_profile']['name'] ?? 'No Shipping', PHP_EOL;\necho 'shipping tax: ', $settings['shipping_tax_profile']['name'] ?? 'No Tax', PHP_EOL;\necho 'shipping classes: ', $settings['enable_shipping_class'] ? 'on' : 'off', PHP_EOL;"
+    },
+    "patch_shipping_settings": {
+      "function": "patchShippingSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$response = ShippingSettings::patchShippingSettings($client, [\n    'shipping_settings' => ['enable_shipping_default_tax' => true],\n]);\n\necho $response->map['shipping_settings']['enable_shipping_default_tax'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_shipping_settings": {
+      "function": "headShippingSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$response = ShippingSettings::headShippingSettings($client);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

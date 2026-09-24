@@ -1,0 +1,18 @@
+{
+  "sdk": "java",
+  "module": "shipping_settings",
+  "endpoints": {
+    "get_shipping_settings": {
+      "function": "getShippingSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingSettings().getShippingSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nMap<?, ?> shippingProfile = (Map<?, ?>) settings.get(\"default_shipping_profile\");\nSystem.out.println(shippingProfile == null ? \"No Shipping\" : shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\"));\nSystem.out.println(settings.get(\"enable_shipping_default_tax\") + \" \" + settings.get(\"enable_delivery_default_tax\"));\nSystem.out.println(settings.get(\"enable_shipping_class\") + \" \" + settings.get(\"enable_flat_view_class\"));"
+    },
+    "patch_shipping_settings": {
+      "function": "patchShippingSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingSettings().patchShippingSettings(\n        Map.of(\"shipping_settings\", Map.of(\"enable_shipping_default_tax\", true)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nSystem.out.println(settings.get(\"enable_shipping_default_tax\"));"
+    },
+    "head_shipping_settings": {
+      "function": "headShippingSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingSettings().headShippingSettings();\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

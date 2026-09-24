@@ -1,0 +1,18 @@
+{
+  "sdk": "js",
+  "module": "shipping_settings",
+  "endpoints": {
+    "get_shipping_settings": {
+      "function": "getShippingSettings",
+      "code": "import {shippingSettings} from 'webcommander-sdk';\n\nconst response = await shippingSettings.getShippingSettings(client);\nconst settings = response.map.shipping_settings;\nconsole.log(settings.default_shipping_profile?.name, settings.default_delivery_profile?.name);\nconsole.log(settings.enable_shipping_default_tax, settings.enable_delivery_default_tax);\nconsole.log(settings.enable_shipping_class, settings.enable_flat_view_class);\n"
+    },
+    "patch_shipping_settings": {
+      "function": "patchShippingSettings",
+      "code": "import {shippingSettings} from 'webcommander-sdk';\n\nconst response = await shippingSettings.patchShippingSettings(client, {\n    shipping_settings: {enable_shipping_default_tax: true},\n});\nconsole.log(response.map.shipping_settings.enable_shipping_default_tax);\n"
+    },
+    "head_shipping_settings": {
+      "function": "headShippingSettings",
+      "code": "import {shippingSettings} from 'webcommander-sdk';\n\nconst response = await shippingSettings.headShippingSettings(client);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}
