@@ -444,7 +444,8 @@ def navigation(areas):
 
 
 def write_programs(target, areas, snippets, setups):
-    """Writes every sample as the complete program the pages show, one folder each, so each SDK can compile them."""
+    """Writes the registration and every sample, exactly as the pages show them, as programs that compile on their
+    own, one folder each. Samples leave out the registration, so an import it provides cannot hide a missing one."""
     count = 0
     for sdk, _, _ in SDKS:
         folder = target / sdk / "authentication" / "register"
@@ -458,7 +459,7 @@ def write_programs(target, areas, snippets, setups):
                     folder = target / sdk / module.NAME / endpoint["key"]
                     folder.mkdir(parents=True, exist_ok=True)
                     sample = snippets[module.NAME][sdk]["endpoints"][endpoint["key"]]["code"]
-                    code = program(sdk, [setups[sdk]["register"], setups[sdk]["client"], sample], complete=True)
+                    code = program(sdk, [setups[sdk]["client"], sample], complete=True)
                     (folder / PROGRAM_FILES[sdk]).write_bytes(code.encode("utf-8"))
                     count += 1
     print("Wrote %d programs to %s" % (count, target))

@@ -4,63 +4,63 @@
   "endpoints": {
     "list_customers": {
       "function": "getCustomers",
-      "code": "ApiResponse response = client.adminCustomers().getCustomers(Map.of(\"limit\", 20, \"status\", \"active\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"customers\")) {\n    Map<?, ?> customer = (Map<?, ?>) row;\n    System.out.println(customer.get(\"customer_id\") + \" \" + customer.get(\"email\"));\n}"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().getCustomers(Map.of(\"limit\", 20, \"status\", \"active\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"customers\")) {\n    Map<?, ?> customer = (Map<?, ?>) row;\n    System.out.println(customer.get(\"customer_id\") + \" \" + customer.get(\"email\"));\n}"
     },
     "get_customer": {
       "function": "getCustomer",
-      "code": "ApiResponse response = client.adminCustomers().getCustomer(123);\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"email\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().getCustomer(123);\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"email\"));"
     },
     "count_customers": {
       "function": "getCustomerCount",
-      "code": "ApiResponse response = client.adminCustomers().getCustomerCount(Map.of(\"status\", \"active\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().getCustomerCount(Map.of(\"status\", \"active\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total\"));"
     },
     "check_email": {
       "function": "getCustomerEmailExists",
-      "code": "ApiResponse response = client.adminCustomers().getCustomerEmailExists(\"jane@example.com\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"exists\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().getCustomerEmailExists(\"jane@example.com\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"exists\"));"
     },
     "export_customers": {
       "function": "getCustomerExport",
-      "code": "ApiResponse response = client.adminCustomers().getCustomerExport();\nbyte[] xlsx = (byte[]) response.getMap();\nFiles.write(Path.of(\"customers.xlsx\"), xlsx);"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\n\nApiResponse response = client.adminCustomers().getCustomerExport();\nbyte[] xlsx = (byte[]) response.getMap();\nFiles.write(Path.of(\"customers.xlsx\"), xlsx);"
     },
     "create_customer": {
       "function": "createCustomer",
-      "code": "ApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\"));"
     },
     "update_customer": {
       "function": "updateCustomer",
-      "code": "ApiResponse response = client.adminCustomers().updateCustomer(123,\n        Map.of(\"customer\", Map.of(\"last_name\", \"Smith\")));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"last_name\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().updateCustomer(123,\n        Map.of(\"customer\", Map.of(\"last_name\", \"Smith\")));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"last_name\"));"
     },
     "delete_customer": {
       "function": "deleteCustomer",
-      "code": "ApiResponse response = client.adminCustomers().deleteCustomer(123);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.adminCustomers().deleteCustomer(123);\nSystem.out.println(response.getStatusCode());"
     },
     "add_addresses": {
       "function": "createCustomerAddresses",
-      "code": "ApiResponse response = client.adminCustomers().createCustomerAddresses(123, Map.of(\"customer\", Map.of(\n        \"addresses\", List.of(Map.of(\n                \"type\", \"shipping\", \"first_name\", \"Jane\", \"last_name\", \"Doe\",\n                \"address_line_1\", \"1 Example Street\", \"city\", \"Sydney\", \"post_code\", \"2000\")))));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"addresses\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().createCustomerAddresses(123, Map.of(\"customer\", Map.of(\n        \"addresses\", List.of(Map.of(\n                \"type\", \"shipping\", \"first_name\", \"Jane\", \"last_name\", \"Doe\",\n                \"address_line_1\", \"1 Example Street\", \"city\", \"Sydney\", \"post_code\", \"2000\")))));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"addresses\"));"
     },
     "reset_password": {
       "function": "resetCustomerPassword",
-      "code": "ApiResponse response = client.adminCustomers().resetCustomerPassword(123,\n        Map.of(\"customer\", Map.of(\"password\", \"NewPassw0rd!\")));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().resetCustomerPassword(123,\n        Map.of(\"customer\", Map.of(\"password\", \"NewPassw0rd!\")));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\"));"
     },
     "change_password": {
       "function": "changeCustomerPassword",
-      "code": "ApiResponse response = client.adminCustomers().changeCustomerPassword(123, Map.of(\"customer\", Map.of(\n        \"email\", \"jane@example.com\", \"old_password\", \"OldPassw0rd!\", \"password\", \"NewPassw0rd!\")));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().changeCustomerPassword(123, Map.of(\"customer\", Map.of(\n        \"email\", \"jane@example.com\", \"old_password\", \"OldPassw0rd!\", \"password\", \"NewPassw0rd!\")));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\"));"
     },
     "bulk_reset_passwords": {
       "function": "bulkResetCustomerPasswords",
-      "code": "ApiResponse response = client.adminCustomers().bulkResetCustomerPasswords(\n        Map.of(\"customer_ids\", List.of(123, 124)));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total_queued\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().bulkResetCustomerPasswords(\n        Map.of(\"customer_ids\", List.of(123, 124)));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total_queued\"));"
     },
     "import_customers": {
       "function": "importCustomers",
-      "code": "ApiResponse response = client.adminCustomers().importCustomers(Map.of(\"file\", Path.of(\"customers.csv\")));\nMap<?, ?> report = (Map<?, ?>) response.getMap();\nSystem.out.println(report.get(\"created\") + \" created, \" + report.get(\"updated\") + \" updated, \"\n        + report.get(\"failed\") + \" failed\");"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().importCustomers(Map.of(\"file\", Path.of(\"customers.csv\")));\nMap<?, ?> report = (Map<?, ?>) response.getMap();\nSystem.out.println(report.get(\"created\") + \" created, \" + report.get(\"updated\") + \" updated, \"\n        + report.get(\"failed\") + \" failed\");"
     },
     "list_store_credit_adjustments": {
       "function": "getCustomerStoreCreditAdjustments",
-      "code": "ApiResponse response = client.adminCustomers().getCustomerStoreCreditAdjustments(123, Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"store_credit_adjustments\")) {\n    Map<?, ?> adjustment = (Map<?, ?>) row;\n    System.out.println(adjustment.get(\"action\") + \" \" + adjustment.get(\"amount\"));\n}"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().getCustomerStoreCreditAdjustments(123, Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"store_credit_adjustments\")) {\n    Map<?, ?> adjustment = (Map<?, ?>) row;\n    System.out.println(adjustment.get(\"action\") + \" \" + adjustment.get(\"amount\"));\n}"
     },
     "adjust_store_credit": {
       "function": "createCustomerStoreCreditAdjustment",
-      "code": "ApiResponse response = client.adminCustomers().createCustomerStoreCreditAdjustment(123,\n        Map.of(\"action\", \"add\", \"amount\", 20, \"note\", \"Refund\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"store_credit\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().createCustomerStoreCreditAdjustment(123,\n        Map.of(\"action\", \"add\", \"amount\", 20, \"note\", \"Refund\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"store_credit\"));"
     }
   }
 }

@@ -4,23 +4,23 @@
   "endpoints": {
     "get_category_page": {
       "function": "GetCategoryPage",
-      "code": "resp, err := client.CategoryPageSettings().GetCategoryPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"category_page\"].(map[string]any)\ninformation := settings[\"category_information\"].(map[string]any)\nproducts := settings[\"product_information\"].(map[string]any)\nfmt.Println(information[\"show_description\"], products[\"default_sort\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CategoryPageSettings().GetCategoryPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"category_page\"].(map[string]any)\ninformation := settings[\"category_information\"].(map[string]any)\nproducts := settings[\"product_information\"].(map[string]any)\nfmt.Println(information[\"show_description\"], products[\"default_sort\"])"
     },
     "patch_category_page": {
       "function": "PatchCategoryPage",
-      "code": "resp, err := client.CategoryPageSettings().PatchCategoryPage(ctx, map[string]any{\n\t\"category_page\": map[string]any{\n\t\t\"category_information\": map[string]any{\"show_description\": true, \"subcategory\": map[string]any{\"per_page\": 24}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"category_page\"].(map[string]any)[\"category_information\"].(map[string]any)\nfmt.Println(information[\"show_description\"], information[\"subcategory\"].(map[string]any)[\"per_page\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CategoryPageSettings().PatchCategoryPage(ctx, map[string]any{\n\t\"category_page\": map[string]any{\n\t\t\"category_information\": map[string]any{\"show_description\": true, \"subcategory\": map[string]any{\"per_page\": 24}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"category_page\"].(map[string]any)[\"category_information\"].(map[string]any)\nfmt.Println(information[\"show_description\"], information[\"subcategory\"].(map[string]any)[\"per_page\"])"
     },
     "head_category_page": {
       "function": "HeadCategoryPage",
-      "code": "resp, err := client.CategoryPageSettings().HeadCategoryPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CategoryPageSettings().HeadCategoryPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "get_category_page_section": {
       "function": "GetCategoryPageSection",
-      "code": "resp, err := client.CategoryPageSettings().GetCategoryPageSection(ctx, \"category_information\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"category_information\"].(map[string]any)\nfmt.Println(information[\"show_description\"], information[\"subcategory\"].(map[string]any)[\"per_page\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CategoryPageSettings().GetCategoryPageSection(ctx, \"category_information\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ninformation := resp.Map().(map[string]any)[\"category_information\"].(map[string]any)\nfmt.Println(information[\"show_description\"], information[\"subcategory\"].(map[string]any)[\"per_page\"])"
     },
     "patch_category_page_section": {
       "function": "PatchCategoryPageSection",
-      "code": "resp, err := client.CategoryPageSettings().PatchCategoryPageSection(ctx, \"category_information\", map[string]any{\n\t\"category_information\": map[string]any{\"show_description\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"category_information\"].(map[string]any)[\"show_description\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CategoryPageSettings().PatchCategoryPageSection(ctx, \"category_information\", map[string]any{\n\t\"category_information\": map[string]any{\"show_description\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"category_information\"].(map[string]any)[\"show_description\"])"
     }
   }
 }

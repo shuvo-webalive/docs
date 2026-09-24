@@ -4,39 +4,39 @@
   "endpoints": {
     "list_shipping_methods": {
       "function": "ListShippingMethods",
-      "code": "resp, err := client.ShippingMethods().ListShippingMethods(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"shipping_methods\"].([]any) {\n\tmethod := row.(map[string]any)\n\tfmt.Println(method[\"id\"], method[\"name\"], method[\"is_default\"])\n}"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().ListShippingMethods(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"shipping_methods\"].([]any) {\n\tmethod := row.(map[string]any)\n\tfmt.Println(method[\"id\"], method[\"name\"], method[\"is_default\"])\n}"
     },
     "head_shipping_methods": {
       "function": "HeadShippingMethods",
-      "code": "resp, err := client.ShippingMethods().HeadShippingMethods(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().HeadShippingMethods(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "count_shipping_methods": {
       "function": "CountShippingMethods",
-      "code": "resp, err := client.ShippingMethods().CountShippingMethods(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_methods\"].(map[string]any)[\"count\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().CountShippingMethods(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_methods\"].(map[string]any)[\"count\"])"
     },
     "create_shipping_method": {
       "function": "CreateShippingMethod",
-      "code": "resp, err := client.ShippingMethods().CreateShippingMethod(ctx, map[string]any{\n\t\"shipping_method\": map[string]any{\"name\": \"Express Post\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nmethod := resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)\nfmt.Println(method[\"id\"], method[\"name\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().CreateShippingMethod(ctx, map[string]any{\n\t\"shipping_method\": map[string]any{\"name\": \"Express Post\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nmethod := resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)\nfmt.Println(method[\"id\"], method[\"name\"])"
     },
     "get_shipping_method": {
       "function": "GetShippingMethod",
-      "code": "resp, err := client.ShippingMethods().GetShippingMethod(ctx, 2, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nmethod := resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)\nfmt.Println(method[\"name\"], method[\"is_default\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().GetShippingMethod(ctx, 2, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nmethod := resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)\nfmt.Println(method[\"name\"], method[\"is_default\"])"
     },
     "head_shipping_method": {
       "function": "HeadShippingMethod",
-      "code": "resp, err := client.ShippingMethods().HeadShippingMethod(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().HeadShippingMethod(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "update_shipping_method": {
       "function": "UpdateShippingMethod",
-      "code": "resp, err := client.ShippingMethods().UpdateShippingMethod(ctx, 4, map[string]any{\n\t\"shipping_method\": map[string]any{\"name\": \"Express Post Next Day\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)[\"name\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().UpdateShippingMethod(ctx, 4, map[string]any{\n\t\"shipping_method\": map[string]any{\"name\": \"Express Post Next Day\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)[\"name\"])"
     },
     "delete_shipping_method": {
       "function": "DeleteShippingMethod",
-      "code": "resp, err := client.ShippingMethods().DeleteShippingMethod(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().DeleteShippingMethod(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "set_shipping_method_default": {
       "function": "SetShippingMethodDefault",
-      "code": "resp, err := client.ShippingMethods().SetShippingMethodDefault(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nmethod := resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)\nfmt.Println(method[\"name\"], method[\"is_default\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingMethods().SetShippingMethodDefault(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nmethod := resp.Map().(map[string]any)[\"shipping_method\"].(map[string]any)\nfmt.Println(method[\"name\"], method[\"is_default\"])"
     }
   }
 }

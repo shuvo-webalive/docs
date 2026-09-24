@@ -20,7 +20,7 @@
     },
     "export_customers": {
       "function": "getCustomerExport",
-      "code": "final response = await client.adminCustomers.getCustomerExport();\nawait File('customers.xlsx').writeAsBytes(response.map as List<int>);"
+      "code": "import 'dart:io';\n\nfinal response = await client.adminCustomers.getCustomerExport();\nawait File('customers.xlsx').writeAsBytes(response.map as List<int>);"
     },
     "create_customer": {
       "function": "createCustomer",
@@ -52,7 +52,7 @@
     },
     "import_customers": {
       "function": "importCustomers",
-      "code": "final csv = await File('customers.csv').readAsBytes();\nfinal response = await client.adminCustomers.importCustomers({\n  'file': ['customers.csv', csv, 'text/csv'],\n});\nprint((response.map as Map)['created']);"
+      "code": "import 'dart:io';\n\nfinal csv = await File('customers.csv').readAsBytes();\nfinal response = await client.adminCustomers.importCustomers({\n  'file': ['customers.csv', csv, 'text/csv'],\n});\nprint((response.map as Map)['created']);"
     },
     "list_store_credit_adjustments": {
       "function": "getCustomerStoreCreditAdjustments",

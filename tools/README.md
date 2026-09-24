@@ -27,7 +27,7 @@ The build fails when:
 - endpoint keys repeat across modules,
 - the spec contains a store address.
 
-To compile every sample as a complete program (registration, client line and call), write them out with
+To compile the registration and every sample exactly as the pages show them, write them out with
 `python build_reference.py --programs <folder>` (one folder per SDK, module and endpoint) and build
 each one against that SDK's `development` branch before publishing.
 

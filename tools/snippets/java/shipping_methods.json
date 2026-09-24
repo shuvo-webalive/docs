@@ -4,39 +4,39 @@
   "endpoints": {
     "list_shipping_methods": {
       "function": "listShippingMethods",
-      "code": "ApiResponse response = client.shippingMethods().listShippingMethods(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_methods\")) {\n    Map<?, ?> shippingMethod = (Map<?, ?>) row;\n    System.out.println(shippingMethod.get(\"id\") + \" \" + shippingMethod.get(\"name\") + \" \" + shippingMethod.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingMethods().listShippingMethods(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_methods\")) {\n    Map<?, ?> shippingMethod = (Map<?, ?>) row;\n    System.out.println(shippingMethod.get(\"id\") + \" \" + shippingMethod.get(\"name\") + \" \" + shippingMethod.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
     "head_shipping_methods": {
       "function": "headShippingMethods",
-      "code": "ApiResponse response = client.shippingMethods().headShippingMethods();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingMethods().headShippingMethods();\nSystem.out.println(response.getStatusCode());"
     },
     "count_shipping_methods": {
       "function": "countShippingMethods",
-      "code": "ApiResponse response = client.shippingMethods().countShippingMethods();\nMap<?, ?> shippingMethods = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_methods\");\nSystem.out.println(shippingMethods.get(\"count\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingMethods().countShippingMethods();\nMap<?, ?> shippingMethods = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_methods\");\nSystem.out.println(shippingMethods.get(\"count\"));"
     },
     "create_shipping_method": {
       "function": "createShippingMethod",
-      "code": "ApiResponse response = client.shippingMethods().createShippingMethod(\n        Map.of(\"shipping_method\", Map.of(\"name\", \"Express Post\")));\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"id\") + \" \" + shippingMethod.get(\"name\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingMethods().createShippingMethod(\n        Map.of(\"shipping_method\", Map.of(\"name\", \"Express Post\")));\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"id\") + \" \" + shippingMethod.get(\"name\"));"
     },
     "get_shipping_method": {
       "function": "getShippingMethod",
-      "code": "ApiResponse response = client.shippingMethods().getShippingMethod(2);\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"name\") + \" \" + shippingMethod.get(\"is_default\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingMethods().getShippingMethod(2);\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"name\") + \" \" + shippingMethod.get(\"is_default\"));"
     },
     "head_shipping_method": {
       "function": "headShippingMethod",
-      "code": "ApiResponse response = client.shippingMethods().headShippingMethod(2);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingMethods().headShippingMethod(2);\nSystem.out.println(response.getStatusCode());"
     },
     "update_shipping_method": {
       "function": "updateShippingMethod",
-      "code": "ApiResponse response = client.shippingMethods().updateShippingMethod(4,\n        Map.of(\"shipping_method\", Map.of(\"name\", \"Express Post Next Day\")));\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"name\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingMethods().updateShippingMethod(4,\n        Map.of(\"shipping_method\", Map.of(\"name\", \"Express Post Next Day\")));\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"name\"));"
     },
     "delete_shipping_method": {
       "function": "deleteShippingMethod",
-      "code": "ApiResponse response = client.shippingMethods().deleteShippingMethod(4);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingMethods().deleteShippingMethod(4);\nSystem.out.println(response.getStatusCode());"
     },
     "set_shipping_method_default": {
       "function": "setShippingMethodDefault",
-      "code": "ApiResponse response = client.shippingMethods().setShippingMethodDefault(2);\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"name\") + \" \" + shippingMethod.get(\"is_default\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingMethods().setShippingMethodDefault(2);\nMap<?, ?> shippingMethod = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_method\");\nSystem.out.println(shippingMethod.get(\"name\") + \" \" + shippingMethod.get(\"is_default\"));"
     }
   }
 }
