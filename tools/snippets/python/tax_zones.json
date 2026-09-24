@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "tax_zones",
+  "endpoints": {
+    "list_tax_zones": {
+      "function": "list_tax_zones",
+      "code": "response = client.tax_zones.list_tax_zones({\"limit\": 2})\nfor tax_zone in response.map[\"tax_zones\"]:\n    print(tax_zone[\"id\"], tax_zone[\"name\"], tax_zone[\"system_generated\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_tax_zones": {
+      "function": "head_tax_zones",
+      "code": "response = client.tax_zones.head_tax_zones()\nprint(response.status_code)\n"
+    },
+    "create_tax_zone": {
+      "function": "create_tax_zone",
+      "code": "response = client.tax_zones.create_tax_zone({\n    \"tax_zone\": {\n        \"name\": \"Sydney Metro\",\n        \"countries\": [{\"id\": 12}],\n        \"states\": [{\"id\": 67}],\n        \"post_code\": [\"2000\", \"3000\"],\n    },\n})\ntax_zone = response.map[\"tax_zone\"]\nprint(tax_zone[\"id\"], tax_zone[\"post_code\"])\n"
+    },
+    "get_tax_zone": {
+      "function": "get_tax_zone",
+      "code": "response = client.tax_zones.get_tax_zone(1)\ntax_zone = response.map[\"tax_zone\"]\nprint(tax_zone[\"name\"], [country[\"code\"] for country in tax_zone[\"countries\"]])\nprint([state[\"code\"] for state in tax_zone[\"states\"]], tax_zone[\"post_code\"])\n"
+    },
+    "head_tax_zone": {
+      "function": "head_tax_zone",
+      "code": "response = client.tax_zones.head_tax_zone(1)\nprint(response.status_code)\n"
+    },
+    "update_tax_zone": {
+      "function": "update_tax_zone",
+      "code": "response = client.tax_zones.update_tax_zone(83, {\n    \"tax_zone\": {\n        \"name\": \"Sydney Metro and Parramatta\",\n        \"countries\": [{\"id\": 12}],\n        \"states\": [{\"id\": 67}],\n        \"post_code\": [\"2000\", \"2150\"],\n    },\n})\ntax_zone = response.map[\"tax_zone\"]\nprint(tax_zone[\"name\"], tax_zone[\"post_code\"])\n"
+    },
+    "delete_tax_zone": {
+      "function": "delete_tax_zone",
+      "code": "response = client.tax_zones.delete_tax_zone(83)\nprint(response.status_code)\n"
+    }
+  }
+}

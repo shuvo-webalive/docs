@@ -1,0 +1,9 @@
+---
+title: "Update a tax zone"
+description: "Replaces a tax zone's name, countries, states and post codes, and returns the updated zone."
+openapi: "PUT /admin/tax_zones/{tax_zone_id}"
+---
+
+Updates the tax zone whose `id` you pass as `tax_zone_id` and returns the updated zone. Wrap the fields in `tax_zone`, and always send `name`: an update without it fails with `500`. The call replaces `countries`, `states` and `post_code` with the lists you send, so a list you leave out comes back empty, and a `use_radius` you leave out comes back `false`. `radius` and `start_location` are saved only with `use_radius: true`, and keep their stored values when you leave them out.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "tax_zones",
+  "endpoints": {
+    "list_tax_zones": {
+      "function": "ListTaxZones",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().ListTaxZones(ctx, map[string]any{\"limit\": 2}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_zones\"].([]any) {\n\tzone := row.(map[string]any)\n\tfmt.Println(zone[\"id\"], zone[\"name\"], zone[\"system_generated\"])\n}"
+    },
+    "head_tax_zones": {
+      "function": "HeadTaxZones",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().HeadTaxZones(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_tax_zone": {
+      "function": "CreateTaxZone",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().CreateTaxZone(ctx, map[string]any{\n\t\"tax_zone\": map[string]any{\n\t\t\"name\": \"Sydney Metro\", \"countries\": []map[string]any{{\"id\": 12}},\n\t\t\"states\": []map[string]any{{\"id\": 67}}, \"post_code\": []string{\"2000\", \"3000\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nzone := resp.Map().(map[string]any)[\"tax_zone\"].(map[string]any)\nfmt.Println(zone[\"id\"], zone[\"name\"], zone[\"post_code\"])"
+    },
+    "get_tax_zone": {
+      "function": "GetTaxZone",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().GetTaxZone(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nzone := resp.Map().(map[string]any)[\"tax_zone\"].(map[string]any)\nfmt.Println(zone[\"name\"], zone[\"system_generated\"], zone[\"post_code\"])"
+    },
+    "head_tax_zone": {
+      "function": "HeadTaxZone",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().HeadTaxZone(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_tax_zone": {
+      "function": "UpdateTaxZone",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().UpdateTaxZone(ctx, 83, map[string]any{\n\t\"tax_zone\": map[string]any{\n\t\t\"name\": \"Sydney Metro and Parramatta\", \"countries\": []map[string]any{{\"id\": 12}},\n\t\t\"states\": []map[string]any{{\"id\": 67}}, \"post_code\": []string{\"2000\", \"2150\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nzone := resp.Map().(map[string]any)[\"tax_zone\"].(map[string]any)\nfmt.Println(zone[\"name\"], zone[\"post_code\"])"
+    },
+    "delete_tax_zone": {
+      "function": "DeleteTaxZone",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxZones().DeleteTaxZone(ctx, 83, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

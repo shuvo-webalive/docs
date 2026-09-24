@@ -1,0 +1,58 @@
+---
+title: "Tax zones"
+sidebarTitle: "Overview"
+description: "List, create, read, update and delete tax zones, each a named set of countries, states and post codes."
+---
+
+The Tax zones API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_zones`; the path in the old API collection, `/api/v4/admin/tax/custom_zones`, returns `404 not_found` with a message that starts `Unknown tax path`.
+
+<Warning>
+  **An update replaces the zone's lists.** A `PUT` replaces `countries`, `states` and `post_code` with
+  the lists you send, so a list you leave out comes back empty. A `use_radius` you leave out comes back
+  `false`. `radius` and `start_location` keep their stored values when you leave them out. Send every
+  list on each update, and send `name` too: an update without it fails with `500`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List tax zones](/api-reference/tax-zones/list-tax-zones) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_zones` | Returns up to 20 tax zones per call, with paging details in `pagination`. |
+| [Check the tax zones list](/api-reference/tax-zones/check-the-tax-zones-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_zones` | Returns `200` with headers only, to check that the tax zones path exists. |
+| [Create a tax zone](/api-reference/tax-zones/create-a-tax-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_zones` | Creates a tax zone and returns it with its `id`, which other calls take as `tax_zone_id`. |
+| [Retrieve a tax zone](/api-reference/tax-zones/retrieve-a-tax-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_zones/{tax_zone_id}` | Returns the tax zone whose `id` you pass as `tax_zone_id`. |
+| [Check a tax zone](/api-reference/tax-zones/check-a-tax-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_zones/{tax_zone_id}` | Returns headers only, and `200` even when no zone has that `tax_zone_id`. |
+| [Update a tax zone](/api-reference/tax-zones/update-a-tax-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/tax_zones/{tax_zone_id}` | Replaces a tax zone's name, countries, states and post codes, and returns the updated zone. |
+| [Delete a tax zone](/api-reference/tax-zones/delete-a-tax-zone) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tax_zones/{tax_zone_id}` | Deletes a tax zone permanently and returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap every write in `tax_zone`, and always send `name`.** Send
+  `{"tax_zone": {"name": "Sydney Metro"}}` to create a zone. A bare record is rejected with `400`
+  and the message `tax_zone missing`. A body with no `name` fails with `500`, on an update as well as
+  on a create.
+- **`countries` and `states` take records that hold the country's or state's `id`.** Send
+  `"countries": [{"id": 12}]`, where `12` is the country's `id`. You can read country and state `id`
+  values from the `countries` and `states` of the zones in a listing. A plain number such as `[12]`, a
+  record with only a `code`, or an `id` that matches no country or state fails with `500`. The store
+  saves a new zone before it checks these records, so after that `500` on a create the zone can still
+  be in the listing. The `500` does not include the zone's `id`: look for the zone by `name`.
+- **You send `post_code` as a flat list and get it back nested.** Send `["2000", "3000"]`, and the zone
+  returns `[["2000"], ["3000"]]`. Sending the nested form fails with `500` and the message
+  `JSONArray cannot be cast to String`.
+- **After a `400` or `404` from a tax endpoint, the next request on the same connection can fail too.**
+  Straight after a `404`, the next retrieve returns `404`, even for a zone that exists. A retrieve from
+  another tax collection returns `404` with that collection's own message, such as `Profile not found`.
+  Straight after a `400` `invalid_pagination`, the next listing returns the same `400`, even on another
+  tax collection. The request after it works normally. A `DELETE` sent straight after a `404` returns
+  that `404` and deletes nothing; sent after a successful read, it returns `204` and the zone is gone.
+- **A listing returns at most 20 zones per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get every zone, raise `offset` by the number of zones each page
+  returned until you reach `pagination.total`. The listing reads only `limit`, `offset` and `page`;
+  `q` and `field_metadata` are accepted and ignored.

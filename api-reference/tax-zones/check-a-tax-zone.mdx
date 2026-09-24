@@ -1,0 +1,9 @@
+---
+title: "Check a tax zone"
+description: "Returns headers only, and `200` even when no zone has that `tax_zone_id`."
+openapi: "HEAD /admin/tax_zones/{tax_zone_id}"
+---
+
+Returns `200` with headers only and no body. It returns `200` even when no zone has that `tax_zone_id`, so it does not tell you whether the zone exists. To check that, use [Retrieve a tax zone](/api-reference/tax-zones/retrieve-a-tax-zone), which returns `404` when no zone has it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
