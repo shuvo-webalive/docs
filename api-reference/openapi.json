@@ -43,6 +43,9 @@
       "name": "Shopping cart"
     },
     {
+      "name": "Animation effects"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -6920,6 +6923,745 @@
         }
       }
     },
+    "/admin/settings/animation_effects": {
+      "get": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Get animation effects settings",
+        "operationId": "get_animation_effects",
+        "description": "Returns every animation effects setting under `animation_effects`, with all five sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get the rules for every field except `custom_loader`, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field in all five sections except `custom_loader`, keyed by section. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All five sections and `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "animation_effects": {
+                      "$ref": "#/components/schemas/AnimationEffectsSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/AnimationEffectsGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/AnimationEffectsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section."
+                    }
+                  }
+                },
+                "example": {
+                  "animation_effects": {
+                    "preloader_design": {
+                      "enable_preloader": true,
+                      "enable_custom_preloader": false,
+                      "preloader_preset": "spinning_dots",
+                      "preloader_size": 30,
+                      "preloader_background_opacity": 0.5,
+                      "background_preloader": "#ffffff",
+                      "preloader_hide_condition": "auto",
+                      "preloader_show_time_condition": "on_every_load",
+                      "preloader_hide_after_time": 0.5,
+                      "preloader_page": "custom",
+                      "preloader_custom_page": [
+                        {
+                          "id": 70,
+                          "name": "Category"
+                        },
+                        {
+                          "id": 1,
+                          "name": "Home-default"
+                        }
+                      ],
+                      "custom_loader": {
+                        "enabled": false,
+                        "file_name": null,
+                        "file_url": null
+                      }
+                    },
+                    "widget_transition": {
+                      "widget_smooth_render": false,
+                      "widget_smooth_render_duration": 1000
+                    },
+                    "page_transition": {
+                      "page_transition_animation_type": "none",
+                      "transition_animation_duration": 0.8,
+                      "animation_before_entering_new_page": false,
+                      "animation_after_entering_new_page": false
+                    },
+                    "image_lazy_effect": {
+                      "preloader_image_lazy_effect_preset": "none",
+                      "product_details_page_image_lazy_effect": false,
+                      "flying_cart_image_lazy_effect": false,
+                      "product_list_image_lazy_effect": false,
+                      "property_list_image_lazy_effect": false,
+                      "property_details_page_image_lazy_effect": false,
+                      "blog_list_image_lazy_effect": false,
+                      "blog_details_page_image_lazy_effect": false,
+                      "lazy_loader_size": 30,
+                      "background_lazy_loader": "#ffffff",
+                      "content_image_lazy_load_background": "rgb(223 223 223) linear-gradient(180deg, rgb(128 141 151 / 0%), rgb(22 44 60 / 30%))"
+                    },
+                    "page_skeleton": {
+                      "checkout_page_skeleton": false
+                    }
+                  },
+                  "group_meta": {
+                    "preloader_design": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/preloader_design"
+                    },
+                    "widget_transition": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/widget_transition"
+                    },
+                    "page_transition": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/page_transition"
+                    },
+                    "image_lazy_effect": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/image_lazy_effect"
+                    },
+                    "page_skeleton": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/page_skeleton"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/animation_effects\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.animation_effects.get_animation_effects()\nsettings = response.map[\"animation_effects\"]\nprint(settings[\"preloader_design\"][\"preloader_preset\"])\nprint(settings[\"widget_transition\"][\"widget_smooth_render\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.getAnimationEffects();\nconst settings = response.map.animation_effects;\nconsole.log(settings.preloader_design.enable_preloader, settings.preloader_design.preloader_preset);\nconsole.log(settings.widget_transition.widget_smooth_render_duration);\nconsole.log(settings.page_transition.page_transition_animation_type);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$response = AnimationEffects::getAnimationEffects($client);\n\n$settings = $response->map['animation_effects'];\necho 'preloader: ', $settings['preloader_design']['preloader_preset'], PHP_EOL;\necho 'page transition: ', $settings['page_transition']['page_transition_animation_type'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().getAnimationEffects();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"animation_effects\");\nMap<?, ?> preloaderDesign = (Map<?, ?>) settings.get(\"preloader_design\");\nMap<?, ?> pageTransition = (Map<?, ?>) settings.get(\"page_transition\");\nSystem.out.println(preloaderDesign.get(\"enable_preloader\") + \" \" + preloaderDesign.get(\"preloader_preset\"));\nSystem.out.println(pageTransition.get(\"page_transition_animation_type\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.GetAnimationEffectsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar animationEffects = (IReadOnlyDictionary<string, object?>)body[\"animation_effects\"]!;\nvar pageTransition = (IReadOnlyDictionary<string, object?>)animationEffects[\"page_transition\"]!;\nConsole.WriteLine($\"{pageTransition[\"page_transition_animation_type\"]} {pageTransition[\"transition_animation_duration\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.animationEffects.getAnimationEffects();\nfinal animationEffects = (response.map as Map)['animation_effects'] as Map;\nprint(animationEffects['preloader_design']);\nprint(animationEffects['widget_transition']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AnimationEffectsSettings().GetAnimationEffects(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"animation_effects\"].(map[string]any)\npreloader := settings[\"preloader_design\"].(map[string]any)\ntransition := settings[\"page_transition\"].(map[string]any)\nfmt.Println(preloader[\"enable_preloader\"], preloader[\"preloader_preset\"], transition[\"page_transition_animation_type\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Update animation effects settings",
+        "operationId": "patch_animation_effects",
+        "description": "Send the fields to change inside `animation_effects`, grouped by section name. One body can change several sections at once. Only the fields you send change: other fields, and every section you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get animation effects settings](/api-reference/animation-effects/get-animation-effects-settings) does.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "animation_effects": {
+                      "$ref": "#/components/schemas/AnimationEffectsSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/AnimationEffectsGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "animation_effects": {
+                    "preloader_design": {
+                      "enable_preloader": true,
+                      "enable_custom_preloader": false,
+                      "preloader_preset": "spinning_dots",
+                      "preloader_size": 30,
+                      "preloader_background_opacity": 0.5,
+                      "background_preloader": "#ffffff",
+                      "preloader_hide_condition": "auto",
+                      "preloader_show_time_condition": "on_every_load",
+                      "preloader_hide_after_time": 0.5,
+                      "preloader_page": "custom",
+                      "preloader_custom_page": [
+                        {
+                          "id": 70,
+                          "name": "Category"
+                        },
+                        {
+                          "id": 1,
+                          "name": "Home-default"
+                        }
+                      ],
+                      "custom_loader": {
+                        "enabled": false,
+                        "file_name": null,
+                        "file_url": null
+                      }
+                    },
+                    "widget_transition": {
+                      "widget_smooth_render": false,
+                      "widget_smooth_render_duration": 1000
+                    },
+                    "page_transition": {
+                      "page_transition_animation_type": "none",
+                      "transition_animation_duration": 0.8,
+                      "animation_before_entering_new_page": true,
+                      "animation_after_entering_new_page": false
+                    },
+                    "image_lazy_effect": {
+                      "preloader_image_lazy_effect_preset": "none",
+                      "product_details_page_image_lazy_effect": false,
+                      "flying_cart_image_lazy_effect": false,
+                      "product_list_image_lazy_effect": false,
+                      "property_list_image_lazy_effect": false,
+                      "property_details_page_image_lazy_effect": false,
+                      "blog_list_image_lazy_effect": true,
+                      "blog_details_page_image_lazy_effect": false,
+                      "lazy_loader_size": 30,
+                      "background_lazy_loader": "#ffffff",
+                      "content_image_lazy_load_background": "rgb(223 223 223) linear-gradient(180deg, rgb(128 141 151 / 0%), rgb(22 44 60 / 30%))"
+                    },
+                    "page_skeleton": {
+                      "checkout_page_skeleton": false
+                    }
+                  },
+                  "group_meta": {
+                    "preloader_design": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/preloader_design"
+                    },
+                    "widget_transition": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/widget_transition"
+                    },
+                    "page_transition": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/page_transition"
+                    },
+                    "image_lazy_effect": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/image_lazy_effect"
+                    },
+                    "page_skeleton": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/animation_effects/page_skeleton"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `animation_effects` (`animation_effects wrapper required`), has another key beside it (`unknown top-level field(s): <name>`), names a section or field that does not exist (`unknown_field`), sends a value the field does not accept (`invalid_boolean`, `invalid_enum` or `out_of_range`), or is not valid JSON (`Request body is not valid JSON`). The reason for each rejected field is in `details[].code`. For a rejected value, `details[].field` gives the section and the field, such as `page_transition.page_transition_animation_type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationEffectsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "page_transition.page_transition_animation_type: must be one of [none, fade_in_out, slide_in_out, zoom_in_out, flip]",
+                    "details": [
+                      {
+                        "field": "page_transition.page_transition_animation_type",
+                        "code": "invalid_enum",
+                        "message": "must be one of [none, fade_in_out, slide_in_out, zoom_in_out, flip]",
+                        "value": "wobble"
+                      }
+                    ],
+                    "request_id": "3d8f1a6c-2b7e-4c91-9f4a-6e0d2c5b8a17"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. The `Retry-After` header says how long until you can write again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationEffectsError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/animation_effects\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"animation_effects\": {\n      \"page_transition\": {\n        \"animation_before_entering_new_page\": true\n      },\n      \"image_lazy_effect\": {\n        \"blog_list_image_lazy_effect\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.animation_effects.patch_animation_effects({\n    \"animation_effects\": {\n        \"page_transition\": {\"animation_before_entering_new_page\": True},\n        \"image_lazy_effect\": {\"blog_list_image_lazy_effect\": True},\n    },\n})\nsettings = response.map[\"animation_effects\"]\nprint(settings[\"page_transition\"][\"animation_before_entering_new_page\"])\nprint(settings[\"image_lazy_effect\"][\"blog_list_image_lazy_effect\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.patchAnimationEffects({\n    animation_effects: {\n        page_transition: {animation_before_entering_new_page: true},\n        image_lazy_effect: {blog_list_image_lazy_effect: true},\n    },\n});\nconst settings = response.map.animation_effects;\nconsole.log(settings.page_transition.animation_before_entering_new_page);\nconsole.log(settings.image_lazy_effect.blog_list_image_lazy_effect);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$response = AnimationEffects::patchAnimationEffects($client, [\n    'animation_effects' => [\n        'page_transition' => ['animation_before_entering_new_page' => true],\n        'image_lazy_effect' => ['blog_list_image_lazy_effect' => true],\n    ],\n]);\n\n$settings = $response->map['animation_effects'];\necho $settings['page_transition']['animation_before_entering_new_page'] ? 'true' : 'false', PHP_EOL;\necho $settings['image_lazy_effect']['blog_list_image_lazy_effect'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().patchAnimationEffects(Map.of(\"animation_effects\", Map.of(\n        \"page_transition\", Map.of(\"animation_before_entering_new_page\", true),\n        \"image_lazy_effect\", Map.of(\"blog_list_image_lazy_effect\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"animation_effects\");\nSystem.out.println(((Map<?, ?>) settings.get(\"page_transition\")).get(\"animation_before_entering_new_page\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"image_lazy_effect\")).get(\"blog_list_image_lazy_effect\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.PatchAnimationEffectsAsync(new Dictionary<string, object?>\n{\n    [\"animation_effects\"] = new Dictionary<string, object?>\n    {\n        [\"page_transition\"] = new Dictionary<string, object?> { [\"animation_before_entering_new_page\"] = true },\n        [\"image_lazy_effect\"] = new Dictionary<string, object?> { [\"blog_list_image_lazy_effect\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar animationEffects = (IReadOnlyDictionary<string, object?>)body[\"animation_effects\"]!;\nvar pageTransition = (IReadOnlyDictionary<string, object?>)animationEffects[\"page_transition\"]!;\nConsole.WriteLine(pageTransition[\"animation_before_entering_new_page\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.animationEffects.patchAnimationEffects({\n  'animation_effects': {\n    'page_transition': {'animation_before_entering_new_page': true},\n    'image_lazy_effect': {'blog_list_image_lazy_effect': true},\n  },\n});\nfinal animationEffects = (response.map as Map)['animation_effects'] as Map;\nprint(animationEffects['page_transition']);\nprint(animationEffects['image_lazy_effect']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AnimationEffectsSettings().PatchAnimationEffects(ctx, map[string]any{\n\t\"animation_effects\": map[string]any{\n\t\t\"page_transition\":   map[string]any{\"animation_before_entering_new_page\": true},\n\t\t\"image_lazy_effect\": map[string]any{\"blog_list_image_lazy_effect\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"animation_effects\"].(map[string]any)\nfmt.Println(settings[\"page_transition\"].(map[string]any)[\"animation_before_entering_new_page\"], settings[\"image_lazy_effect\"].(map[string]any)[\"blog_list_image_lazy_effect\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "animation_effects"
+                ],
+                "properties": {
+                  "animation_effects": {
+                    "$ref": "#/components/schemas/AnimationEffectsInput",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Get animation effects settings headers",
+        "operationId": "head_animation_effects",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/animation_effects\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.animation_effects.head_animation_effects()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.headAnimationEffects();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$response = AnimationEffects::headAnimationEffects($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().headAnimationEffects();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.HeadAnimationEffectsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.animationEffects.headAnimationEffects();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AnimationEffectsSettings().HeadAnimationEffects(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/animation_effects/{section}": {
+      "get": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Get a settings section",
+        "operationId": "get_animation_effects_section",
+        "description": "Returns one section, wrapped in the section's own name rather than in `animation_effects`, and without `group_meta`. Its values are the same as that section's in [Get animation effects settings](/api-reference/animation-effects/get-animation-effects-settings). Add `field_metadata=true` to also get the rules for each of the section's fields except `custom_loader`, keyed by field name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `preloader_design`, `widget_transition`, `page_transition`, `image_lazy_effect` or `page_skeleton`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "preloader_design",
+                "widget_transition",
+                "page_transition",
+                "image_lazy_effect",
+                "page_skeleton"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields except `custom_loader`, keyed by field name. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "preloader_design": {
+                      "$ref": "#/components/schemas/PreloaderDesign"
+                    },
+                    "widget_transition": {
+                      "$ref": "#/components/schemas/WidgetTransition"
+                    },
+                    "page_transition": {
+                      "$ref": "#/components/schemas/PageTransition"
+                    },
+                    "image_lazy_effect": {
+                      "$ref": "#/components/schemas/ImageLazyEffect"
+                    },
+                    "page_skeleton": {
+                      "$ref": "#/components/schemas/PageSkeleton"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/AnimationEffectsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "widget_transition": {
+                    "widget_smooth_render": false,
+                    "widget_smooth_render_duration": 1000
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The message is `Unknown animation_effects section: <name>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationEffectsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown animation_effects section: bogus",
+                    "details": [],
+                    "request_id": "8a2c4e6f-1d3b-4f5a-9c7e-0b2d4f6a8c13"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/animation_effects/widget_transition\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.animation_effects.get_animation_effects_section(\"widget_transition\")\ntransition = response.map[\"widget_transition\"]\nprint(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.getAnimationEffectsSection('widget_transition');\nconst transition = response.map.widget_transition;\nconsole.log(transition.widget_smooth_render, transition.widget_smooth_render_duration);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$response = AnimationEffects::getAnimationEffectsSection($client, 'widget_transition');\n\n$section = $response->map['widget_transition'];\necho 'smooth render: ', $section['widget_smooth_render'] ? 'on' : 'off', PHP_EOL;\necho $section['widget_smooth_render_duration'], ' ms', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().getAnimationEffectsSection(\"widget_transition\");\nMap<?, ?> widgetTransition = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"widget_transition\");\nSystem.out.println(widgetTransition.get(\"widget_smooth_render\"));\nSystem.out.println(widgetTransition.get(\"widget_smooth_render_duration\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.GetAnimationEffectsSectionAsync(\"widget_transition\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar widgetTransition = (IReadOnlyDictionary<string, object?>)body[\"widget_transition\"]!;\nConsole.WriteLine($\"{widgetTransition[\"widget_smooth_render\"]} {widgetTransition[\"widget_smooth_render_duration\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.animationEffects\n    .getAnimationEffectsSection('widget_transition');\nfinal section = (response.map as Map)['widget_transition'] as Map;\nprint(section['widget_smooth_render']);\nprint(section['widget_smooth_render_duration']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AnimationEffectsSettings().GetAnimationEffectsSection(ctx, \"widget_transition\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntransition := resp.Map().(map[string]any)[\"widget_transition\"].(map[string]any)\nfmt.Println(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Update a settings section",
+        "operationId": "patch_animation_effects_section",
+        "description": "Send the fields to change, wrapped in the section's own name, such as `widget_transition`. A body wrapped in `animation_effects`, or not wrapped at all, is rejected with `400 invalid_request`. Only the fields you send change, and you get back the whole section under the same key, without `group_meta`. After a `400` on a section path, the next write on the same client to a different section is also rejected with `400`, and the message names the previous section.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `preloader_design`, `widget_transition`, `page_transition`, `image_lazy_effect` or `page_skeleton`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "preloader_design",
+                "widget_transition",
+                "page_transition",
+                "image_lazy_effect",
+                "page_skeleton"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "preloader_design": {
+                      "$ref": "#/components/schemas/PreloaderDesign"
+                    },
+                    "widget_transition": {
+                      "$ref": "#/components/schemas/WidgetTransition"
+                    },
+                    "page_transition": {
+                      "$ref": "#/components/schemas/PageTransition"
+                    },
+                    "image_lazy_effect": {
+                      "$ref": "#/components/schemas/ImageLazyEffect"
+                    },
+                    "page_skeleton": {
+                      "$ref": "#/components/schemas/PageSkeleton"
+                    }
+                  }
+                },
+                "example": {
+                  "widget_transition": {
+                    "widget_smooth_render": true,
+                    "widget_smooth_render_duration": 1000
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in the section's own name (`request body must be wrapped in a '<section>' object`), or sends a value the field does not accept, such as a number outside the field's `min` and `max` (`out_of_range`). For a rejected value, `details[].field` gives the section and the field, such as `widget_transition.widget_smooth_render_duration`. After a `400`, the next write on the same client to a different section is checked against the previous section's name, so it is rejected with `request body must be wrapped in a '<previous section>' object`. Send that write from a new client and it is checked correctly.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationEffectsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "widget_transition.widget_smooth_render_duration: must be between 0 and 1000",
+                    "details": [
+                      {
+                        "field": "widget_transition.widget_smooth_render_duration",
+                        "code": "out_of_range",
+                        "message": "must be between 0 and 1000",
+                        "value": -1
+                      }
+                    ],
+                    "request_id": "5b7d9f1a-3c5e-4a7b-8d9f-2e4a6c8b0d35"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. The `Retry-After` header says how long until you can write again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationEffectsError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/animation_effects/widget_transition\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"widget_transition\": {\n      \"widget_smooth_render\": true\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.animation_effects.patch_animation_effects_section(\n    \"widget_transition\", {\"widget_transition\": {\"widget_smooth_render\": True}}\n)\ntransition = response.map[\"widget_transition\"]\nprint(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.patchAnimationEffectsSection('widget_transition', {\n    widget_transition: {widget_smooth_render: true},\n});\nconsole.log(response.map.widget_transition.widget_smooth_render);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$response = AnimationEffects::patchAnimationEffectsSection($client, 'widget_transition', [\n    'widget_transition' => ['widget_smooth_render' => true],\n]);\n\necho $response->map['widget_transition']['widget_smooth_render'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().patchAnimationEffectsSection(\"widget_transition\",\n        Map.of(\"widget_transition\", Map.of(\"widget_smooth_render\", true)));\nMap<?, ?> widgetTransition = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"widget_transition\");\nSystem.out.println(widgetTransition.get(\"widget_smooth_render\"));\nSystem.out.println(widgetTransition.get(\"widget_smooth_render_duration\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.PatchAnimationEffectsSectionAsync(\"widget_transition\", new Dictionary<string, object?>\n{\n    [\"widget_transition\"] = new Dictionary<string, object?> { [\"widget_smooth_render\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar widgetTransition = (IReadOnlyDictionary<string, object?>)body[\"widget_transition\"]!;\nConsole.WriteLine(widgetTransition[\"widget_smooth_render\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.animationEffects\n    .patchAnimationEffectsSection('widget_transition', {\n  'widget_transition': {'widget_smooth_render': true},\n});\nfinal section = (response.map as Map)['widget_transition'] as Map;\nprint(section['widget_smooth_render']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AnimationEffectsSettings().PatchAnimationEffectsSection(ctx, \"widget_transition\", map[string]any{\n\t\"widget_transition\": map[string]any{\"widget_smooth_render\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntransition := resp.Map().(map[string]any)[\"widget_transition\"].(map[string]any)\nfmt.Println(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the section named in the path. No other wrapper is accepted.",
+                "properties": {
+                  "preloader_design": {
+                    "$ref": "#/components/schemas/PreloaderDesignInput"
+                  },
+                  "widget_transition": {
+                    "$ref": "#/components/schemas/WidgetTransition"
+                  },
+                  "page_transition": {
+                    "$ref": "#/components/schemas/PageTransition"
+                  },
+                  "image_lazy_effect": {
+                    "$ref": "#/components/schemas/ImageLazyEffect"
+                  },
+                  "page_skeleton": {
+                    "$ref": "#/components/schemas/PageSkeleton"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -10775,6 +11517,548 @@
               "request_id": {
                 "type": "string",
                 "description": "Identifies the request. A response that repeats an earlier rejection has a new `request_id`."
+              }
+            }
+          }
+        }
+      },
+      "AnimationEffectsSettings": {
+        "type": "object",
+        "properties": {
+          "preloader_design": {
+            "$ref": "#/components/schemas/PreloaderDesign"
+          },
+          "widget_transition": {
+            "$ref": "#/components/schemas/WidgetTransition"
+          },
+          "page_transition": {
+            "$ref": "#/components/schemas/PageTransition"
+          },
+          "image_lazy_effect": {
+            "$ref": "#/components/schemas/ImageLazyEffect"
+          },
+          "page_skeleton": {
+            "$ref": "#/components/schemas/PageSkeleton"
+          }
+        }
+      },
+      "AnimationEffectsInput": {
+        "type": "object",
+        "description": "Name only the sections and fields that change.",
+        "properties": {
+          "preloader_design": {
+            "$ref": "#/components/schemas/PreloaderDesignInput"
+          },
+          "widget_transition": {
+            "$ref": "#/components/schemas/WidgetTransition"
+          },
+          "page_transition": {
+            "$ref": "#/components/schemas/PageTransition"
+          },
+          "image_lazy_effect": {
+            "$ref": "#/components/schemas/ImageLazyEffect"
+          },
+          "page_skeleton": {
+            "$ref": "#/components/schemas/PageSkeleton"
+          }
+        }
+      },
+      "PreloaderDesign": {
+        "type": "object",
+        "description": "The loader shown while a page loads, and when and where it shows.",
+        "properties": {
+          "enable_preloader": {
+            "type": "boolean",
+            "description": "Show the preloader while a page loads."
+          },
+          "enable_custom_preloader": {
+            "type": "boolean",
+            "description": "Show your own uploaded loader instead of the preset in `preloader_preset`."
+          },
+          "preloader_preset": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pulse_circle",
+              "tube_spinner",
+              "spinning_dots",
+              "ripples",
+              "infinite_spinner",
+              "gears_spinner",
+              "gear_spinner",
+              "bouncing_squares",
+              "bouncing_circles",
+              "bouncing_ball"
+            ],
+            "description": "The preset loader. `field_metadata` gives a label for each value under `options`, such as `Flying dots` for `pulse_circle`."
+          },
+          "preloader_size": {
+            "type": "integer",
+            "minimum": 20,
+            "maximum": 300,
+            "description": "The loader's size in pixels, from `20` to `300`."
+          },
+          "preloader_background_opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "The preloader's background opacity, from `0` to `1`."
+          },
+          "background_preloader": {
+            "type": "string",
+            "description": "The preloader's background colour, as a hex or CSS colour, such as `#ffffff`."
+          },
+          "preloader_hide_condition": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "x_seconds"
+            ],
+            "description": "When the preloader hides: `auto`, or `x_seconds` to hide it after `preloader_hide_after_time` seconds."
+          },
+          "preloader_show_time_condition": {
+            "type": "string",
+            "enum": [
+              "on_every_load",
+              "once_per_user_session_all",
+              "once_per_user_session_per_single_page"
+            ],
+            "description": "When the preloader shows: `on_every_load`, `once_per_user_session_all` or `once_per_user_session_per_single_page`."
+          },
+          "preloader_hide_after_time": {
+            "type": "number",
+            "minimum": 0.2,
+            "maximum": 5,
+            "description": "Seconds before the preloader hides, from `0.2` to `5`. Used when `preloader_hide_condition` is `x_seconds`."
+          },
+          "preloader_page": {
+            "type": "string",
+            "enum": [
+              "all",
+              "custom"
+            ],
+            "description": "Which pages show the preloader: `all`, or `custom` for only the pages in `preloader_custom_page`."
+          },
+          "preloader_custom_page": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PreloaderPage"
+            },
+            "description": "The pages that show the preloader when `preloader_page` is `custom`, each as the page's `id` and `name`. A write takes each page's `id`, and also accepts these records."
+          },
+          "custom_loader": {
+            "$ref": "#/components/schemas/CustomLoader",
+            "description": "The uploaded loader file. Read-only."
+          }
+        }
+      },
+      "PreloaderDesignInput": {
+        "type": "object",
+        "description": "The `preloader_design` fields a write accepts. `custom_loader` is not one of them.",
+        "properties": {
+          "enable_preloader": {
+            "type": "boolean",
+            "description": "Show the preloader while a page loads."
+          },
+          "enable_custom_preloader": {
+            "type": "boolean",
+            "description": "Show your own uploaded loader instead of the preset in `preloader_preset`."
+          },
+          "preloader_preset": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pulse_circle",
+              "tube_spinner",
+              "spinning_dots",
+              "ripples",
+              "infinite_spinner",
+              "gears_spinner",
+              "gear_spinner",
+              "bouncing_squares",
+              "bouncing_circles",
+              "bouncing_ball"
+            ],
+            "description": "The preset loader. `field_metadata` gives a label for each value under `options`, such as `Flying dots` for `pulse_circle`."
+          },
+          "preloader_size": {
+            "type": "integer",
+            "minimum": 20,
+            "maximum": 300,
+            "description": "The loader's size in pixels, from `20` to `300`."
+          },
+          "preloader_background_opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "The preloader's background opacity, from `0` to `1`."
+          },
+          "background_preloader": {
+            "type": "string",
+            "description": "The preloader's background colour, as a hex or CSS colour, such as `#ffffff`."
+          },
+          "preloader_hide_condition": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "x_seconds"
+            ],
+            "description": "When the preloader hides: `auto`, or `x_seconds` to hide it after `preloader_hide_after_time` seconds."
+          },
+          "preloader_show_time_condition": {
+            "type": "string",
+            "enum": [
+              "on_every_load",
+              "once_per_user_session_all",
+              "once_per_user_session_per_single_page"
+            ],
+            "description": "When the preloader shows: `on_every_load`, `once_per_user_session_all` or `once_per_user_session_per_single_page`."
+          },
+          "preloader_hide_after_time": {
+            "type": "number",
+            "minimum": 0.2,
+            "maximum": 5,
+            "description": "Seconds before the preloader hides, from `0.2` to `5`. Used when `preloader_hide_condition` is `x_seconds`."
+          },
+          "preloader_page": {
+            "type": "string",
+            "enum": [
+              "all",
+              "custom"
+            ],
+            "description": "Which pages show the preloader: `all`, or `custom` for only the pages in `preloader_custom_page`."
+          },
+          "preloader_custom_page": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "description": "A page's `id`."
+                },
+                {
+                  "$ref": "#/components/schemas/PreloaderPage"
+                }
+              ]
+            },
+            "description": "The ids of the pages that show the preloader, such as `[70, 1]`. A write also accepts the records a read returns, with each page's `id` and `name`. The list cannot be empty while `preloader_page` is `custom`, and a page `id` that matches no page is rejected with `400 invalid_request`. `field_metadata` lists the pages you can choose under `options`."
+          }
+        }
+      },
+      "PreloaderPage": {
+        "type": "object",
+        "description": "One page that shows the preloader.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The page's `id`. A write sends this value in `preloader_custom_page`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The page's name."
+          }
+        }
+      },
+      "CustomLoader": {
+        "type": "object",
+        "description": "The loader file uploaded for `enable_custom_preloader`. Read-only: `field_metadata` has no entry for it, and a write body that names only `custom_loader` is rejected with `400 invalid_request`.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "`true` when a loader file has been uploaded."
+          },
+          "file_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The uploaded file's name, or `null` when there is none."
+          },
+          "file_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The uploaded file's URL, or `null` when there is none."
+          }
+        }
+      },
+      "WidgetTransition": {
+        "type": "object",
+        "description": "Whether widgets fade in, and for how long.",
+        "properties": {
+          "widget_smooth_render": {
+            "type": "boolean",
+            "description": "Fade widgets in."
+          },
+          "widget_smooth_render_duration": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000,
+            "description": "How long the fade takes, in milliseconds, from `0` to `1000`."
+          }
+        }
+      },
+      "PageTransition": {
+        "type": "object",
+        "description": "The animation between pages, and when it plays.",
+        "properties": {
+          "page_transition_animation_type": {
+            "type": "string",
+            "enum": [
+              "none",
+              "fade_in_out",
+              "slide_in_out",
+              "zoom_in_out",
+              "flip"
+            ],
+            "description": "The animation between pages: `none`, `fade_in_out`, `slide_in_out`, `zoom_in_out` or `flip`."
+          },
+          "transition_animation_duration": {
+            "type": "number",
+            "minimum": 0.3,
+            "maximum": 5,
+            "description": "How long the animation takes, in seconds, from `0.3` to `5`."
+          },
+          "animation_before_entering_new_page": {
+            "type": "boolean",
+            "description": "Play the animation before entering a new page."
+          },
+          "animation_after_entering_new_page": {
+            "type": "boolean",
+            "description": "Play the animation after entering a new page."
+          }
+        }
+      },
+      "ImageLazyEffect": {
+        "type": "object",
+        "description": "Which pages lazy-load images, and the loader and placeholder they show.",
+        "properties": {
+          "preloader_image_lazy_effect_preset": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pulse_circle",
+              "tube_spinner",
+              "spinning_dots",
+              "ripples",
+              "infinite_spinner",
+              "gears_spinner",
+              "gear_spinner",
+              "bouncing_squares",
+              "bouncing_circles",
+              "bouncing_ball"
+            ],
+            "description": "The preset lazy loader. It takes the same values as `preloader_design.preloader_preset`."
+          },
+          "product_details_page_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images on the product details page."
+          },
+          "flying_cart_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images in the flying cart popup."
+          },
+          "product_list_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images on product list pages."
+          },
+          "property_list_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images on property list pages."
+          },
+          "property_details_page_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images on the property details page."
+          },
+          "blog_list_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images on blog list pages."
+          },
+          "blog_details_page_image_lazy_effect": {
+            "type": "boolean",
+            "description": "Lazy-load images on the blog details page."
+          },
+          "lazy_loader_size": {
+            "type": "integer",
+            "minimum": 20,
+            "maximum": 300,
+            "description": "The lazy loader's size in pixels, from `20` to `300`."
+          },
+          "background_lazy_loader": {
+            "type": "string",
+            "description": "The lazy loader's background colour, as a hex or CSS colour, such as `#ffffff`."
+          },
+          "content_image_lazy_load_background": {
+            "type": "string",
+            "description": "The CSS background of the image placeholder."
+          }
+        }
+      },
+      "PageSkeleton": {
+        "type": "object",
+        "description": "The checkout page skeleton setting. It is the section's only field.",
+        "properties": {
+          "checkout_page_skeleton": {
+            "type": "boolean",
+            "description": "Turn on the checkout page skeleton. A value that is not a boolean is rejected with `400 invalid_request`."
+          }
+        }
+      },
+      "AnimationEffectsGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get animation effects settings](/api-reference/animation-effects/get-animation-effects-settings) and [Update animation effects settings](/api-reference/animation-effects/update-animation-effects-settings) return it.",
+        "properties": {
+          "preloader_design": {
+            "$ref": "#/components/schemas/AnimationEffectsSectionMeta"
+          },
+          "widget_transition": {
+            "$ref": "#/components/schemas/AnimationEffectsSectionMeta"
+          },
+          "page_transition": {
+            "$ref": "#/components/schemas/AnimationEffectsSectionMeta"
+          },
+          "image_lazy_effect": {
+            "$ref": "#/components/schemas/AnimationEffectsSectionMeta"
+          },
+          "page_skeleton": {
+            "$ref": "#/components/schemas/AnimationEffectsSectionMeta"
+          }
+        }
+      },
+      "AnimationEffectsSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is. `setting` for all five sections."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `true` for all five sections."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/animation_effects/preloader_design`."
+          }
+        }
+      },
+      "AnimationEffectsFieldMetadata": {
+        "type": "object",
+        "description": "On [Get animation effects settings](/api-reference/animation-effects/get-animation-effects-settings) it is keyed by section and then by field name. On a section it is keyed by field name. `custom_loader` has no entry.",
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/AnimationEffectsFieldMetadataEntry"
+            },
+            {
+              "type": "object",
+              "description": "One section's fields, keyed by field name.",
+              "additionalProperties": {
+                "$ref": "#/components/schemas/AnimationEffectsFieldMetadataEntry"
+              }
+            }
+          ]
+        }
+      },
+      "AnimationEffectsFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "boolean",
+              "integer",
+              "decimal",
+              "enum",
+              "color",
+              "text",
+              "id_list"
+            ],
+            "description": "The kind of value the field takes."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "More about the value the field takes, on some fields, such as `Hex or CSS color.`"
+          },
+          "default": {
+            "description": "The field's default value. `preloader_custom_page` and `content_image_lazy_load_background` have none."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The values the field accepts, for an `enum` field."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For `preloader_preset` and `preloader_image_lazy_effect_preset`, a `value` and a `label` for each allowed value. For `preloader_custom_page`, each page you can choose, as the page's `id` and `name`."
+          },
+          "min": {
+            "type": "number",
+            "description": "The lowest value, for an `integer` or `decimal` field."
+          },
+          "max": {
+            "type": "number",
+            "description": "The highest value, for an `integer` or `decimal` field."
+          },
+          "depends_on": {
+            "type": "string",
+            "description": "The field this one depends on: `preloader_hide_condition` for `preloader_hide_after_time`, and `preloader_page` for `preloader_custom_page`."
+          },
+          "references": {
+            "type": "string",
+            "description": "The kind of record an `id_list` field points to: `page` for `preloader_custom_page`, which holds page ids."
+          }
+        }
+      },
+      "AnimationEffectsError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field` or `invalid_enum`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "An id for this request."
               }
             }
           }

@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "GetAnimationEffectsAsync",
+      "code": "var response = await client.AnimationEffects.GetAnimationEffectsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar animationEffects = (IReadOnlyDictionary<string, object?>)body[\"animation_effects\"]!;\nvar pageTransition = (IReadOnlyDictionary<string, object?>)animationEffects[\"page_transition\"]!;\nConsole.WriteLine($\"{pageTransition[\"page_transition_animation_type\"]} {pageTransition[\"transition_animation_duration\"]}\");"
+    },
+    "patch_animation_effects": {
+      "function": "PatchAnimationEffectsAsync",
+      "code": "var response = await client.AnimationEffects.PatchAnimationEffectsAsync(new Dictionary<string, object?>\n{\n    [\"animation_effects\"] = new Dictionary<string, object?>\n    {\n        [\"page_transition\"] = new Dictionary<string, object?> { [\"animation_before_entering_new_page\"] = true },\n        [\"image_lazy_effect\"] = new Dictionary<string, object?> { [\"blog_list_image_lazy_effect\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar animationEffects = (IReadOnlyDictionary<string, object?>)body[\"animation_effects\"]!;\nvar pageTransition = (IReadOnlyDictionary<string, object?>)animationEffects[\"page_transition\"]!;\nConsole.WriteLine(pageTransition[\"animation_before_entering_new_page\"]);"
+    },
+    "head_animation_effects": {
+      "function": "HeadAnimationEffectsAsync",
+      "code": "var response = await client.AnimationEffects.HeadAnimationEffectsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_animation_effects_section": {
+      "function": "GetAnimationEffectsSectionAsync",
+      "code": "var response = await client.AnimationEffects.GetAnimationEffectsSectionAsync(\"widget_transition\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar widgetTransition = (IReadOnlyDictionary<string, object?>)body[\"widget_transition\"]!;\nConsole.WriteLine($\"{widgetTransition[\"widget_smooth_render\"]} {widgetTransition[\"widget_smooth_render_duration\"]}\");"
+    },
+    "patch_animation_effects_section": {
+      "function": "PatchAnimationEffectsSectionAsync",
+      "code": "var response = await client.AnimationEffects.PatchAnimationEffectsSectionAsync(\"widget_transition\", new Dictionary<string, object?>\n{\n    [\"widget_transition\"] = new Dictionary<string, object?> { [\"widget_smooth_render\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar widgetTransition = (IReadOnlyDictionary<string, object?>)body[\"widget_transition\"]!;\nConsole.WriteLine(widgetTransition[\"widget_smooth_render\"]);"
+    }
+  }
+}

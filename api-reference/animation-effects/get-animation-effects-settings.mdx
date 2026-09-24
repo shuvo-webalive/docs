@@ -1,0 +1,9 @@
+---
+title: "Get animation effects settings"
+description: "Returns all five settings sections and a `group_meta` block describing each one."
+openapi: "GET /admin/settings/animation_effects"
+---
+
+Returns every animation effects setting under `animation_effects`, with all five sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get the rules for every field except `custom_loader`, keyed by section.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

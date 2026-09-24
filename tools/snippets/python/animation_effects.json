@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "get_animation_effects",
+      "code": "response = client.animation_effects.get_animation_effects()\nsettings = response.map[\"animation_effects\"]\nprint(settings[\"preloader_design\"][\"preloader_preset\"])\nprint(settings[\"widget_transition\"][\"widget_smooth_render\"])\n"
+    },
+    "patch_animation_effects": {
+      "function": "patch_animation_effects",
+      "code": "response = client.animation_effects.patch_animation_effects({\n    \"animation_effects\": {\n        \"page_transition\": {\"animation_before_entering_new_page\": True},\n        \"image_lazy_effect\": {\"blog_list_image_lazy_effect\": True},\n    },\n})\nsettings = response.map[\"animation_effects\"]\nprint(settings[\"page_transition\"][\"animation_before_entering_new_page\"])\nprint(settings[\"image_lazy_effect\"][\"blog_list_image_lazy_effect\"])\n"
+    },
+    "head_animation_effects": {
+      "function": "head_animation_effects",
+      "code": "response = client.animation_effects.head_animation_effects()\nprint(response.status_code)\n"
+    },
+    "get_animation_effects_section": {
+      "function": "get_animation_effects_section",
+      "code": "response = client.animation_effects.get_animation_effects_section(\"widget_transition\")\ntransition = response.map[\"widget_transition\"]\nprint(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+    },
+    "patch_animation_effects_section": {
+      "function": "patch_animation_effects_section",
+      "code": "response = client.animation_effects.patch_animation_effects_section(\n    \"widget_transition\", {\"widget_transition\": {\"widget_smooth_render\": True}}\n)\ntransition = response.map[\"widget_transition\"]\nprint(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+    }
+  }
+}

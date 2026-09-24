@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "getAnimationEffects",
+      "code": "final response = await client.animationEffects.getAnimationEffects();\nfinal animationEffects = (response.map as Map)['animation_effects'] as Map;\nprint(animationEffects['preloader_design']);\nprint(animationEffects['widget_transition']);"
+    },
+    "patch_animation_effects": {
+      "function": "patchAnimationEffects",
+      "code": "final response = await client.animationEffects.patchAnimationEffects({\n  'animation_effects': {\n    'page_transition': {'animation_before_entering_new_page': true},\n    'image_lazy_effect': {'blog_list_image_lazy_effect': true},\n  },\n});\nfinal animationEffects = (response.map as Map)['animation_effects'] as Map;\nprint(animationEffects['page_transition']);\nprint(animationEffects['image_lazy_effect']);"
+    },
+    "head_animation_effects": {
+      "function": "headAnimationEffects",
+      "code": "final response = await client.animationEffects.headAnimationEffects();\nprint(response.statusCode);"
+    },
+    "get_animation_effects_section": {
+      "function": "getAnimationEffectsSection",
+      "code": "final response = await client.animationEffects\n    .getAnimationEffectsSection('widget_transition');\nfinal section = (response.map as Map)['widget_transition'] as Map;\nprint(section['widget_smooth_render']);\nprint(section['widget_smooth_render_duration']);"
+    },
+    "patch_animation_effects_section": {
+      "function": "patchAnimationEffectsSection",
+      "code": "final response = await client.animationEffects\n    .patchAnimationEffectsSection('widget_transition', {\n  'widget_transition': {'widget_smooth_render': true},\n});\nfinal section = (response.map as Map)['widget_transition'] as Map;\nprint(section['widget_smooth_render']);"
+    }
+  }
+}
