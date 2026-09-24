@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "getAnimationEffects",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.animationEffects().getAnimationEffects();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"animation_effects\");\nMap<?, ?> preloaderDesign = (Map<?, ?>) settings.get(\"preloader_design\");\nMap<?, ?> pageTransition = (Map<?, ?>) settings.get(\"page_transition\");\nSystem.out.println(preloaderDesign.get(\"enable_preloader\") + \" \" + preloaderDesign.get(\"preloader_preset\"));\nSystem.out.println(pageTransition.get(\"page_transition_animation_type\"));"
+    },
+    "patch_animation_effects": {
+      "function": "patchAnimationEffects",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.animationEffects().patchAnimationEffects(Map.of(\"animation_effects\", Map.of(\n        \"page_transition\", Map.of(\"animation_before_entering_new_page\", true),\n        \"image_lazy_effect\", Map.of(\"blog_list_image_lazy_effect\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"animation_effects\");\nSystem.out.println(((Map<?, ?>) settings.get(\"page_transition\")).get(\"animation_before_entering_new_page\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"image_lazy_effect\")).get(\"blog_list_image_lazy_effect\"));"
+    },
+    "head_animation_effects": {
+      "function": "headAnimationEffects",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.animationEffects().headAnimationEffects();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_animation_effects_section": {
+      "function": "getAnimationEffectsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.animationEffects().getAnimationEffectsSection(\"widget_transition\");\nMap<?, ?> widgetTransition = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"widget_transition\");\nSystem.out.println(widgetTransition.get(\"widget_smooth_render\"));\nSystem.out.println(widgetTransition.get(\"widget_smooth_render_duration\"));"
+    },
+    "patch_animation_effects_section": {
+      "function": "patchAnimationEffectsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.animationEffects().patchAnimationEffectsSection(\"widget_transition\",\n        Map.of(\"widget_transition\", Map.of(\"widget_smooth_render\", true)));\nMap<?, ?> widgetTransition = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"widget_transition\");\nSystem.out.println(widgetTransition.get(\"widget_smooth_render\"));\nSystem.out.println(widgetTransition.get(\"widget_smooth_render_duration\"));"
+    }
+  }
+}

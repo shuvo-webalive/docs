@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "getAnimationEffects",
+      "code": "const response = await client.animationEffects.getAnimationEffects();\nconst settings = response.map.animation_effects;\nconsole.log(settings.preloader_design.enable_preloader, settings.preloader_design.preloader_preset);\nconsole.log(settings.widget_transition.widget_smooth_render_duration);\nconsole.log(settings.page_transition.page_transition_animation_type);\n"
+    },
+    "patch_animation_effects": {
+      "function": "patchAnimationEffects",
+      "code": "const response = await client.animationEffects.patchAnimationEffects({\n    animation_effects: {\n        page_transition: {animation_before_entering_new_page: true},\n        image_lazy_effect: {blog_list_image_lazy_effect: true},\n    },\n});\nconst settings = response.map.animation_effects;\nconsole.log(settings.page_transition.animation_before_entering_new_page);\nconsole.log(settings.image_lazy_effect.blog_list_image_lazy_effect);\n"
+    },
+    "head_animation_effects": {
+      "function": "headAnimationEffects",
+      "code": "const response = await client.animationEffects.headAnimationEffects();\nconsole.log(response.statusCode);\n"
+    },
+    "get_animation_effects_section": {
+      "function": "getAnimationEffectsSection",
+      "code": "const response = await client.animationEffects.getAnimationEffectsSection('widget_transition');\nconst transition = response.map.widget_transition;\nconsole.log(transition.widget_smooth_render, transition.widget_smooth_render_duration);\n"
+    },
+    "patch_animation_effects_section": {
+      "function": "patchAnimationEffectsSection",
+      "code": "const response = await client.animationEffects.patchAnimationEffectsSection('widget_transition', {\n    widget_transition: {widget_smooth_render: true},\n});\nconsole.log(response.map.widget_transition.widget_smooth_render);\n"
+    }
+  }
+}

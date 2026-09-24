@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "GetAnimationEffects",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().GetAnimationEffects(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"animation_effects\"].(map[string]any)\npreloader := settings[\"preloader_design\"].(map[string]any)\ntransition := settings[\"page_transition\"].(map[string]any)\nfmt.Println(preloader[\"enable_preloader\"], preloader[\"preloader_preset\"], transition[\"page_transition_animation_type\"])"
+    },
+    "patch_animation_effects": {
+      "function": "PatchAnimationEffects",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().PatchAnimationEffects(ctx, map[string]any{\n\t\"animation_effects\": map[string]any{\n\t\t\"page_transition\":   map[string]any{\"animation_before_entering_new_page\": true},\n\t\t\"image_lazy_effect\": map[string]any{\"blog_list_image_lazy_effect\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"animation_effects\"].(map[string]any)\nfmt.Println(settings[\"page_transition\"].(map[string]any)[\"animation_before_entering_new_page\"], settings[\"image_lazy_effect\"].(map[string]any)[\"blog_list_image_lazy_effect\"])"
+    },
+    "head_animation_effects": {
+      "function": "HeadAnimationEffects",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().HeadAnimationEffects(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_animation_effects_section": {
+      "function": "GetAnimationEffectsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().GetAnimationEffectsSection(ctx, \"widget_transition\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntransition := resp.Map().(map[string]any)[\"widget_transition\"].(map[string]any)\nfmt.Println(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])"
+    },
+    "patch_animation_effects_section": {
+      "function": "PatchAnimationEffectsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().PatchAnimationEffectsSection(ctx, \"widget_transition\", map[string]any{\n\t\"widget_transition\": map[string]any{\"widget_smooth_render\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntransition := resp.Map().(map[string]any)[\"widget_transition\"].(map[string]any)\nfmt.Println(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])"
+    }
+  }
+}

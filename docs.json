@@ -137,6 +137,25 @@
             ]
           },
           {
+            "group": "Store settings",
+            "icon": "sliders",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Animation effects",
+                "expanded": false,
+                "pages": [
+                  "animation-effects",
+                  "api-reference/animation-effects/get-animation-effects-settings",
+                  "api-reference/animation-effects/update-animation-effects-settings",
+                  "api-reference/animation-effects/get-animation-effects-settings-headers",
+                  "api-reference/animation-effects/get-a-settings-section",
+                  "api-reference/animation-effects/update-a-settings-section"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Shipping",
             "icon": "truck",
             "expanded": false,

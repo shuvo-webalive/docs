@@ -19,6 +19,13 @@
       ]
     },
     {
+      "name": "Store settings",
+      "icon": "sliders",
+      "modules": [
+        "animation_effects"
+      ]
+    },
+    {
       "name": "Shipping",
       "icon": "truck",
       "modules": [

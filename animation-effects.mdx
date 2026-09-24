@@ -1,0 +1,67 @@
+---
+title: "Animation effects"
+sidebarTitle: "Overview"
+description: "Read and change your store's page preloader, widget and page transitions, image lazy loading and checkout page skeleton."
+---
+
+The Animation effects API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/animation_effects`.
+
+<Warning>
+  Every write body must be wrapped in a key, and the key depends on the path. On `/animation_effects`,
+  wrap the fields in `animation_effects` and then in the section name. On `/animation_effects/{section}`,
+  wrap them in the section's own name only, such as `widget_transition`. A body without the right
+  wrapper is rejected with `400 invalid_request`: the message is `animation_effects wrapper required`
+  on the first path and `request body must be wrapped in a '<section>' object` on the second.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get animation effects settings](/api-reference/animation-effects/get-animation-effects-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/animation_effects` | Returns all five settings sections and a `group_meta` block describing each one. |
+| [Update animation effects settings](/api-reference/animation-effects/update-animation-effects-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/animation_effects` | Changes the fields you send in one or more sections and returns all settings. |
+| [Get animation effects settings headers](/api-reference/animation-effects/get-animation-effects-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/animation_effects` | Returns the headers for the animation effects settings, with no body. |
+| [Get a settings section](/api-reference/animation-effects/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/animation_effects/{section}` | Returns one settings section under its own key, such as `widget_transition`. |
+| [Update a settings section](/api-reference/animation-effects/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/animation_effects/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into five sections.** `preloader_design` controls the loader shown while a
+  page loads, and when and where it shows. `widget_transition` controls whether widgets fade in, and
+  for how long. `page_transition` controls the animation between pages and when it plays. `image_lazy_effect` controls
+  which pages lazy-load images, and the loader and placeholder they show. `page_skeleton` has one
+  field, `checkout_page_skeleton`. Read or write all five through `/animation_effects`, or one through
+  `/animation_effects/{section}`. An unknown section returns `404 not_found`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields you leave out
+  keep their stored values, and so does every section you leave out. One body sent to
+  `/animation_effects` can change several sections at once. Sending the settings back exactly as a
+  read returned them also returns `200`. `PUT`, `POST` and `DELETE` are rejected on
+  `/animation_effects` and on each of the five section paths with `405 method_not_allowed` and an
+  `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **Add `field_metadata=true` to a read to get the rules for every field except `custom_loader`.** The
+  settings are still returned with it. Each entry gives the field's `type` and `ui_label`, and every
+  field except `preloader_custom_page` and `content_image_lazy_load_background` gives a `default`.
+  Every `enum` field lists its `allowed_values`, every `integer` and `decimal` field gives its `min`
+  and `max`, and `preloader_hide_after_time` and `preloader_custom_page` name the field they depend on
+  in `depends_on`. A write that sends a value outside `allowed_values`, or outside `min` and `max`, is
+  rejected with `400 invalid_request`. On `/animation_effects` the block is keyed by section; on a
+  section it is keyed by field name.
+- **Two `preloader_design` fields differ between a read and a write.** A read returns each page in
+  `preloader_custom_page` as the page's `id` and `name`, such as `{"id": 70, "name": "Category"}`. A
+  write takes the pages' ids, such as `[70, 1]`, and also accepts the records a read returns. An empty list
+  while `preloader_page` is `custom`, or a page `id` that matches no page, is rejected with
+  `400 invalid_request`. `custom_loader` is in every read but cannot be written: a body that names only
+  `custom_loader` is rejected with `400 invalid_request` and the message
+  `no recognized animation_effects fields in body`.
+- **Animation effects writes have their own rate limit.** If you send eleven writes with no pause,
+  within about 0.8 seconds, the eleventh is rejected with `429` and a `Retry-After` header that counts
+  down the time left before writes are accepted again. It is separate from the page settings limit:
+  after you use it up, a shopping cart settings write still succeeds, and the reverse. Reads showed
+  no limit: forty reads within about 1.2 seconds were all accepted. A retry before `Retry-After`
+  has passed counts as another write, so wait until then before you write again.

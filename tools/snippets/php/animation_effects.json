@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "animation_effects",
+  "endpoints": {
+    "get_animation_effects": {
+      "function": "getAnimationEffects",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::getAnimationEffects($client);\n\n$settings = $response->map['animation_effects'];\necho 'preloader: ', $settings['preloader_design']['preloader_preset'], PHP_EOL;\necho 'page transition: ', $settings['page_transition']['page_transition_animation_type'], PHP_EOL;"
+    },
+    "patch_animation_effects": {
+      "function": "patchAnimationEffects",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::patchAnimationEffects($client, [\n    'animation_effects' => [\n        'page_transition' => ['animation_before_entering_new_page' => true],\n        'image_lazy_effect' => ['blog_list_image_lazy_effect' => true],\n    ],\n]);\n\n$settings = $response->map['animation_effects'];\necho $settings['page_transition']['animation_before_entering_new_page'] ? 'true' : 'false', PHP_EOL;\necho $settings['image_lazy_effect']['blog_list_image_lazy_effect'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_animation_effects": {
+      "function": "headAnimationEffects",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::headAnimationEffects($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_animation_effects_section": {
+      "function": "getAnimationEffectsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::getAnimationEffectsSection($client, 'widget_transition');\n\n$section = $response->map['widget_transition'];\necho 'smooth render: ', $section['widget_smooth_render'] ? 'on' : 'off', PHP_EOL;\necho $section['widget_smooth_render_duration'], ' ms', PHP_EOL;"
+    },
+    "patch_animation_effects_section": {
+      "function": "patchAnimationEffectsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::patchAnimationEffectsSection($client, 'widget_transition', [\n    'widget_transition' => ['widget_smooth_render' => true],\n]);\n\necho $response->map['widget_transition']['widget_smooth_render'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}
