@@ -3,54 +3,99 @@ title: "Introduction"
 description: "The WebCommander v4 REST API and the seven SDKs that wrap it."
 ---
 
-WebCommander exposes a store's admin data through the **v4 REST API**: customers, page and store
-settings, tax, shipping, inventory locations, order flags and domain aliases. Seven SDKs wrap that
-API with the same surface in every language, so a call you learn in one reads the same in the
-others.
+WebCommander exposes a store's admin data through the **v4 REST API**. Seven SDKs wrap it with the
+same calls in every language, so a call you learn in one reads the same in the others. These docs
+cover only the endpoints that **all seven SDKs implement**: if a call is documented here, you can
+make it from any of them.
 
-| Language | Package |
-| --- | --- |
-| Python | `webcommander-sdk` (import `webcommander`) |
-| JavaScript | `webcommander-sdk` |
-| PHP | `webcommander/sdk` |
-| Java | `com.webcommander:webcommander-sdk` |
-| .NET | `WebCommander.Sdk` |
-| Dart | `webcommander_sdk` |
-| Go | `bitbucket.org/webalive/webcommander-sdk-go/v3` |
+## Choose your language
 
-All seven are at version 3.5.0.
+<CardGroup cols={4}>
+  <Card title="Python" icon="python" href="/installation">
+    `webcommander-sdk`, imported as `webcommander`
+  </Card>
+  <Card title="JavaScript" icon="js" href="/installation">
+    `webcommander-sdk`
+  </Card>
+  <Card title="PHP" icon="php" href="/installation">
+    `webcommander/sdk`
+  </Card>
+  <Card title="Java" icon="java" href="/installation">
+    `com.webcommander:webcommander-sdk`
+  </Card>
+  <Card title=".NET" icon="microsoft" href="/installation">
+    `WebCommander.Sdk`
+  </Card>
+  <Card title="Dart" icon="code" href="/installation">
+    `webcommander_sdk`
+  </Card>
+  <Card title="Go" icon="golang" href="/installation">
+    `webcommander-sdk-go/v3`
+  </Card>
+  <Card title="cURL" icon="terminal" href="/authentication#calling-the-api-directly">
+    Any HTTP client, with a bearer token
+  </Card>
+</CardGroup>
 
-## What the API covers
+All seven SDKs are at version 3.5.0.
 
-These docs describe only the endpoints that all seven SDKs implement. If a call is documented here,
-you can make it from any of the seven languages.
+## What you can work with
 
-| Area | What you can do |
-| --- | --- |
-| Customers | List, read, create, update and delete customers, export and import them, manage addresses, passwords and store credit |
-| Page settings | Read and update the category, product, search result, shopping cart and checkout page settings |
-| Store settings | Read and update site, e-commerce, customer portal, price display, product listing, search, SEO, shipping and animation settings |
-| Tax | Manage tax codes, rules, zones, profiles, custom profiles, country taxes and the store's tax settings |
-| Shipping | Manage shipping methods and shipping classes |
-| Inventory and orders | Manage inventory locations and order flags |
-| Domain aliases | List, add and remove the extra hostnames a store answers on |
+<CardGroup cols={3}>
+  <Card title="Customers" icon="users" href="/customers">
+    Find, create, update and delete customers; export and import them; manage addresses, passwords
+    and store credit.
+  </Card>
+  <Card title="Page settings" icon="file-lines">
+    Category, product, search result, shopping cart and checkout page settings.
+  </Card>
+  <Card title="Store settings" icon="sliders">
+    Site, e-commerce, customer portal, price display, product listing, search, SEO, shipping and
+    animation settings.
+  </Card>
+  <Card title="Tax" icon="percent">
+    Tax codes, rules, zones, profiles, custom profiles, country taxes and tax settings.
+  </Card>
+  <Card title="Shipping" icon="truck">
+    Shipping methods and shipping classes.
+  </Card>
+  <Card title="Inventory and orders" icon="boxes-stacked">
+    Inventory locations and order flags.
+  </Card>
+</CardGroup>
+
+<Note>
+  Every area above is available in all seven SDKs. Customers has full reference pages; the other
+  areas' pages are being added. Domain aliases are covered by the SDKs as well.
+</Note>
 
 ## What every SDK does for you
 
-- **Authentication.** You give the client your store's credentials. It exchanges them for an access
-  token, caches the token and renews it when it expires.
-- **One client, every resource.** Each area above is a property on the client, and each endpoint is
-  a method on that property.
-- **Responses as sent.** You get the body exactly as the API returned it, with an optional typed
-  view over the top.
-- **Real failures.** A non-2xx status is a failure. So is a `200` whose body says
-  `"isSuccess": false`, which the API returns for a path it cannot route.
-- **Retries and timeouts.** Calls that certainly did not reach the store are retried with backoff.
+<CardGroup cols={2}>
+  <Card title="Signs in for you" icon="key">
+    Exchanges your credentials for an access token, caches it and renews it before it expires.
+  </Card>
+  <Card title="One client for everything" icon="cubes">
+    Each area is a property on the client, and each endpoint is a method on it.
+  </Card>
+  <Card title="Responses as sent" icon="brackets-curly">
+    The body exactly as the API returned it, with an optional typed view over the top.
+  </Card>
+  <Card title="Failures you cannot miss" icon="triangle-exclamation">
+    A non-2xx status is a failure, and so is a `200` whose body says `"isSuccess": false`.
+  </Card>
+</CardGroup>
 
 ## Next steps
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Installation" icon="download" href="/installation">
     Add the SDK for your language to a project.
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    Set up a client with your store's credentials.
+  </Card>
+  <Card title="Customers" icon="users" href="/customers">
+    Your first calls: list, find and create customers.
   </Card>
 </CardGroup>

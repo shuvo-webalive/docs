@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "luma",
+  "theme": "palm",
   "name": "WebCommander API & SDK",
   "colors": {
     "primary": "#ef7025",
-    "light": "#eec9bc",
-    "dark": "#4fa1ab"
+    "light": "#f5935a",
+    "dark": "#c75b17"
   },
   "logo": {
     "light": "/logo/webcommander-light.svg",
@@ -13,44 +13,37 @@
   },
   "favicon": "/webcommander-favicon.svg",
   "navigation": {
-    "tabs": [
+    "groups": [
       {
-        "tab": "Documentation",
-        "groups": [
-          {
-            "group": "Get started",
-            "pages": [
-              "introduction",
-              "installation"
-            ]
-          }
-        ]
+        "group": "Get started",
+        "pages": [
+          "introduction",
+          "installation",
+          "authentication"
+        ],
+        "icon": "rocket"
       },
       {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "Customers",
-            "pages": [
-              "api-reference/customers/overview",
-              "api-reference/customers/list-customers",
-              "api-reference/customers/retrieve-a-customer",
-              "api-reference/customers/count-customers",
-              "api-reference/customers/check-an-email-address",
-              "api-reference/customers/export-customers",
-              "api-reference/customers/create-a-customer",
-              "api-reference/customers/update-a-customer",
-              "api-reference/customers/delete-a-customer",
-              "api-reference/customers/add-addresses",
-              "api-reference/customers/reset-a-password",
-              "api-reference/customers/change-a-password",
-              "api-reference/customers/bulk-reset-passwords",
-              "api-reference/customers/import-customers",
-              "api-reference/customers/list-store-credit-adjustments",
-              "api-reference/customers/adjust-store-credit"
-            ]
-          }
-        ]
+        "group": "Customers",
+        "pages": [
+          "customers",
+          "api-reference/customers/list-customers",
+          "api-reference/customers/retrieve-a-customer",
+          "api-reference/customers/count-customers",
+          "api-reference/customers/check-an-email-address",
+          "api-reference/customers/export-customers",
+          "api-reference/customers/create-a-customer",
+          "api-reference/customers/update-a-customer",
+          "api-reference/customers/delete-a-customer",
+          "api-reference/customers/add-addresses",
+          "api-reference/customers/reset-a-password",
+          "api-reference/customers/change-a-password",
+          "api-reference/customers/bulk-reset-passwords",
+          "api-reference/customers/import-customers",
+          "api-reference/customers/list-store-credit-adjustments",
+          "api-reference/customers/adjust-store-credit"
+        ],
+        "icon": "users"
       }
     ]
   },

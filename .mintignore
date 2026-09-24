@@ -9,7 +9,6 @@ drafts/
 # Starter template pages, not yet written for WebCommander
 index.mdx
 quickstart.mdx
-authentication.mdx
 concepts/
 guides/
 sdk/

@@ -1,0 +1,32 @@
+@media (min-width: 1280px) {
+  #content-container {
+    padding-left: 3.5rem !important;
+    padding-right: 3.5rem !important;
+  }
+
+  #content-container > div {
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+@media (min-width: 1536px) {
+  #content-side-layout:has(.code-group) {
+    max-width: 36rem !important;
+    width: 36rem !important;
+    flex: 0 0 36rem !important;
+  }
+
+  #content-side-layout:has(.code-group) > div {
+    width: 100% !important;
+  }
+}
+
+#content-area table {
+  font-size: 0.9rem;
+}
+
+#content-area th {
+  white-space: nowrap;
+}
