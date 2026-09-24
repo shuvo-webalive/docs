@@ -1,0 +1,14 @@
+{
+  "sdk": "dart",
+  "module": "tax_settings",
+  "endpoints": {
+    "get_tax_settings": {
+      "function": "getTaxSettings",
+      "code": "final response = await client.taxSettings.getTaxSettings();\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['default_country']);\nprint(taxSettings['default_tax_code']);\nprint(taxSettings['tax_message']);"
+    },
+    "put_tax_settings": {
+      "function": "putTaxSettings",
+      "code": "final response = await client.taxSettings.putTaxSettings({\n  'settings': {'tax_message': 'All prices include GST'},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_message']);"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "sdk": "java",
+  "module": "tax_settings",
+  "endpoints": {
+    "get_tax_settings": {
+      "function": "getTaxSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().getTaxSettings();\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"default_country\") + \" \" + taxSettings.get(\"default_tax_code\"));\nSystem.out.println(taxSettings.get(\"tax_message\"));"
+    },
+    "put_tax_settings": {
+      "function": "putTaxSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().putTaxSettings(\n        Map.of(\"settings\", Map.of(\"tax_message\", \"All prices include GST\")));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_message\"));"
+    }
+  }
+}
