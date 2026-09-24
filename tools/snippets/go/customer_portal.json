@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "GetCustomerPortal",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerPortalSettings().GetCustomerPortal(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nsettings := body[\"customer_portal\"].(map[string]any)\nfmt.Println(settings[\"portal\"].(map[string]any)[\"enabled\"], settings[\"login\"].(map[string]any)[\"registration_link\"])\nfor section, meta := range body[\"group_meta\"].(map[string]any) {\n\tfmt.Println(section, meta.(map[string]any)[\"writable\"])\n}"
+    },
+    "patch_customer_portal": {
+      "function": "PatchCustomerPortal",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerPortalSettings().PatchCustomerPortal(ctx, map[string]any{\n\t\"customer_portal\": map[string]any{\n\t\t\"login\": map[string]any{\"registration_link\": false},\n\t\t\"sso\":   map[string]any{\"azure_ad\": map[string]any{\"data_mapping\": map[string]any{\"city\": \"city\"}}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"customer_portal\"].(map[string]any)\nmapping := settings[\"sso\"].(map[string]any)[\"azure_ad\"].(map[string]any)[\"data_mapping\"].(map[string]any)\nfmt.Println(settings[\"login\"].(map[string]any)[\"registration_link\"], mapping[\"city\"])"
+    },
+    "head_customer_portal": {
+      "function": "HeadCustomerPortal",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerPortalSettings().HeadCustomerPortal(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_customer_portal_section": {
+      "function": "GetCustomerPortalSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerPortalSettings().GetCustomerPortalSection(ctx, \"login\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlogin := resp.Map().(map[string]any)[\"login\"].(map[string]any)\nfmt.Println(login[\"enabled\"], login[\"password_recovery\"], login[\"registration_link\"], login[\"captcha\"].(map[string]any)[\"fail_count\"])"
+    },
+    "patch_customer_portal_section": {
+      "function": "PatchCustomerPortalSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerPortalSettings().PatchCustomerPortalSection(ctx, \"login\", map[string]any{\n\t\"login\": map[string]any{\"registration_link\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"login\"].(map[string]any)[\"registration_link\"])"
+    }
+  }
+}

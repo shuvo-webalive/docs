@@ -1,0 +1,9 @@
+---
+title: "Get a customer portal section"
+description: "Returns one customer portal section under its own key, such as `login`."
+openapi: "GET /admin/settings/customer_portal/{section}"
+---
+
+Returns one section, wrapped in the section's own name rather than in `customer_portal`, and without `group_meta`. The section is the same as the one [Get customer portal settings](/api-reference/customer-portal/get-customer-portal-settings) includes. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "customer_portal",
+  "endpoints": {
+    "get_customer_portal": {
+      "function": "getCustomerPortal",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.customerPortal().getCustomerPortal();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"customer_portal\");\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) settings.get(\"portal\")).get(\"enabled\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"login\")).get(\"registration_link\"));\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"profile_page\")).get(\"writable\"));"
+    },
+    "patch_customer_portal": {
+      "function": "patchCustomerPortal",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.customerPortal().patchCustomerPortal(Map.of(\"customer_portal\", Map.of(\n        \"login\", Map.of(\"registration_link\", false),\n        \"sso\", Map.of(\"azure_ad\", Map.of(\"data_mapping\", Map.of(\"city\", \"city\"))))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer_portal\");\nMap<?, ?> azureAd = (Map<?, ?>) ((Map<?, ?>) settings.get(\"sso\")).get(\"azure_ad\");\nSystem.out.println(((Map<?, ?>) settings.get(\"login\")).get(\"registration_link\"));\nSystem.out.println(((Map<?, ?>) azureAd.get(\"data_mapping\")).get(\"city\"));"
+    },
+    "head_customer_portal": {
+      "function": "headCustomerPortal",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.customerPortal().headCustomerPortal();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_customer_portal_section": {
+      "function": "getCustomerPortalSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.customerPortal().getCustomerPortalSection(\"login\");\nMap<?, ?> login = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"login\");\nSystem.out.println(login.get(\"enabled\") + \" \" + login.get(\"registration_link\"));\nSystem.out.println(((Map<?, ?>) login.get(\"captcha\")).get(\"fail_count\"));"
+    },
+    "patch_customer_portal_section": {
+      "function": "patchCustomerPortalSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.customerPortal().patchCustomerPortalSection(\"login\",\n        Map.of(\"login\", Map.of(\"registration_link\", false)));\nMap<?, ?> login = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"login\");\nSystem.out.println(login.get(\"registration_link\"));"
+    }
+  }
+}

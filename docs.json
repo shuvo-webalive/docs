@@ -152,6 +152,18 @@
                   "api-reference/animation-effects/get-a-settings-section",
                   "api-reference/animation-effects/update-a-settings-section"
                 ]
+              },
+              {
+                "group": "Customer portal",
+                "expanded": false,
+                "pages": [
+                  "customer-portal",
+                  "api-reference/customer-portal/get-customer-portal-settings",
+                  "api-reference/customer-portal/update-customer-portal-settings",
+                  "api-reference/customer-portal/get-customer-portal-settings-headers",
+                  "api-reference/customer-portal/get-a-customer-portal-section",
+                  "api-reference/customer-portal/update-a-customer-portal-section"
+                ]
               }
             ]
           },
