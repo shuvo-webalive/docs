@@ -79,6 +79,9 @@
       "name": "Country taxes"
     },
     {
+      "name": "Custom tax profiles"
+    },
+    {
       "name": "Tax rules"
     },
     {
@@ -18298,6 +18301,590 @@
         ]
       }
     },
+    "/admin/tax/custom_profiles": {
+      "get": {
+        "tags": [
+          "Custom tax profiles"
+        ],
+        "summary": "List custom tax profiles",
+        "operationId": "list_tax_custom_profiles",
+        "description": "Returns up to 20 custom tax profiles under `custom_profiles`, and a `pagination` object with the `total` number of profiles and `has_next`, which says whether more rows follow. Each row gives its number of rate rules in `rate_rules_count`; to get the rules themselves, use [Retrieve a custom tax profile](/api-reference/custom-tax-profiles/retrieve-a-custom-tax-profile). Only `limit`, `offset` and `page` change the result; `q` and `field_metadata` are ignored. A `HEAD` or `OPTIONS` request on this path returns `404`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Rows per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of rows to skip.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit`. `limit=2&page=2` skips 2 rows.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Accepted and ignored: it does not filter the listing.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Accepted and ignored: it adds nothing to the response.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 20 custom tax profiles under `custom_profiles`, each with nine fields, and `pagination` with the `total` number of profiles, the `offset` and `limit` of this page, and `has_next`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "custom_profiles": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxCustomProfile"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TaxCustomProfilePagination"
+                    }
+                  }
+                },
+                "example": {
+                  "custom_profiles": [
+                    {
+                      "id": 1,
+                      "name": "Wholesale customers",
+                      "code": "WHOLESALE",
+                      "description": "Rates for wholesale accounts",
+                      "is_default": true,
+                      "rate_rules_count": 1,
+                      "transaction_no": null,
+                      "created_at": "2026-08-24T10:21:56",
+                      "updated_at": "2026-08-24T10:21:56"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Export orders",
+                      "code": null,
+                      "description": null,
+                      "is_default": false,
+                      "rate_rules_count": 0,
+                      "transaction_no": null,
+                      "created_at": "2026-08-31T11:57:23",
+                      "updated_at": "2026-08-31T11:57:23"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.list_tax_custom_profiles({\"limit\": 20})\nfor profile in response.map[\"custom_profiles\"]:\n    print(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.listTaxCustomProfiles(client, {limit: 20});\nfor (const customProfile of response.map.custom_profiles) {\n    console.log(customProfile.id, customProfile.name, customProfile.rate_rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::listTaxCustomProfiles($client, ['limit' => 20]);\n\nforeach ($response->map['custom_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], ', ', $profile['rate_rules_count'], ' rate rules', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' custom tax profiles in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().listTaxCustomProfiles(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"custom_profiles\")) {\n    Map<?, ?> customProfile = (Map<?, ?>) row;\n    System.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\") + \" \" + customProfile.get(\"rate_rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.ListTaxCustomProfilesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customProfile in ((IReadOnlyList<object?>)body[\"custom_profiles\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customProfile[\"id\"]} {customProfile[\"name\"]} {customProfile[\"rate_rules_count\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles\n    .listTaxCustomProfiles(queryParams: {'limit': 20});\nfinal customProfiles = (response.map as Map)['custom_profiles'] as List;\nfor (final customProfile in customProfiles) {\n  print('${(customProfile as Map)['id']} ${customProfile['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().ListTaxCustomProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"custom_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\n}\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Custom tax profiles"
+        ],
+        "summary": "Create a custom tax profile",
+        "operationId": "create_tax_custom_profile",
+        "description": "Creates a custom tax profile and returns it with the profile's `id`, which the other calls take as `custom_profile_id`. Wrap the record in `custom_profile`; `name` is required and `description` is optional. Any `code` you send is discarded, so the new profile's `code` is `null`. The response has the nine fields of a listing row, and a new profile holds no rate rules, so its `rate_rules_count` is `0`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new custom tax profile. Its `id` is the `custom_profile_id` the other calls take.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "custom_profile": {
+                      "$ref": "#/components/schemas/TaxCustomProfile"
+                    }
+                  }
+                },
+                "example": {
+                  "custom_profile": {
+                    "id": 7,
+                    "name": "Wholesale customers",
+                    "code": null,
+                    "description": "Rates for wholesale accounts",
+                    "is_default": false,
+                    "rate_rules_count": 0,
+                    "transaction_no": null,
+                    "created_at": "2026-09-22T09:14:05",
+                    "updated_at": "2026-09-22T09:14:05"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `custom_profile`, for example a bare record or a body wrapped in the plural `custom_profiles`. The message is `custom_profile missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_profile\": {\n      \"name\": \"Wholesale customers\",\n      \"description\": \"Rates for wholesale accounts\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.create_tax_custom_profile({\n    \"custom_profile\": {\n        \"name\": \"Wholesale customers\",\n        \"description\": \"Rates for wholesale accounts\",\n    },\n})\nprint(response.map[\"custom_profile\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.createTaxCustomProfile(client, {\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n});\nconsole.log(response.map.custom_profile.id);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::createTaxCustomProfile($client, [\n    'custom_profile' => ['name' => 'Wholesale customers', 'description' => 'Rates for wholesale accounts'],\n]);\n\necho $response->map['custom_profile']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().createTaxCustomProfile(Map.of(\"custom_profile\",\n        Map.of(\"name\", \"Wholesale customers\", \"description\", \"Rates for wholesale accounts\")));\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.CreateTaxCustomProfileAsync(new Dictionary<string, object?>\n{\n    [\"custom_profile\"] = new Dictionary<string, object?> { [\"name\"] = \"Wholesale customers\", [\"description\"] = \"Rates for wholesale accounts\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine(customProfile[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.createTaxCustomProfile({\n  'custom_profile': {\n    'name': 'Wholesale customers',\n    'description': 'Rates for wholesale accounts',\n  },\n});\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint(customProfile['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().CreateTaxCustomProfile(ctx, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale customers\", \"description\": \"Rates for wholesale accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "custom_profile"
+                ],
+                "properties": {
+                  "custom_profile": {
+                    "$ref": "#/components/schemas/TaxCustomProfileInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/tax/custom_profiles/{custom_profile_id}": {
+      "get": {
+        "tags": [
+          "Custom tax profiles"
+        ],
+        "summary": "Retrieve a custom tax profile",
+        "operationId": "get_tax_custom_profile",
+        "description": "Returns the profile whose `id` you pass as `custom_profile_id`, under the `custom_profile` key. It has the nine fields of a listing row plus `rate_rules`, the profile's rate rules, which is an empty list when the profile holds none. No other call returns `rate_rules`. A `HEAD` request on this path returns `200` whether or not a profile has that `custom_profile_id`, so use this call to check that a profile exists.",
+        "parameters": [
+          {
+            "name": "custom_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom tax profile's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom tax profile, with its `rate_rules`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "custom_profile": {
+                      "$ref": "#/components/schemas/TaxCustomProfile"
+                    }
+                  }
+                },
+                "example": {
+                  "custom_profile": {
+                    "id": 1,
+                    "name": "Wholesale customers",
+                    "code": "WHOLESALE",
+                    "description": "Rates for wholesale accounts",
+                    "is_default": true,
+                    "rate_rules_count": 1,
+                    "transaction_no": null,
+                    "created_at": "2026-08-24T10:21:56",
+                    "updated_at": "2026-08-24T10:21:56",
+                    "rate_rules": [
+                      {
+                        "id": 12,
+                        "name": "Wholesale rate",
+                        "description": "Rate for wholesale orders",
+                        "zones_count": 2,
+                        "transaction_no": null,
+                        "created_at": "2026-08-24T10:25:40",
+                        "updated_at": "2026-08-24T10:25:40"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No custom tax profile has that `custom_profile_id`, including a profile you have deleted. The message is `Profile not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Profile not found",
+                    "details": [],
+                    "request_id": "5b2e8c1d-3f4a-4e6b-9c7d-1a2b3c4d5e6f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles/1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.get_tax_custom_profile(1)\ncustom_profile = response.map[\"custom_profile\"]\nprint(custom_profile[\"name\"], custom_profile[\"description\"])\nfor rate_rule in custom_profile[\"rate_rules\"]:\n    print(rate_rule[\"id\"], rate_rule[\"name\"], rate_rule[\"zones_count\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.getTaxCustomProfile(client, 1);\nconst customProfile = response.map.custom_profile;\nconsole.log(customProfile.name, customProfile.description, customProfile.rate_rules_count);\nfor (const rateRule of customProfile.rate_rules) {\n    console.log(rateRule.id, rateRule.name, rateRule.zones_count);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::getTaxCustomProfile($client, 1);\n\n$profile = $response->map['custom_profile'];\necho $profile['name'], ': ', $profile['description'], PHP_EOL;\nforeach ($profile['rate_rules'] as $rule) {\n    echo 'rate rule ', $rule['id'], ' ', $rule['name'], ', ', $rule['zones_count'], ' zones', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().getTaxCustomProfile(1);\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"name\") + \" \" + customProfile.get(\"rate_rules_count\"));\nfor (Object row : (List<?>) customProfile.get(\"rate_rules\")) {\n    Map<?, ?> rateRule = (Map<?, ?>) row;\n    System.out.println(rateRule.get(\"id\") + \" \" + rateRule.get(\"name\") + \" \" + rateRule.get(\"zones_count\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.GetTaxCustomProfileAsync(1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine(customProfile[\"name\"]);\nforeach (var rateRule in ((IReadOnlyList<object?>)customProfile[\"rate_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{rateRule[\"id\"]} {rateRule[\"name\"]} {rateRule[\"zones_count\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['rate_rules_count']}');\nfinal rateRules = customProfile['rate_rules'] as List;\nfor (final rateRule in rateRules) {\n  print('${(rateRule as Map)['id']} ${rateRule['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().GetTaxCustomProfile(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], len(profile[\"rate_rules\"].([]any)))\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Custom tax profiles"
+        ],
+        "summary": "Replace a custom tax profile",
+        "operationId": "update_tax_custom_profile",
+        "description": "Replaces the `name` and `description` of the profile whose `id` you pass as `custom_profile_id`, and returns the profile under `custom_profile` with the nine fields of a listing row. Wrap the record in `custom_profile` and send `name` every time, or the call is rejected with `400`. A `description` you leave out comes back `null`, so send the current `description` to keep it. Any `code` you send is discarded.",
+        "parameters": [
+          {
+            "name": "custom_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom tax profile's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The custom tax profile with its new `name` and `description`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "custom_profile": {
+                      "$ref": "#/components/schemas/TaxCustomProfile"
+                    }
+                  }
+                },
+                "example": {
+                  "custom_profile": {
+                    "id": 7,
+                    "name": "Wholesale and trade customers",
+                    "code": null,
+                    "description": "Rates for wholesale and trade accounts",
+                    "is_default": false,
+                    "rate_rules_count": 0,
+                    "transaction_no": null,
+                    "created_at": "2026-09-22T09:14:05",
+                    "updated_at": "2026-09-22T09:20:31"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`name` is missing: `error.code` is `invalid_request` and the message is `Profile name is required`. Or the body is not wrapped in `custom_profile`, and the message is `custom_profile missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "Profile name is required",
+                    "details": [],
+                    "request_id": "5b2e8c1d-3f4a-4e6b-9c7d-1a2b3c4d5e6f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_profile\": {\n      \"name\": \"Wholesale and trade customers\",\n      \"description\": \"Rates for wholesale and trade accounts\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.update_tax_custom_profile(7, {\n    \"custom_profile\": {\n        \"name\": \"Wholesale and trade customers\",\n        \"description\": \"Rates for wholesale and trade accounts\",\n    },\n})\ncustom_profile = response.map[\"custom_profile\"]\nprint(custom_profile[\"name\"], custom_profile[\"description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.updateTaxCustomProfile(client, 7, {\n    custom_profile: {name: 'Wholesale and trade customers', description: 'Rates for wholesale and trade accounts'},\n});\nconsole.log(response.map.custom_profile.name, response.map.custom_profile.description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::updateTaxCustomProfile($client, 7, [\n    'custom_profile' => [\n        'name' => 'Wholesale and trade customers',\n        'description' => 'Rates for wholesale and trade accounts',\n    ],\n]);\n\necho $response->map['custom_profile']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().updateTaxCustomProfile(7, Map.of(\"custom_profile\",\n        Map.of(\"name\", \"Wholesale and trade customers\", \"description\", \"Rates for wholesale and trade accounts\")));\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"name\") + \" \" + customProfile.get(\"description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.UpdateTaxCustomProfileAsync(7, new Dictionary<string, object?>\n{\n    [\"custom_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wholesale and trade customers\", [\"description\"] = \"Rates for wholesale and trade accounts\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine($\"{customProfile[\"name\"]} {customProfile[\"description\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.updateTaxCustomProfile(7, {\n  'custom_profile': {\n    'name': 'Wholesale and trade customers',\n    'description': 'Rates for wholesale and trade accounts',\n  },\n});\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['description']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().UpdateTaxCustomProfile(ctx, 7, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale and trade customers\", \"description\": \"Rates for wholesale and trade accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "custom_profile"
+                ],
+                "properties": {
+                  "custom_profile": {
+                    "$ref": "#/components/schemas/TaxCustomProfileInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Custom tax profiles"
+        ],
+        "summary": "Delete a custom tax profile",
+        "operationId": "delete_tax_custom_profile",
+        "description": "Deletes the profile whose `id` you pass as `custom_profile_id` and returns `204` with no body. The profile leaves the listing, and retrieving it afterwards returns `404`. If the request just before this one on the same client was rejected with `404` for an id in its path that no record has, such as a `custom_profile_id` that no profile has, the store handles this call with that rejected value: it returns `404` and deletes nothing. Retrieve the profile afterwards to confirm it is gone.",
+        "parameters": [
+          {
+            "name": "custom_profile_id",
+            "in": "path",
+            "required": true,
+            "description": "The custom tax profile's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.delete_tax_custom_profile(7)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.deleteTaxCustomProfile(client, 7);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::deleteTaxCustomProfile($client, 7);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().deleteTaxCustomProfile(7);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.DeleteTaxCustomProfileAsync(7);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.deleteTaxCustomProfile(7);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().DeleteTaxCustomProfile(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
     "/admin/tax_rules": {
       "get": {
         "tags": [
@@ -30637,6 +31224,183 @@
               "request_id": {
                 "type": "string",
                 "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "TaxCustomProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The custom tax profile's `id`, assigned by the store. The other calls take it as `custom_profile_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The profile's name. Required on every write."
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Read-only. Create and update discard any `code` you send, so a profile you create has `code` set to `null`. Only a profile that already had a `code` in the store shows one."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The profile's description. `null` after an update that leaves it out."
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "rate_rules_count": {
+            "type": "integer",
+            "description": "The number of rate rules the profile holds. `0` on a new profile."
+          },
+          "transaction_no": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the profile was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "When the profile was last changed."
+          },
+          "rate_rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxCustomProfileRateRule"
+            },
+            "description": "Only when you retrieve one profile. The profile's rate rules, or an empty list when it holds none."
+          }
+        }
+      },
+      "TaxCustomProfileRateRule": {
+        "type": "object",
+        "description": "One rate rule a custom tax profile holds.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The rate rule's `id`."
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "zones_count": {
+            "type": "integer",
+            "description": "The number of zones the rate rule has."
+          },
+          "transaction_no": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "TaxCustomProfileInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required on create and on update."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional. An update that leaves it out sets it to `null`."
+          }
+        }
+      },
+      "TaxCustomProfilePagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of custom tax profiles in the store."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. At most `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of rows skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of rows on this page."
+          },
+          "current_page": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_previous": {
+            "type": "boolean"
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The previous page, or `null` on the first page."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The next page, or `null` on the last page. Check `has_next` before you request it."
+          }
+        }
+      },
+      "TaxCustomProfileError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "The store's identifier for this request."
               }
             }
           }

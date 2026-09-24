@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "listTaxCustomProfiles",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$response = TaxCustomProfiles::listTaxCustomProfiles($client, ['limit' => 20]);\n\nforeach ($response->map['custom_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], ', ', $profile['rate_rules_count'], ' rate rules', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' custom tax profiles in total', PHP_EOL;"
+    },
+    "create_tax_custom_profile": {
+      "function": "createTaxCustomProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$response = TaxCustomProfiles::createTaxCustomProfile($client, [\n    'custom_profile' => ['name' => 'Wholesale customers', 'description' => 'Rates for wholesale accounts'],\n]);\n\necho $response->map['custom_profile']['id'], PHP_EOL;"
+    },
+    "get_tax_custom_profile": {
+      "function": "getTaxCustomProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$response = TaxCustomProfiles::getTaxCustomProfile($client, 1);\n\n$profile = $response->map['custom_profile'];\necho $profile['name'], ': ', $profile['description'], PHP_EOL;\nforeach ($profile['rate_rules'] as $rule) {\n    echo 'rate rule ', $rule['id'], ' ', $rule['name'], ', ', $rule['zones_count'], ' zones', PHP_EOL;\n}"
+    },
+    "update_tax_custom_profile": {
+      "function": "updateTaxCustomProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$response = TaxCustomProfiles::updateTaxCustomProfile($client, 7, [\n    'custom_profile' => [\n        'name' => 'Wholesale and trade customers',\n        'description' => 'Rates for wholesale and trade accounts',\n    ],\n]);\n\necho $response->map['custom_profile']['name'], PHP_EOL;"
+    },
+    "delete_tax_custom_profile": {
+      "function": "deleteTaxCustomProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$response = TaxCustomProfiles::deleteTaxCustomProfile($client, 7);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

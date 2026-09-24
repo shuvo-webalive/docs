@@ -1,0 +1,9 @@
+---
+title: "Replace a custom tax profile"
+description: "Replaces a profile's `name` and `description`; a `description` you leave out becomes `null`."
+openapi: "PUT /admin/tax/custom_profiles/{custom_profile_id}"
+---
+
+Replaces the `name` and `description` of the profile whose `id` you pass as `custom_profile_id`, and returns the profile under `custom_profile` with the nine fields of a listing row. Wrap the record in `custom_profile` and send `name` every time, or the call is rejected with `400`. A `description` you leave out comes back `null`, so send the current `description` to keep it. Any `code` you send is discarded.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

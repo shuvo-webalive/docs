@@ -1,0 +1,9 @@
+---
+title: "List custom tax profiles"
+description: "Returns up to 20 custom tax profiles per call, with the total in `pagination`."
+openapi: "GET /admin/tax/custom_profiles"
+---
+
+Returns up to 20 custom tax profiles under `custom_profiles`, and a `pagination` object with the `total` number of profiles and `has_next`, which says whether more rows follow. Each row gives its number of rate rules in `rate_rules_count`; to get the rules themselves, use [Retrieve a custom tax profile](/api-reference/custom-tax-profiles/retrieve-a-custom-tax-profile). Only `limit`, `offset` and `page` change the result; `q` and `field_metadata` are ignored. A `HEAD` or `OPTIONS` request on this path returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

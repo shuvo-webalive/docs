@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "tax_custom_profiles",
+  "endpoints": {
+    "list_tax_custom_profiles": {
+      "function": "listTaxCustomProfiles",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCustomProfiles().listTaxCustomProfiles(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"custom_profiles\")) {\n    Map<?, ?> customProfile = (Map<?, ?>) row;\n    System.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\") + \" \" + customProfile.get(\"rate_rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "create_tax_custom_profile": {
+      "function": "createTaxCustomProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCustomProfiles().createTaxCustomProfile(Map.of(\"custom_profile\",\n        Map.of(\"name\", \"Wholesale customers\", \"description\", \"Rates for wholesale accounts\")));\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\"));"
+    },
+    "get_tax_custom_profile": {
+      "function": "getTaxCustomProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCustomProfiles().getTaxCustomProfile(1);\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"name\") + \" \" + customProfile.get(\"rate_rules_count\"));\nfor (Object row : (List<?>) customProfile.get(\"rate_rules\")) {\n    Map<?, ?> rateRule = (Map<?, ?>) row;\n    System.out.println(rateRule.get(\"id\") + \" \" + rateRule.get(\"name\") + \" \" + rateRule.get(\"zones_count\"));\n}"
+    },
+    "update_tax_custom_profile": {
+      "function": "updateTaxCustomProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCustomProfiles().updateTaxCustomProfile(7, Map.of(\"custom_profile\",\n        Map.of(\"name\", \"Wholesale and trade customers\", \"description\", \"Rates for wholesale and trade accounts\")));\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"name\") + \" \" + customProfile.get(\"description\"));"
+    },
+    "delete_tax_custom_profile": {
+      "function": "deleteTaxCustomProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.taxCustomProfiles().deleteTaxCustomProfile(7);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

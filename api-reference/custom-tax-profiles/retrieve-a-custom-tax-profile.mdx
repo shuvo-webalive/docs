@@ -1,0 +1,9 @@
+---
+title: "Retrieve a custom tax profile"
+description: "Returns the custom tax profile whose `id` you pass as `custom_profile_id`, with its rate rules."
+openapi: "GET /admin/tax/custom_profiles/{custom_profile_id}"
+---
+
+Returns the profile whose `id` you pass as `custom_profile_id`, under the `custom_profile` key. It has the nine fields of a listing row plus `rate_rules`, the profile's rate rules, which is an empty list when the profile holds none. No other call returns `rate_rules`. A `HEAD` request on this path returns `200` whether or not a profile has that `custom_profile_id`, so use this call to check that a profile exists.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
