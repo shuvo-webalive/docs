@@ -1,0 +1,49 @@
+---
+title: "Customers"
+sidebarTitle: "Overview"
+description: "Read, create, update and remove customers, and manage their addresses, passwords and store credit."
+---
+
+Fifteen endpoints, available in all seven SDKs. Every path is under `/api/v4/admin/customers`.
+
+<Warning>
+  Paths take the customer's `customer_id`. A customer also carries an `internal_id`, which is a
+  second id space over the same records: sending it by mistake can return a **different customer
+  with a `200`** rather than a `404`. Check the record you get back is the one you asked for.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List customers](/api-reference/customers/list-customers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customers` | A page of customers, with a `pagination` block for the next page. |
+| [Retrieve a customer](/api-reference/customers/retrieve-a-customer) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customers/{customer_id}` | One customer by `customer_id`. |
+| [Count customers](/api-reference/customers/count-customers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customers/count` | The number of customers, optionally filtered. |
+| [Check an email address](/api-reference/customers/check-an-email-address) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customers/check-email` | Whether an email address already belongs to a customer. |
+| [Export customers](/api-reference/customers/export-customers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customers/export` | Every customer as an XLSX spreadsheet. |
+| [Create a customer](/api-reference/customers/create-a-customer) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers` | Add a customer and get back its new `customer_id`. |
+| [Update a customer](/api-reference/customers/update-a-customer) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/customers/{customer_id}` | Change only the fields you send; the rest stay as they are. |
+| [Delete a customer](/api-reference/customers/delete-a-customer) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/customers/{customer_id}` | Remove a customer permanently. |
+| [Add addresses](/api-reference/customers/add-addresses) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers/{customer_id}/addresses` | Add shipping, billing or primary addresses to a customer. |
+| [Reset a password](/api-reference/customers/reset-a-password) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers/{customer_id}/reset-password` | Set a new password without the old one. |
+| [Change a password](/api-reference/customers/change-a-password) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers/{customer_id}/change-password` | Change a password by giving the old one. |
+| [Bulk reset passwords](/api-reference/customers/bulk-reset-passwords) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers/bulk-reset-password` | Email a password reset to several customers. |
+| [Import customers](/api-reference/customers/import-customers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers/import` | Create or update customers from a CSV or spreadsheet file. |
+| [List store credit adjustments](/api-reference/customers/list-store-credit-adjustments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customers/{customer_id}/store-credit/adjustments` | A customer's store credit movements, newest first. |
+| [Adjust store credit](/api-reference/customers/adjust-store-credit) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customers/{customer_id}/store-credit/adjustments` | Add to or deduct from a customer's store credit. |
+
+## Before you call
+
+Set up a client once with your store's credentials, as shown in [Authentication](/authentication).
+Every sample on these pages starts from that client. With cURL, send the access token as
+`Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Listings are capped at 20 rows a page.** A larger `limit` is accepted and the cap is echoed back
+  in `pagination.limit`. Page with `page` or `offset`.
+- **A new customer cannot sign in until it is active.** Without `status: "active"` a customer is
+  created `awaiting_verification`, and change-password answers `401` for it.
+- **The export is every customer.** Its parameters switch columns on and off; they do not filter rows.
+- **Errors share one shape:** `status`, `code` and `message`, plus `error` and a per-field `errors`
+  list when the API gives them.

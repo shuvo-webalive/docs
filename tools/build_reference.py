@@ -59,7 +59,8 @@ def curl(endpoint):
     elif endpoint.get("body"):
         lines[-1] += " \\"
         lines.append("  -H \"Content-Type: application/json\" \\")
-        lines.append("  -d '%s'" % json.dumps(endpoint["body"]["example"]))
+        body = json.dumps(endpoint["body"]["example"], indent=2)
+        lines.append("  -d '%s'" % body.replace("\n", "\n  "))
     return "\n".join(lines)
 
 
@@ -126,7 +127,7 @@ def page(endpoint):
         "",
         endpoint["description"],
         "",
-        "<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>",
+        "<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>",
         "",
     ])
 
@@ -149,16 +150,20 @@ def badge(method):
             'letterSpacing: "0.02em", color: "%s"}}>%s</span>' % (METHOD_COLOURS[method], method))
 
 
-def overview(snippets):
-    rows = []
-    for endpoint in customers.ENDPOINTS:
-        rows.append("| [%s](/api-reference/customers/%s) | %s | `%s` |" % (
-            endpoint["title"], endpoint["slug"], badge(endpoint["method"]),
-            endpoint["path"].replace("/admin/customers", "…/customers")))
-    tabs = ['<CodeGroup>', '```bash cURL', CURL_SETUP, '```', '']
+def client_setup(snippets):
+    tabs = ["<CodeGroup>", "```bash cURL", CURL_SETUP, "```", ""]
     for sdk, lang, label in SDKS:
         tabs += ["```%s %s" % (lang, label), snippets[sdk]["setup"].rstrip(), "```", ""]
     tabs.append("</CodeGroup>")
+    return "\n".join(tabs) + "\n"
+
+
+def overview():
+    rows = []
+    for endpoint in customers.ENDPOINTS:
+        rows.append("| [%s](/api-reference/customers/%s) | %s | `%s` | %s |" % (
+            endpoint["title"], endpoint["slug"], badge(endpoint["method"]),
+            endpoint["path"].replace("/admin/customers", "…/customers"), endpoint["summary"]))
     return "\n".join([
         "---",
         "title: \"Customers\"",
@@ -176,17 +181,15 @@ def overview(snippets):
         "",
         "## At a glance",
         "",
-        "| Endpoint | Method | Path |",
-        "| --- | --- | --- |",
+        "| Endpoint | Method | Path | What it does |",
+        "| --- | --- | --- | --- |",
     ] + rows + [
         "",
-        "## Set up a client",
+        "## Before you call",
         "",
-        "Every sample on these pages assumes a client set up once, with your store's credentials read from",
-        "environment variables. The SDKs exchange them for an access token, cache it and renew it before it",
-        "expires. With cURL you request the token yourself and send it as `Authorization: Bearer $ACCESS_TOKEN`.",
-        "",
-    ] + tabs + [
+        "Set up a client once with your store's credentials, as shown in [Authentication](/authentication).",
+        "Every sample on these pages starts from that client. With cURL, send the access token as",
+        "`Authorization: Bearer $ACCESS_TOKEN`.",
         "",
         "## Things to know",
         "",
@@ -222,7 +225,9 @@ def main():
     (OUT / "openapi.json").write_text(document + "\n", encoding="utf-8")
     for endpoint in customers.ENDPOINTS:
         (OUT / "customers" / (endpoint["slug"] + ".mdx")).write_text(page(endpoint), encoding="utf-8")
-    (OUT / "customers" / "overview.mdx").write_text(overview(snippets), encoding="utf-8")
+    (DOCS / "customers.mdx").write_text(overview(), encoding="utf-8")
+    (DOCS / "snippets").mkdir(exist_ok=True)
+    (DOCS / "snippets" / "client-setup.mdx").write_text(client_setup(snippets), encoding="utf-8")
     print("Built the overview, %d endpoint pages and openapi.json" % len(customers.ENDPOINTS))
     return 0
 
