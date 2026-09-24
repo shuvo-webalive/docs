@@ -64,6 +64,13 @@ def curl(endpoint):
     return "\n".join(lines)
 
 
+def without_path_example(parameter):
+    if parameter.get("in") != "path":
+        return parameter
+    schema = {k: v for k, v in parameter.get("schema", {}).items() if k != "example"}
+    return dict({k: v for k, v in parameter.items() if k != "example"}, schema=schema)
+
+
 def operation(endpoint, snippets):
     samples = [{"lang": "bash", "label": "cURL", "source": curl(endpoint)}]
     for sdk, lang, label in SDKS:
@@ -73,16 +80,13 @@ def operation(endpoint, snippets):
         "summary": endpoint["title"],
         "operationId": endpoint["key"],
         "description": endpoint["description"],
-        "parameters": endpoint.get("parameters", []),
+        "parameters": [without_path_example(p) for p in endpoint.get("parameters", [])],
         "responses": {},
         "x-codeSamples": samples,
     }
     if endpoint.get("body"):
         media = "multipart/form-data" if endpoint.get("multipart") else "application/json"
-        content = {"schema": endpoint["body"]["schema"]}
-        if "example" in endpoint["body"]:
-            content["example"] = endpoint["body"]["example"]
-        op["requestBody"] = {"required": True, "content": {media: content}}
+        op["requestBody"] = {"required": True, "content": {media: {"schema": endpoint["body"]["schema"]}}}
     for status, response in endpoint["responses"].items():
         entry = {"description": response["description"]}
         if "schema" in response:
@@ -116,7 +120,7 @@ def token_operation():
         "security": [],
         "requestBody": {"required": True, "content": {"application/json": {
             "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret", "redirect_uri", "auth_string"], "properties": {
-                "grant_type": {"type": "string", "const": "client_credentials", "default": "client_credentials", "description": "Always `client_credentials`."},
+                "grant_type": {"type": "string", "enum": ["client_credentials"], "description": "Always `client_credentials`."},
                 "client_id": {"type": "string", "description": "Your integration's client ID."},
                 "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
                 "redirect_uri": {"type": "string", "description": "The redirect URI registered for your integration."},
