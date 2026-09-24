@@ -1,0 +1,46 @@
+{
+  "sdk": "dotnet",
+  "module": "inventory_locations",
+  "endpoints": {
+    "list_inventory_locations": {
+      "function": "ListInventoryLocationsAsync",
+      "code": "var response = await client.InventoryLocations.ListInventoryLocationsAsync(\n    new Dictionary<string, object?> { [\"q\"] = \"Sydney\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var inventoryLocation in ((IReadOnlyList<object?>)body[\"inventory_locations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{inventoryLocation[\"id\"]} {inventoryLocation[\"name\"]} {inventoryLocation[\"is_default\"]}\");"
+    },
+    "head_inventory_locations": {
+      "function": "HeadInventoryLocationsAsync",
+      "code": "var response = await client.InventoryLocations.HeadInventoryLocationsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_inventory_location": {
+      "function": "CreateInventoryLocationAsync",
+      "code": "var response = await client.InventoryLocations.CreateInventoryLocationAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Perth Warehouse\", [\"address\"] = \"4 Example Street, Perth WA 6000\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine(inventoryLocation[\"id\"]);"
+    },
+    "get_inventory_location": {
+      "function": "GetInventoryLocationAsync",
+      "code": "var response = await client.InventoryLocations.GetInventoryLocationAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"is_default\"]}\");"
+    },
+    "head_inventory_location": {
+      "function": "HeadInventoryLocationAsync",
+      "code": "var response = await client.InventoryLocations.HeadInventoryLocationAsync(4);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_inventory_location": {
+      "function": "UpdateInventoryLocationAsync",
+      "code": "var response = await client.InventoryLocations.UpdateInventoryLocationAsync(19, new Dictionary<string, object?>\n{\n    [\"name\"] = \"Perth Warehouse\", [\"address\"] = \"10 Example Street, Perth WA 6000\",\n    [\"is_active\"] = true, [\"is_default\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"address\"]} {inventoryLocation[\"is_active\"]}\");"
+    },
+    "delete_inventory_location": {
+      "function": "DeleteInventoryLocationAsync",
+      "code": "var response = await client.InventoryLocations.DeleteInventoryLocationAsync(19);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_inventory_location_stock": {
+      "function": "GetInventoryLocationStockAsync",
+      "code": "var response = await client.InventoryLocations.GetInventoryLocationStockAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var product in ((IReadOnlyList<object?>)body[\"products\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{product[\"product_id\"]} {product[\"sku\"]} {product[\"stock\"]}\");"
+    },
+    "set_inventory_location_default": {
+      "function": "SetInventoryLocationDefaultAsync",
+      "code": "var response = await client.InventoryLocations.SetInventoryLocationDefaultAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"is_default\"]}\");"
+    },
+    "update_inventory_location_status": {
+      "function": "UpdateInventoryLocationStatusAsync",
+      "code": "var response = await client.InventoryLocations.UpdateInventoryLocationStatusAsync(19, new Dictionary<string, object?>\n{\n    [\"is_active\"] = true,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"is_active\"]}\");"
+    }
+  }
+}

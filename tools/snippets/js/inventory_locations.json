@@ -1,0 +1,46 @@
+{
+  "sdk": "js",
+  "module": "inventory_locations",
+  "endpoints": {
+    "list_inventory_locations": {
+      "function": "listInventoryLocations",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.listInventoryLocations(client, {q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.is_default);\n}\n"
+    },
+    "head_inventory_locations": {
+      "function": "headInventoryLocations",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.headInventoryLocations(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_inventory_location": {
+      "function": "createInventoryLocation",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.createInventoryLocation(client, {\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.is_active);\n"
+    },
+    "get_inventory_location": {
+      "function": "getInventoryLocation",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.getInventoryLocation(client, 4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.is_active);\n"
+    },
+    "head_inventory_location": {
+      "function": "headInventoryLocation",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.headInventoryLocation(client, 4);\nconsole.log(response.statusCode);\n"
+    },
+    "update_inventory_location": {
+      "function": "updateInventoryLocation",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.updateInventoryLocation(client, 19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    is_active: true,\n    is_default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.is_active, inventoryLocation.is_default);\n"
+    },
+    "delete_inventory_location": {
+      "function": "deleteInventoryLocation",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.deleteInventoryLocation(client, 19);\nconsole.log(response.statusCode);\n"
+    },
+    "get_inventory_location_stock": {
+      "function": "getInventoryLocationStock",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.getInventoryLocationStock(client, 4);\nfor (const product of response.map.products) {\n    console.log(product.product_id, product.name, product.stock);\n}\n"
+    },
+    "set_inventory_location_default": {
+      "function": "setInventoryLocationDefault",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.setInventoryLocationDefault(client, 4);\nconsole.log(response.map.inventory_location.is_default, response.map.inventory_location.is_active);\n"
+    },
+    "update_inventory_location_status": {
+      "function": "updateInventoryLocationStatus",
+      "code": "import {inventoryLocations} from 'webcommander-sdk';\n\nconst response = await inventoryLocations.updateInventoryLocationStatus(client, 19, {is_active: true});\nconsole.log(response.map.inventory_location.is_active);\n"
+    }
+  }
+}

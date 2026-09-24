@@ -1,0 +1,9 @@
+---
+title: "Create an inventory location"
+description: "Creates an inventory location and returns it with its `id`, which other calls take as `inventory_location_id`."
+openapi: "POST /admin/inventory_locations"
+---
+
+Send the fields at the top level of the body, not wrapped in `inventory_location`; only `name` is required. A new location has `is_active` and `is_default` set to `false` unless you send `true`, and sending `"is_default": true` takes the flag from the location that had it. The store sets the location's `id`, `created` and `updated` itself, and ignores any values you send for them and any unknown field. A `name` another location already has is accepted.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

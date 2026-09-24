@@ -1,0 +1,9 @@
+---
+title: "Activate or deactivate an inventory location"
+description: "Sets `is_active` on an inventory location and leaves every other field as it is."
+openapi: "PUT /admin/inventory_locations/{inventory_location_id}/status"
+---
+
+Send `{"is_active": true}` to activate the location or `{"is_active": false}` to deactivate it. The store reads only `is_active`: `name`, `is_default` and any other field stay as they are, even if you send them. A value that is not a boolean is read as true or false, so `1` and `"yes"` both activate. You can deactivate the default location with this call.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

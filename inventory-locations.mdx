@@ -1,0 +1,58 @@
+---
+title: "Inventory locations"
+sidebarTitle: "Overview"
+description: "List, create, replace and delete inventory locations, activate or deactivate them, see the products each one holds, and choose the default location."
+---
+
+The Inventory locations API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/inventory_locations`.
+
+<Warning>
+  **Replacing a location resets every field you leave out of the body.** `PUT` on a location does
+  not merge: `address` becomes `""`, and `is_active` and `is_default` become `false`. If you
+  replace the default location and leave out `is_default`, the store has no default location
+  until you give the flag back with [Set the default inventory location](/api-reference/inventory-locations/set-the-default-inventory-location).
+  Send every field you want to keep, `is_default` included.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List inventory locations](/api-reference/inventory-locations/list-inventory-locations) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/inventory_locations` | Returns up to 20 inventory locations per call, default location first, with paging details. |
+| [Check the inventory locations list](/api-reference/inventory-locations/check-the-inventory-locations-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/inventory_locations` | Checks that the inventory locations list is reachable. Returns headers only, with no body. |
+| [Create an inventory location](/api-reference/inventory-locations/create-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/inventory_locations` | Creates an inventory location and returns it with its `id`, which other calls take as `inventory_location_id`. |
+| [Retrieve an inventory location](/api-reference/inventory-locations/retrieve-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/inventory_locations/{inventory_location_id}` | Returns the inventory location whose `id` you pass as `inventory_location_id`. |
+| [Check an inventory location](/api-reference/inventory-locations/check-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/inventory_locations/{inventory_location_id}` | Returns headers only, with no body, for the location you pass as `inventory_location_id`. |
+| [Replace an inventory location](/api-reference/inventory-locations/replace-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/inventory_locations/{inventory_location_id}` | Replaces the location's `name`, `address`, `is_active` and `is_default` with your body and returns it. |
+| [Delete an inventory location](/api-reference/inventory-locations/delete-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/inventory_locations/{inventory_location_id}` | Deletes an inventory location permanently. You cannot delete the default location. |
+| [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/inventory_locations/{inventory_location_id}/stock` | Returns an inventory location and up to 20 of the products it holds, with paging details. |
+| [Set the default inventory location](/api-reference/inventory-locations/set-the-default-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/inventory_locations/{inventory_location_id}/default` | Makes an inventory location the default and removes the flag from the previous one. |
+| [Activate or deactivate an inventory location](/api-reference/inventory-locations/activate-or-deactivate-an-inventory-location) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/inventory_locations/{inventory_location_id}/status` | Sets `is_active` on an inventory location and leaves every other field as it is. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send the fields at the top level of the body, not inside `inventory_location`.** Create and
+  replace both read `name`, `address`, `is_active` and `is_default` from the top level. A create
+  wrapped in `{"inventory_location": {...}}` is rejected with `400` and the message
+  `name is required`. Responses return the location inside `inventory_location`.
+- **At most one location is the default.**
+  [Set the default inventory location](/api-reference/inventory-locations/set-the-default-inventory-location) gives the flag to the location you name and
+  takes it from the location that had it. A create with `"is_default": true` takes the flag the same
+  way, and a replace that leaves out `is_default` clears it. You cannot delete the default location:
+  make another location the default first, or the delete is rejected with `409`.
+- **A listing returns at most 20 locations per call, whatever `limit` you send.** The store checks
+  `limit` but does not apply it: `pagination.limit` always shows `20`, and `limit=0` is rejected
+  with `400`. To get more, send a higher `offset`, or a `page` (read as `offset = (page - 1) * 20`),
+  while `pagination.has_next` is `true`. The stock listing pages the same way, 20 products at a
+  time. Unknown query parameters are ignored, not rejected.
+- **A `200` does not prove a write worked.** For a method these paths do not support, such as
+  `PATCH` on a location or any write to `/stock`, the store returns `200` with
+  `{"isSuccess": false, "message": "Invalid API Request"}` and stores nothing. Use `PUT` to
+  replace a location, and [Activate or deactivate an inventory location](/api-reference/inventory-locations/activate-or-deactivate-an-inventory-location) to change
+  only `is_active`. No call changes stock.

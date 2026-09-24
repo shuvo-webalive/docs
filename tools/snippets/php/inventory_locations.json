@@ -1,0 +1,46 @@
+{
+  "sdk": "php",
+  "module": "inventory_locations",
+  "endpoints": {
+    "list_inventory_locations": {
+      "function": "listInventoryLocations",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::listInventoryLocations($client, ['q' => 'Sydney']);\n\nforeach ($response->map['inventory_locations'] as $location) {\n    echo $location['id'], ' ', $location['name'], $location['is_default'] ? ' (default)' : '', PHP_EOL;\n}"
+    },
+    "head_inventory_locations": {
+      "function": "headInventoryLocations",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::headInventoryLocations($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_inventory_location": {
+      "function": "createInventoryLocation",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::createInventoryLocation($client, [\n    'name' => 'Perth Warehouse',\n    'address' => '4 Example Street, Perth WA 6000',\n]);\n\necho $response->map['inventory_location']['id'], PHP_EOL;"
+    },
+    "get_inventory_location": {
+      "function": "getInventoryLocation",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::getInventoryLocation($client, 4);\n\n$location = $response->map['inventory_location'];\necho $location['name'], ', ', $location['address'], PHP_EOL;"
+    },
+    "head_inventory_location": {
+      "function": "headInventoryLocation",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::headInventoryLocation($client, 4);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_inventory_location": {
+      "function": "updateInventoryLocation",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::updateInventoryLocation($client, 19, [\n    'name' => 'Perth Warehouse',\n    'address' => '10 Example Street, Perth WA 6000',\n    'is_active' => true,\n    'is_default' => false,\n]);\n\necho $response->map['inventory_location']['address'], PHP_EOL;"
+    },
+    "delete_inventory_location": {
+      "function": "deleteInventoryLocation",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::deleteInventoryLocation($client, 19);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_inventory_location_stock": {
+      "function": "getInventoryLocationStock",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::getInventoryLocationStock($client, 4);\n\nforeach ($response->map['products'] as $product) {\n    echo $product['sku'], ' ', $product['name'], ': ', $product['stock'], PHP_EOL;\n}"
+    },
+    "set_inventory_location_default": {
+      "function": "setInventoryLocationDefault",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::setInventoryLocationDefault($client, 4);\n\necho $response->map['inventory_location']['is_default'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "update_inventory_location_status": {
+      "function": "updateInventoryLocationStatus",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::updateInventoryLocationStatus($client, 19, ['is_active' => true]);\n\necho $response->map['inventory_location']['is_active'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}
