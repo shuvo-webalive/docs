@@ -1,0 +1,9 @@
+---
+title: "Check a tax rule"
+description: "Returns headers only, and `200` even when no tax rule has that `tax_rule_id`."
+openapi: "HEAD /admin/tax_rules/{tax_rule_id}"
+---
+
+Returns `200` with headers only and no body. It returns `200` even when no tax rule has that `tax_rule_id`, so it does not tell you whether the rule exists. To check that, use [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule), which returns `404` with the message `Rule not found`. The response has no `ETag` or `Last-Modified` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

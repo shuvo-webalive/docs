@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "tax_rules",
+  "endpoints": {
+    "list_tax_rules": {
+      "function": "ListTaxRulesAsync",
+      "code": "var response = await client.TaxRules.ListTaxRulesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var taxRule in ((IReadOnlyList<object?>)body[\"tax_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{taxRule[\"id\"]} {taxRule[\"name\"]} {taxRule[\"default\"]}\");"
+    },
+    "head_tax_rules": {
+      "function": "HeadTaxRulesAsync",
+      "code": "var response = await client.TaxRules.HeadTaxRulesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_tax_rule": {
+      "function": "CreateTaxRuleAsync",
+      "code": "var response = await client.TaxRules.CreateTaxRuleAsync(new Dictionary<string, object?>\n{\n    [\"tax_rule\"] = new Dictionary<string, object?> { [\"name\"] = \"Reduced rate\", [\"description\"] = \"Rule for reduced-rate goods\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxRule = (IReadOnlyDictionary<string, object?>)body[\"tax_rule\"]!;\nConsole.WriteLine(taxRule[\"id\"]);"
+    },
+    "get_tax_rule": {
+      "function": "GetTaxRuleAsync",
+      "code": "var response = await client.TaxRules.GetTaxRuleAsync(7);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxRule = (IReadOnlyDictionary<string, object?>)body[\"tax_rule\"]!;\nConsole.WriteLine(taxRule[\"name\"]);\nforeach (var zone in ((IReadOnlyList<object?>)taxRule[\"zones\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{zone[\"id\"]} {zone[\"name\"]}\");"
+    },
+    "head_tax_rule": {
+      "function": "HeadTaxRuleAsync",
+      "code": "var response = await client.TaxRules.HeadTaxRuleAsync(7);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_tax_rule": {
+      "function": "UpdateTaxRuleAsync",
+      "code": "var response = await client.TaxRules.UpdateTaxRuleAsync(42, new Dictionary<string, object?>\n{\n    [\"tax_rule\"] = new Dictionary<string, object?> { [\"name\"] = \"Reduced rate goods\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxRule = (IReadOnlyDictionary<string, object?>)body[\"tax_rule\"]!;\nConsole.WriteLine(taxRule[\"name\"]);"
+    },
+    "delete_tax_rule": {
+      "function": "DeleteTaxRuleAsync",
+      "code": "var response = await client.TaxRules.DeleteTaxRuleAsync(42);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

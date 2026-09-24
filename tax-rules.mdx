@@ -1,0 +1,57 @@
+---
+title: "Tax rules"
+sidebarTitle: "Overview"
+description: "List, create, update and delete tax rules, and read the tax code and tax zones on each rule."
+---
+
+The Tax rules API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_rules`.
+
+<Warning>
+  **`code`, `zones`, `decimal_point` and `rounding_type` cannot be set through this API.** Create and
+  update accept them and return success, but store none of them. A rule you create has `code: {}`,
+  `zones: []`, `decimal_point` set to `2` and `rounding_type` set to `nearest`, whatever you send, and
+  an update leaves these four fields as they were.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List tax rules](/api-reference/tax-rules/list-tax-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules` | Returns up to 20 tax rules per call, each with its tax code and tax zones. |
+| [Check the tax rules list](/api-reference/tax-rules/check-the-tax-rules-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_rules` | Checks that the tax rules path exists. Returns headers only, with no body. |
+| [Create a tax rule](/api-reference/tax-rules/create-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_rules` | Creates a tax rule and returns the new rule, whose `id` other calls take as `tax_rule_id`. |
+| [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules/{tax_rule_id}` | Returns the tax rule whose `id` you pass as `tax_rule_id`, with its tax code and zones. |
+| [Check a tax rule](/api-reference/tax-rules/check-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_rules/{tax_rule_id}` | Returns headers only, and `200` even when no tax rule has that `tax_rule_id`. |
+| [Update a tax rule](/api-reference/tax-rules/update-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/tax_rules/{tax_rule_id}` | Changes a tax rule's `name` or `description` and returns the updated rule. |
+| [Delete a tax rule](/api-reference/tax-rules/delete-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tax_rules/{tax_rule_id}` | Deletes a tax rule permanently and returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap every write in `tax_rule`.** Send `{"tax_rule": {"name": "Reduced rate"}}` to create or
+  update a rule. A bare record is rejected with `400` and the message `tax_rule missing`. On create,
+  `name` is required and a body without it fails with `500`; `description` is the only other field
+  the store reads. An update changes only the fields you send.
+- **A listing returns at most 20 rules per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To read every rule, step `offset` by the number of rules each page
+  returned until you reach `pagination.total`. A `limit` below `1`, or a `limit` or `offset` that is
+  not a number, is rejected with `400` and the error `invalid_pagination`.
+- **A rejected request can make the next request on the same connection fail too.** Straight after a
+  `404`, the next retrieve returns `404`, even for a tax rule that exists. A retrieve from another tax
+  collection returns `404` with that collection's own message, such as `Profile not found`. Straight
+  after a `400` `invalid_pagination`, the next listing returns the same `400`, even on another tax
+  collection. The request after that is handled normally. So a delete sent straight after a `404`
+  returns that `404` and deletes nothing. Check the status of every call, and send the delete again
+  when it returns the previous call's error.
+- **A `200` does not always mean the call worked.** A method these paths do not handle, such as
+  `OPTIONS`, returns `200` with `{"isSuccess": false, "message": "Invalid API Request"}` instead
+  of `405`, and stores nothing. A `HEAD` request for one rule returns `200` even when no rule has the
+  `tax_rule_id` you send; use [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule) to check that a rule exists.
+- **Tax rules live at `/admin/tax_rules`, not under `/admin/tax/`.** `/admin/tax/custom_rules`, the
+  path an older API collection used, returns `404` with the error code `not_found` and a message that
+  starts `Unknown tax path`.

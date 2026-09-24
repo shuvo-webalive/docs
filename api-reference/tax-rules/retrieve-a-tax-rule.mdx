@@ -1,0 +1,9 @@
+---
+title: "Retrieve a tax rule"
+description: "Returns the tax rule whose `id` you pass as `tax_rule_id`, with its tax code and zones."
+openapi: "GET /admin/tax_rules/{tax_rule_id}"
+---
+
+Returns one tax rule under the `tax_rule` key, with the same ten fields a listing row has. `code` holds the rule's tax code and `zones` its tax zones. A rule created through this API has `code: {}` and `zones: []`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

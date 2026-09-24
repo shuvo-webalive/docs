@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "tax_rules",
+  "endpoints": {
+    "list_tax_rules": {
+      "function": "list_tax_rules",
+      "code": "response = client.tax_rules.list_tax_rules({\"limit\": 20})\nfor tax_rule in response.map[\"tax_rules\"]:\n    print(tax_rule[\"id\"], tax_rule[\"name\"], len(tax_rule[\"zones\"]))\nprint(response.map[\"pagination\"][\"total\"])\n"
+    },
+    "head_tax_rules": {
+      "function": "head_tax_rules",
+      "code": "response = client.tax_rules.head_tax_rules()\nprint(response.status_code)\n"
+    },
+    "create_tax_rule": {
+      "function": "create_tax_rule",
+      "code": "response = client.tax_rules.create_tax_rule({\n    \"tax_rule\": {\n        \"name\": \"Reduced rate\",\n        \"description\": \"Rule for reduced-rate goods\",\n    },\n})\nprint(response.map[\"tax_rule\"][\"id\"])\n"
+    },
+    "get_tax_rule": {
+      "function": "get_tax_rule",
+      "code": "response = client.tax_rules.get_tax_rule(7)\ntax_rule = response.map[\"tax_rule\"]\nprint(tax_rule[\"name\"], tax_rule[\"code\"].get(\"name\"))\nprint([zone[\"name\"] for zone in tax_rule[\"zones\"]])\n"
+    },
+    "head_tax_rule": {
+      "function": "head_tax_rule",
+      "code": "response = client.tax_rules.head_tax_rule(7)\nprint(response.status_code)\n"
+    },
+    "update_tax_rule": {
+      "function": "update_tax_rule",
+      "code": "response = client.tax_rules.update_tax_rule(42, {\n    \"tax_rule\": {\"name\": \"Reduced rate goods\"},\n})\nprint(response.map[\"tax_rule\"][\"name\"])\n"
+    },
+    "delete_tax_rule": {
+      "function": "delete_tax_rule",
+      "code": "response = client.tax_rules.delete_tax_rule(42)\nprint(response.status_code)\n"
+    }
+  }
+}

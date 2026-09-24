@@ -62,6 +62,9 @@
     },
     {
       "name": "Tax codes"
+    },
+    {
+      "name": "Tax rules"
     }
   ],
   "paths": {
@@ -12961,6 +12964,726 @@
           }
         ]
       }
+    },
+    "/admin/tax_rules": {
+      "get": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "List tax rules",
+        "operationId": "list_tax_rules",
+        "description": "Returns up to 20 tax rules under `tax_rules`, and the rule count and page position under `pagination`. Each rule has ten fields, including its tax code in `code` and its tax zones in `zones`. To read every rule, step `offset` by the number of rules each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored: `q` does not filter the rules.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Rules per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. A value below `1`, or one that is not a number, is rejected with `400` and the error `invalid_pagination`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of rules to skip. A value that is not a number is rejected with `400` and the error `invalid_pagination`.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit` against the `limit` you send with it.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 20 tax rules under `tax_rules`. `pagination.total` is the number of rules in the store. No `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rules": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxRule"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TaxRulePagination"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rules": [
+                    {
+                      "id": 7,
+                      "name": "GST",
+                      "code": {
+                        "id": 3,
+                        "name": "GST",
+                        "is_default": true
+                      },
+                      "description": "Goods and services tax",
+                      "default": true,
+                      "rounding_type": "nearest",
+                      "decimal_point": 2,
+                      "zones": [
+                        {
+                          "id": 1,
+                          "name": "Australia",
+                          "is_system_generated": true,
+                          "is_default": true
+                        }
+                      ],
+                      "created_at": "2026-01-15T09:30:00",
+                      "updated_at": "2026-01-15T09:30:00"
+                    },
+                    {
+                      "id": 42,
+                      "name": "Reduced rate",
+                      "code": {},
+                      "description": "Rule for reduced-rate goods",
+                      "default": false,
+                      "rounding_type": "nearest",
+                      "decimal_point": 2,
+                      "zones": [],
+                      "created_at": "2026-09-21T10:15:00",
+                      "updated_at": "2026-09-21T10:15:00"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`limit` is below `1`, or `limit` or `offset` is not a number. The error is `invalid_pagination`, and the `errors` list in the response names the rejected parameter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxRuleError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax_rules?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.list_tax_rules({\"limit\": 20})\nfor tax_rule in response.map[\"tax_rules\"]:\n    print(tax_rule[\"id\"], tax_rule[\"name\"], len(tax_rule[\"zones\"]))\nprint(response.map[\"pagination\"][\"total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.listTaxRules(client, {limit: 20});\nfor (const taxRule of response.map.tax_rules) {\n    console.log(taxRule.id, taxRule.name, taxRule.default);\n}\nconsole.log(response.map.pagination.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::listTaxRules($client, ['limit' => 20]);\n\nforeach ($response->map['tax_rules'] as $rule) {\n    echo $rule['id'], ' ', $rule['name'], ', ', count($rule['zones']), ' zones', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' tax rules in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().listTaxRules(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"tax_rules\")) {\n    Map<?, ?> taxRule = (Map<?, ?>) row;\n    System.out.println(taxRule.get(\"id\") + \" \" + taxRule.get(\"name\") + \" \" + taxRule.get(\"default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.ListTaxRulesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var taxRule in ((IReadOnlyList<object?>)body[\"tax_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{taxRule[\"id\"]} {taxRule[\"name\"]} {taxRule[\"default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.listTaxRules(queryParams: {'limit': 20});\nfinal taxRules = (response.map as Map)['tax_rules'] as List;\nfor (final taxRule in taxRules) {\n  print('${(taxRule as Map)['id']} ${taxRule['name']} ${taxRule['zones']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().ListTaxRules(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_rules\"].([]any) {\n\trule := row.(map[string]any)\n\tfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"default\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "Check the tax rules list",
+        "operationId": "head_tax_rules",
+        "description": "Returns `200` with headers only and no body. A `200` shows only that the path exists: the store also returns `200` for a method it does not handle, and a `HEAD` response has no body to tell the two apart. The response has no `ETag` or `Last-Modified` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The path exists. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/tax_rules\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.head_tax_rules()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.headTaxRules(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::headTaxRules($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().headTaxRules();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.HeadTaxRulesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.headTaxRules();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().HeadTaxRules(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "Create a tax rule",
+        "operationId": "create_tax_rule",
+        "description": "Creates a tax rule and returns it, with the rule's `id` set by the store. Pass that `id` as `tax_rule_id` to retrieve, update or delete the rule. Wrap the fields in `tax_rule`: `name` is required, and `description` is the only other field the store reads. `code`, `zones`, `decimal_point` and `rounding_type` are accepted and not stored, so the new rule has `code: {}`, `zones: []`, `decimal_point` set to `2` and `rounding_type` set to `nearest`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new tax rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rule": {
+                      "$ref": "#/components/schemas/TaxRule"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rule": {
+                    "id": 42,
+                    "name": "Reduced rate",
+                    "code": {},
+                    "description": "Rule for reduced-rate goods",
+                    "default": false,
+                    "rounding_type": "nearest",
+                    "decimal_point": 2,
+                    "zones": [],
+                    "created_at": "2026-09-21T10:15:00",
+                    "updated_at": "2026-09-21T10:15:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `tax_rule`. The message is `tax_rule missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxRuleError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has no `name` inside `tax_rule`. The store rejects a create without a `name` with `500`, not `400`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxRuleError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax_rules\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_rule\": {\n      \"name\": \"Reduced rate\",\n      \"description\": \"Rule for reduced-rate goods\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.create_tax_rule({\n    \"tax_rule\": {\n        \"name\": \"Reduced rate\",\n        \"description\": \"Rule for reduced-rate goods\",\n    },\n})\nprint(response.map[\"tax_rule\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.createTaxRule(client, {\n    tax_rule: {name: 'Reduced rate', description: 'Rule for reduced-rate goods'},\n});\nconsole.log(response.map.tax_rule.id);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::createTaxRule($client, [\n    'tax_rule' => ['name' => 'Reduced rate', 'description' => 'Rule for reduced-rate goods'],\n]);\n\necho $response->map['tax_rule']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().createTaxRule(Map.of(\"tax_rule\",\n        Map.of(\"name\", \"Reduced rate\", \"description\", \"Rule for reduced-rate goods\")));\nMap<?, ?> taxRule = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_rule\");\nSystem.out.println(taxRule.get(\"id\") + \" \" + taxRule.get(\"name\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.CreateTaxRuleAsync(new Dictionary<string, object?>\n{\n    [\"tax_rule\"] = new Dictionary<string, object?> { [\"name\"] = \"Reduced rate\", [\"description\"] = \"Rule for reduced-rate goods\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxRule = (IReadOnlyDictionary<string, object?>)body[\"tax_rule\"]!;\nConsole.WriteLine(taxRule[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.createTaxRule({\n  'tax_rule': {\n    'name': 'Reduced rate',\n    'description': 'Rule for reduced-rate goods',\n  },\n});\nfinal taxRule = (response.map as Map)['tax_rule'] as Map;\nprint(taxRule['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().CreateTaxRule(ctx, map[string]any{\n\t\"tax_rule\": map[string]any{\"name\": \"Reduced rate\", \"description\": \"Rule for reduced-rate goods\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"tax_rule\"].(map[string]any)\nfmt.Println(rule[\"id\"], rule[\"name\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_rule"
+                ],
+                "properties": {
+                  "tax_rule": {
+                    "$ref": "#/components/schemas/TaxRuleInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/tax_rules/{tax_rule_id}": {
+      "get": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "Retrieve a tax rule",
+        "operationId": "get_tax_rule",
+        "description": "Returns one tax rule under the `tax_rule` key, with the same ten fields a listing row has. `code` holds the rule's tax code and `zones` its tax zones. A rule created through this API has `code: {}` and `zones: []`.",
+        "parameters": [
+          {
+            "name": "tax_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax rule's `id`, from a listing or from the response to creating the rule.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The tax rule. No `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rule": {
+                      "$ref": "#/components/schemas/TaxRule"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rule": {
+                    "id": 7,
+                    "name": "GST",
+                    "code": {
+                      "id": 3,
+                      "name": "GST",
+                      "is_default": true
+                    },
+                    "description": "Goods and services tax",
+                    "default": true,
+                    "rounding_type": "nearest",
+                    "decimal_point": 2,
+                    "zones": [
+                      {
+                        "id": 1,
+                        "name": "Australia",
+                        "is_system_generated": true,
+                        "is_default": true
+                      }
+                    ],
+                    "created_at": "2026-01-15T09:30:00",
+                    "updated_at": "2026-01-15T09:30:00"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No tax rule has that `tax_rule_id`. The message is `Rule not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxRuleError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax_rules/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.get_tax_rule(7)\ntax_rule = response.map[\"tax_rule\"]\nprint(tax_rule[\"name\"], tax_rule[\"code\"].get(\"name\"))\nprint([zone[\"name\"] for zone in tax_rule[\"zones\"]])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.getTaxRule(client, 7);\nconst taxRule = response.map.tax_rule;\nconsole.log(taxRule.name, taxRule.code.name);\nfor (const zone of taxRule.zones) {\n    console.log(zone.id, zone.name);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::getTaxRule($client, 7);\n\n$rule = $response->map['tax_rule'];\necho $rule['name'], ': ', $rule['description'], PHP_EOL;\nforeach ($rule['zones'] as $zone) {\n    echo 'zone ', $zone['id'], ' ', $zone['name'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().getTaxRule(7);\nMap<?, ?> taxRule = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_rule\");\nSystem.out.println(taxRule.get(\"name\") + \" \" + ((Map<?, ?>) taxRule.get(\"code\")).get(\"name\"));\nfor (Object zone : (List<?>) taxRule.get(\"zones\")) {\n    System.out.println(((Map<?, ?>) zone).get(\"id\") + \" \" + ((Map<?, ?>) zone).get(\"name\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.GetTaxRuleAsync(7);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxRule = (IReadOnlyDictionary<string, object?>)body[\"tax_rule\"]!;\nConsole.WriteLine(taxRule[\"name\"]);\nforeach (var zone in ((IReadOnlyList<object?>)taxRule[\"zones\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{zone[\"id\"]} {zone[\"name\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.getTaxRule(7);\nfinal taxRule = (response.map as Map)['tax_rule'] as Map;\nprint(taxRule['name']);\nprint(taxRule['code']);\nprint(taxRule['zones']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().GetTaxRule(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"tax_rule\"].(map[string]any)\ncode := rule[\"code\"].(map[string]any)\nfmt.Println(rule[\"name\"], code[\"name\"], len(rule[\"zones\"].([]any)))\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "Check a tax rule",
+        "operationId": "head_tax_rule",
+        "description": "Returns `200` with headers only and no body. It returns `200` even when no tax rule has that `tax_rule_id`, so it does not tell you whether the rule exists. To check that, use [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule), which returns `404` with the message `Rule not found`. The response has no `ETag` or `Last-Modified` header.",
+        "parameters": [
+          {
+            "name": "tax_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax rule's `id`, from a listing or from the response to creating the rule.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body. Returned even when no tax rule has that `tax_rule_id`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/tax_rules/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.head_tax_rule(7)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.headTaxRule(client, 7);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::headTaxRule($client, 7);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().headTaxRule(7);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.HeadTaxRuleAsync(7);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.headTaxRule(7);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().HeadTaxRule(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "Update a tax rule",
+        "operationId": "update_tax_rule",
+        "description": "Changes the fields you send and returns the whole rule; fields you leave out keep their values. Wrap the fields in `tax_rule`. `name` and `description` are the fields you can change: `code`, `zones`, `decimal_point` and `rounding_type` are accepted and left as they were.",
+        "parameters": [
+          {
+            "name": "tax_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax rule's `id`, from a listing or from the response to creating the rule.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated tax rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rule": {
+                      "$ref": "#/components/schemas/TaxRule"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rule": {
+                    "id": 42,
+                    "name": "Reduced rate goods",
+                    "code": {},
+                    "description": "Rule for reduced-rate goods",
+                    "default": false,
+                    "rounding_type": "nearest",
+                    "decimal_point": 2,
+                    "zones": [],
+                    "created_at": "2026-09-21T10:15:00",
+                    "updated_at": "2026-09-22T08:40:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `tax_rule`. The message is `tax_rule missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxRuleError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax_rules/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_rule\": {\n      \"name\": \"Reduced rate goods\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.update_tax_rule(42, {\n    \"tax_rule\": {\"name\": \"Reduced rate goods\"},\n})\nprint(response.map[\"tax_rule\"][\"name\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.updateTaxRule(client, 42, {tax_rule: {name: 'Reduced rate goods'}});\nconsole.log(response.map.tax_rule.name);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::updateTaxRule($client, 42, [\n    'tax_rule' => ['name' => 'Reduced rate goods'],\n]);\n\necho $response->map['tax_rule']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().updateTaxRule(42,\n        Map.of(\"tax_rule\", Map.of(\"name\", \"Reduced rate goods\")));\nMap<?, ?> taxRule = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_rule\");\nSystem.out.println(taxRule.get(\"name\") + \" \" + taxRule.get(\"updated_at\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.UpdateTaxRuleAsync(42, new Dictionary<string, object?>\n{\n    [\"tax_rule\"] = new Dictionary<string, object?> { [\"name\"] = \"Reduced rate goods\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxRule = (IReadOnlyDictionary<string, object?>)body[\"tax_rule\"]!;\nConsole.WriteLine(taxRule[\"name\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.updateTaxRule(42, {\n  'tax_rule': {'name': 'Reduced rate goods'},\n});\nfinal taxRule = (response.map as Map)['tax_rule'] as Map;\nprint('${taxRule['name']} ${taxRule['updated_at']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().UpdateTaxRule(ctx, 42, map[string]any{\n\t\"tax_rule\": map[string]any{\"name\": \"Reduced rate goods\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_rule\"].(map[string]any)[\"name\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_rule"
+                ],
+                "properties": {
+                  "tax_rule": {
+                    "$ref": "#/components/schemas/TaxRuleInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tax rules"
+        ],
+        "summary": "Delete a tax rule",
+        "operationId": "delete_tax_rule",
+        "description": "Deletes the tax rule permanently and returns `204` with no body. Retrieving it afterwards returns `404` with the message `Rule not found`. If the tax request just before this one was rejected, this call returns that same error instead and deletes nothing, so check the status before you treat the rule as gone.",
+        "parameters": [
+          {
+            "name": "tax_rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax rule's `id`, from a listing or from the response to creating the rule.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "The tax request just before this one was rejected with `404`, so this call returns that same `404` and deletes nothing. The next request is handled normally: send the delete again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxRuleError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax_rules/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_rules.delete_tax_rule(42)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.deleteTaxRule(client, 42);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxRules\\TaxRules;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxRules::deleteTaxRule($client, 42);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxRules().deleteTaxRule(42);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxRules.DeleteTaxRuleAsync(42);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxRules.deleteTaxRule(42);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxRules().DeleteTaxRule(ctx, 42, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -18759,6 +19482,164 @@
           "errors": {
             "type": "array",
             "description": "On a `400` `invalid_pagination`, names the rejected parameter: `limit` or `offset`.",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TaxRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The tax rule's `id`, assigned by the store. Pass it as `tax_rule_id` in a path."
+          },
+          "name": {
+            "type": "string",
+            "description": "Required on create."
+          },
+          "code": {
+            "$ref": "#/components/schemas/TaxRuleCode",
+            "description": "The rule's tax code. No call here sets it: it is `{}` on a rule created through this API."
+          },
+          "description": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          },
+          "rounding_type": {
+            "type": "string",
+            "description": "The rule's rounding type, such as `nearest`. Create and update ignore it: it is `nearest` on a rule created through this API."
+          },
+          "decimal_point": {
+            "type": "integer",
+            "description": "Create and update ignore it: it is `2` on a rule created through this API."
+          },
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxRuleZone"
+            },
+            "description": "The rule's tax zones. No call here sets them: the list is empty on a rule created through this API."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the rule was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "When the rule was last changed."
+          }
+        }
+      },
+      "TaxRuleCode": {
+        "type": "object",
+        "description": "The tax code on a rule. On a rule created through this API it is `{}`, with none of these fields.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The tax code's `id`, which the Tax codes endpoints take as `tax_code_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The tax code's name."
+          },
+          "is_default": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaxRuleZone": {
+        "type": "object",
+        "description": "One tax zone on a rule.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The tax zone's `id`, which the Tax zones endpoints take as `tax_zone_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The tax zone's name."
+          },
+          "is_system_generated": {
+            "type": "boolean"
+          },
+          "is_default": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaxRuleInput": {
+        "type": "object",
+        "description": "The two fields a create or update stores: `name` and `description`. The store ignores any other field you send.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required on create. On update, send it only to change it."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional. On update, send it only to change it."
+          }
+        }
+      },
+      "TaxRulePagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of tax rules in the store."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. At most `20`, even when you send a larger `limit`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of rules skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of rules on this page."
+          },
+          "current_page": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_previous": {
+            "type": "boolean"
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the previous page, or `null` on the first page."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the next page, or `null` on the last page."
+          }
+        }
+      },
+      "TaxRuleError": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Why the request was rejected. Each error status on these pages gives its message.",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "Only on a `400` for a paging parameter: names the rejected parameter, `limit` or `offset`.",
             "items": {
               "type": "object"
             }

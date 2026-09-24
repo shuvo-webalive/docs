@@ -242,6 +242,20 @@
                   "api-reference/tax-codes/update-a-tax-code",
                   "api-reference/tax-codes/delete-a-tax-code"
                 ]
+              },
+              {
+                "group": "Tax rules",
+                "expanded": false,
+                "pages": [
+                  "tax-rules",
+                  "api-reference/tax-rules/list-tax-rules",
+                  "api-reference/tax-rules/check-the-tax-rules-list",
+                  "api-reference/tax-rules/create-a-tax-rule",
+                  "api-reference/tax-rules/retrieve-a-tax-rule",
+                  "api-reference/tax-rules/check-a-tax-rule",
+                  "api-reference/tax-rules/update-a-tax-rule",
+                  "api-reference/tax-rules/delete-a-tax-rule"
+                ]
               }
             ]
           }
