@@ -33,6 +33,14 @@
         "group": "API reference",
         "pages": [
           {
+            "group": "Authentication",
+            "icon": "key",
+            "expanded": true,
+            "pages": [
+              "api-reference/authentication/get-an-access-token"
+            ]
+          },
+          {
             "group": "Customers",
             "icon": "users",
             "expanded": true,
@@ -72,7 +80,8 @@
   "api": {
     "openapi": "api-reference/openapi.json",
     "playground": {
-      "display": "none"
+      "display": "interactive",
+      "proxy": true
     }
   },
   "interaction": {

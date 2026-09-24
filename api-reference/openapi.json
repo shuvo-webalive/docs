@@ -10,7 +10,7 @@
       "variables": {
         "store": {
           "default": "your-store.example.com",
-          "description": "Your store's host name."
+          "description": "Your store's host name, without https://."
         }
       }
     }
@@ -22,10 +22,116 @@
   ],
   "tags": [
     {
+      "name": "Authentication"
+    },
+    {
       "name": "Customers"
     }
   ],
   "paths": {
+    "/oauth2/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get an access token",
+        "operationId": "get_access_token",
+        "description": "Exchanges your store's credentials for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "grant_type",
+                  "client_id",
+                  "client_secret",
+                  "redirect_uri",
+                  "auth_string"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": [
+                      "client_credentials"
+                    ],
+                    "description": "Always `client_credentials`."
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Your integration's client ID."
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "The secret paired with the client ID."
+                  },
+                  "redirect_uri": {
+                    "type": "string",
+                    "description": "The redirect URI registered for your integration."
+                  },
+                  "auth_string": {
+                    "type": "string",
+                    "description": "Decides which user the token acts as."
+                  }
+                }
+              },
+              "example": {
+                "grant_type": "client_credentials",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET",
+                "redirect_uri": "YOUR_REDIRECT_URI",
+                "auth_string": "YOUR_AUTH_STRING"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Seconds until the token expires."
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "description": "Exchanged for a new access token when this one expires."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials were not accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/oauth2/token\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"grant_type\": \"client_credentials\",\n    \"client_id\": \"YOUR_CLIENT_ID\",\n    \"client_secret\": \"YOUR_CLIENT_SECRET\",\n    \"redirect_uri\": \"YOUR_REDIRECT_URI\",\n    \"auth_string\": \"YOUR_AUTH_STRING\"\n  }'"
+          }
+        ]
+      }
+    },
     "/admin/customers": {
       "get": {
         "tags": [

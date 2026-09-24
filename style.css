@@ -99,7 +99,8 @@
   background: #98a2b3 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23101828%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%204h6a4%204%200%200%201%204%204v12a3%203%200%200%200-3-3H2z%22/%3E%3Cpath%20d%3D%22M22%204h-6a4%204%200%200%200-4%204v12a3%203%200%200%201%203-3h7z%22/%3E%3C/svg%3E") center / 0.8rem no-repeat;
 }
 
-#sidebar-content ul ul a[style*="padding-left:2.5rem"] {
+#sidebar-content ul ul a[style*="padding-left:2.5rem"],
+#sidebar-content ul ul a[style*="padding-left: 2.5rem"] {
   padding-left: 1.75rem !important;
   column-gap: 0.6rem !important;
 }
