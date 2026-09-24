@@ -1,0 +1,57 @@
+---
+title: "Price display settings"
+sidebarTitle: "Overview"
+description: "Read and change how prices, tax, discounts and order totals show in the shopping cart, at checkout and on the order success page."
+---
+
+The Price display settings API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/price_display_settings`.
+
+<Warning>
+  **While a block's `customize` is `false`, its `scopes` follow its `enabled` value, whatever you send in `scopes`.**
+  Set `enabled` to `true` on such a block and the response shows every surface the block accepts as
+  `true`, even if your body sent other `scopes` values. Set `enabled` back and the scopes change back
+  with it. To set the surfaces one by one, send `customize: true` with your `scopes`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get price display settings](/api-reference/price-display-settings/get-price-display-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/price_display_settings` | Returns both settings sections and a `group_meta` block describing each one. |
+| [Update price display settings](/api-reference/price-display-settings/update-price-display-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/price_display_settings` | Changes the fields you send in one or both sections and returns all settings. |
+| [Get price display settings headers](/api-reference/price-display-settings/get-price-display-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/price_display_settings` | Returns the headers for the price display settings, with no body. |
+| [Get a settings section](/api-reference/price-display-settings/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/price_display_settings/{section}` | Returns one settings section under its own key, such as `order_item`. |
+| [Update a settings section](/api-reference/price-display-settings/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/price_display_settings/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into two sections.** `order_item` controls how each line item's own price
+  shows. `order_summary` controls the lines of the order summary, such as the subtotal, discount,
+  shipping cost, handling and order total, and what each line includes. Read or write both through
+  `/price_display_settings`, or one through `/price_display_settings/{section}`. Reading a section
+  that does not exist returns `404 not_found`.
+- **The wrapper a write needs depends on the path.** On `/price_display_settings`, wrap the fields in
+  `price_display_settings` and then in the section name: a body without that wrapper is rejected with
+  `400 invalid_request`. On `/price_display_settings/{section}`, wrap them in the section's own name,
+  such as `order_item`, or send them with no wrapper at all. A section body wrapped in
+  `price_display_settings` is rejected with `400 invalid_request`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields you leave out
+  keep their stored values, at every level of nesting and in a section you did not name. One body on
+  `/price_display_settings` can change both sections. `PUT`, `POST` and `DELETE` are rejected on all
+  three paths with `405 method_not_allowed` and an `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **Add `field_metadata=true` to a read to get a description of every field.** The settings are still
+  returned with it. Each entry gives the field's `ui_label`, `description` and `type`, which is
+  `boolean`, `string` or `scope_flags`. A `scope_flags` entry lists the surfaces the block accepts in
+  `allowed_scopes`, with a label for each in `scope_labels`. A write that sends any other surface is
+  rejected with `400 invalid_request` and the reason `invalid_enum`. On `/price_display_settings`,
+  `field_metadata` is keyed by section; on a section path it holds that section under its own name.
+- **Each block accepts its own set of surfaces.** The three surfaces are `shopping_cart`, `checkout`
+  and `order_success`. `tax_in_line` and `item_total_including_tax` accept `shopping_cart` and
+  `order_success` only. `shipping_cost`, `shipping_discount`, `handling` and `payment_surcharge`
+  accept `checkout` and `order_success` only. A response lists only the surfaces a block accepts.

@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "getPriceDisplaySettings",
+      "code": "final response = await client.priceDisplaySettings.getPriceDisplaySettings();\nfinal settings = (response.map as Map)['price_display_settings'] as Map;\nprint(settings['order_item']);\nprint(settings['order_summary']);"
+    },
+    "patch_price_display_settings": {
+      "function": "patchPriceDisplaySettings",
+      "code": "final response = await client.priceDisplaySettings.patchPriceDisplaySettings({\n  'price_display_settings': {\n    'order_item': {\n      'price_including_tax': {'enabled': true, 'customize': false},\n    },\n    'order_summary': {\n      'payment_surcharge': {'enabled': true, 'customize': false},\n    },\n  },\n});\nfinal settings = (response.map as Map)['price_display_settings'] as Map;\nprint('${settings['order_item']} ${settings['order_summary']}');"
+    },
+    "head_price_display_settings": {
+      "function": "headPriceDisplaySettings",
+      "code": "final response = await client.priceDisplaySettings.headPriceDisplaySettings();\nprint(response.statusCode);"
+    },
+    "get_price_display_settings_section": {
+      "function": "getPriceDisplaySettingsSection",
+      "code": "final response = await client.priceDisplaySettings\n    .getPriceDisplaySettingsSection('order_item');\nfinal orderItem = (response.map as Map)['order_item'] as Map;\nprint(orderItem['price_including_tax']);\nprint(orderItem['price_including_discount']);"
+    },
+    "patch_price_display_settings_section": {
+      "function": "patchPriceDisplaySettingsSection",
+      "code": "final response = await client.priceDisplaySettings\n    .patchPriceDisplaySettingsSection('order_item', {\n  'order_item': {\n    'price_including_discount': {'enabled': true},\n  },\n});\nfinal orderItem = (response.map as Map)['order_item'] as Map;\nprint(orderItem['price_including_discount']);"
+    }
+  }
+}

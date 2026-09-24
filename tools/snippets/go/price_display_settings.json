@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "GetPriceDisplaySettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PriceDisplaySettings().GetPriceDisplaySettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"price_display_settings\"].(map[string]any)\ntax := settings[\"order_item\"].(map[string]any)[\"price_including_tax\"].(map[string]any)\ntotal := settings[\"order_summary\"].(map[string]any)[\"order_total\"].(map[string]any)\nfmt.Println(tax[\"enabled\"], tax[\"scopes\"], total[\"enabled\"])"
+    },
+    "patch_price_display_settings": {
+      "function": "PatchPriceDisplaySettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PriceDisplaySettings().PatchPriceDisplaySettings(ctx, map[string]any{\n\t\"price_display_settings\": map[string]any{\n\t\t\"order_item\":    map[string]any{\"price_including_tax\": map[string]any{\"enabled\": true, \"customize\": false}},\n\t\t\"order_summary\": map[string]any{\"payment_surcharge\": map[string]any{\"enabled\": true, \"customize\": false}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"price_display_settings\"].(map[string]any)\ntax := settings[\"order_item\"].(map[string]any)[\"price_including_tax\"].(map[string]any)\nfmt.Println(tax[\"enabled\"], tax[\"scopes\"], settings[\"order_summary\"].(map[string]any)[\"payment_surcharge\"].(map[string]any)[\"enabled\"])"
+    },
+    "head_price_display_settings": {
+      "function": "HeadPriceDisplaySettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PriceDisplaySettings().HeadPriceDisplaySettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_price_display_settings_section": {
+      "function": "GetPriceDisplaySettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PriceDisplaySettings().GetPriceDisplaySettingsSection(ctx, \"order_item\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntax := resp.Map().(map[string]any)[\"order_item\"].(map[string]any)[\"price_including_tax\"].(map[string]any)\nfmt.Println(tax[\"enabled\"], tax[\"customize\"], tax[\"scopes\"])"
+    },
+    "patch_price_display_settings_section": {
+      "function": "PatchPriceDisplaySettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PriceDisplaySettings().PatchPriceDisplaySettingsSection(ctx, \"order_item\", map[string]any{\n\t\"order_item\": map[string]any{\"price_including_discount\": map[string]any{\"enabled\": true}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndiscount := resp.Map().(map[string]any)[\"order_item\"].(map[string]any)[\"price_including_discount\"].(map[string]any)\nfmt.Println(discount[\"enabled\"], discount[\"scopes\"])"
+    }
+  }
+}

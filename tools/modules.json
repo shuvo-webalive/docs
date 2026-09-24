@@ -24,7 +24,8 @@
       "modules": [
         "animation_effects",
         "customer_portal",
-        "ecommerce_settings"
+        "ecommerce_settings",
+        "price_display_settings"
       ]
     },
     {
