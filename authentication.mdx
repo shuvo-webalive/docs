@@ -74,3 +74,24 @@ Send the access token in the `Authorization` header on every call:
 curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
+
+## Try it in the docs
+
+Every endpoint page has a **Try it** button that calls your store from this site.
+
+<Steps>
+  <Step title="Get a token">
+    Open [Get an access token](/api-reference/authentication/get-an-access-token), click **Try it**,
+    set `store` to your store's host name (without `https://`), choose `client_credentials` for
+    `grant_type`, fill in your credentials and click **Send**. Copy `access_token` from the response.
+  </Step>
+  <Step title="Call an endpoint">
+    Open any endpoint, click **Try it**, set the same `store`, paste the token into
+    **Authorization**, and click **Send**.
+  </Step>
+</Steps>
+
+<Warning>
+  These calls run against your real store: creating, changing and deleting data is real. Requests
+  are sent through Mintlify's servers. Use test data, and never share your credentials.
+</Warning>

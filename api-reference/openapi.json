@@ -10,7 +10,7 @@
       "variables": {
         "store": {
           "default": "your-store.example.com",
-          "description": "Your store's host name."
+          "description": "Your store's host name, without https://."
         }
       }
     }
@@ -22,10 +22,116 @@
   ],
   "tags": [
     {
+      "name": "Authentication"
+    },
+    {
       "name": "Customers"
     }
   ],
   "paths": {
+    "/oauth2/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get an access token",
+        "operationId": "get_access_token",
+        "description": "Exchanges your store's credentials for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "grant_type",
+                  "client_id",
+                  "client_secret",
+                  "redirect_uri",
+                  "auth_string"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": [
+                      "client_credentials"
+                    ],
+                    "description": "Choose `client_credentials` from the list."
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Your integration's client ID."
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "The secret paired with the client ID."
+                  },
+                  "redirect_uri": {
+                    "type": "string",
+                    "description": "The redirect URI registered for your integration."
+                  },
+                  "auth_string": {
+                    "type": "string",
+                    "description": "Decides which user the token acts as."
+                  }
+                }
+              },
+              "example": {
+                "grant_type": "client_credentials",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET",
+                "redirect_uri": "YOUR_REDIRECT_URI",
+                "auth_string": "YOUR_AUTH_STRING"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Seconds until the token expires."
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "description": "Exchanged for a new access token when this one expires."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The credentials were not accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/oauth2/token\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"grant_type\": \"client_credentials\",\n    \"client_id\": \"YOUR_CLIENT_ID\",\n    \"client_secret\": \"YOUR_CLIENT_SECRET\",\n    \"redirect_uri\": \"YOUR_REDIRECT_URI\",\n    \"auth_string\": \"YOUR_AUTH_STRING\"\n  }'"
+          }
+        ]
+      }
+    },
     "/admin/customers": {
       "get": {
         "tags": [
@@ -418,14 +524,6 @@
                     "description": "Optional reference for this write."
                   }
                 }
-              },
-              "example": {
-                "customer": {
-                  "first_name": "Jane",
-                  "last_name": "Doe",
-                  "email": "jane@example.com",
-                  "company": false
-                }
               }
             }
           }
@@ -447,8 +545,7 @@
             "required": true,
             "description": "The customer's `customer_id`, as returned by List customers, Check an email address or Create a customer. Not the `internal_id`.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -564,8 +661,7 @@
             "required": true,
             "description": "The `customer_id` of the customer to update. Do not send its `internal_id`: that number can also be another customer's `customer_id`, so the call can update the wrong customer.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -680,11 +776,6 @@
                     "$ref": "#/components/schemas/CustomerInput"
                   }
                 }
-              },
-              "example": {
-                "customer": {
-                  "last_name": "Smith"
-                }
               }
             }
           }
@@ -704,8 +795,7 @@
             "required": true,
             "description": "The `customer_id` of the customer to delete. Do not send its `internal_id`: that number can also be another customer's `customer_id`, so the call can delete the wrong customer.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -1250,8 +1340,7 @@
             "required": true,
             "description": "The customer's `customer_id`, as returned when you list or create customers. Do not use `internal_id`: it is a different number and can match a different customer.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -1374,20 +1463,6 @@
                     }
                   }
                 }
-              },
-              "example": {
-                "customer": {
-                  "addresses": [
-                    {
-                      "type": "shipping",
-                      "first_name": "Jane",
-                      "last_name": "Doe",
-                      "address_line_1": "1 Example Street",
-                      "city": "Sydney",
-                      "post_code": "2000"
-                    }
-                  ]
-                }
               }
             }
           }
@@ -1409,8 +1484,7 @@
             "required": true,
             "description": "The customer's `customer_id`, as returned when you list or create customers. Do not use `internal_id`: it is a different number and can match a different customer.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -1498,11 +1572,6 @@
                     "description": "Optional reference for this write."
                   }
                 }
-              },
-              "example": {
-                "customer": {
-                  "password": "NewPassw0rd!"
-                }
               }
             }
           }
@@ -1524,8 +1593,7 @@
             "required": true,
             "description": "The customer's `customer_id`, as returned when you list or create customers. Do not use `internal_id`: it is a different number and can match a different customer.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -1631,13 +1699,6 @@
                     "type": "string",
                     "description": "Optional reference for this write."
                   }
-                }
-              },
-              "example": {
-                "customer": {
-                  "email": "jane@example.com",
-                  "old_password": "OldPassw0rd!",
-                  "password": "NewPassw0rd!"
                 }
               }
             }
@@ -1770,12 +1831,6 @@
                     }
                   }
                 }
-              },
-              "example": {
-                "customer_ids": [
-                  123,
-                  124
-                ]
               }
             }
           }
@@ -1909,8 +1964,7 @@
             "required": true,
             "description": "The customer's `customer_id` from [List customers](/api-reference/customers/list-customers). Do not send `internal_id`, because the same number can be another customer's `customer_id`.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           },
           {
@@ -2048,8 +2102,7 @@
             "required": true,
             "description": "The customer's `customer_id` from [List customers](/api-reference/customers/list-customers). Do not send `internal_id`: the same number can be another customer's `customer_id`, and that customer would get the adjustment.",
             "schema": {
-              "type": "integer",
-              "example": 123
+              "type": "integer"
             }
           }
         ],
@@ -2133,11 +2186,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/StoreCreditAdjustmentInput"
-              },
-              "example": {
-                "action": "add",
-                "amount": 20,
-                "note": "Refund"
               }
             }
           }

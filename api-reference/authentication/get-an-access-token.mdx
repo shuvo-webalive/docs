@@ -1,0 +1,29 @@
+---
+title: "Get an access token"
+description: "Exchange your store's credentials for the token every other call needs."
+openapi: "POST /oauth2/token"
+---
+
+Every call to the API needs an access token. Request one here with your store's credentials, then send
+it as `Authorization: Bearer ACCESS_TOKEN`. The SDKs make this call for you, so you only need it for
+cURL, another HTTP client, or to try the API on this site.
+
+<Steps>
+  <Step title="Enter your store and credentials">
+    Click **Try it**, set `store` to your store's host name (without `https://`), choose
+    `client_credentials` for `grant_type`, and fill in your client ID, client secret, redirect URI
+    and auth string.
+  </Step>
+  <Step title="Send the request">
+    The response holds `access_token`.
+  </Step>
+  <Step title="Use the token">
+    On any other endpoint, click **Try it**, set the same `store`, and paste the token into
+    **Authorization**.
+  </Step>
+</Steps>
+
+<Warning>
+  Calls you make here run against your real store: creating, changing and deleting data is real.
+  Requests are sent through Mintlify's servers. Use test data, and never share your credentials.
+</Warning>
