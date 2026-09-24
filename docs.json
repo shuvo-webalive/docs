@@ -20,7 +20,7 @@
           {
             "group": "Get started",
             "icon": "rocket",
-            "expanded": true,
+            "expanded": false,
             "pages": [
               "introduction",
               "installation",
@@ -35,7 +35,7 @@
           {
             "group": "Authentication",
             "icon": "key",
-            "expanded": true,
+            "expanded": false,
             "pages": [
               "api-reference/authentication/get-an-access-token"
             ]

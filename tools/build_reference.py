@@ -336,7 +336,7 @@ def module_pages(module):
 
 
 def navigation(areas):
-    groups = [{"group": "Authentication", "icon": "key", "expanded": True,
+    groups = [{"group": "Authentication", "icon": "key", "expanded": False,
                "pages": ["api-reference/authentication/get-an-access-token"]}]
     for area in areas:
         modules = area["modules"]
