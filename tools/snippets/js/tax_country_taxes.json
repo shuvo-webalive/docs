@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "tax_country_taxes",
+  "endpoints": {
+    "list_tax_country_taxes": {
+      "function": "listTaxCountryTaxes",
+      "code": "import {taxCountryTaxes} from 'webcommander-sdk';\n\nconst response = await taxCountryTaxes.listTaxCountryTaxes(client, {limit: 20});\nfor (const countryTax of response.map.country_taxes) {\n    console.log(countryTax.id, countryTax.name, countryTax.rate_display);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "create_tax_country_tax": {
+      "function": "createTaxCountryTax",
+      "code": "import {taxCountryTaxes} from 'webcommander-sdk';\n\nconst countryTax = {\n    country_code: 'NZ',\n    name: 'New Zealand',\n    tax_rate: 4.5,\n    tax_method: 'FIXED_RATE',\n    is_default: false,\n};\nconst response = await taxCountryTaxes.createTaxCountryTax(client, {country_tax: countryTax});\nconsole.log(response.map.country_tax.id, response.map.country_tax.rate_display);\n"
+    },
+    "get_tax_country_tax": {
+      "function": "getTaxCountryTax",
+      "code": "import {taxCountryTaxes} from 'webcommander-sdk';\n\nconst response = await taxCountryTaxes.getTaxCountryTax(client, 4);\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.name, countryTax.tax_rate, countryTax.rate_display);\nfor (const stateRule of countryTax.state_rules) {\n    console.log(stateRule.id, stateRule.tax_rule, stateRule.effective_tax_rate);\n}\n"
+    },
+    "update_tax_country_tax": {
+      "function": "updateTaxCountryTax",
+      "code": "import {taxCountryTaxes} from 'webcommander-sdk';\n\nconst response = await taxCountryTaxes.updateTaxCountryTax(client, 42, {country_tax: {tax_rate: 6.25}});\nconsole.log(response.map.country_tax.tax_rate, response.map.country_tax.rate_display);\n"
+    },
+    "delete_tax_country_tax": {
+      "function": "deleteTaxCountryTax",
+      "code": "import {taxCountryTaxes} from 'webcommander-sdk';\n\nconst response = await taxCountryTaxes.deleteTaxCountryTax(client, 42);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

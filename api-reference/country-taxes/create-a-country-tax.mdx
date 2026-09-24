@@ -1,0 +1,9 @@
+---
+title: "Create a country tax"
+description: "Creates a country tax and returns it with its `id`, which other calls take as `country_tax_id`."
+openapi: "POST /admin/tax/country_taxes"
+---
+
+Creates a country tax and returns it with the `id` the store assigned, which the other calls take as `country_tax_id`. Wrap the record in `country_tax` and include `country_code`: the store fills `country` and `code` from it and works out `rate_display` from `tax_rate`, but no response includes `country_code` itself. Fields the store does not know are dropped, and you can create a second country tax for a country that already has one. The response has the same thirteen fields as a country tax in the listing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

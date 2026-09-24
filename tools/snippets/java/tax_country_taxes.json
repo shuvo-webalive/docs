@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "tax_country_taxes",
+  "endpoints": {
+    "list_tax_country_taxes": {
+      "function": "listTaxCountryTaxes",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().listTaxCountryTaxes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"country_taxes\")) {\n    Map<?, ?> countryTax = (Map<?, ?>) row;\n    System.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"rate_display\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "create_tax_country_tax": {
+      "function": "createTaxCountryTax",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().createTaxCountryTax(Map.of(\"country_tax\", Map.of(\n        \"country_code\", \"NZ\", \"name\", \"New Zealand\", \"tax_rate\", 4.5, \"tax_method\", \"FIXED_RATE\", \"is_default\", false)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"code\") + \" \" + countryTax.get(\"rate_display\"));"
+    },
+    "get_tax_country_tax": {
+      "function": "getTaxCountryTax",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().getTaxCountryTax(4);\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"rate_display\"));\nfor (Object row : (List<?>) countryTax.get(\"state_rules\")) {\n    Map<?, ?> stateRule = (Map<?, ?>) row;\n    System.out.println(stateRule.get(\"id\") + \" \" + stateRule.get(\"tax_rule\") + \" \" + stateRule.get(\"effective_tax_rate\"));\n}"
+    },
+    "update_tax_country_tax": {
+      "function": "updateTaxCountryTax",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().updateTaxCountryTax(42,\n        Map.of(\"country_tax\", Map.of(\"tax_rate\", 6.25)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"rate_display\"));"
+    },
+    "delete_tax_country_tax": {
+      "function": "deleteTaxCountryTax",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.taxCountryTaxes().deleteTaxCountryTax(42);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

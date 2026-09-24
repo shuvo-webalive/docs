@@ -1,0 +1,9 @@
+---
+title: "Delete a country tax"
+description: "Deletes a country tax permanently and returns `204` with no body."
+openapi: "DELETE /admin/tax/country_taxes/{country_tax_id}"
+---
+
+Deletes the country tax permanently and returns `204` with no body. The country tax leaves the listing, `pagination.total` goes down by one, and retrieving it returns `404`. If the request just before this one on the same client was rejected with `404` for an id in its path that no record has, such as a `country_tax_id` that no country tax has, the store handles the delete with that rejected value: it returns `404` and removes nothing. Retrieve the country tax afterwards to confirm it is gone.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

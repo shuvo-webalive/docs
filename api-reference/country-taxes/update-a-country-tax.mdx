@@ -1,0 +1,9 @@
+---
+title: "Update a country tax"
+description: "Changes only the fields you send and returns the updated country tax."
+openapi: "PUT /admin/tax/country_taxes/{country_tax_id}"
+---
+
+Changes the fields you send inside `country_tax` and returns the updated country tax. Fields you leave out keep their values, so you do not send `country_code` again. When you change `tax_rate`, `rate_display` changes with it. The response has the same thirteen fields as a country tax in the listing, without `state_rules`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

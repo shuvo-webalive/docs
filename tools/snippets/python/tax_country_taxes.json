@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "tax_country_taxes",
+  "endpoints": {
+    "list_tax_country_taxes": {
+      "function": "list_tax_country_taxes",
+      "code": "response = client.tax_country_taxes.list_tax_country_taxes({\"limit\": 20})\nfor country_tax in response.map[\"country_taxes\"]:\n    print(country_tax[\"id\"], country_tax[\"name\"], country_tax[\"rate_display\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+    },
+    "create_tax_country_tax": {
+      "function": "create_tax_country_tax",
+      "code": "response = client.tax_country_taxes.create_tax_country_tax({\n    \"country_tax\": {\n        \"country_code\": \"NZ\",\n        \"name\": \"New Zealand\",\n        \"tax_rate\": 4.5,\n        \"tax_method\": \"FIXED_RATE\",\n        \"is_default\": False,\n    },\n})\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"id\"], country_tax[\"country\"][\"code\"], country_tax[\"rate_display\"])\n"
+    },
+    "get_tax_country_tax": {
+      "function": "get_tax_country_tax",
+      "code": "response = client.tax_country_taxes.get_tax_country_tax(4)\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"name\"], country_tax[\"rate_display\"])\nfor state_rule in country_tax[\"state_rules\"]:\n    print(state_rule[\"tax_rule\"], state_rule[\"effective_tax_rate\"])\n"
+    },
+    "update_tax_country_tax": {
+      "function": "update_tax_country_tax",
+      "code": "response = client.tax_country_taxes.update_tax_country_tax(42, {\n    \"country_tax\": {\"tax_rate\": 6.25},\n})\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"tax_rate\"], country_tax[\"rate_display\"])\n"
+    },
+    "delete_tax_country_tax": {
+      "function": "delete_tax_country_tax",
+      "code": "response = client.tax_country_taxes.delete_tax_country_tax(42)\nprint(response.status_code)\n"
+    }
+  }
+}

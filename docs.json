@@ -303,6 +303,18 @@
                 ]
               },
               {
+                "group": "Country taxes",
+                "expanded": false,
+                "pages": [
+                  "country-taxes",
+                  "api-reference/country-taxes/list-country-taxes",
+                  "api-reference/country-taxes/create-a-country-tax",
+                  "api-reference/country-taxes/retrieve-a-country-tax",
+                  "api-reference/country-taxes/update-a-country-tax",
+                  "api-reference/country-taxes/delete-a-country-tax"
+                ]
+              },
+              {
                 "group": "Tax rules",
                 "expanded": false,
                 "pages": [

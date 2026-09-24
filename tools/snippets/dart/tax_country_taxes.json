@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "tax_country_taxes",
+  "endpoints": {
+    "list_tax_country_taxes": {
+      "function": "listTaxCountryTaxes",
+      "code": "final response = await client.taxCountryTaxes\n    .listTaxCountryTaxes(queryParams: {'limit': 20});\nfinal countryTaxes = (response.map as Map)['country_taxes'] as List;\nfor (final countryTax in countryTaxes) {\n  print('${(countryTax as Map)['id']} ${countryTax['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
+    },
+    "create_tax_country_tax": {
+      "function": "createTaxCountryTax",
+      "code": "final response = await client.taxCountryTaxes.createTaxCountryTax({\n  'country_tax': {\n    'country_code': 'NZ',\n    'name': 'New Zealand',\n    'tax_rate': 4.5,\n    'tax_method': 'FIXED_RATE',\n    'is_default': false,\n  },\n});\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint(countryTax['id']);"
+    },
+    "get_tax_country_tax": {
+      "function": "getTaxCountryTax",
+      "code": "final response = await client.taxCountryTaxes.getTaxCountryTax(4);\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['name']} ${countryTax['rate_display']}');\nfinal stateRules = countryTax['state_rules'] as List;\nfor (final stateRule in stateRules) {\n  print('${(stateRule as Map)['id']} ${stateRule['tax_rule']}');\n}"
+    },
+    "update_tax_country_tax": {
+      "function": "updateTaxCountryTax",
+      "code": "final response = await client.taxCountryTaxes.updateTaxCountryTax(42, {\n  'country_tax': {'tax_rate': 6.25},\n});\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['tax_rate']} ${countryTax['rate_display']}');"
+    },
+    "delete_tax_country_tax": {
+      "function": "deleteTaxCountryTax",
+      "code": "final response = await client.taxCountryTaxes.deleteTaxCountryTax(42);\nprint(response.statusCode);"
+    }
+  }
+}
