@@ -1,0 +1,9 @@
+---
+title: "List product promotions"
+description: "Returns the store's product promotions under `product_promotions`. Send `offset` to skip some; `limit` is ignored."
+openapi: "GET /admin/settings/page_settings/search_result_page/product_promotion"
+---
+
+Returns the product promotions as a list under `product_promotions`, with a `pagination` block that gives the `total` and the `offset` you sent. Send `offset` to skip promotions. `limit` is not applied: you get the same promotions whatever `limit` you send, and `pagination.limit` shows the collection's own limit. Add `field_metadata=true` to also get a description of each promotion field, the values `rule` and `position` accept, and the most promotions the collection holds, as `max_items`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,9 @@
+---
+title: "Create a product promotion"
+description: "Creates a product promotion and returns it with its `id`, which other calls take as `promotion_id`."
+openapi: "POST /admin/settings/page_settings/search_result_page/product_promotion"
+---
+
+Creates a promotion from a body wrapped in `product_promotion`, in which `name`, `rule` and `position` are required. Returns `201` with the new promotion, including the `id` the other promotion calls take as `promotion_id`. Fields you leave out get their defaults: `is_active` and `is_always_available` both default to `true`. The response has no `Location` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

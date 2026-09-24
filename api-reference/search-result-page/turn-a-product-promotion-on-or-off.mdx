@@ -1,0 +1,9 @@
+---
+title: "Turn a product promotion on or off"
+description: "Turns a product promotion on or off and returns the whole promotion."
+openapi: "PATCH /admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}/active"
+---
+
+Send `{"product_promotion": {"is_active": false}}` to turn the promotion off, or `true` to turn it on; `is_active` is required. Every other field in the body is ignored. Returns the whole promotion after the change. This path takes only `PATCH`: a `GET` of it is rejected with `405 method_not_allowed`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

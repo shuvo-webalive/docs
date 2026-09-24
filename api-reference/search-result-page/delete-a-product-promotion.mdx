@@ -1,0 +1,9 @@
+---
+title: "Delete a product promotion"
+description: "Deletes a product promotion permanently and returns `204` with no body."
+openapi: "DELETE /admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}"
+---
+
+Deletes the promotion permanently and returns `204` with no body. The promotion leaves the listing, and retrieving the same `promotion_id` then returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

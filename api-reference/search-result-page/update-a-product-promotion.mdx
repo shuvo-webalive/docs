@@ -1,0 +1,9 @@
+---
+title: "Update a product promotion"
+description: "Changes the promotion fields you send and returns the whole promotion."
+openapi: "PATCH /admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}"
+---
+
+Send the fields to change wrapped in `product_promotion`, as on create. Only the fields you send change; the others keep their stored values. Returns the whole promotion after the change.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

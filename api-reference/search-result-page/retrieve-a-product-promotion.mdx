@@ -1,0 +1,9 @@
+---
+title: "Retrieve a product promotion"
+description: "Returns the product promotion whose `id` you pass as `promotion_id`."
+openapi: "GET /admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}"
+---
+
+Returns one promotion under the `product_promotion` key, with the same fields as a listing row. Returns `404 not_found` when no promotion has that `promotion_id`, including a promotion you deleted.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

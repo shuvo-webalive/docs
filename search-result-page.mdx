@@ -1,0 +1,63 @@
+---
+title: "Search result page"
+sidebarTitle: "Overview"
+description: "Read and change how your store's search result page shows products, and create, change and delete its product promotions."
+---
+
+The Search result page API has eleven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/search_result_page`.
+
+<Warning>
+  A section read and a section write use different wrappers. `GET /search_result_page/{section}`
+  returns the section inside `search_result_page`, such as `{"search_result_page": {"seo": {...}}}`,
+  not under the section's own key. `PATCH /search_result_page/{section}` takes the fields wrapped in
+  the section's own key, such as `{"product_information": {...}}`, and also accepts them wrapped in
+  `search_result_page` and then `product_information`. A body with no wrapper is rejected with
+  `400 invalid_request`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get search result page settings](/api-reference/search-result-page/get-search-result-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_result_page` | Returns all search result page settings and a `group_meta` block describing each section. |
+| [Update search result page settings](/api-reference/search-result-page/update-search-result-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_result_page` | Changes the `product_information` fields you send and returns all the settings. |
+| [Get search result page settings headers](/api-reference/search-result-page/get-search-result-page-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/search_result_page` | Returns the headers for the search result page settings, with no body. |
+| [Get a settings section](/api-reference/search-result-page/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_result_page/{section}` | Returns one section, such as `product_information`, inside a `search_result_page` key. |
+| [Update a settings section](/api-reference/search-result-page/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_result_page/{section}` | Changes the fields you send in `product_information` and returns the whole section. |
+| [List product promotions](/api-reference/search-result-page/list-product-promotions) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_result_page/product_promotion` | Returns the store's product promotions under `product_promotions`. Send `offset` to skip some; `limit` is ignored. |
+| [Create a product promotion](/api-reference/search-result-page/create-a-product-promotion) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/search_result_page/product_promotion` | Creates a product promotion and returns it with its `id`, which other calls take as `promotion_id`. |
+| [Retrieve a product promotion](/api-reference/search-result-page/retrieve-a-product-promotion) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_result_page/product_promotion/{promotion_id}` | Returns the product promotion whose `id` you pass as `promotion_id`. |
+| [Update a product promotion](/api-reference/search-result-page/update-a-product-promotion) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_result_page/product_promotion/{promotion_id}` | Changes the promotion fields you send and returns the whole promotion. |
+| [Turn a product promotion on or off](/api-reference/search-result-page/turn-a-product-promotion-on-or-off) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_result_page/product_promotion/{promotion_id}/active` | Turns a product promotion on or off and returns the whole promotion. |
+| [Delete a product promotion](/api-reference/search-result-page/delete-a-product-promotion) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/search_result_page/product_promotion/{promotion_id}` | Deletes a product promotion permanently and returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Only `product_information` can be written.** `group_meta` marks `seo` and `reinitialise` as
+  `writable: false`, and its `href` for each points to where it is managed: `/api/v4/admin/seo-settings`
+  for this page's SEO, and `/api/v4/admin/search/reindex` for the search reindex. A write to `seo` is
+  rejected with `400` and `seo is a read-only section`, and a write to `reinitialise` with `400` and
+  `reinitialise is not a writable setting`.
+- **The promotions are a collection, not a settings section.** Reading the settings returns
+  `product_promotion` as `{"read_only": true}` only. [List product promotions](/api-reference/search-result-page/list-product-promotions)
+  returns them under `product_promotions` with a `pagination` block. The listing ignores `limit`: send
+  `offset` to skip promotions. Each promotion's `id` is the `promotion_id` the other promotion calls take.
+- **The promotion collection has a cap.** Send `field_metadata=true` to the listing to read it as
+  `field_metadata.group_meta.product_promotion.max_items`; the `group_meta` returned with the settings
+  does not include it. Every promotion in the store counts towards the cap, so delete promotions you no
+  longer need.
+- **`PATCH` is the only way to change settings, and it changes only the fields you send.** Fields you
+  leave out keep their stored values, including the other fields inside a nested block such as
+  `product_interaction_buttons`. The settings path and each section path allow only `GET`, `HEAD`,
+  `PATCH` and `OPTIONS`, as their `Allow` header shows: `PUT`, `POST` or `DELETE` on the settings, or
+  `PUT` on a section, returns `405 method_not_allowed`.
+- **Settings writes share one rate limit.** Writes to the settings and to each section count against
+  one allowance. Once it is spent, a write is rejected with `429 rate_limited` and a `Retry-After`
+  header that counts down the time left. A retry counts as another write, so wait until `Retry-After`
+  has passed. Promotion writes have a separate allowance.

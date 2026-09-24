@@ -1,0 +1,9 @@
+---
+title: "Get a settings section"
+description: "Returns one section, such as `product_information`, inside a `search_result_page` key."
+openapi: "GET /admin/settings/page_settings/search_result_page/{section}"
+---
+
+Returns one section inside the `search_result_page` key, not under the section's own key: a read of `seo` returns `{"search_result_page": {"seo": {"read_only": true, "page_kind": "search_result"}}}`. The response has no `group_meta`. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

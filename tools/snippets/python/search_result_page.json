@@ -1,0 +1,50 @@
+{
+  "sdk": "python",
+  "module": "search_result_page",
+  "endpoints": {
+    "get_search_result_page": {
+      "function": "get_search_result_page",
+      "code": "response = client.search_result_page.get_search_result_page()\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"number_of_searches_per_result\"][\"items_per_page\"])\nprint(information[\"set_product_display_preferences\"][\"display_mode\"])\nprint(response.map[\"group_meta\"][\"seo\"][\"writable\"])\n"
+    },
+    "patch_search_result_page": {
+      "function": "patch_search_result_page",
+      "code": "response = client.search_result_page.patch_search_result_page({\n    \"search_result_page\": {\n        \"product_information\": {\"display_short_description\": True},\n    },\n})\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"display_short_description\"])\n"
+    },
+    "head_search_result_page": {
+      "function": "head_search_result_page",
+      "code": "response = client.search_result_page.head_search_result_page()\nprint(response.status_code)\n"
+    },
+    "get_search_result_page_section": {
+      "function": "get_search_result_page_section",
+      "code": "response = client.search_result_page.get_search_result_page_section(\n    \"product_information\"\n)\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"display_short_description\"], information[\"label_for_price\"])\n"
+    },
+    "patch_search_result_page_section": {
+      "function": "patch_search_result_page_section",
+      "code": "response = client.search_result_page.patch_search_result_page_section(\n    \"product_information\", {\"product_information\": {\"display_short_description\": True}}\n)\ninformation = response.map[\"search_result_page\"][\"product_information\"]\nprint(information[\"display_short_description\"])\n"
+    },
+    "get_search_result_page_product_promotions": {
+      "function": "get_search_result_page_product_promotions",
+      "code": "response = client.search_result_page.get_search_result_page_product_promotions()\nfor promotion in response.map[\"product_promotions\"]:\n    print(promotion[\"id\"], promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+    },
+    "create_search_result_page_product_promotion": {
+      "function": "create_search_result_page_product_promotion",
+      "code": "response = client.search_result_page.create_search_result_page_product_promotion({\n    \"product_promotion\": {\n        \"name\": \"Spring campaign\",\n        \"rule\": \"all_search_result\",\n        \"position\": \"top\",\n    },\n})\npromotion = response.map[\"product_promotion\"]\nprint(promotion[\"id\"], promotion[\"is_active\"])\n"
+    },
+    "get_search_result_page_product_promotion": {
+      "function": "get_search_result_page_product_promotion",
+      "code": "response = client.search_result_page.get_search_result_page_product_promotion(4)\npromotion = response.map[\"product_promotion\"]\nprint(promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"])\nprint(promotion[\"product_ids\"])\n"
+    },
+    "patch_search_result_page_product_promotion": {
+      "function": "patch_search_result_page_product_promotion",
+      "code": "response = client.search_result_page.patch_search_result_page_product_promotion(\n    6, {\"product_promotion\": {\"position\": \"bottom\"}}\n)\nprint(response.map[\"product_promotion\"][\"position\"])\n"
+    },
+    "patch_search_result_page_product_promotion_active": {
+      "function": "patch_search_result_page_product_promotion_active",
+      "code": "response = client.search_result_page.patch_search_result_page_product_promotion_active(\n    6, {\"product_promotion\": {\"is_active\": False}}\n)\nprint(response.map[\"product_promotion\"][\"is_active\"])\n"
+    },
+    "delete_search_result_page_product_promotion": {
+      "function": "delete_search_result_page_product_promotion",
+      "code": "response = client.search_result_page.delete_search_result_page_product_promotion(6)\nprint(response.status_code)\n"
+    }
+  }
+}
