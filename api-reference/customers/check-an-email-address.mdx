@@ -1,0 +1,9 @@
+---
+title: "Check an email address"
+description: "Whether an email address already belongs to a customer."
+openapi: "GET /admin/customers/check-email"
+---
+
+Answers `exists`. For a free address that is the only key. For a taken one the answer also carries that customer's `customer_id` and `internal_id`.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

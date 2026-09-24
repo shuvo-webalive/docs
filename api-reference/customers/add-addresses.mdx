@@ -1,0 +1,9 @@
+---
+title: "Add addresses"
+description: "Add addresses to a customer."
+openapi: "POST /admin/customers/{customer_id}/addresses"
+---
+
+Adds one or more addresses. `type` is `primary`, `shipping` or `billing`; any other value is refused with `400 invalid_enum`. A `state` that is not in the `country` is refused with `400 state_country_mismatch`.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

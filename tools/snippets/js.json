@@ -1,0 +1,67 @@
+{
+  "sdk": "js",
+  "language": "javascript",
+  "setup": "import {AuthConfig, buildClient, registerInstances} from 'webcommander-sdk';\n\nregisterInstances([\n    new AuthConfig({\n        clientName: 'default',\n        grantType: 'client_credentials',\n        baseUrl: process.env.WC_BASE_URL,\n        clientId: process.env.WC_CLIENT_ID,\n        clientSecret: process.env.WC_CLIENT_SECRET,\n        redirectUri: process.env.WC_REDIRECT_URI,\n        authString: process.env.WC_AUTH_STRING,\n    }),\n]);\n\nconst client = await buildClient(0, {raiseOnError: true});\n",
+  "endpoints": {
+    "list_customers": {
+      "function": "getCustomers",
+      "code": "const response = await client.adminCustomers.getCustomers({limit: 20, status: 'active'});\nfor (const customer of response.map.customers) {\n    console.log(customer.customer_id, customer.email);\n}\n"
+    },
+    "get_customer": {
+      "function": "getCustomer",
+      "code": "const response = await client.adminCustomers.getCustomer(123);\nconsole.log(response.map.customer.email);\n"
+    },
+    "count_customers": {
+      "function": "getCustomerCount",
+      "code": "const response = await client.adminCustomers.getCustomerCount({status: 'active'});\nconsole.log(response.map.total);\n"
+    },
+    "check_email": {
+      "function": "getCustomerEmailExists",
+      "code": "const response = await client.adminCustomers.getCustomerEmailExists('jane@example.com');\nconsole.log(response.map.exists);\n"
+    },
+    "export_customers": {
+      "function": "getCustomerExport",
+      "code": "import {writeFileSync} from 'node:fs';\n\nconst response = await client.adminCustomers.getCustomerExport();\nwriteFileSync('customers.xlsx', response.map);\n"
+    },
+    "create_customer": {
+      "function": "createCustomer",
+      "code": "const response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n});\nconsole.log(response.map.customer.customer_id);\n"
+    },
+    "update_customer": {
+      "function": "updateCustomer",
+      "code": "const response = await client.adminCustomers.updateCustomer(123, {customer: {last_name: 'Smith'}});\nconsole.log(response.map.customer.last_name);\n"
+    },
+    "delete_customer": {
+      "function": "deleteCustomer",
+      "code": "const response = await client.adminCustomers.deleteCustomer(123);\nconsole.log(response.statusCode);\n"
+    },
+    "add_addresses": {
+      "function": "createCustomerAddresses",
+      "code": "const address = {\n    type: 'shipping',\n    first_name: 'Jane',\n    last_name: 'Doe',\n    address_line_1: '1 Example Street',\n    city: 'Sydney',\n    post_code: '2000',\n};\nconst response = await client.adminCustomers.createCustomerAddresses(123, {customer: {addresses: [address]}});\nconsole.log(response.map.customer.addresses);\n"
+    },
+    "reset_password": {
+      "function": "resetCustomerPassword",
+      "code": "const response = await client.adminCustomers.resetCustomerPassword(123, {customer: {password: 'NewPassw0rd!'}});\nconsole.log(response.map.status);\n"
+    },
+    "change_password": {
+      "function": "changeCustomerPassword",
+      "code": "const response = await client.adminCustomers.changeCustomerPassword(123, {\n    customer: {email: 'jane@example.com', old_password: 'OldPassw0rd!', password: 'NewPassw0rd!'},\n});\nconsole.log(response.map.status);\n"
+    },
+    "bulk_reset_passwords": {
+      "function": "bulkResetCustomerPasswords",
+      "code": "const response = await client.adminCustomers.bulkResetCustomerPasswords({customer_ids: [123, 124]});\nconsole.log(response.map.total_queued);\n"
+    },
+    "import_customers": {
+      "function": "importCustomers",
+      "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.adminCustomers.importCustomers({\n    file: ['customers.csv', readFileSync('customers.csv'), 'text/csv'],\n});\nconsole.log(response.map.created, response.map.updated, response.map.failed);\n"
+    },
+    "list_store_credit_adjustments": {
+      "function": "getCustomerStoreCreditAdjustments",
+      "code": "const response = await client.adminCustomers.getCustomerStoreCreditAdjustments(123, {limit: 20});\nfor (const adjustment of response.map.store_credit_adjustments) {\n    console.log(adjustment.action, adjustment.amount);\n}\n"
+    },
+    "adjust_store_credit": {
+      "function": "createCustomerStoreCreditAdjustment",
+      "code": "const response = await client.adminCustomers.createCustomerStoreCreditAdjustment(123, {\n    action: 'add',\n    amount: 20,\n    note: 'Refund',\n});\nconsole.log(response.map.store_credit);\n"
+    }
+  }
+}

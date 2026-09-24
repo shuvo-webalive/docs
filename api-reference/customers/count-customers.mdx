@@ -1,0 +1,9 @@
+---
+title: "Count customers"
+description: "The number of customers, optionally filtered."
+openapi: "GET /admin/customers/count"
+---
+
+Returns the total as one key. `email`, `search`, `status`, `companyName`, `phone`, `city`, `state` and `customerGroup` narrow the total. `country`, the paging parameters, `sort` and the date ranges are accepted and ignored, so they return the unfiltered total.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

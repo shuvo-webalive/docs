@@ -1,0 +1,9 @@
+---
+title: "List customers"
+description: "A page of customers, with a `pagination` block for the next page."
+openapi: "GET /admin/customers"
+---
+
+Returns customers one page at a time. Filters narrow the page; `sort` reorders it and must name a real field, or the call is refused with `400 invalid_sort_field`. Parameter names are case-sensitive and an unknown one is refused with `400 unknown_parameter`. The date-range parameters `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo` are accepted but not applied.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

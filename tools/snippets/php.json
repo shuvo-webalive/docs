@@ -1,0 +1,67 @@
+{
+  "sdk": "php",
+  "language": "php",
+  "setup": "require __DIR__ . '/vendor/autoload.php';\n\nuse WebCommander\\Sdk\\Client\\WebCommanderClient;\nuse WebCommander\\Sdk\\Config\\AuthConfig;\nuse WebCommander\\Sdk\\Config\\SdkConfig;\nuse WebCommander\\Sdk\\Resources\\Customers\\AdminCustomers;\n\n$auth = new AuthConfig(\n    baseUrl: (string) getenv('WC_BASE_URL'),\n    clientId: (string) getenv('WC_CLIENT_ID'),\n    clientSecret: (string) getenv('WC_CLIENT_SECRET'),\n    redirectUri: (string) getenv('WC_REDIRECT_URI'),\n    authString: (string) getenv('WC_AUTH_STRING'),\n    clientName: 'default',\n    grantType: 'client_credentials',\n);\n\n$client = new WebCommanderClient(new SdkConfig($auth, raiseOnError: true));",
+  "endpoints": {
+    "list_customers": {
+      "function": "getCustomers",
+      "code": "$response = AdminCustomers::getCustomers($client, ['limit' => 20, 'status' => 'active']);\n\nforeach ($response->map['customers'] as $customer) {\n    echo $customer['customer_id'], ' ', $customer['email'], PHP_EOL;\n}"
+    },
+    "get_customer": {
+      "function": "getCustomer",
+      "code": "$response = AdminCustomers::getCustomer($client, 123);\n\necho $response->map['customer']['email'], PHP_EOL;"
+    },
+    "count_customers": {
+      "function": "getCustomerCount",
+      "code": "$response = AdminCustomers::getCustomerCount($client, ['status' => 'active']);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "check_email": {
+      "function": "getCustomerEmailExists",
+      "code": "$response = AdminCustomers::getCustomerEmailExists($client, 'jane@example.com');\n\necho $response->map['exists'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "export_customers": {
+      "function": "getCustomerExport",
+      "code": "$response = AdminCustomers::getCustomerExport($client);\n\nfile_put_contents('customers.xlsx', $response->map);"
+    },
+    "create_customer": {
+      "function": "createCustomer",
+      "code": "$response = AdminCustomers::createCustomer($client, [\n    'customer' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane@example.com',\n        'company' => false,\n    ],\n]);\n\necho $response->map['customer']['customer_id'], PHP_EOL;"
+    },
+    "update_customer": {
+      "function": "updateCustomer",
+      "code": "$response = AdminCustomers::updateCustomer($client, 123, [\n    'customer' => ['last_name' => 'Smith'],\n]);\n\necho $response->map['customer']['last_name'], PHP_EOL;"
+    },
+    "delete_customer": {
+      "function": "deleteCustomer",
+      "code": "$response = AdminCustomers::deleteCustomer($client, 123);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "add_addresses": {
+      "function": "createCustomerAddresses",
+      "code": "$address = [\n    'type' => 'shipping', 'first_name' => 'Jane', 'last_name' => 'Doe',\n    'address_line_1' => '1 Example Street', 'city' => 'Sydney', 'post_code' => '2000',\n];\n$response = AdminCustomers::createCustomerAddresses($client, 123, ['customer' => ['addresses' => [$address]]]);\n\necho count($response->map['customer']['addresses']), PHP_EOL;"
+    },
+    "reset_password": {
+      "function": "resetCustomerPassword",
+      "code": "$response = AdminCustomers::resetCustomerPassword($client, 123, [\n    'customer' => ['password' => 'NewPassw0rd!'],\n]);\n\necho $response->map['status'], PHP_EOL;"
+    },
+    "change_password": {
+      "function": "changeCustomerPassword",
+      "code": "$response = AdminCustomers::changeCustomerPassword($client, 123, [\n    'customer' => [\n        'email' => 'jane@example.com',\n        'old_password' => 'OldPassw0rd!',\n        'password' => 'NewPassw0rd!',\n    ],\n]);\n\necho $response->map['status'], PHP_EOL;"
+    },
+    "bulk_reset_passwords": {
+      "function": "bulkResetCustomerPasswords",
+      "code": "$response = AdminCustomers::bulkResetCustomerPasswords($client, ['customer_ids' => [123, 124]]);\n\necho $response->map['total_queued'], PHP_EOL;"
+    },
+    "import_customers": {
+      "function": "importCustomers",
+      "code": "$handle = fopen('customers.csv', 'rb');\n$response = AdminCustomers::importCustomers($client, ['file' => ['customers.csv', $handle, 'text/csv']]);\nfclose($handle);\n\necho $response->map['created'], ' created, ', $response->map['updated'], ' updated', PHP_EOL;"
+    },
+    "list_store_credit_adjustments": {
+      "function": "getCustomerStoreCreditAdjustments",
+      "code": "$response = AdminCustomers::getCustomerStoreCreditAdjustments($client, 123, ['limit' => 20]);\n\nforeach ($response->map['store_credit_adjustments'] as $adjustment) {\n    echo $adjustment['action'], ' ', $adjustment['amount'], PHP_EOL;\n}"
+    },
+    "adjust_store_credit": {
+      "function": "createCustomerStoreCreditAdjustment",
+      "code": "$response = AdminCustomers::createCustomerStoreCreditAdjustment($client, 123, [\n    'action' => 'add',\n    'amount' => 20,\n    'note' => 'Refund',\n]);\n\necho $response->map['store_credit'], PHP_EOL;"
+    }
+  }
+}

@@ -14,3 +14,6 @@ concepts/
 guides/
 sdk/
 support/
+
+# Reference generator and its inputs
+tools/
