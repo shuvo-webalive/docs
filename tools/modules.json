@@ -48,6 +48,7 @@
         "tax_codes",
         "tax_country_taxes",
         "tax_custom_profiles",
+        "tax_profiles",
         "tax_rules",
         "tax_settings",
         "tax_zones"

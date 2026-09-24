@@ -1,0 +1,9 @@
+---
+title: "Retrieve a tax profile"
+description: "Returns the tax profile whose `id` you pass as `tax_profile_id`."
+openapi: "GET /admin/tax_profiles/{tax_profile_id}"
+---
+
+Returns one tax profile under the `tax_profile` key, with the same six fields a listing row has: `id`, `name`, `description`, `default`, `created_at` and `updated_at`. When no tax profile has that `tax_profile_id`, it returns `404` with `Profile not found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

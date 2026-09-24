@@ -1,0 +1,9 @@
+---
+title: "List tax profiles"
+description: "Returns up to 20 tax profiles per call, and a `pagination` object with the total count."
+openapi: "GET /admin/tax_profiles"
+---
+
+Returns the tax profiles under `tax_profiles`, up to 20 per call, and a `pagination` object with the `total` number of profiles. Each profile has the same six fields that [Retrieve a tax profile](/api-reference/tax-profiles/retrieve-a-tax-profile) returns, and at most one has `default` set to `true`. A `limit` above `20` does not return more. To get every profile, step `offset` by the number of profiles each page returned until you reach `pagination.total`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

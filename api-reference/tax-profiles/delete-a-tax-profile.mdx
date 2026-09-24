@@ -1,0 +1,9 @@
+---
+title: "Delete a tax profile"
+description: "Deletes a tax profile permanently. The default profile can be deleted too."
+openapi: "DELETE /admin/tax_profiles/{tax_profile_id}"
+---
+
+Deletes the tax profile permanently and returns `204` with no body. Retrieving it afterwards returns `404` with `Profile not found`. The default profile is deleted like any other, and `default_tax_profile` in the tax settings then still holds the deleted profile's `id`. To keep a default, first make another profile the default with [Update a tax profile](/api-reference/tax-profiles/update-a-tax-profile).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

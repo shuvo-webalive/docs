@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "tax_profiles",
+  "endpoints": {
+    "list_tax_profiles": {
+      "function": "ListTaxProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().ListTaxProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"default\"])\n}"
+    },
+    "head_tax_profiles": {
+      "function": "HeadTaxProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().HeadTaxProfiles(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_tax_profile": {
+      "function": "CreateTaxProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().CreateTaxProfile(ctx, map[string]any{\n\t\"tax_profile\": map[string]any{\"name\": \"Wholesale\", \"description\": \"Profile for wholesale customers\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"tax_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"])"
+    },
+    "get_tax_profile": {
+      "function": "GetTaxProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().GetTaxProfile(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"tax_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], profile[\"default\"])"
+    },
+    "head_tax_profile": {
+      "function": "HeadTaxProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().HeadTaxProfile(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_tax_profile": {
+      "function": "UpdateTaxProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().UpdateTaxProfile(ctx, 4, map[string]any{\n\t\"tax_profile\": map[string]any{\"name\": \"Wholesale AU\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_profile\"].(map[string]any)[\"name\"])"
+    },
+    "delete_tax_profile": {
+      "function": "DeleteTaxProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxProfiles().DeleteTaxProfile(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

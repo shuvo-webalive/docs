@@ -1,0 +1,53 @@
+---
+title: "Tax profiles"
+sidebarTitle: "Overview"
+description: "List, create, update and delete tax profiles, and choose which profile is the store's default."
+---
+
+The Tax profiles API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_profiles`.
+
+<Warning>
+  **When a tax request is rejected, the next request on the same connection can fail too.** Straight after
+  a `404`, the next retrieve returns `404`, even for a tax profile that exists, and a `DELETE` returns that
+  `404` and deletes nothing. Straight after a `400` `invalid_pagination`, the next listing returns the same
+  `400`, even on another tax collection. The request after that one is handled normally. If a call returns
+  an error you did not expect, read the tax profile back to see whether the change took effect before you
+  send the call again.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List tax profiles](/api-reference/tax-profiles/list-tax-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_profiles` | Returns up to 20 tax profiles per call, and a `pagination` object with the total count. |
+| [Check the tax profiles list](/api-reference/tax-profiles/check-the-tax-profiles-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_profiles` | Checks that the tax profiles list is reachable. Returns headers only, with no body. |
+| [Create a tax profile](/api-reference/tax-profiles/create-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_profiles` | Creates a tax profile and returns it with its `id`, which other calls take as `tax_profile_id`. |
+| [Retrieve a tax profile](/api-reference/tax-profiles/retrieve-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_profiles/{tax_profile_id}` | Returns the tax profile whose `id` you pass as `tax_profile_id`. |
+| [Check a tax profile](/api-reference/tax-profiles/check-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_profiles/{tax_profile_id}` | Returns headers only, and `200` even when no tax profile has that `tax_profile_id`. |
+| [Update a tax profile](/api-reference/tax-profiles/update-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/tax_profiles/{tax_profile_id}` | Changes the fields you send and returns the updated tax profile. |
+| [Delete a tax profile](/api-reference/tax-profiles/delete-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tax_profiles/{tax_profile_id}` | Deletes a tax profile permanently. The default profile can be deleted too. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create and update wrap the profile in `tax_profile`.** Send `{"tax_profile": {"name": "Wholesale"}}`.
+  A bare record is rejected with `400` (`tax_profile missing`). On create, a `tax_profile` with no
+  `name` is rejected with `500`, and so is one with an `id` field.
+- **At most one profile is the default, and you move the flag rather than clear it.** Send `default: true`
+  in [Update a tax profile](/api-reference/tax-profiles/update-a-tax-profile) to make a profile the default. The profile that had the
+  flag loses it, and `default_tax_profile` in the [tax settings](/api-reference/tax-settings/get-tax-settings) changes to
+  this profile's `id`. `default: false` returns `200` and leaves the flag on. Deleting the default
+  profile leaves `default_tax_profile` holding the deleted profile's `id`.
+- **A listing returns at most 20 profiles per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get every profile, step `offset` by the number of profiles each
+  page returned until you reach `pagination.total`.
+- **A `200` does not prove that a write took effect.** A method these paths have no handler for, such as
+  `OPTIONS`, returns `200` with `{"isSuccess": false, "message": "Invalid API Request"}` and stores
+  nothing. Use `PUT` to update a profile, and read the profile back to confirm the change.
+- **Tax profiles are not custom tax profiles.** [Custom tax profiles](/custom-tax-profiles) live at
+  `/api/v4/admin/tax/custom_profiles`, a different collection with a similar name.

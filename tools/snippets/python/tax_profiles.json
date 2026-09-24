@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "tax_profiles",
+  "endpoints": {
+    "list_tax_profiles": {
+      "function": "list_tax_profiles",
+      "code": "response = client.tax_profiles.list_tax_profiles({\"limit\": 20})\nfor tax_profile in response.map[\"tax_profiles\"]:\n    print(tax_profile[\"id\"], tax_profile[\"name\"], tax_profile[\"default\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+    },
+    "head_tax_profiles": {
+      "function": "head_tax_profiles",
+      "code": "response = client.tax_profiles.head_tax_profiles()\nprint(response.status_code)\n"
+    },
+    "create_tax_profile": {
+      "function": "create_tax_profile",
+      "code": "response = client.tax_profiles.create_tax_profile({\n    \"tax_profile\": {\n        \"name\": \"Wholesale\",\n        \"description\": \"Profile for wholesale customers\",\n    },\n})\nprint(response.map[\"tax_profile\"][\"id\"])\n"
+    },
+    "get_tax_profile": {
+      "function": "get_tax_profile",
+      "code": "response = client.tax_profiles.get_tax_profile(2)\ntax_profile = response.map[\"tax_profile\"]\nprint(tax_profile[\"name\"], tax_profile[\"description\"], tax_profile[\"default\"])\n"
+    },
+    "head_tax_profile": {
+      "function": "head_tax_profile",
+      "code": "response = client.tax_profiles.head_tax_profile(2)\nprint(response.status_code)\n"
+    },
+    "update_tax_profile": {
+      "function": "update_tax_profile",
+      "code": "response = client.tax_profiles.update_tax_profile(4, {\n    \"tax_profile\": {\"name\": \"Wholesale AU\"},\n})\nprint(response.map[\"tax_profile\"][\"name\"])\n"
+    },
+    "delete_tax_profile": {
+      "function": "delete_tax_profile",
+      "code": "response = client.tax_profiles.delete_tax_profile(4)\nprint(response.status_code)\n"
+    }
+  }
+}

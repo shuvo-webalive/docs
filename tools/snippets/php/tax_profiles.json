@@ -1,0 +1,34 @@
+{
+  "sdk": "php",
+  "module": "tax_profiles",
+  "endpoints": {
+    "list_tax_profiles": {
+      "function": "listTaxProfiles",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::listTaxProfiles($client, ['limit' => 20]);\n\nforeach ($response->map['tax_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], $profile['default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' tax profiles in total', PHP_EOL;"
+    },
+    "head_tax_profiles": {
+      "function": "headTaxProfiles",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::headTaxProfiles($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_tax_profile": {
+      "function": "createTaxProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::createTaxProfile($client, [\n    'tax_profile' => ['name' => 'Wholesale', 'description' => 'Profile for wholesale customers'],\n]);\n\necho $response->map['tax_profile']['id'], PHP_EOL;"
+    },
+    "get_tax_profile": {
+      "function": "getTaxProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::getTaxProfile($client, 2);\n\n$profile = $response->map['tax_profile'];\necho $profile['name'], ': ', $profile['description'], PHP_EOL;"
+    },
+    "head_tax_profile": {
+      "function": "headTaxProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::headTaxProfile($client, 2);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_tax_profile": {
+      "function": "updateTaxProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::updateTaxProfile($client, 4, [\n    'tax_profile' => ['name' => 'Wholesale AU'],\n]);\n\necho $response->map['tax_profile']['name'], PHP_EOL;"
+    },
+    "delete_tax_profile": {
+      "function": "deleteTaxProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxProfiles\\TaxProfiles;\n\n$response = TaxProfiles::deleteTaxProfile($client, 4);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

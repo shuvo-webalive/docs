@@ -1,0 +1,9 @@
+---
+title: "Create a tax profile"
+description: "Creates a tax profile and returns it with its `id`, which other calls take as `tax_profile_id`."
+openapi: "POST /admin/tax_profiles"
+---
+
+Creates a tax profile and returns it with the `id` the store assigned, which the other calls take as `tax_profile_id`. Wrap the profile in `tax_profile`, with a required `name` and an optional `description`. The store sets `created_at` and `updated_at` itself: it ignores a `created_at` you send and drops fields it does not know. Do not put an `id` field in `tax_profile`: it is rejected with `500`, so remove the profile's `id` before you send back a profile you read.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
