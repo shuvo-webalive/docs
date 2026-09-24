@@ -1,0 +1,9 @@
+---
+title: "Set the default shipping class"
+description: "Makes a shipping class the default and sets `is_default` to `false` on the previous default."
+openapi: "PUT /admin/shipping_classes/{shipping_class_id}/default"
+---
+
+Makes the class whose `shipping_class_id` you pass the default, and returns it with `is_default` set to `true`. The class that was the default now has `is_default` set to `false`. The call reads no body, so anything you send is ignored. Calling it on the class that is already the default also returns `200`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

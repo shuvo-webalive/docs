@@ -1,0 +1,42 @@
+{
+  "sdk": "dotnet",
+  "module": "shipping_classes",
+  "endpoints": {
+    "list_shipping_classes": {
+      "function": "ListShippingClassesAsync",
+      "code": "var response = await client.ShippingClasses.ListShippingClassesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var shippingClass in ((IReadOnlyList<object?>)body[\"shipping_classes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{shippingClass[\"id\"]} {shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");"
+    },
+    "head_shipping_classes": {
+      "function": "HeadShippingClassesAsync",
+      "code": "var response = await client.ShippingClasses.HeadShippingClassesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_shipping_classes": {
+      "function": "CountShippingClassesAsync",
+      "code": "var response = await client.ShippingClasses.CountShippingClassesAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClasses = (IReadOnlyDictionary<string, object?>)body[\"shipping_classes\"]!;\nConsole.WriteLine(shippingClasses[\"count\"]);"
+    },
+    "create_shipping_class": {
+      "function": "CreateShippingClassAsync",
+      "code": "var response = await client.ShippingClasses.CreateShippingClassAsync(new Dictionary<string, object?>\n{\n    [\"shipping_class\"] = new Dictionary<string, object?> { [\"name\"] = \"Bulky Goods\", [\"description\"] = \"Items over 20kg\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine(shippingClass[\"id\"]);"
+    },
+    "get_shipping_class": {
+      "function": "GetShippingClassAsync",
+      "code": "var response = await client.ShippingClasses.GetShippingClassAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");"
+    },
+    "head_shipping_class": {
+      "function": "HeadShippingClassAsync",
+      "code": "var response = await client.ShippingClasses.HeadShippingClassAsync(2);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_shipping_class": {
+      "function": "UpdateShippingClassAsync",
+      "code": "var response = await client.ShippingClasses.UpdateShippingClassAsync(3, new Dictionary<string, object?>\n{\n    [\"shipping_class\"] = new Dictionary<string, object?> { [\"name\"] = \"Bulky Goods\", [\"description\"] = \"Items over 25kg\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"description\"]}\");"
+    },
+    "delete_shipping_class": {
+      "function": "DeleteShippingClassAsync",
+      "code": "var response = await client.ShippingClasses.DeleteShippingClassAsync(3);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "set_shipping_class_default": {
+      "function": "SetShippingClassDefaultAsync",
+      "code": "var response = await client.ShippingClasses.SetShippingClassDefaultAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");"
+    }
+  }
+}

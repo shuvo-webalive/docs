@@ -1,0 +1,42 @@
+{
+  "sdk": "java",
+  "module": "shipping_classes",
+  "endpoints": {
+    "list_shipping_classes": {
+      "function": "listShippingClasses",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().listShippingClasses(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_classes\")) {\n    Map<?, ?> shippingClass = (Map<?, ?>) row;\n    System.out.println(shippingClass.get(\"id\") + \" \" + shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "head_shipping_classes": {
+      "function": "headShippingClasses",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingClasses().headShippingClasses();\nSystem.out.println(response.getStatusCode());"
+    },
+    "count_shipping_classes": {
+      "function": "countShippingClasses",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().countShippingClasses();\nMap<?, ?> shippingClasses = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_classes\");\nSystem.out.println(shippingClasses.get(\"count\"));"
+    },
+    "create_shipping_class": {
+      "function": "createShippingClass",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().createShippingClass(\n        Map.of(\"shipping_class\", Map.of(\"name\", \"Bulky Goods\", \"description\", \"Items over 20kg\")));\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"id\") + \" \" + shippingClass.get(\"name\"));"
+    },
+    "get_shipping_class": {
+      "function": "getShippingClass",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().getShippingClass(2);\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));"
+    },
+    "head_shipping_class": {
+      "function": "headShippingClass",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingClasses().headShippingClass(2);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_shipping_class": {
+      "function": "updateShippingClass",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().updateShippingClass(3,\n        Map.of(\"shipping_class\", Map.of(\"name\", \"Bulky Goods\", \"description\", \"Items over 25kg\")));\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"description\"));"
+    },
+    "delete_shipping_class": {
+      "function": "deleteShippingClass",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shippingClasses().deleteShippingClass(3);\nSystem.out.println(response.getStatusCode());"
+    },
+    "set_shipping_class_default": {
+      "function": "setShippingClassDefault",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().setShippingClassDefault(2);\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));"
+    }
+  }
+}

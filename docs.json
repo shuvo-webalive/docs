@@ -280,6 +280,22 @@
                   "api-reference/shipping-methods/delete-a-shipping-method",
                   "api-reference/shipping-methods/set-the-default-shipping-method"
                 ]
+              },
+              {
+                "group": "Shipping classes",
+                "expanded": false,
+                "pages": [
+                  "shipping-classes",
+                  "api-reference/shipping-classes/list-shipping-classes",
+                  "api-reference/shipping-classes/check-the-shipping-classes-list",
+                  "api-reference/shipping-classes/count-shipping-classes",
+                  "api-reference/shipping-classes/create-a-shipping-class",
+                  "api-reference/shipping-classes/retrieve-a-shipping-class",
+                  "api-reference/shipping-classes/check-a-shipping-class",
+                  "api-reference/shipping-classes/update-a-shipping-class",
+                  "api-reference/shipping-classes/delete-a-shipping-class",
+                  "api-reference/shipping-classes/set-the-default-shipping-class"
+                ]
               }
             ]
           },

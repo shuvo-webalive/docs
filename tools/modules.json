@@ -37,7 +37,8 @@
       "name": "Shipping",
       "icon": "truck",
       "modules": [
-        "shipping_methods"
+        "shipping_methods",
+        "shipping_classes"
       ]
     },
     {

@@ -1,0 +1,42 @@
+{
+  "sdk": "go",
+  "module": "shipping_classes",
+  "endpoints": {
+    "list_shipping_classes": {
+      "function": "ListShippingClasses",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().ListShippingClasses(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"shipping_classes\"].([]any) {\n\tshippingClass := row.(map[string]any)\n\tfmt.Println(shippingClass[\"id\"], shippingClass[\"name\"], shippingClass[\"is_default\"])\n}"
+    },
+    "head_shipping_classes": {
+      "function": "HeadShippingClasses",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().HeadShippingClasses(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "count_shipping_classes": {
+      "function": "CountShippingClasses",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().CountShippingClasses(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_classes\"].(map[string]any)[\"count\"])"
+    },
+    "create_shipping_class": {
+      "function": "CreateShippingClass",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().CreateShippingClass(ctx, map[string]any{\n\t\"shipping_class\": map[string]any{\"name\": \"Bulky Goods\", \"description\": \"Items over 20kg\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"id\"], shippingClass[\"name\"], shippingClass[\"is_default\"])"
+    },
+    "get_shipping_class": {
+      "function": "GetShippingClass",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().GetShippingClass(ctx, 2, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"description\"], shippingClass[\"is_default\"])"
+    },
+    "head_shipping_class": {
+      "function": "HeadShippingClass",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().HeadShippingClass(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_shipping_class": {
+      "function": "UpdateShippingClass",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().UpdateShippingClass(ctx, 3, map[string]any{\n\t\"shipping_class\": map[string]any{\"name\": \"Bulky Goods\", \"description\": \"Items over 25kg\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"description\"])"
+    },
+    "delete_shipping_class": {
+      "function": "DeleteShippingClass",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().DeleteShippingClass(ctx, 3, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "set_shipping_class_default": {
+      "function": "SetShippingClassDefault",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().SetShippingClassDefault(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"is_default\"])"
+    }
+  }
+}

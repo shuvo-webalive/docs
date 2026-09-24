@@ -1,0 +1,9 @@
+---
+title: "Retrieve a shipping class"
+description: "Returns the shipping class whose `id` you pass as `shipping_class_id`."
+openapi: "GET /admin/shipping_classes/{shipping_class_id}"
+---
+
+Returns one shipping class under the `shipping_class` key, with the same four fields a listing row has: `id`, `name`, `description` and `is_default`. Send `field_metadata=true` to add a description of each field beside the class. Unknown query parameters are ignored. The response has no `ETag` header. If the request just before this one on the same client was rejected with `404` for a `shipping_class_id` that no shipping class has, the store handles this call with that rejected `shipping_class_id`: it returns `404` even for a class that exists. Send the call again.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

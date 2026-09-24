@@ -1,0 +1,42 @@
+{
+  "sdk": "python",
+  "module": "shipping_classes",
+  "endpoints": {
+    "list_shipping_classes": {
+      "function": "list_shipping_classes",
+      "code": "response = client.shipping_classes.list_shipping_classes({\"limit\": 20})\nfor shipping_class in response.map[\"shipping_classes\"]:\n    print(shipping_class[\"id\"], shipping_class[\"name\"], shipping_class[\"is_default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_shipping_classes": {
+      "function": "head_shipping_classes",
+      "code": "response = client.shipping_classes.head_shipping_classes()\nprint(response.status_code)\n"
+    },
+    "count_shipping_classes": {
+      "function": "count_shipping_classes",
+      "code": "response = client.shipping_classes.count_shipping_classes()\nprint(response.map[\"shipping_classes\"][\"count\"])\n"
+    },
+    "create_shipping_class": {
+      "function": "create_shipping_class",
+      "code": "response = client.shipping_classes.create_shipping_class({\n    \"shipping_class\": {\"name\": \"Bulky Goods\", \"description\": \"Items over 20kg\"},\n})\nprint(response.map[\"shipping_class\"][\"id\"])\n"
+    },
+    "get_shipping_class": {
+      "function": "get_shipping_class",
+      "code": "response = client.shipping_classes.get_shipping_class(2)\nshipping_class = response.map[\"shipping_class\"]\nprint(shipping_class[\"name\"], shipping_class[\"is_default\"])\n"
+    },
+    "head_shipping_class": {
+      "function": "head_shipping_class",
+      "code": "response = client.shipping_classes.head_shipping_class(2)\nprint(response.status_code)\n"
+    },
+    "update_shipping_class": {
+      "function": "update_shipping_class",
+      "code": "response = client.shipping_classes.update_shipping_class(3, {\n    \"shipping_class\": {\"name\": \"Bulky Goods\", \"description\": \"Items over 25kg\"},\n})\nshipping_class = response.map[\"shipping_class\"]\nprint(shipping_class[\"name\"], shipping_class[\"description\"])\n"
+    },
+    "delete_shipping_class": {
+      "function": "delete_shipping_class",
+      "code": "response = client.shipping_classes.delete_shipping_class(3)\nprint(response.status_code)\n"
+    },
+    "set_shipping_class_default": {
+      "function": "set_shipping_class_default",
+      "code": "response = client.shipping_classes.set_shipping_class_default(2)\nshipping_class = response.map[\"shipping_class\"]\nprint(shipping_class[\"name\"], shipping_class[\"is_default\"])\n"
+    }
+  }
+}
