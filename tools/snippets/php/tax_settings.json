@@ -1,0 +1,14 @@
+{
+  "sdk": "php",
+  "module": "tax_settings",
+  "endpoints": {
+    "get_tax_settings": {
+      "function": "getTaxSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::getTaxSettings($client);\n\n$settings = $response->map['tax_settings'];\necho $settings['default_country'], ' ', $settings['default_tax_code'], PHP_EOL;\necho $settings['tax_message'], PHP_EOL;"
+    },
+    "put_tax_settings": {
+      "function": "putTaxSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::putTaxSettings($client, [\n    'settings' => ['tax_message' => 'All prices include GST'],\n]);\n\necho $response->map['tax_settings']['tax_message'], PHP_EOL;"
+    }
+  }
+}

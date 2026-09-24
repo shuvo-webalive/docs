@@ -79,6 +79,9 @@
       "name": "Tax rules"
     },
     {
+      "name": "Tax settings"
+    },
+    {
       "name": "Tax zones"
     },
     {
@@ -18359,6 +18362,206 @@
         ]
       }
     },
+    "/admin/tax/settings": {
+      "get": {
+        "tags": [
+          "Tax settings"
+        ],
+        "summary": "Get tax settings",
+        "operationId": "get_tax_settings",
+        "description": "Returns the store's tax settings as nine fields in one flat `tax_settings` object, with no sections. Query parameters have no effect: `field_metadata=true` returns the same body and no field descriptions. The response has no `ETag` or `Last-Modified` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The nine tax settings under `tax_settings`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_settings": {
+                      "$ref": "#/components/schemas/TaxSettings"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_settings": {
+                    "configuration_type": "DEFAULT",
+                    "system_default_tax": true,
+                    "default_country": "AU",
+                    "custom_tax_profile_id": 1,
+                    "default_tax_profile": 3,
+                    "show_price_with_tax": true,
+                    "is_price_with_tax": false,
+                    "default_tax_code": "GST",
+                    "tax_message": "All prices include GST"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.get_tax_settings()\nsettings = response.map[\"tax_settings\"]\nprint(settings[\"default_country\"], settings[\"default_tax_code\"])\nprint(settings[\"default_tax_profile\"], settings[\"show_price_with_tax\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxSettings.getTaxSettings(client);\nconst settings = response.map.tax_settings;\nconsole.log(settings.default_country, settings.default_tax_code, settings.default_tax_profile);\nconsole.log(settings.show_price_with_tax, settings.tax_message);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::getTaxSettings($client);\n\n$settings = $response->map['tax_settings'];\necho $settings['default_country'], ' ', $settings['default_tax_code'], PHP_EOL;\necho $settings['tax_message'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().getTaxSettings();\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"default_country\") + \" \" + taxSettings.get(\"default_tax_code\"));\nSystem.out.println(taxSettings.get(\"tax_message\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.GetTaxSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine($\"{taxSettings[\"default_country\"]} {taxSettings[\"default_tax_code\"]} {taxSettings[\"tax_message\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.getTaxSettings();\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['default_country']);\nprint(taxSettings['default_tax_code']);\nprint(taxSettings['tax_message']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().GetTaxSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)\nfmt.Println(settings[\"default_country\"], settings[\"default_tax_code\"], settings[\"tax_message\"])\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tax settings"
+        ],
+        "summary": "Update tax settings",
+        "operationId": "put_tax_settings",
+        "description": "Send the fields to change inside a `settings` object. Only those fields change; the others keep their stored values. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](/api-reference/tax-settings/get-tax-settings). A body wrapped in `tax_settings`, the key the read returns, is rejected with `400` and the message `settings missing`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All nine tax settings after the change, under `tax_settings`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_settings": {
+                      "$ref": "#/components/schemas/TaxSettings"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_settings": {
+                    "configuration_type": "DEFAULT",
+                    "system_default_tax": true,
+                    "default_country": "AU",
+                    "custom_tax_profile_id": 1,
+                    "default_tax_profile": 3,
+                    "show_price_with_tax": true,
+                    "is_price_with_tax": false,
+                    "default_tax_code": "GST",
+                    "tax_message": "All prices include GST"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `settings`, or `settings` is empty: the message is `settings missing`. Or every field in `settings` is one the store does not know: the message is `No settings provided to update`. Or no tax profile has the `tax_profile_id` you sent as `default_tax_profile`, or `configuration_type` is a type the store does not know: the stored value stays as it was.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "settings missing",
+                    "details": [],
+                    "request_id": "7d2e4a91-3b6c-4f0e-9a58-1c2b3d4e5f60"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"settings\": {\n      \"tax_message\": \"All prices include GST\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.put_tax_settings({\n    \"settings\": {\"tax_message\": \"All prices include GST\"},\n})\nprint(response.map[\"tax_settings\"][\"tax_message\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxSettings.putTaxSettings(client, {settings: {tax_message: 'All prices include GST'}});\nconsole.log(response.map.tax_settings.tax_message);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::putTaxSettings($client, [\n    'settings' => ['tax_message' => 'All prices include GST'],\n]);\n\necho $response->map['tax_settings']['tax_message'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().putTaxSettings(\n        Map.of(\"settings\", Map.of(\"tax_message\", \"All prices include GST\")));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_message\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.PutTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"settings\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"All prices include GST\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"tax_message\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.putTaxSettings({\n  'settings': {'tax_message': 'All prices include GST'},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_message']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().PutTaxSettings(ctx, map[string]any{\n\t\"settings\": map[string]any{\"tax_message\": \"All prices include GST\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"tax_message\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "$ref": "#/components/schemas/TaxSettingsInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/tax_zones": {
       "get": {
         "tags": [
@@ -29585,6 +29788,113 @@
             "description": "Only on a `400` for a paging parameter: names the rejected parameter, `limit` or `offset`.",
             "items": {
               "type": "object"
+            }
+          }
+        }
+      },
+      "TaxSettings": {
+        "type": "object",
+        "description": "The store's tax settings: nine fields at one level, with no sections.",
+        "properties": {
+          "configuration_type": {
+            "type": "string",
+            "description": "The tax configuration type, such as `DEFAULT`."
+          },
+          "system_default_tax": {
+            "type": "boolean"
+          },
+          "default_country": {
+            "type": "string",
+            "description": "The default country, such as `AU`. The store does not check this value."
+          },
+          "custom_tax_profile_id": {
+            "type": "integer",
+            "description": "A custom tax profile's `id`, such as `1`. The store does not check this value."
+          },
+          "default_tax_profile": {
+            "type": "integer",
+            "description": "The `id` of the default tax profile, the one whose `default` is `true`. The tax profile calls take it as `tax_profile_id`. It changes when another tax profile becomes the default, and after the default tax profile is deleted it still holds that profile's `tax_profile_id`."
+          },
+          "show_price_with_tax": {
+            "type": "boolean"
+          },
+          "is_price_with_tax": {
+            "type": "boolean"
+          },
+          "default_tax_code": {
+            "type": "string",
+            "description": "The default tax code, such as `GST`. The store does not check this value."
+          },
+          "tax_message": {
+            "type": "string",
+            "description": "Free text, such as `All prices include GST`."
+          }
+        }
+      },
+      "TaxSettingsInput": {
+        "type": "object",
+        "description": "Send only the fields you want to change. Every field you leave out keeps its stored value, and a field the store does not know is ignored.",
+        "properties": {
+          "configuration_type": {
+            "type": "string",
+            "description": "Must be a type the store knows, such as `DEFAULT`. Any other value is rejected with `400 invalid_request`."
+          },
+          "system_default_tax": {
+            "type": "boolean"
+          },
+          "default_country": {
+            "type": "string",
+            "description": "Stored as you send it: `ZZ` is accepted."
+          },
+          "custom_tax_profile_id": {
+            "type": "integer",
+            "description": "A custom tax profile's `id`. Stored as you send it, without a check: `99999999` is accepted."
+          },
+          "default_tax_profile": {
+            "type": "integer",
+            "description": "Must be the `tax_profile_id` of an existing tax profile. Any other value is rejected with `400 invalid_request`, including the `tax_profile_id` of a deleted default profile that the read still returns, and the stored value stays as it was."
+          },
+          "show_price_with_tax": {
+            "type": "boolean"
+          },
+          "is_price_with_tax": {
+            "type": "boolean"
+          },
+          "default_tax_code": {
+            "type": "string",
+            "description": "Stored as you send it, including a tax code that does not exist."
+          },
+          "tax_message": {
+            "type": "string",
+            "description": "Free text."
+          }
+        }
+      },
+      "TaxSettingsError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What was wrong, such as `settings missing`."
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "Extra detail, or an empty list."
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
             }
           }
         }

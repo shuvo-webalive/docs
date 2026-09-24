@@ -46,6 +46,7 @@
       "modules": [
         "tax_codes",
         "tax_rules",
+        "tax_settings",
         "tax_zones"
       ]
     },

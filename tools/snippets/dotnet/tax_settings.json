@@ -1,0 +1,14 @@
+{
+  "sdk": "dotnet",
+  "module": "tax_settings",
+  "endpoints": {
+    "get_tax_settings": {
+      "function": "GetTaxSettingsAsync",
+      "code": "var response = await client.TaxSettings.GetTaxSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine($\"{taxSettings[\"default_country\"]} {taxSettings[\"default_tax_code\"]} {taxSettings[\"tax_message\"]}\");"
+    },
+    "put_tax_settings": {
+      "function": "PutTaxSettingsAsync",
+      "code": "var response = await client.TaxSettings.PutTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"settings\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"All prices include GST\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"tax_message\"]);"
+    }
+  }
+}

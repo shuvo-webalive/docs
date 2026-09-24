@@ -1,0 +1,59 @@
+---
+title: "Tax settings"
+sidebarTitle: "Overview"
+description: "Read and change your store's tax settings, such as the default country, the default tax code and the tax message."
+---
+
+The Tax settings API has two endpoints, and you can call both from all seven SDKs. Both use the path `/api/v4/admin/tax/settings`.
+
+<Warning>
+  **Wrap a write in `settings`, not in `tax_settings`.** The read returns the settings under
+  `tax_settings`, but the write takes them under `settings`. A body wrapped in `tax_settings`,
+  a body with no wrapper and an empty `settings` object are each rejected with
+  `400 invalid_request` and the message `settings missing`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get tax settings](/api-reference/tax-settings/get-tax-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/settings` | Returns all nine tax settings in one `tax_settings` object. |
+| [Update tax settings](/api-reference/tax-settings/update-tax-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/settings` | Changes the tax settings you send inside `settings` and returns all nine. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A write changes only the fields you send.** Every field you leave out keeps its stored value,
+  and the response returns all nine settings. A field the store does not know is ignored, and a
+  body in which every field is ignored is rejected with `400` and the message
+  `No settings provided to update`.
+- **Only `default_tax_profile` and `configuration_type` are checked.** If no tax profile has the
+  `tax_profile_id` you send as `default_tax_profile`, or the store does not know the
+  `configuration_type` you send, the write is rejected with `400 invalid_request` and the stored
+  value stays as it was. `default_country`, `default_tax_code` and `custom_tax_profile_id` are
+  stored without a check: `default_country: "ZZ"`, a `default_tax_code` that matches no tax code
+  and `custom_tax_profile_id: 99999999` are each accepted with `200`. Check these three values
+  yourself before you send them.
+- **`default_tax_profile` follows the default tax profile.** It holds the `id` of the tax profile
+  whose `default` is `true`, which the tax profile calls take as `tax_profile_id`, and it changes
+  when another tax profile becomes the default. If the default tax profile is deleted,
+  `default_tax_profile` keeps the deleted profile's `tax_profile_id`, and a write cannot send that
+  value back: it is rejected with `400`. Leave `default_tax_profile` out of a write unless you are
+  changing it.
+- **After a rejected request, the store handles your next request on the same client with the rejected
+  value.** This applies to the id in the path, such as a `country_tax_id`, and to a query parameter
+  such as `limit`, and it lasts for one request. After `GET /admin/tax/country_taxes/99999999`
+  returns `404`, a `GET /admin/tax/custom_profiles/1` sent next also returns `404`, even though that
+  profile exists. [Get tax settings](/api-reference/tax-settings/get-tax-settings) takes neither value, so it returns the settings
+  as usual straight after a rejected request. If a call fails straight after another call failed,
+  send it again.
+- **Only `GET` and `PUT` exist, on one flat path.** There is no `HEAD` endpoint: `HEAD`, `POST`,
+  `PATCH` and `OPTIONS` on `/admin/tax/settings` return `404`. The settings have no sections, so
+  a path below it, such as `/admin/tax/settings/bogus`, returns `404 not_found` with the message
+  `Unknown tax path: /api/v4/admin/tax/settings/bogus`. Responses have no `ETag` or
+  `Last-Modified` header, and `field_metadata=true` changes nothing.

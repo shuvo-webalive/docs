@@ -1,0 +1,14 @@
+{
+  "sdk": "js",
+  "module": "tax_settings",
+  "endpoints": {
+    "get_tax_settings": {
+      "function": "getTaxSettings",
+      "code": "import {taxSettings} from 'webcommander-sdk';\n\nconst response = await taxSettings.getTaxSettings(client);\nconst settings = response.map.tax_settings;\nconsole.log(settings.default_country, settings.default_tax_code, settings.default_tax_profile);\nconsole.log(settings.show_price_with_tax, settings.tax_message);\n"
+    },
+    "put_tax_settings": {
+      "function": "putTaxSettings",
+      "code": "import {taxSettings} from 'webcommander-sdk';\n\nconst response = await taxSettings.putTaxSettings(client, {settings: {tax_message: 'All prices include GST'}});\nconsole.log(response.map.tax_settings.tax_message);\n"
+    }
+  }
+}

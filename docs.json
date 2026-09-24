@@ -317,6 +317,15 @@
                 ]
               },
               {
+                "group": "Tax settings",
+                "expanded": false,
+                "pages": [
+                  "tax-settings",
+                  "api-reference/tax-settings/get-tax-settings",
+                  "api-reference/tax-settings/update-tax-settings"
+                ]
+              },
+              {
                 "group": "Tax zones",
                 "expanded": false,
                 "pages": [
