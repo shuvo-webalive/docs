@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "category_page",
+  "endpoints": {
+    "get_category_page": {
+      "function": "getCategoryPage",
+      "code": "const response = await client.categoryPage.getCategoryPage();\nconst settings = response.map.category_page;\nconsole.log(settings.category_information.subcategory.per_page);\nconsole.log(settings.product_information.default_sort.by);\n"
+    },
+    "patch_category_page": {
+      "function": "patchCategoryPage",
+      "code": "const response = await client.categoryPage.patchCategoryPage({\n    category_page: {category_information: {show_description: true, subcategory: {per_page: 24}}},\n});\nconst information = response.map.category_page.category_information;\nconsole.log(information.show_description, information.subcategory.per_page);\n"
+    },
+    "head_category_page": {
+      "function": "headCategoryPage",
+      "code": "const response = await client.categoryPage.headCategoryPage();\nconsole.log(response.statusCode);\n"
+    },
+    "get_category_page_section": {
+      "function": "getCategoryPageSection",
+      "code": "const response = await client.categoryPage.getCategoryPageSection('category_information');\nconst information = response.map.category_information;\nconsole.log(information.show_description, information.subcategory.per_page);\n"
+    },
+    "patch_category_page_section": {
+      "function": "patchCategoryPageSection",
+      "code": "const response = await client.categoryPage.patchCategoryPageSection('category_information', {\n    category_information: {show_description: true},\n});\nconsole.log(response.map.category_information.show_description);\n"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+---
+title: "Retrieve a shipping method"
+description: "Returns one shipping method by its `id`."
+openapi: "GET /admin/shipping_methods/{shipping_method_id}"
+---
+
+Returns one shipping method under the `shipping_method` key, with the same three fields a listing row has: `id`, `name` and `is_default`. Send `field_metadata=true` to add a description of each field. Unknown query parameters are ignored.
+
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.shipping_methods.get_shipping_method()` |
+| JavaScript | `shippingMethods.getShippingMethod()` |
+| PHP | `ShippingMethods::getShippingMethod()` |
+| Java | `client.shippingMethods().getShippingMethod()` |
+| .NET | `client.ShippingMethods.GetShippingMethodAsync()` |
+| Dart | `client.shippingMethods.getShippingMethod()` |
+| Go | `client.ShippingMethods().GetShippingMethod()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

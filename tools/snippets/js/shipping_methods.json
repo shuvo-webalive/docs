@@ -1,0 +1,42 @@
+{
+  "sdk": "js",
+  "module": "shipping_methods",
+  "endpoints": {
+    "list_shipping_methods": {
+      "function": "listShippingMethods",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.listShippingMethods(client, {limit: 20});\nfor (const shippingMethod of response.map.shipping_methods) {\n    console.log(shippingMethod.id, shippingMethod.name, shippingMethod.is_default);\n}\n"
+    },
+    "head_shipping_methods": {
+      "function": "headShippingMethods",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.headShippingMethods(client);\nconsole.log(response.statusCode);\n"
+    },
+    "count_shipping_methods": {
+      "function": "countShippingMethods",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.countShippingMethods(client);\nconsole.log(response.map.shipping_methods.count);\n"
+    },
+    "create_shipping_method": {
+      "function": "createShippingMethod",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.createShippingMethod(client, {shipping_method: {name: 'Express Post'}});\nconsole.log(response.map.shipping_method.id);\n"
+    },
+    "get_shipping_method": {
+      "function": "getShippingMethod",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.getShippingMethod(client, 2);\nconsole.log(response.map.shipping_method.name, response.map.shipping_method.is_default);\n"
+    },
+    "head_shipping_method": {
+      "function": "headShippingMethod",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.headShippingMethod(client, 2);\nconsole.log(response.statusCode);\n"
+    },
+    "update_shipping_method": {
+      "function": "updateShippingMethod",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.updateShippingMethod(client, 4, {\n    shipping_method: {name: 'Express Post Next Day'},\n});\nconsole.log(response.map.shipping_method.name);\n"
+    },
+    "delete_shipping_method": {
+      "function": "deleteShippingMethod",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.deleteShippingMethod(client, 4);\nconsole.log(response.statusCode);\n"
+    },
+    "set_shipping_method_default": {
+      "function": "setShippingMethodDefault",
+      "code": "import {shippingMethods} from 'webcommander-sdk';\n\nconst response = await shippingMethods.setShippingMethodDefault(client, 2);\nconsole.log(response.map.shipping_method.is_default);\n"
+    }
+  }
+}

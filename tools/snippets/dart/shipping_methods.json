@@ -1,0 +1,42 @@
+{
+  "sdk": "dart",
+  "module": "shipping_methods",
+  "endpoints": {
+    "list_shipping_methods": {
+      "function": "listShippingMethods",
+      "code": "final response = await client.shippingMethods\n    .listShippingMethods(queryParams: {'limit': 20});\nfinal shippingMethods = (response.map as Map)['shipping_methods'] as List;\nfor (final shippingMethod in shippingMethods) {\n  print('${(shippingMethod as Map)['id']} ${shippingMethod['name']}');\n}"
+    },
+    "head_shipping_methods": {
+      "function": "headShippingMethods",
+      "code": "final response = await client.shippingMethods.headShippingMethods();\nprint(response.statusCode);"
+    },
+    "count_shipping_methods": {
+      "function": "countShippingMethods",
+      "code": "final response = await client.shippingMethods.countShippingMethods();\nfinal shippingMethods = (response.map as Map)['shipping_methods'] as Map;\nprint(shippingMethods['count']);"
+    },
+    "create_shipping_method": {
+      "function": "createShippingMethod",
+      "code": "final response = await client.shippingMethods.createShippingMethod({\n  'shipping_method': {'name': 'Express Post'},\n});\nfinal shippingMethod = (response.map as Map)['shipping_method'] as Map;\nprint(shippingMethod['id']);"
+    },
+    "get_shipping_method": {
+      "function": "getShippingMethod",
+      "code": "final response = await client.shippingMethods.getShippingMethod(2);\nfinal shippingMethod = (response.map as Map)['shipping_method'] as Map;\nprint('${shippingMethod['name']} ${shippingMethod['is_default']}');"
+    },
+    "head_shipping_method": {
+      "function": "headShippingMethod",
+      "code": "final response = await client.shippingMethods.headShippingMethod(2);\nprint(response.statusCode);"
+    },
+    "update_shipping_method": {
+      "function": "updateShippingMethod",
+      "code": "final response = await client.shippingMethods.updateShippingMethod(4, {\n  'shipping_method': {'name': 'Express Post Next Day'},\n});\nfinal shippingMethod = (response.map as Map)['shipping_method'] as Map;\nprint(shippingMethod['name']);"
+    },
+    "delete_shipping_method": {
+      "function": "deleteShippingMethod",
+      "code": "final response = await client.shippingMethods.deleteShippingMethod(4);\nprint(response.statusCode);"
+    },
+    "set_shipping_method_default": {
+      "function": "setShippingMethodDefault",
+      "code": "final response = await client.shippingMethods.setShippingMethodDefault(2);\nfinal shippingMethod = (response.map as Map)['shipping_method'] as Map;\nprint('${shippingMethod['name']} ${shippingMethod['is_default']}');"
+    }
+  }
+}

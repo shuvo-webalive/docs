@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "category_page",
+  "endpoints": {
+    "get_category_page": {
+      "function": "get_category_page",
+      "code": "response = client.category_page.get_category_page()\nsettings = response.map[\"category_page\"]\nprint(settings[\"category_information\"][\"subcategory\"][\"per_page\"])\nprint(settings[\"product_information\"][\"default_sort\"][\"by\"])\n"
+    },
+    "patch_category_page": {
+      "function": "patch_category_page",
+      "code": "response = client.category_page.patch_category_page({\n    \"category_page\": {\n        \"category_information\": {\n            \"show_description\": True,\n            \"subcategory\": {\"per_page\": 24},\n        },\n    },\n})\ninformation = response.map[\"category_page\"][\"category_information\"]\nprint(information[\"show_description\"], information[\"subcategory\"][\"per_page\"])\n"
+    },
+    "head_category_page": {
+      "function": "head_category_page",
+      "code": "response = client.category_page.head_category_page()\nprint(response.status_code)\n"
+    },
+    "get_category_page_section": {
+      "function": "get_category_page_section",
+      "code": "response = client.category_page.get_category_page_section(\"category_information\")\ninformation = response.map[\"category_information\"]\nprint(information[\"heading\"][\"style\"], information[\"show_description\"])\n"
+    },
+    "patch_category_page_section": {
+      "function": "patch_category_page_section",
+      "code": "response = client.category_page.patch_category_page_section(\n    \"category_information\", {\"category_information\": {\"show_description\": True}}\n)\nprint(response.map[\"category_information\"][\"show_description\"])\n"
+    }
+  }
+}

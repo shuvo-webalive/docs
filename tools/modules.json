@@ -1,5 +1,25 @@
 {
   "areas": [
-    {"name": "Customers", "icon": "users", "modules": ["customers"]}
+    {
+      "name": "Customers",
+      "icon": "users",
+      "modules": [
+        "customers"
+      ]
+    },
+    {
+      "name": "Page settings",
+      "icon": "file-lines",
+      "modules": [
+        "category_page"
+      ]
+    },
+    {
+      "name": "Shipping",
+      "icon": "truck",
+      "modules": [
+        "shipping_methods"
+      ]
+    }
   ]
 }

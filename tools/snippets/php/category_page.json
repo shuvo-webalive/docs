@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "category_page",
+  "endpoints": {
+    "get_category_page": {
+      "function": "getCategoryPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CategoryPage;\n\n$response = CategoryPage::getCategoryPage($client);\n\n$settings = $response->map['category_page'];\necho $settings['category_information']['subcategory']['per_page'], ' subcategories per page', PHP_EOL;\necho $settings['product_information']['load']['per_page'], ' products per page', PHP_EOL;"
+    },
+    "patch_category_page": {
+      "function": "patchCategoryPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CategoryPage;\n\n$response = CategoryPage::patchCategoryPage($client, [\n    'category_page' => [\n        'category_information' => ['show_description' => true, 'subcategory' => ['per_page' => 24]],\n    ],\n]);\n\necho $response->map['category_page']['category_information']['subcategory']['per_page'], PHP_EOL;"
+    },
+    "head_category_page": {
+      "function": "headCategoryPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CategoryPage;\n\n$response = CategoryPage::headCategoryPage($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_category_page_section": {
+      "function": "getCategoryPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CategoryPage;\n\n$response = CategoryPage::getCategoryPageSection($client, 'category_information');\n\necho $response->map['category_information']['subcategory']['per_page'], ' subcategories per page', PHP_EOL;"
+    },
+    "patch_category_page_section": {
+      "function": "patchCategoryPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CategoryPage;\n\n$response = CategoryPage::patchCategoryPageSection($client, 'category_information', [\n    'category_information' => ['show_description' => true],\n]);\n\necho $response->map['category_information']['show_description'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}

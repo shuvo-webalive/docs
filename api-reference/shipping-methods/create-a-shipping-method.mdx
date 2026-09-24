@@ -1,0 +1,21 @@
+---
+title: "Create a shipping method"
+description: "Creates a shipping method from a `name` and returns it with its new `id`."
+openapi: "POST /admin/shipping_methods"
+---
+
+Creates a shipping method and returns it with the `id` the store assigned. Wrap the record in `shipping_method`; `name` is the only field the store reads. A new method always has `is_default` set to `false`, and any `id` or `is_default` you send is ignored.
+
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.shipping_methods.create_shipping_method()` |
+| JavaScript | `shippingMethods.createShippingMethod()` |
+| PHP | `ShippingMethods::createShippingMethod()` |
+| Java | `client.shippingMethods().createShippingMethod()` |
+| .NET | `client.ShippingMethods.CreateShippingMethodAsync()` |
+| Dart | `client.shippingMethods.createShippingMethod()` |
+| Go | `client.ShippingMethods().CreateShippingMethod()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

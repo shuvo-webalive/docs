@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "category_page",
+  "endpoints": {
+    "get_category_page": {
+      "function": "getCategoryPage",
+      "code": "final response = await client.categoryPage.getCategoryPage();\nfinal categoryPage = (response.map as Map)['category_page'] as Map;\nprint(categoryPage['category_information']);\nprint(categoryPage['product_information']);"
+    },
+    "patch_category_page": {
+      "function": "patchCategoryPage",
+      "code": "final response = await client.categoryPage.patchCategoryPage({\n  'category_page': {\n    'category_information': {\n      'show_description': true,\n      'subcategory': {'per_page': 24},\n    },\n  },\n});\nfinal categoryPage = (response.map as Map)['category_page'] as Map;\nprint(categoryPage['category_information']);"
+    },
+    "head_category_page": {
+      "function": "headCategoryPage",
+      "code": "final response = await client.categoryPage.headCategoryPage();\nprint(response.statusCode);"
+    },
+    "get_category_page_section": {
+      "function": "getCategoryPageSection",
+      "code": "final response =\n    await client.categoryPage.getCategoryPageSection('category_information');\nfinal section = (response.map as Map)['category_information'] as Map;\nprint(section['show_description']);\nprint(section['subcategory']);"
+    },
+    "patch_category_page_section": {
+      "function": "patchCategoryPageSection",
+      "code": "final response = await client.categoryPage\n    .patchCategoryPageSection('category_information', {\n  'category_information': {'show_description': true},\n});\nfinal section = (response.map as Map)['category_information'] as Map;\nprint(section['show_description']);"
+    }
+  }
+}

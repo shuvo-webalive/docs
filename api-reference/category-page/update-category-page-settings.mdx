@@ -1,0 +1,21 @@
+---
+title: "Update category page settings"
+description: "Changes the fields you send in one or both sections and returns all settings."
+openapi: "PATCH /admin/settings/page_settings/category_page"
+---
+
+Send the fields to change inside `category_page`, grouped by section name. Only the fields you send change: other fields in the same block, and a section you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get category page settings](/api-reference/category-page/get-category-page-settings) does. A body that is not wrapped in `category_page` is rejected with `400 invalid_request`.
+
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.category_page.patch_category_page()` |
+| JavaScript | `client.categoryPage.patchCategoryPage()` |
+| PHP | `CategoryPage::patchCategoryPage()` |
+| Java | `client.categoryPage().patchCategoryPage()` |
+| .NET | `client.CategoryPage.PatchCategoryPageAsync()` |
+| Dart | `client.categoryPage.patchCategoryPage()` |
+| Go | `client.CategoryPageSettings().PatchCategoryPage()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

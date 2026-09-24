@@ -1,0 +1,42 @@
+{
+  "sdk": "php",
+  "module": "shipping_methods",
+  "endpoints": {
+    "list_shipping_methods": {
+      "function": "listShippingMethods",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::listShippingMethods($client, ['limit' => 20]);\n\nforeach ($response->map['shipping_methods'] as $method) {\n    echo $method['id'], ' ', $method['name'], $method['is_default'] ? ' (default)' : '', PHP_EOL;\n}"
+    },
+    "head_shipping_methods": {
+      "function": "headShippingMethods",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::headShippingMethods($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_shipping_methods": {
+      "function": "countShippingMethods",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::countShippingMethods($client);\n\necho $response->map['shipping_methods']['count'], PHP_EOL;"
+    },
+    "create_shipping_method": {
+      "function": "createShippingMethod",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::createShippingMethod($client, [\n    'shipping_method' => ['name' => 'Express Post'],\n]);\n\necho $response->map['shipping_method']['id'], PHP_EOL;"
+    },
+    "get_shipping_method": {
+      "function": "getShippingMethod",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::getShippingMethod($client, 2);\n\necho $response->map['shipping_method']['name'], PHP_EOL;"
+    },
+    "head_shipping_method": {
+      "function": "headShippingMethod",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::headShippingMethod($client, 2);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_shipping_method": {
+      "function": "updateShippingMethod",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::updateShippingMethod($client, 4, [\n    'shipping_method' => ['name' => 'Express Post Next Day'],\n]);\n\necho $response->map['shipping_method']['name'], PHP_EOL;"
+    },
+    "delete_shipping_method": {
+      "function": "deleteShippingMethod",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::deleteShippingMethod($client, 4);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "set_shipping_method_default": {
+      "function": "setShippingMethodDefault",
+      "code": "use WebCommander\\Sdk\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::setShippingMethodDefault($client, 2);\n\necho $response->map['shipping_method']['is_default'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}
