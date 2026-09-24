@@ -1,0 +1,9 @@
+---
+title: "Check an order flag"
+description: "Returns headers only, with no body, for the order flag you pass as `order_flag_id`."
+openapi: "HEAD /admin/order_flags/{order_flag_id}"
+---
+
+Returns `200` with headers only and no body. The response has no `ETag` header. It returns `200` even when no order flag has that `order_flag_id`, so it does not tell you whether the flag exists. To read the flag's fields, or to get `404` for a flag that does not exist, use [Retrieve an order flag](/api-reference/order-flags/retrieve-an-order-flag).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

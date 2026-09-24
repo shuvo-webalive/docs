@@ -1,0 +1,34 @@
+{
+  "sdk": "php",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "listOrderFlags",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::listOrderFlags($client, ['limit' => 20]);\n\nforeach ($response->map['order_flags'] as $flag) {\n    echo $flag['id'], ' ', $flag['name'], ' ', $flag['color'], PHP_EOL;\n}"
+    },
+    "head_order_flags": {
+      "function": "headOrderFlags",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::headOrderFlags($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_order_flag": {
+      "function": "createOrderFlag",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::createOrderFlag($client, [\n    'order_flag' => [\n        'name' => 'Awaiting Stock',\n        'color' => '#5A7BD4',\n        'description' => 'Waiting for stock to arrive.',\n    ],\n]);\n\necho $response->map['order_flag']['id'], PHP_EOL;"
+    },
+    "get_order_flag": {
+      "function": "getOrderFlag",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::getOrderFlag($client, 2);\n\n$flag = $response->map['order_flag'];\necho $flag['name'], ' ', $flag['color'], PHP_EOL;"
+    },
+    "head_order_flag": {
+      "function": "headOrderFlag",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::headOrderFlag($client, 2);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_order_flag": {
+      "function": "updateOrderFlag",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::updateOrderFlag($client, 4, [\n    'order_flag' => [\n        'name' => 'Awaiting Stock',\n        'color' => '#B02E2E',\n        'description' => 'Waiting for stock from the supplier.',\n    ],\n]);\n\necho $response->map['order_flag']['color'], PHP_EOL;"
+    },
+    "delete_order_flag": {
+      "function": "deleteOrderFlag",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$response = OrderFlags::deleteOrderFlag($client, 4);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

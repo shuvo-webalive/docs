@@ -1,0 +1,34 @@
+{
+  "sdk": "dart",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "listOrderFlags",
+      "code": "final response = await client.orderFlags\n    .listOrderFlags(queryParams: {'limit': 20});\nfinal orderFlags = (response.map as Map)['order_flags'] as List;\nfor (final orderFlag in orderFlags) {\n  print('${(orderFlag as Map)['id']} ${orderFlag['name']}');\n}"
+    },
+    "head_order_flags": {
+      "function": "headOrderFlags",
+      "code": "final response = await client.orderFlags.headOrderFlags();\nprint(response.statusCode);"
+    },
+    "create_order_flag": {
+      "function": "createOrderFlag",
+      "code": "final response = await client.orderFlags.createOrderFlag({\n  'order_flag': {\n    'name': 'Awaiting Stock',\n    'color': '#5A7BD4',\n    'description': 'Waiting for stock to arrive.',\n  },\n});\nfinal orderFlag = (response.map as Map)['order_flag'] as Map;\nprint(orderFlag['id']);"
+    },
+    "get_order_flag": {
+      "function": "getOrderFlag",
+      "code": "final response = await client.orderFlags.getOrderFlag(2);\nfinal orderFlag = (response.map as Map)['order_flag'] as Map;\nprint('${orderFlag['name']} ${orderFlag['color']}');"
+    },
+    "head_order_flag": {
+      "function": "headOrderFlag",
+      "code": "final response = await client.orderFlags.headOrderFlag(2);\nprint(response.statusCode);"
+    },
+    "update_order_flag": {
+      "function": "updateOrderFlag",
+      "code": "final response = await client.orderFlags.updateOrderFlag(4, {\n  'order_flag': {\n    'name': 'Awaiting Stock',\n    'color': '#B02E2E',\n    'description': 'Waiting for stock from the supplier.',\n  },\n});\nfinal orderFlag = (response.map as Map)['order_flag'] as Map;\nprint('${orderFlag['color']} ${orderFlag['description']}');"
+    },
+    "delete_order_flag": {
+      "function": "deleteOrderFlag",
+      "code": "final response = await client.orderFlags.deleteOrderFlag(4);\nprint(response.statusCode);"
+    }
+  }
+}

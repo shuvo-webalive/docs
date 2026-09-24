@@ -294,6 +294,20 @@
                   "api-reference/inventory-locations/set-the-default-inventory-location",
                   "api-reference/inventory-locations/activate-or-deactivate-an-inventory-location"
                 ]
+              },
+              {
+                "group": "Order flags",
+                "expanded": false,
+                "pages": [
+                  "order-flags",
+                  "api-reference/order-flags/list-order-flags",
+                  "api-reference/order-flags/check-the-order-flags-list",
+                  "api-reference/order-flags/create-an-order-flag",
+                  "api-reference/order-flags/retrieve-an-order-flag",
+                  "api-reference/order-flags/check-an-order-flag",
+                  "api-reference/order-flags/replace-an-order-flag",
+                  "api-reference/order-flags/delete-an-order-flag"
+                ]
               }
             ]
           }

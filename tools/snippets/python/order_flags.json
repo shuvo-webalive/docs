@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "list_order_flags",
+      "code": "response = client.order_flags.list_order_flags({\"limit\": 20})\nfor order_flag in response.map[\"order_flags\"]:\n    print(order_flag[\"id\"], order_flag[\"name\"], order_flag[\"color\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_order_flags": {
+      "function": "head_order_flags",
+      "code": "response = client.order_flags.head_order_flags()\nprint(response.status_code)\n"
+    },
+    "create_order_flag": {
+      "function": "create_order_flag",
+      "code": "response = client.order_flags.create_order_flag({\n    \"order_flag\": {\n        \"name\": \"Awaiting Stock\",\n        \"color\": \"#5A7BD4\",\n        \"description\": \"Waiting for stock to arrive.\",\n    },\n})\nprint(response.map[\"order_flag\"][\"id\"])\n"
+    },
+    "get_order_flag": {
+      "function": "get_order_flag",
+      "code": "response = client.order_flags.get_order_flag(2)\norder_flag = response.map[\"order_flag\"]\nprint(order_flag[\"name\"], order_flag[\"color\"], order_flag[\"description\"])\n"
+    },
+    "head_order_flag": {
+      "function": "head_order_flag",
+      "code": "response = client.order_flags.head_order_flag(2)\nprint(response.status_code)\n"
+    },
+    "update_order_flag": {
+      "function": "update_order_flag",
+      "code": "response = client.order_flags.update_order_flag(4, {\n    \"order_flag\": {\n        \"name\": \"Awaiting Stock\",\n        \"color\": \"#B02E2E\",\n        \"description\": \"Waiting for stock from the supplier.\",\n    },\n})\norder_flag = response.map[\"order_flag\"]\nprint(order_flag[\"color\"], order_flag[\"description\"])\n"
+    },
+    "delete_order_flag": {
+      "function": "delete_order_flag",
+      "code": "response = client.order_flags.delete_order_flag(4)\nprint(response.status_code)\n"
+    }
+  }
+}

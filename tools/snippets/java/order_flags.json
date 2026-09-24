@@ -1,0 +1,34 @@
+{
+  "sdk": "java",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "listOrderFlags",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orderFlags().listOrderFlags(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"order_flags\")) {\n    Map<?, ?> orderFlag = (Map<?, ?>) row;\n    System.out.println(orderFlag.get(\"id\") + \" \" + orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));"
+    },
+    "head_order_flags": {
+      "function": "headOrderFlags",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.orderFlags().headOrderFlags();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_order_flag": {
+      "function": "createOrderFlag",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderFlags().createOrderFlag(Map.of(\"order_flag\", Map.of(\n        \"name\", \"Awaiting Stock\", \"color\", \"#5A7BD4\", \"description\", \"Waiting for stock to arrive.\")));\nMap<?, ?> orderFlag = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_flag\");\nSystem.out.println(orderFlag.get(\"id\") + \" \" + orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\"));"
+    },
+    "get_order_flag": {
+      "function": "getOrderFlag",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderFlags().getOrderFlag(2);\nMap<?, ?> orderFlag = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_flag\");\nSystem.out.println(orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\") + \" \" + orderFlag.get(\"description\"));"
+    },
+    "head_order_flag": {
+      "function": "headOrderFlag",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.orderFlags().headOrderFlag(2);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_order_flag": {
+      "function": "updateOrderFlag",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderFlags().updateOrderFlag(4, Map.of(\"order_flag\", Map.of(\n        \"name\", \"Awaiting Stock\", \"color\", \"#B02E2E\", \"description\", \"Waiting for stock from the supplier.\")));\nMap<?, ?> orderFlag = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_flag\");\nSystem.out.println(orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\") + \" \" + orderFlag.get(\"description\"));"
+    },
+    "delete_order_flag": {
+      "function": "deleteOrderFlag",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.orderFlags().deleteOrderFlag(4);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

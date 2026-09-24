@@ -1,0 +1,9 @@
+---
+title: "Create an order flag"
+description: "Creates an order flag and returns it with its `id`, which other calls take as `order_flag_id`."
+openapi: "POST /admin/order_flags"
+---
+
+Creates an order flag and returns it with the `id` the store assigned. Pass the flag's `id` as `order_flag_id` to retrieve, replace or delete it. Wrap the record in `order_flag`: `name` and `color` are required, and `description` is optional. The store ignores any `id`, `type` or unknown field you send inside `order_flag`, and sets `type` to `order`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,51 @@
+---
+title: "Order flags"
+sidebarTitle: "Overview"
+description: "List, create, read, replace and delete your store's order flags."
+---
+
+The Order flags API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/order_flags`.
+
+<Warning>
+  **An update replaces the whole order flag, so send every field you want to keep.** `PUT` does not
+  merge: if you leave `description` out of the body, the store sets it to `null`. `name` and `color`
+  are required on every update, and `PATCH` is rejected with `405`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List order flags](/api-reference/order-flags/list-order-flags) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/order_flags` | Returns up to 20 order flags per call, sorted by `name`, with paging details. |
+| [Check the order flags list](/api-reference/order-flags/check-the-order-flags-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/order_flags` | Checks that the order flags list is reachable. Returns headers only, with no body. |
+| [Create an order flag](/api-reference/order-flags/create-an-order-flag) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/order_flags` | Creates an order flag and returns it with its `id`, which other calls take as `order_flag_id`. |
+| [Retrieve an order flag](/api-reference/order-flags/retrieve-an-order-flag) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/order_flags/{order_flag_id}` | Returns the order flag whose `id` you pass as `order_flag_id`. |
+| [Check an order flag](/api-reference/order-flags/check-an-order-flag) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/order_flags/{order_flag_id}` | Returns headers only, with no body, for the order flag you pass as `order_flag_id`. |
+| [Replace an order flag](/api-reference/order-flags/replace-an-order-flag) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/order_flags/{order_flag_id}` | Replaces an order flag's `name`, `color` and `description` and returns the updated flag. |
+| [Delete an order flag](/api-reference/order-flags/delete-an-order-flag) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/order_flags/{order_flag_id}` | Permanently deletes the order flag whose `id` you pass as `order_flag_id`. Returns no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap the flag in `order_flag` on create and on update.** Send
+  `{"order_flag": {"name": "Awaiting Stock", "color": "#5A7BD4"}}`. A bare record is rejected
+  with `400` and the message `order_flag missing`.
+- **`name` and `color` are required, and `description` is optional.** When you create a flag, a
+  `color` that is not a hex code such as `#FF6868` is rejected with `400`, and a `name` another order
+  flag already has is rejected with `409`. A new flag's `description` is `null` unless you send one.
+- **A `201` does not mean the store kept every field you sent.** Inside `order_flag`, the store ignores
+  any `id` or `type` you send, and any field it does not know, and still returns `201`. It assigns
+  the new order flag's `id` itself, and `type` is always `order`.
+- **A listing returns at most 20 order flags per call, sorted by `name`.** A larger `limit` is capped
+  at `20`, and `pagination.limit` shows `20`. To get more, send the next `page` or a higher `offset`
+  while `pagination.has_next` is `true`. The listing accepts only `limit`, `offset`, `page` and
+  `field_metadata`, and rejects any other parameter with `400`.
+- **Ecommerce settings shows these flags, but you change them only here.**
+  [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) lists the store's order flags under
+  `order_flags`, and its `group_meta` entry for them has `writable` set to `false` and `href` set to
+  `/api/v4/admin/order_flags`.

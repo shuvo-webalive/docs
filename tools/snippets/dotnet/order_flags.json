@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "ListOrderFlagsAsync",
+      "code": "var response = await client.OrderFlags.ListOrderFlagsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var orderFlag in ((IReadOnlyList<object?>)body[\"order_flags\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderFlag[\"id\"]} {orderFlag[\"name\"]} {orderFlag[\"color\"]}\");"
+    },
+    "head_order_flags": {
+      "function": "HeadOrderFlagsAsync",
+      "code": "var response = await client.OrderFlags.HeadOrderFlagsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_order_flag": {
+      "function": "CreateOrderFlagAsync",
+      "code": "var response = await client.OrderFlags.CreateOrderFlagAsync(new Dictionary<string, object?>\n{\n    [\"order_flag\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Awaiting Stock\", [\"color\"] = \"#5A7BD4\", [\"description\"] = \"Waiting for stock to arrive.\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFlag = (IReadOnlyDictionary<string, object?>)body[\"order_flag\"]!;\nConsole.WriteLine(orderFlag[\"id\"]);"
+    },
+    "get_order_flag": {
+      "function": "GetOrderFlagAsync",
+      "code": "var response = await client.OrderFlags.GetOrderFlagAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFlag = (IReadOnlyDictionary<string, object?>)body[\"order_flag\"]!;\nConsole.WriteLine($\"{orderFlag[\"name\"]} {orderFlag[\"color\"]}\");"
+    },
+    "head_order_flag": {
+      "function": "HeadOrderFlagAsync",
+      "code": "var response = await client.OrderFlags.HeadOrderFlagAsync(2);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_order_flag": {
+      "function": "UpdateOrderFlagAsync",
+      "code": "var response = await client.OrderFlags.UpdateOrderFlagAsync(4, new Dictionary<string, object?>\n{\n    [\"order_flag\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Awaiting Stock\", [\"color\"] = \"#B02E2E\", [\"description\"] = \"Waiting for stock from the supplier.\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFlag = (IReadOnlyDictionary<string, object?>)body[\"order_flag\"]!;\nConsole.WriteLine($\"{orderFlag[\"color\"]} {orderFlag[\"description\"]}\");"
+    },
+    "delete_order_flag": {
+      "function": "DeleteOrderFlagAsync",
+      "code": "var response = await client.OrderFlags.DeleteOrderFlagAsync(4);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Retrieve an order flag"
+description: "Returns the order flag whose `id` you pass as `order_flag_id`."
+openapi: "GET /admin/order_flags/{order_flag_id}"
+---
+
+Returns one order flag under the `order_flag` key, with the same five fields each flag in a listing has: `id`, `name`, `color`, `description` and `type`. Unknown query parameters are ignored. The response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -71,6 +71,9 @@
     },
     {
       "name": "Inventory locations"
+    },
+    {
+      "name": "Order flags"
     }
   ],
   "paths": {
@@ -15554,6 +15557,763 @@
           }
         }
       }
+    },
+    "/admin/order_flags": {
+      "get": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "List order flags",
+        "operationId": "list_order_flags",
+        "description": "Returns the store's order flags under `order_flags`, sorted by `name`, at most 20 per call, and a `pagination` object with the `total` and `has_next`. Only `limit`, `offset`, `page` and `field_metadata` are accepted; any other parameter, such as `sort`, is rejected with `400`. After a rejected `limit=0`, the next request on the same client returns that rejection's body instead of its own. The response has `ETag` and `Last-Modified` headers.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Order flags per page, at most `20`. A larger value is capped at `20`, and `pagination.limit` shows `20`. `0` or less is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of order flags to skip. When you send both `offset` and `page`, `offset` wins.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit`.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Accepted, but adds nothing: the response still has only `order_flags` and `pagination`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order flags on this page under `order_flags`, sorted by `name`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_flags": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrderFlag"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/OrderFlagPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "order_flags": [
+                    {
+                      "id": 2,
+                      "name": "Partial Shipment",
+                      "color": "#4FD9FC",
+                      "description": null,
+                      "type": "order"
+                    },
+                    {
+                      "id": 1,
+                      "name": "Payment Failed",
+                      "color": "#FF6868",
+                      "description": null,
+                      "type": "order"
+                    },
+                    {
+                      "id": 3,
+                      "name": "Payment Pending",
+                      "color": "#FFA959",
+                      "description": null,
+                      "type": "order"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 3,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a parameter the listing does not accept: the message is `unknown query parameter(s): <name>` and `details[0].code` is `unknown_parameter`. Or you sent a `limit` of `0` or less.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFlagError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "unknown query parameter(s): sort",
+                    "details": [
+                      {
+                        "field": "sort",
+                        "code": "unknown_parameter",
+                        "message": null
+                      }
+                    ],
+                    "request_id": "5c98dbea-ea13-4b77-b0b0-476ad4104429"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/order_flags?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.list_order_flags({\"limit\": 20})\nfor order_flag in response.map[\"order_flags\"]:\n    print(order_flag[\"id\"], order_flag[\"name\"], order_flag[\"color\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.listOrderFlags(client, {limit: 20});\nfor (const orderFlag of response.map.order_flags) {\n    console.log(orderFlag.id, orderFlag.name, orderFlag.color);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::listOrderFlags($client, ['limit' => 20]);\n\nforeach ($response->map['order_flags'] as $flag) {\n    echo $flag['id'], ' ', $flag['name'], ' ', $flag['color'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().listOrderFlags(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"order_flags\")) {\n    Map<?, ?> orderFlag = (Map<?, ?>) row;\n    System.out.println(orderFlag.get(\"id\") + \" \" + orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.ListOrderFlagsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var orderFlag in ((IReadOnlyList<object?>)body[\"order_flags\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderFlag[\"id\"]} {orderFlag[\"name\"]} {orderFlag[\"color\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags\n    .listOrderFlags(queryParams: {'limit': 20});\nfinal orderFlags = (response.map as Map)['order_flags'] as List;\nfor (final orderFlag in orderFlags) {\n  print('${(orderFlag as Map)['id']} ${orderFlag['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().ListOrderFlags(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"order_flags\"].([]any) {\n\tflag := row.(map[string]any)\n\tfmt.Println(flag[\"id\"], flag[\"name\"], flag[\"color\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "Check the order flags list",
+        "operationId": "head_order_flags",
+        "description": "Returns `200` with headers only and no body. Unlike [List order flags](/api-reference/order-flags/list-order-flags), the response has no `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body, and no `ETag` header."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/order_flags\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.head_order_flags()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.headOrderFlags(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::headOrderFlags($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().headOrderFlags();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.HeadOrderFlagsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags.headOrderFlags();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().HeadOrderFlags(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "Create an order flag",
+        "operationId": "create_order_flag",
+        "description": "Creates an order flag and returns it with the `id` the store assigned. Pass the flag's `id` as `order_flag_id` to retrieve, replace or delete it. Wrap the record in `order_flag`: `name` and `color` are required, and `description` is optional. The store ignores any `id`, `type` or unknown field you send inside `order_flag`, and sets `type` to `order`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new order flag, with the `id` the store assigned. The response has no `Location` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_flag": {
+                      "$ref": "#/components/schemas/OrderFlag"
+                    }
+                  }
+                },
+                "example": {
+                  "order_flag": {
+                    "id": 4,
+                    "name": "Awaiting Stock",
+                    "color": "#5A7BD4",
+                    "description": "Waiting for stock to arrive.",
+                    "type": "order"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `order_flag` (`order_flag missing`), `name` or `color` is missing (for example `color is required`), or `color` is not a hex code (`color must be a hex code like #FF6868`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFlagError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "color is required",
+                    "details": [
+                      {
+                        "field": "color",
+                        "code": "required",
+                        "message": "color is required"
+                      }
+                    ],
+                    "request_id": "5c98dbea-ea13-4b77-b0b0-476ad4104429"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another order flag already has that `name`. The message is `an order flag named '<name>' already exists` and `details[0].code` is `duplicate`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFlagError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "an order flag named 'Awaiting Stock' already exists",
+                    "details": [
+                      {
+                        "field": "name",
+                        "code": "duplicate",
+                        "message": "name already exists",
+                        "value": "Awaiting Stock"
+                      }
+                    ],
+                    "request_id": "5c98dbea-ea13-4b77-b0b0-476ad4104429"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/order_flags\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"order_flag\": {\n      \"name\": \"Awaiting Stock\",\n      \"color\": \"#5A7BD4\",\n      \"description\": \"Waiting for stock to arrive.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.create_order_flag({\n    \"order_flag\": {\n        \"name\": \"Awaiting Stock\",\n        \"color\": \"#5A7BD4\",\n        \"description\": \"Waiting for stock to arrive.\",\n    },\n})\nprint(response.map[\"order_flag\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.createOrderFlag(client, {\n    order_flag: {name: 'Awaiting Stock', color: '#5A7BD4', description: 'Waiting for stock to arrive.'},\n});\nconsole.log(response.map.order_flag.id);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::createOrderFlag($client, [\n    'order_flag' => [\n        'name' => 'Awaiting Stock',\n        'color' => '#5A7BD4',\n        'description' => 'Waiting for stock to arrive.',\n    ],\n]);\n\necho $response->map['order_flag']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().createOrderFlag(Map.of(\"order_flag\", Map.of(\n        \"name\", \"Awaiting Stock\", \"color\", \"#5A7BD4\", \"description\", \"Waiting for stock to arrive.\")));\nMap<?, ?> orderFlag = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_flag\");\nSystem.out.println(orderFlag.get(\"id\") + \" \" + orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.CreateOrderFlagAsync(new Dictionary<string, object?>\n{\n    [\"order_flag\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Awaiting Stock\", [\"color\"] = \"#5A7BD4\", [\"description\"] = \"Waiting for stock to arrive.\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFlag = (IReadOnlyDictionary<string, object?>)body[\"order_flag\"]!;\nConsole.WriteLine(orderFlag[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags.createOrderFlag({\n  'order_flag': {\n    'name': 'Awaiting Stock',\n    'color': '#5A7BD4',\n    'description': 'Waiting for stock to arrive.',\n  },\n});\nfinal orderFlag = (response.map as Map)['order_flag'] as Map;\nprint(orderFlag['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().CreateOrderFlag(ctx, map[string]any{\n\t\"order_flag\": map[string]any{\n\t\t\"name\":        \"Awaiting Stock\",\n\t\t\"color\":       \"#5A7BD4\",\n\t\t\"description\": \"Waiting for stock to arrive.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nflag := resp.Map().(map[string]any)[\"order_flag\"].(map[string]any)\nfmt.Println(flag[\"id\"], flag[\"name\"], flag[\"color\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "order_flag"
+                ],
+                "properties": {
+                  "order_flag": {
+                    "$ref": "#/components/schemas/OrderFlagInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/order_flags/{order_flag_id}": {
+      "get": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "Retrieve an order flag",
+        "operationId": "get_order_flag",
+        "description": "Returns one order flag under the `order_flag` key, with the same five fields each flag in a listing has: `id`, `name`, `color`, `description` and `type`. Unknown query parameters are ignored. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "order_flag_id",
+            "in": "path",
+            "required": true,
+            "description": "The order flag's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order flag, under `order_flag`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_flag": {
+                      "$ref": "#/components/schemas/OrderFlag"
+                    }
+                  }
+                },
+                "example": {
+                  "order_flag": {
+                    "id": 2,
+                    "name": "Partial Shipment",
+                    "color": "#4FD9FC",
+                    "description": null,
+                    "type": "order"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No order flag has that `order_flag_id`, or it is not a number. The message is `Order flag not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFlagError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Order flag not found",
+                    "details": [],
+                    "request_id": "5c98dbea-ea13-4b77-b0b0-476ad4104429"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/order_flags/2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.get_order_flag(2)\norder_flag = response.map[\"order_flag\"]\nprint(order_flag[\"name\"], order_flag[\"color\"], order_flag[\"description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.getOrderFlag(client, 2);\nconsole.log(response.map.order_flag.name, response.map.order_flag.color);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::getOrderFlag($client, 2);\n\n$flag = $response->map['order_flag'];\necho $flag['name'], ' ', $flag['color'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().getOrderFlag(2);\nMap<?, ?> orderFlag = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_flag\");\nSystem.out.println(orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\") + \" \" + orderFlag.get(\"description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.GetOrderFlagAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFlag = (IReadOnlyDictionary<string, object?>)body[\"order_flag\"]!;\nConsole.WriteLine($\"{orderFlag[\"name\"]} {orderFlag[\"color\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags.getOrderFlag(2);\nfinal orderFlag = (response.map as Map)['order_flag'] as Map;\nprint('${orderFlag['name']} ${orderFlag['color']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().GetOrderFlag(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nflag := resp.Map().(map[string]any)[\"order_flag\"].(map[string]any)\nfmt.Println(flag[\"name\"], flag[\"color\"], flag[\"type\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "Check an order flag",
+        "operationId": "head_order_flag",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. It returns `200` even when no order flag has that `order_flag_id`, so it does not tell you whether the flag exists. To read the flag's fields, or to get `404` for a flag that does not exist, use [Retrieve an order flag](/api-reference/order-flags/retrieve-an-order-flag).",
+        "parameters": [
+          {
+            "name": "order_flag_id",
+            "in": "path",
+            "required": true,
+            "description": "The order flag's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body, and no `ETag` header. You get `200` for any `order_flag_id`, including one no order flag has."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/order_flags/2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.head_order_flag(2)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.headOrderFlag(client, 2);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::headOrderFlag($client, 2);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().headOrderFlag(2);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.HeadOrderFlagAsync(2);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags.headOrderFlag(2);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().HeadOrderFlag(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "Replace an order flag",
+        "operationId": "update_order_flag",
+        "description": "Replaces the order flag whose `id` you pass as `order_flag_id` with the fields you send, and returns it. This is a replace, not a merge: `name` and `color` are required, and if you leave out `description` it is set to `null`. Wrap the fields in `order_flag`. `PATCH` is rejected with `405 method_not_allowed` and the message `HTTP method not allowed for this endpoint.`",
+        "parameters": [
+          {
+            "name": "order_flag_id",
+            "in": "path",
+            "required": true,
+            "description": "The order flag's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order flag with the values you sent. If you left out `description`, it is `null`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_flag": {
+                      "$ref": "#/components/schemas/OrderFlag"
+                    }
+                  }
+                },
+                "example": {
+                  "order_flag": {
+                    "id": 4,
+                    "name": "Awaiting Stock",
+                    "color": "#B02E2E",
+                    "description": "Waiting for stock from the supplier.",
+                    "type": "order"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `order_flag` (`order_flag missing`), or `name` or `color` is missing (for example `color is required`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFlagError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "color is required",
+                    "details": [
+                      {
+                        "field": "color",
+                        "code": "required",
+                        "message": "color is required"
+                      }
+                    ],
+                    "request_id": "5c98dbea-ea13-4b77-b0b0-476ad4104429"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/order_flags/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"order_flag\": {\n      \"name\": \"Awaiting Stock\",\n      \"color\": \"#B02E2E\",\n      \"description\": \"Waiting for stock from the supplier.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.update_order_flag(4, {\n    \"order_flag\": {\n        \"name\": \"Awaiting Stock\",\n        \"color\": \"#B02E2E\",\n        \"description\": \"Waiting for stock from the supplier.\",\n    },\n})\norder_flag = response.map[\"order_flag\"]\nprint(order_flag[\"color\"], order_flag[\"description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.updateOrderFlag(client, 4, {\n    order_flag: {name: 'Awaiting Stock', color: '#B02E2E', description: 'Waiting for stock from the supplier.'},\n});\nconsole.log(response.map.order_flag.color, response.map.order_flag.description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::updateOrderFlag($client, 4, [\n    'order_flag' => [\n        'name' => 'Awaiting Stock',\n        'color' => '#B02E2E',\n        'description' => 'Waiting for stock from the supplier.',\n    ],\n]);\n\necho $response->map['order_flag']['color'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().updateOrderFlag(4, Map.of(\"order_flag\", Map.of(\n        \"name\", \"Awaiting Stock\", \"color\", \"#B02E2E\", \"description\", \"Waiting for stock from the supplier.\")));\nMap<?, ?> orderFlag = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_flag\");\nSystem.out.println(orderFlag.get(\"name\") + \" \" + orderFlag.get(\"color\") + \" \" + orderFlag.get(\"description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.UpdateOrderFlagAsync(4, new Dictionary<string, object?>\n{\n    [\"order_flag\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Awaiting Stock\", [\"color\"] = \"#B02E2E\", [\"description\"] = \"Waiting for stock from the supplier.\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFlag = (IReadOnlyDictionary<string, object?>)body[\"order_flag\"]!;\nConsole.WriteLine($\"{orderFlag[\"color\"]} {orderFlag[\"description\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags.updateOrderFlag(4, {\n  'order_flag': {\n    'name': 'Awaiting Stock',\n    'color': '#B02E2E',\n    'description': 'Waiting for stock from the supplier.',\n  },\n});\nfinal orderFlag = (response.map as Map)['order_flag'] as Map;\nprint('${orderFlag['color']} ${orderFlag['description']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().UpdateOrderFlag(ctx, 4, map[string]any{\n\t\"order_flag\": map[string]any{\n\t\t\"name\":        \"Awaiting Stock\",\n\t\t\"color\":       \"#B02E2E\",\n\t\t\"description\": \"Waiting for stock from the supplier.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nflag := resp.Map().(map[string]any)[\"order_flag\"].(map[string]any)\nfmt.Println(flag[\"color\"], flag[\"description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "order_flag"
+                ],
+                "properties": {
+                  "order_flag": {
+                    "$ref": "#/components/schemas/OrderFlagInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Order flags"
+        ],
+        "summary": "Delete an order flag",
+        "operationId": "delete_order_flag",
+        "description": "Deletes the order flag permanently and returns `204` with no body. The flag no longer appears in the listing, and the listing's `pagination.total` goes down by one. Retrieving it or deleting it again returns `404`.",
+        "parameters": [
+          {
+            "name": "order_flag_id",
+            "in": "path",
+            "required": true,
+            "description": "The order flag's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No order flag has that `order_flag_id`, including a flag you already deleted. The message is `Order flag not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFlagError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Order flag not found",
+                    "details": [],
+                    "request_id": "5c98dbea-ea13-4b77-b0b0-476ad4104429"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/order_flags/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.order_flags.delete_order_flag(4)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.deleteOrderFlag(client, 4);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\OrderFlags\\OrderFlags;\n\n$client = ClientRegistry::buildClient();\n\n$response = OrderFlags::deleteOrderFlag($client, 4);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.orderFlags().deleteOrderFlag(4);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.OrderFlags.DeleteOrderFlagAsync(4);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.orderFlags.deleteOrderFlag(4);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.OrderFlags().DeleteOrderFlag(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -21908,6 +22668,131 @@
           "message": {
             "type": "string",
             "description": "What went wrong, such as `Inventory location not found`."
+          }
+        }
+      },
+      "OrderFlag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The order flag's `id`, assigned by the store. The other calls take it as `order_flag_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The flag's name. No two order flags have the same name."
+          },
+          "color": {
+            "type": "string",
+            "description": "The flag's colour as a hex code, such as `#FF6868`."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The flag's description, or `null` when it has none."
+          },
+          "type": {
+            "type": "string",
+            "description": "Always `order`. No write changes it."
+          }
+        }
+      },
+      "OrderFlagInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "color"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required. On create, a name another order flag already has is rejected with `409`."
+          },
+          "color": {
+            "type": "string",
+            "description": "Required. Send a hex code, such as `#FF6868`: a create with any other value is rejected with `400`."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional. `null` when you leave it out, on create and on update."
+          }
+        }
+      },
+      "OrderFlagPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of order flags in the store."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. At most `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of order flags skipped before this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "Whether a page comes before this one."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "Whether a page comes after this one."
+          }
+        }
+      },
+      "OrderFlagError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Order flag not found` or `color is required`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or parameter, or an empty list. The first entry's `code` gives the reason, such as `required`, `duplicate` or `unknown_parameter`.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
           }
         }
       }
