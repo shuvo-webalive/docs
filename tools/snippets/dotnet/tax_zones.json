@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "tax_zones",
+  "endpoints": {
+    "list_tax_zones": {
+      "function": "ListTaxZonesAsync",
+      "code": "var response = await client.TaxZones.ListTaxZonesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 2 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var taxZone in ((IReadOnlyList<object?>)body[\"tax_zones\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{taxZone[\"id\"]} {taxZone[\"name\"]}\");"
+    },
+    "head_tax_zones": {
+      "function": "HeadTaxZonesAsync",
+      "code": "var response = await client.TaxZones.HeadTaxZonesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_tax_zone": {
+      "function": "CreateTaxZoneAsync",
+      "code": "var response = await client.TaxZones.CreateTaxZoneAsync(new Dictionary<string, object?>\n{\n    [\"tax_zone\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Sydney Metro\", [\"post_code\"] = new List<object?> { \"2000\", \"3000\" },\n        [\"countries\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 12 } },\n        [\"states\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 67 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxZone = (IReadOnlyDictionary<string, object?>)body[\"tax_zone\"]!;\nConsole.WriteLine(taxZone[\"id\"]);"
+    },
+    "get_tax_zone": {
+      "function": "GetTaxZoneAsync",
+      "code": "var response = await client.TaxZones.GetTaxZoneAsync(1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxZone = (IReadOnlyDictionary<string, object?>)body[\"tax_zone\"]!;\nConsole.WriteLine(taxZone[\"name\"]);"
+    },
+    "head_tax_zone": {
+      "function": "HeadTaxZoneAsync",
+      "code": "var response = await client.TaxZones.HeadTaxZoneAsync(1);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_tax_zone": {
+      "function": "UpdateTaxZoneAsync",
+      "code": "var response = await client.TaxZones.UpdateTaxZoneAsync(83, new Dictionary<string, object?>\n{\n    [\"tax_zone\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Sydney Metro and Parramatta\", [\"post_code\"] = new List<object?> { \"2000\", \"2150\" },\n        [\"countries\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 12 } },\n        [\"states\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 67 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxZone = (IReadOnlyDictionary<string, object?>)body[\"tax_zone\"]!;\nConsole.WriteLine(taxZone[\"name\"]);"
+    },
+    "delete_tax_zone": {
+      "function": "DeleteTaxZoneAsync",
+      "code": "var response = await client.TaxZones.DeleteTaxZoneAsync(83);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

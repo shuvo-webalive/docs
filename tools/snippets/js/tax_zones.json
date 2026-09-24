@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "tax_zones",
+  "endpoints": {
+    "list_tax_zones": {
+      "function": "listTaxZones",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.listTaxZones(client, {limit: 2});\nfor (const taxZone of response.map.tax_zones) {\n    console.log(taxZone.id, taxZone.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.next_page);\n"
+    },
+    "head_tax_zones": {
+      "function": "headTaxZones",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.headTaxZones(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_tax_zone": {
+      "function": "createTaxZone",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.createTaxZone(client, {\n    tax_zone: {\n        name: 'Sydney Metro',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '3000'],\n    },\n});\nconsole.log(response.map.tax_zone.id, response.map.tax_zone.post_code);\n"
+    },
+    "get_tax_zone": {
+      "function": "getTaxZone",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.getTaxZone(client, 1);\nconst taxZone = response.map.tax_zone;\nconsole.log(taxZone.name, taxZone.countries, taxZone.states, taxZone.post_code);\n"
+    },
+    "head_tax_zone": {
+      "function": "headTaxZone",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.headTaxZone(client, 1);\nconsole.log(response.statusCode);\n"
+    },
+    "update_tax_zone": {
+      "function": "updateTaxZone",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.updateTaxZone(client, 83, {\n    tax_zone: {\n        name: 'Sydney Metro and Parramatta',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '2150'],\n    },\n});\nconsole.log(response.map.tax_zone.name, response.map.tax_zone.post_code);\n"
+    },
+    "delete_tax_zone": {
+      "function": "deleteTaxZone",
+      "code": "import {taxZones} from 'webcommander-sdk';\n\nconst response = await taxZones.deleteTaxZone(client, 83);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

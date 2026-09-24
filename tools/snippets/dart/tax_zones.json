@@ -1,0 +1,34 @@
+{
+  "sdk": "dart",
+  "module": "tax_zones",
+  "endpoints": {
+    "list_tax_zones": {
+      "function": "listTaxZones",
+      "code": "final response = await client.taxZones.listTaxZones(queryParams: {'limit': 2});\nfinal taxZones = (response.map as Map)['tax_zones'] as List;\nfor (final taxZone in taxZones) {\n  print('${(taxZone as Map)['id']} ${taxZone['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['next_page']}');"
+    },
+    "head_tax_zones": {
+      "function": "headTaxZones",
+      "code": "final response = await client.taxZones.headTaxZones();\nprint(response.statusCode);"
+    },
+    "create_tax_zone": {
+      "function": "createTaxZone",
+      "code": "final response = await client.taxZones.createTaxZone({\n  'tax_zone': {\n    'name': 'Sydney Metro',\n    'countries': [{'id': 12}],\n    'states': [{'id': 67}],\n    'post_code': ['2000', '3000'],\n  },\n});\nfinal taxZone = (response.map as Map)['tax_zone'] as Map;\nprint('${taxZone['id']} ${taxZone['post_code']}');"
+    },
+    "get_tax_zone": {
+      "function": "getTaxZone",
+      "code": "final response = await client.taxZones.getTaxZone(1);\nfinal taxZone = (response.map as Map)['tax_zone'] as Map;\nprint(taxZone['name']);\nprint(taxZone['countries']);\nprint(taxZone['states']);\nprint(taxZone['post_code']);"
+    },
+    "head_tax_zone": {
+      "function": "headTaxZone",
+      "code": "final response = await client.taxZones.headTaxZone(1);\nprint(response.statusCode);"
+    },
+    "update_tax_zone": {
+      "function": "updateTaxZone",
+      "code": "final response = await client.taxZones.updateTaxZone(83, {\n  'tax_zone': {\n    'name': 'Sydney Metro and Parramatta',\n    'countries': [{'id': 12}],\n    'states': [{'id': 67}],\n    'post_code': ['2000', '2150'],\n  },\n});\nfinal taxZone = (response.map as Map)['tax_zone'] as Map;\nprint('${taxZone['name']} ${taxZone['post_code']}');"
+    },
+    "delete_tax_zone": {
+      "function": "deleteTaxZone",
+      "code": "final response = await client.taxZones.deleteTaxZone(83);\nprint(response.statusCode);"
+    }
+  }
+}

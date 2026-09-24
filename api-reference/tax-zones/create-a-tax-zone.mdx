@@ -1,0 +1,9 @@
+---
+title: "Create a tax zone"
+description: "Creates a tax zone and returns it with its `id`, which other calls take as `tax_zone_id`."
+openapi: "POST /admin/tax_zones"
+---
+
+Creates a tax zone and returns it with the zone's `id`; pass that `id` as `tax_zone_id` to retrieve, update or delete the zone. Wrap the fields in `tax_zone` and always send `name`. `radius` and `start_location` are read only when you send `use_radius: true`: without it they are stored as `0.0` and `""`, and a `radius` is stored as a whole number, so `7.5` reads back as `7`. A new zone always has `default` and `system_generated` set to `false`, and fields a zone does not have are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

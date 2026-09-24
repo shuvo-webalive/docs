@@ -41,7 +41,8 @@
       "icon": "percent",
       "modules": [
         "tax_codes",
-        "tax_rules"
+        "tax_rules",
+        "tax_zones"
       ]
     }
   ]

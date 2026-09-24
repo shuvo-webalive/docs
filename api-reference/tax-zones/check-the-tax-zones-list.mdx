@@ -1,0 +1,9 @@
+---
+title: "Check the tax zones list"
+description: "Returns `200` with headers only, to check that the tax zones path exists."
+openapi: "HEAD /admin/tax_zones"
+---
+
+Returns `200` with headers only and no body. The `200` only tells you the path exists: the store also returns `200` for methods it does not handle, and a `HEAD` response has no body to tell the two apart. Neither this response nor the listing has an `ETag` or `Last-Modified` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

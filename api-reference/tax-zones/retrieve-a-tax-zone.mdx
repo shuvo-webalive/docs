@@ -1,0 +1,9 @@
+---
+title: "Retrieve a tax zone"
+description: "Returns the tax zone whose `id` you pass as `tax_zone_id`."
+openapi: "GET /admin/tax_zones/{tax_zone_id}"
+---
+
+Returns one tax zone under the `tax_zone` key, with the same twelve fields a listing row has. `post_code` comes back as a list of lists, such as `[["2000"], ["3000"]]`. The response has no `ETag` or `Last-Modified` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -256,6 +256,20 @@
                   "api-reference/tax-rules/update-a-tax-rule",
                   "api-reference/tax-rules/delete-a-tax-rule"
                 ]
+              },
+              {
+                "group": "Tax zones",
+                "expanded": false,
+                "pages": [
+                  "tax-zones",
+                  "api-reference/tax-zones/list-tax-zones",
+                  "api-reference/tax-zones/check-the-tax-zones-list",
+                  "api-reference/tax-zones/create-a-tax-zone",
+                  "api-reference/tax-zones/retrieve-a-tax-zone",
+                  "api-reference/tax-zones/check-a-tax-zone",
+                  "api-reference/tax-zones/update-a-tax-zone",
+                  "api-reference/tax-zones/delete-a-tax-zone"
+                ]
               }
             ]
           }

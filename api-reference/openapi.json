@@ -65,6 +65,9 @@
     },
     {
       "name": "Tax rules"
+    },
+    {
+      "name": "Tax zones"
     }
   ],
   "paths": {
@@ -13684,6 +13687,798 @@
           }
         ]
       }
+    },
+    "/admin/tax_zones": {
+      "get": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "List tax zones",
+        "operationId": "list_tax_zones",
+        "description": "Returns the tax zones under `tax_zones`, up to 20 per call, with a `pagination` block. Each zone has the same twelve fields that [Retrieve a tax zone](/api-reference/tax-zones/retrieve-a-tax-zone) returns. To get every zone, raise `offset` by the number of zones each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored: `q` does not filter the zones, and `field_metadata=true` returns no field descriptions.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Zones per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. A `limit` below `1`, or one that is not a number, is rejected with `400 invalid_pagination`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of zones to skip. An `offset` that is not a number is rejected with `400 invalid_pagination`.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit` against the `limit` you send with it. `limit=2&page=2` skips 2 zones.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The zones on this page under `tax_zones`, and a `pagination` block with the total, the applied `limit` and the URLs of the pages before and after.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_zones": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxZone"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TaxZonePagination"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_zones": [
+                    {
+                      "id": 1,
+                      "name": "New South Wales",
+                      "system_generated": true,
+                      "default": false,
+                      "use_radius": false,
+                      "radius": 0.0,
+                      "start_location": "",
+                      "countries": [
+                        {
+                          "id": 12,
+                          "name": "Australia",
+                          "code": "AU"
+                        }
+                      ],
+                      "states": [
+                        {
+                          "id": 67,
+                          "name": "New South Wales",
+                          "code": "NSW"
+                        }
+                      ],
+                      "post_code": [],
+                      "created_at": "2026-01-12T03:20:00",
+                      "updated_at": "2026-01-12T03:20:00"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Victoria",
+                      "system_generated": true,
+                      "default": false,
+                      "use_radius": false,
+                      "radius": 0.0,
+                      "start_location": "",
+                      "countries": [
+                        {
+                          "id": 12,
+                          "name": "Australia",
+                          "code": "AU"
+                        }
+                      ],
+                      "states": [
+                        {
+                          "id": 72,
+                          "name": "Victoria",
+                          "code": "VIC"
+                        }
+                      ],
+                      "post_code": [],
+                      "created_at": "2026-01-12T03:20:00",
+                      "updated_at": "2026-01-12T03:20:00"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 42,
+                    "limit": 2,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 21,
+                    "has_next": true,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": "https://your-store.example.com/api/v4/admin/tax_zones?limit=2&offset=2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`limit` is below `1`, or `limit` or `offset` is not a number. The call is rejected with `invalid_pagination`, and an `errors` list names the field. The next listing you send on the same connection gets this same `400` back, even from another tax collection.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax_zones?limit=2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.list_tax_zones({\"limit\": 2})\nfor tax_zone in response.map[\"tax_zones\"]:\n    print(tax_zone[\"id\"], tax_zone[\"name\"], tax_zone[\"system_generated\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.listTaxZones(client, {limit: 2});\nfor (const taxZone of response.map.tax_zones) {\n    console.log(taxZone.id, taxZone.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.next_page);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::listTaxZones($client, ['limit' => 2]);\n\nforeach ($response->map['tax_zones'] as $zone) {\n    echo $zone['id'], ' ', $zone['name'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' tax zones in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().listTaxZones(Map.of(\"limit\", 2));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"tax_zones\")) {\n    Map<?, ?> taxZone = (Map<?, ?>) row;\n    System.out.println(taxZone.get(\"id\") + \" \" + taxZone.get(\"name\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.ListTaxZonesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 2 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var taxZone in ((IReadOnlyList<object?>)body[\"tax_zones\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{taxZone[\"id\"]} {taxZone[\"name\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.listTaxZones(queryParams: {'limit': 2});\nfinal taxZones = (response.map as Map)['tax_zones'] as List;\nfor (final taxZone in taxZones) {\n  print('${(taxZone as Map)['id']} ${taxZone['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['next_page']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().ListTaxZones(ctx, map[string]any{\"limit\": 2}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_zones\"].([]any) {\n\tzone := row.(map[string]any)\n\tfmt.Println(zone[\"id\"], zone[\"name\"], zone[\"system_generated\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "Check the tax zones list",
+        "operationId": "head_tax_zones",
+        "description": "Returns `200` with headers only and no body. The `200` only tells you the path exists: the store also returns `200` for methods it does not handle, and a `HEAD` response has no body to tell the two apart. Neither this response nor the listing has an `ETag` or `Last-Modified` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The path exists. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/tax_zones\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.head_tax_zones()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.headTaxZones(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::headTaxZones($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().headTaxZones();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.HeadTaxZonesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.headTaxZones();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().HeadTaxZones(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "Create a tax zone",
+        "operationId": "create_tax_zone",
+        "description": "Creates a tax zone and returns it with the zone's `id`; pass that `id` as `tax_zone_id` to retrieve, update or delete the zone. Wrap the fields in `tax_zone` and always send `name`. `radius` and `start_location` are read only when you send `use_radius: true`: without it they are stored as `0.0` and `\"\"`, and a `radius` is stored as a whole number, so `7.5` reads back as `7`. A new zone always has `default` and `system_generated` set to `false`, and fields a zone does not have are ignored.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new tax zone under `tax_zone`, with each post code in `post_code` in a list of its own.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_zone": {
+                      "$ref": "#/components/schemas/TaxZone"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_zone": {
+                    "id": 83,
+                    "name": "Sydney Metro",
+                    "system_generated": false,
+                    "default": false,
+                    "use_radius": false,
+                    "radius": 0.0,
+                    "start_location": "",
+                    "countries": [
+                      {
+                        "id": 12,
+                        "name": "Australia",
+                        "code": "AU"
+                      }
+                    ],
+                    "states": [
+                      {
+                        "id": 67,
+                        "name": "New South Wales",
+                        "code": "NSW"
+                      }
+                    ],
+                    "post_code": [
+                      [
+                        "2000"
+                      ],
+                      [
+                        "3000"
+                      ]
+                    ],
+                    "created_at": "2026-09-22T04:15:00",
+                    "updated_at": "2026-09-22T04:15:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `tax_zone`. The message is `tax_zone missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has no `name`. Or a `countries` or `states` entry is a plain number instead of a record (`No such property: id for class: java.lang.Integer`), holds only a `code`, or holds an `id` that matches no country or state (`Cannot get property 'id' on null object`). Or `post_code` is nested (`JSONArray cannot be cast to String`). After a `500` from a bad `countries` or `states` entry, the zone can still have been created, and the `500` does not include its `id`: look for the zone by `name` in the listing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax_zones\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_zone\": {\n      \"name\": \"Sydney Metro\",\n      \"countries\": [\n        {\n          \"id\": 12\n        }\n      ],\n      \"states\": [\n        {\n          \"id\": 67\n        }\n      ],\n      \"post_code\": [\n        \"2000\",\n        \"3000\"\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.create_tax_zone({\n    \"tax_zone\": {\n        \"name\": \"Sydney Metro\",\n        \"countries\": [{\"id\": 12}],\n        \"states\": [{\"id\": 67}],\n        \"post_code\": [\"2000\", \"3000\"],\n    },\n})\ntax_zone = response.map[\"tax_zone\"]\nprint(tax_zone[\"id\"], tax_zone[\"post_code\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.createTaxZone(client, {\n    tax_zone: {\n        name: 'Sydney Metro',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '3000'],\n    },\n});\nconsole.log(response.map.tax_zone.id, response.map.tax_zone.post_code);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::createTaxZone($client, [\n    'tax_zone' => [\n        'name' => 'Sydney Metro',\n        'countries' => [['id' => 12]],\n        'states' => [['id' => 67]],\n        'post_code' => ['2000', '3000'],\n    ],\n]);\n\necho $response->map['tax_zone']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().createTaxZone(Map.of(\"tax_zone\", Map.of(\n        \"name\", \"Sydney Metro\",\n        \"countries\", List.of(Map.of(\"id\", 12)),\n        \"states\", List.of(Map.of(\"id\", 67)),\n        \"post_code\", List.of(\"2000\", \"3000\"))));\nMap<?, ?> taxZone = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_zone\");\nSystem.out.println(taxZone.get(\"id\") + \" \" + taxZone.get(\"name\"));\nSystem.out.println(taxZone.get(\"post_code\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.CreateTaxZoneAsync(new Dictionary<string, object?>\n{\n    [\"tax_zone\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Sydney Metro\", [\"post_code\"] = new List<object?> { \"2000\", \"3000\" },\n        [\"countries\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 12 } },\n        [\"states\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 67 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxZone = (IReadOnlyDictionary<string, object?>)body[\"tax_zone\"]!;\nConsole.WriteLine(taxZone[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.createTaxZone({\n  'tax_zone': {\n    'name': 'Sydney Metro',\n    'countries': [{'id': 12}],\n    'states': [{'id': 67}],\n    'post_code': ['2000', '3000'],\n  },\n});\nfinal taxZone = (response.map as Map)['tax_zone'] as Map;\nprint('${taxZone['id']} ${taxZone['post_code']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().CreateTaxZone(ctx, map[string]any{\n\t\"tax_zone\": map[string]any{\n\t\t\"name\": \"Sydney Metro\", \"countries\": []map[string]any{{\"id\": 12}},\n\t\t\"states\": []map[string]any{{\"id\": 67}}, \"post_code\": []string{\"2000\", \"3000\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nzone := resp.Map().(map[string]any)[\"tax_zone\"].(map[string]any)\nfmt.Println(zone[\"id\"], zone[\"name\"], zone[\"post_code\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_zone"
+                ],
+                "properties": {
+                  "tax_zone": {
+                    "$ref": "#/components/schemas/TaxZoneInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/tax_zones/{tax_zone_id}": {
+      "get": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "Retrieve a tax zone",
+        "operationId": "get_tax_zone",
+        "description": "Returns one tax zone under the `tax_zone` key, with the same twelve fields a listing row has. `post_code` comes back as a list of lists, such as `[[\"2000\"], [\"3000\"]]`. The response has no `ETag` or `Last-Modified` header.",
+        "parameters": [
+          {
+            "name": "tax_zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax zone's `id`, from a listing or from the response to creating the zone.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The tax zone.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_zone": {
+                      "$ref": "#/components/schemas/TaxZone"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_zone": {
+                    "id": 1,
+                    "name": "New South Wales",
+                    "system_generated": true,
+                    "default": false,
+                    "use_radius": false,
+                    "radius": 0.0,
+                    "start_location": "",
+                    "countries": [
+                      {
+                        "id": 12,
+                        "name": "Australia",
+                        "code": "AU"
+                      }
+                    ],
+                    "states": [
+                      {
+                        "id": 67,
+                        "name": "New South Wales",
+                        "code": "NSW"
+                      }
+                    ],
+                    "post_code": [],
+                    "created_at": "2026-01-12T03:20:00",
+                    "updated_at": "2026-01-12T03:20:00"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No zone has that `tax_zone_id`. The message is `Rule not found`, not the `Zone not found` that a delete returns. The next retrieve you send on the same connection, from any tax collection, returns `404` too, even when that record exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax_zones/1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.get_tax_zone(1)\ntax_zone = response.map[\"tax_zone\"]\nprint(tax_zone[\"name\"], [country[\"code\"] for country in tax_zone[\"countries\"]])\nprint([state[\"code\"] for state in tax_zone[\"states\"]], tax_zone[\"post_code\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.getTaxZone(client, 1);\nconst taxZone = response.map.tax_zone;\nconsole.log(taxZone.name, taxZone.countries, taxZone.states, taxZone.post_code);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::getTaxZone($client, 1);\n\n$zone = $response->map['tax_zone'];\necho $zone['name'], PHP_EOL;\nforeach ($zone['states'] as $state) {\n    echo 'state ', $state['id'], ' ', $state['name'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().getTaxZone(1);\nMap<?, ?> taxZone = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_zone\");\nSystem.out.println(taxZone.get(\"name\"));\nfor (Object state : (List<?>) taxZone.get(\"states\")) {\n    System.out.println(((Map<?, ?>) state).get(\"id\") + \" \" + ((Map<?, ?>) state).get(\"code\"));\n}\nSystem.out.println(taxZone.get(\"post_code\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.GetTaxZoneAsync(1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxZone = (IReadOnlyDictionary<string, object?>)body[\"tax_zone\"]!;\nConsole.WriteLine(taxZone[\"name\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.getTaxZone(1);\nfinal taxZone = (response.map as Map)['tax_zone'] as Map;\nprint(taxZone['name']);\nprint(taxZone['countries']);\nprint(taxZone['states']);\nprint(taxZone['post_code']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().GetTaxZone(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nzone := resp.Map().(map[string]any)[\"tax_zone\"].(map[string]any)\nfmt.Println(zone[\"name\"], zone[\"system_generated\"], zone[\"post_code\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "Check a tax zone",
+        "operationId": "head_tax_zone",
+        "description": "Returns `200` with headers only and no body. It returns `200` even when no zone has that `tax_zone_id`, so it does not tell you whether the zone exists. To check that, use [Retrieve a tax zone](/api-reference/tax-zones/retrieve-a-tax-zone), which returns `404` when no zone has it.",
+        "parameters": [
+          {
+            "name": "tax_zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax zone's `id`, from a listing or from the response to creating the zone.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body. Returned even when no zone has that `tax_zone_id`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/tax_zones/1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.head_tax_zone(1)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.headTaxZone(client, 1);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::headTaxZone($client, 1);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().headTaxZone(1);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.HeadTaxZoneAsync(1);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.headTaxZone(1);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().HeadTaxZone(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "Update a tax zone",
+        "operationId": "update_tax_zone",
+        "description": "Updates the tax zone whose `id` you pass as `tax_zone_id` and returns the updated zone. Wrap the fields in `tax_zone`, and always send `name`: an update without it fails with `500`. The call replaces `countries`, `states` and `post_code` with the lists you send, so a list you leave out comes back empty, and a `use_radius` you leave out comes back `false`. `radius` and `start_location` are saved only with `use_radius: true`, and keep their stored values when you leave them out.",
+        "parameters": [
+          {
+            "name": "tax_zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax zone's `id`, from a listing or from the response to creating the zone.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated tax zone under `tax_zone`. A method these paths do not handle also returns `200`, with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and nothing stored, so check that the response holds `tax_zone`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_zone": {
+                      "$ref": "#/components/schemas/TaxZone"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_zone": {
+                    "id": 83,
+                    "name": "Sydney Metro and Parramatta",
+                    "system_generated": false,
+                    "default": false,
+                    "use_radius": false,
+                    "radius": 0.0,
+                    "start_location": "",
+                    "countries": [
+                      {
+                        "id": 12,
+                        "name": "Australia",
+                        "code": "AU"
+                      }
+                    ],
+                    "states": [
+                      {
+                        "id": 67,
+                        "name": "New South Wales",
+                        "code": "NSW"
+                      }
+                    ],
+                    "post_code": [
+                      [
+                        "2000"
+                      ],
+                      [
+                        "2150"
+                      ]
+                    ],
+                    "created_at": "2026-09-22T04:15:00",
+                    "updated_at": "2026-09-22T04:30:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `tax_zone`. The message is `tax_zone missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has no `name`. Or a `countries` or `states` entry is a plain number, holds only a `code`, or holds an `id` that matches no country or state. Or `post_code` is nested.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax_zones/83\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_zone\": {\n      \"name\": \"Sydney Metro and Parramatta\",\n      \"countries\": [\n        {\n          \"id\": 12\n        }\n      ],\n      \"states\": [\n        {\n          \"id\": 67\n        }\n      ],\n      \"post_code\": [\n        \"2000\",\n        \"2150\"\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.update_tax_zone(83, {\n    \"tax_zone\": {\n        \"name\": \"Sydney Metro and Parramatta\",\n        \"countries\": [{\"id\": 12}],\n        \"states\": [{\"id\": 67}],\n        \"post_code\": [\"2000\", \"2150\"],\n    },\n})\ntax_zone = response.map[\"tax_zone\"]\nprint(tax_zone[\"name\"], tax_zone[\"post_code\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.updateTaxZone(client, 83, {\n    tax_zone: {\n        name: 'Sydney Metro and Parramatta',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '2150'],\n    },\n});\nconsole.log(response.map.tax_zone.name, response.map.tax_zone.post_code);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::updateTaxZone($client, 83, [\n    'tax_zone' => [\n        'name' => 'Sydney Metro and Parramatta',\n        'countries' => [['id' => 12]],\n        'states' => [['id' => 67]],\n        'post_code' => ['2000', '2150'],\n    ],\n]);\n\necho $response->map['tax_zone']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().updateTaxZone(83, Map.of(\"tax_zone\", Map.of(\n        \"name\", \"Sydney Metro and Parramatta\",\n        \"countries\", List.of(Map.of(\"id\", 12)),\n        \"states\", List.of(Map.of(\"id\", 67)),\n        \"post_code\", List.of(\"2000\", \"2150\"))));\nMap<?, ?> taxZone = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_zone\");\nSystem.out.println(taxZone.get(\"name\") + \" \" + taxZone.get(\"post_code\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.UpdateTaxZoneAsync(83, new Dictionary<string, object?>\n{\n    [\"tax_zone\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Sydney Metro and Parramatta\", [\"post_code\"] = new List<object?> { \"2000\", \"2150\" },\n        [\"countries\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 12 } },\n        [\"states\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 67 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxZone = (IReadOnlyDictionary<string, object?>)body[\"tax_zone\"]!;\nConsole.WriteLine(taxZone[\"name\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.updateTaxZone(83, {\n  'tax_zone': {\n    'name': 'Sydney Metro and Parramatta',\n    'countries': [{'id': 12}],\n    'states': [{'id': 67}],\n    'post_code': ['2000', '2150'],\n  },\n});\nfinal taxZone = (response.map as Map)['tax_zone'] as Map;\nprint('${taxZone['name']} ${taxZone['post_code']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().UpdateTaxZone(ctx, 83, map[string]any{\n\t\"tax_zone\": map[string]any{\n\t\t\"name\": \"Sydney Metro and Parramatta\", \"countries\": []map[string]any{{\"id\": 12}},\n\t\t\"states\": []map[string]any{{\"id\": 67}}, \"post_code\": []string{\"2000\", \"2150\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nzone := resp.Map().(map[string]any)[\"tax_zone\"].(map[string]any)\nfmt.Println(zone[\"name\"], zone[\"post_code\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_zone"
+                ],
+                "properties": {
+                  "tax_zone": {
+                    "$ref": "#/components/schemas/TaxZoneInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tax zones"
+        ],
+        "summary": "Delete a tax zone",
+        "operationId": "delete_tax_zone",
+        "description": "Deletes the zone permanently and returns `204` with no body. The zone leaves the listing, and `pagination.total` goes down by one. A `DELETE` sent straight after a `404` from a tax endpoint returns that same `404` and deletes nothing; sent after a successful read, it deletes the zone.",
+        "parameters": [
+          {
+            "name": "tax_zone_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax zone's `id`, from a listing or from the response to creating the zone.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No zone has that `tax_zone_id`, including a zone you already deleted. The message is `Zone not found`. You also get the previous request's `404`, with nothing deleted, when the tax request just before this one was rejected with `404`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax_zones/83\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_zones.delete_tax_zone(83)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.deleteTaxZone(client, 83);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxZones\\TaxZones;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxZones::deleteTaxZone($client, 83);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxZones().deleteTaxZone(83);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxZones.DeleteTaxZoneAsync(83);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxZones.deleteTaxZone(83);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxZones().DeleteTaxZone(ctx, 83, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -19643,6 +20438,227 @@
             "items": {
               "type": "object"
             }
+          }
+        }
+      },
+      "TaxZone": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The tax zone's `id`, assigned by the store. The other calls take it as `tax_zone_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The zone's name. Required on a create and on every update."
+          },
+          "system_generated": {
+            "type": "boolean",
+            "description": "`true` on the zones the store created itself. Read-only: a zone you create has `false`."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "Read-only. A zone you create has `false`, even if you send `true`."
+          },
+          "use_radius": {
+            "type": "boolean",
+            "description": "Whether a write saves `radius` and `start_location`. An update that leaves it out sets it to `false`."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Stored as a whole number: `7.5` reads back as `7`. A write saves it only when you also send `use_radius: true`; a create without `use_radius: true` stores `0.0`."
+          },
+          "start_location": {
+            "type": "string",
+            "description": "A write saves it only when you also send `use_radius: true`; a create without `use_radius: true` stores `\"\"`."
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxZoneCountry"
+            },
+            "description": "The countries in the zone. An update that leaves it out empties it."
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxZoneState"
+            },
+            "description": "The states in the zone. An update that leaves it out empties it."
+          },
+          "post_code": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "The zone's post codes, each in a list of its own: `[[\"2000\"], [\"3000\"]]`. You send them as a flat list. An update that leaves it out empties it."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the zone was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "When the zone was last changed."
+          }
+        }
+      },
+      "TaxZoneCountry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's `id`. Send it in a zone's `countries` list, as in `[{\"id\": 12}]`, to add this country to the zone."
+          },
+          "name": {
+            "type": "string",
+            "description": "The country's name."
+          },
+          "code": {
+            "type": "string",
+            "description": "The country's code."
+          }
+        }
+      },
+      "TaxZoneState": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The state's `id`. Send it in a zone's `states` list, as in `[{\"id\": 67}]`, to add this state to the zone."
+          },
+          "name": {
+            "type": "string",
+            "description": "The state's name."
+          },
+          "code": {
+            "type": "string",
+            "description": "The state's code."
+          }
+        }
+      },
+      "TaxZoneInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required on a create and on every update. A body without it fails with `500`."
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxZoneCountryInput"
+            },
+            "description": "The countries in the zone, such as `[{\"id\": 12}]`. On an update, leaving it out empties the list."
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxZoneStateInput"
+            },
+            "description": "The states in the zone, such as `[{\"id\": 67}]`. On an update, leaving it out empties the list."
+          },
+          "post_code": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "A flat list, such as `[\"2000\", \"3000\"]`. The nested form a zone returns fails with `500`. On an update, leaving it out empties the list."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Saved only when you also send `use_radius: true`. Stored as a whole number, so `7.5` reads back as `7`."
+          },
+          "start_location": {
+            "type": "string",
+            "description": "Saved only when you also send `use_radius: true`."
+          },
+          "use_radius": {
+            "type": "boolean",
+            "description": "Send `true` to store `radius` and `start_location`. On an update, leaving it out sets it to `false`."
+          }
+        }
+      },
+      "TaxZoneCountryInput": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "description": "A record holding the country's `id`. A plain number instead of a record, a record with only a `code`, or an `id` that matches no country fails with `500`.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's `id`, as a zone's `countries` list returns it."
+          }
+        }
+      },
+      "TaxZoneStateInput": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "description": "A record holding the state's `id`. A plain number instead of a record, a record with only a `code`, or an `id` that matches no state fails with `500`.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The state's `id`, as a zone's `states` list returns it."
+          }
+        }
+      },
+      "TaxZonePagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of tax zones in the store."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. At most `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of zones skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of zones on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The number of this page."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "The number of pages."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "Whether more zones follow this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "Whether zones come before this page."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the previous page, or `null` on the first page."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the next page, or `null` on the last page."
           }
         }
       }

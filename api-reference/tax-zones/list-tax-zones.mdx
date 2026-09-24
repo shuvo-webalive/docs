@@ -1,0 +1,9 @@
+---
+title: "List tax zones"
+description: "Returns up to 20 tax zones per call, with paging details in `pagination`."
+openapi: "GET /admin/tax_zones"
+---
+
+Returns the tax zones under `tax_zones`, up to 20 per call, with a `pagination` block. Each zone has the same twelve fields that [Retrieve a tax zone](/api-reference/tax-zones/retrieve-a-tax-zone) returns. To get every zone, raise `offset` by the number of zones each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored: `q` does not filter the zones, and `field_metadata=true` returns no field descriptions.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
