@@ -54,9 +54,7 @@
                 "properties": {
                   "grant_type": {
                     "type": "string",
-                    "enum": [
-                      "client_credentials"
-                    ],
+                    "const": "client_credentials",
                     "default": "client_credentials",
                     "description": "Always `client_credentials`."
                   },
