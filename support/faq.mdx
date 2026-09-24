@@ -1,0 +1,215 @@
+---
+title: "SDK Knowledge Base FAQ: Setup, Auth, and Best Practices"
+sidebarTitle: "FAQ"
+description: "Find answers to the most common questions about SDK Knowledge Base setup, configuration, supported runtimes, rate limits, and best practices."
+---
+
+The SDK Knowledge Base FAQ collects the questions developers ask most often — from obtaining your first API key to managing multiple credentials in a single application. Browse the sections below to find quick, actionable answers.
+
+<AccordionGroup>
+  <Accordion title="How do I get an API key?">
+    Every request to SDK Knowledge Base requires an API key that identifies your account.
+
+    1. Log in to the [SDK Knowledge Base dashboard](https://dashboard.sdkknowledgebase.com).
+    2. Navigate to **Settings → API Keys**.
+    3. Click **Create new key**, give it a descriptive name, and choose the appropriate permissions scope.
+    4. Copy the key immediately — it is shown only once.
+
+    Store the key in an environment variable (for example, `SDK_KB_API_KEY`) and pass it to the SDK client at initialisation time. Never hard-code API keys in source files or commit them to version control.
+
+    <Note>
+      If you lose a key, revoke it immediately from the dashboard and generate a replacement.
+    </Note>
+  </Accordion>
+
+  <Accordion title="What languages and runtimes does the SDK support?">
+    SDK Knowledge Base ships official SDK packages for the following languages and runtimes:
+
+    | Language | Package | Minimum version |
+    |---|---|---|
+    | TypeScript / JavaScript | `@sdkkb/sdk` (npm) | Node.js 18 LTS |
+    | Python | `sdkkb` (PyPI) | Python 3.9 |
+    | Go | `github.com/sdkkb/sdk-go` | Go 1.21 |
+    | Java | `com.sdkkb:sdk` (Maven) | Java 11 |
+    | Ruby | `sdkkb` (RubyGems) | Ruby 3.1 |
+
+    Community-maintained packages are available for Rust, PHP, and .NET — see the [community SDKs](https://github.com/sdkkb/community) repository for links and maturity levels.
+  </Accordion>
+
+  <Accordion title="How do I handle rate limits?">
+    SDK Knowledge Base enforces per-account rate limits measured in requests per minute (RPM) and tokens per minute (TPM). When you exceed a limit the API responds with a `429 Too Many Requests` status code.
+
+    The SDK's built-in retry logic handles `429` responses automatically using **exponential backoff with jitter**. You can tune the behaviour through the client configuration:
+
+    ```ts
+    import { SDKClient } from "@sdkkb/sdk";
+
+    const client = new SDKClient({
+      apiKey: process.env.SDK_KB_API_KEY,
+      maxRetries: 5,          // default: 3
+      retryDelay: 500,        // base delay in ms
+    });
+    ```
+
+    <Tip>
+      Inspect the `X-RateLimit-Remaining` and `X-RateLimit-Reset` headers in the raw response to build more precise throttling logic in high-throughput applications.
+    </Tip>
+
+    If you consistently hit limits, consider requesting a higher-tier plan or batching requests where the API supports it.
+  </Accordion>
+
+  <Accordion title="Can I use the SDK in the browser?">
+    The JavaScript/TypeScript SDK ships a dedicated **browser bundle** (`@sdkkb/sdk/browser`) that excludes Node.js-specific modules and works with modern bundlers such as Vite, webpack, and esbuild.
+
+    <Warning>
+      Never expose your secret API key in browser code. Browser clients should authenticate through a **short-lived session token** issued by your own backend. See the [authentication guide](/authentication) for security best practices.
+    </Warning>
+
+    ```ts
+    import { SDKClient } from "@sdkkb/sdk/browser";
+
+    const client = new SDKClient({ sessionToken: userSessionToken });
+    ```
+
+    The browser bundle does not include server-side features such as webhook signature verification or admin-scoped API methods.
+  </Accordion>
+
+  <Accordion title="How do I migrate from an older version?">
+    The recommended migration path depends on which version you are upgrading from:
+
+    - **v1.x → v2.x** — This is a major release with breaking changes. Read the [v2.0.0 changelog entry](/support/changelog#v200) and follow the migration steps before upgrading.
+    - **v2.0.x → v2.1.x** — A backwards-compatible minor release. Update the package version and review the [changelog](/support/changelog#v210) for new opt-in features.
+
+    Always run your test suite after upgrading. Enable TypeScript strict mode to surface type-level incompatibilities early:
+
+    ```jsonc
+    // tsconfig.json
+    { "compilerOptions": { "strict": true } }
+    ```
+
+    Use the [migration CLI tool](https://github.com/sdkkb/migrate) to automatically rewrite the most common API call patterns:
+
+    ```bash
+    npx @sdkkb/migrate --from 1 --to 2 ./src
+    ```
+  </Accordion>
+
+  <Accordion title="What is the difference between test mode and live mode?">
+    SDK Knowledge Base operates in two modes controlled by the type of API key you provide:
+
+    | | Test mode | Live mode |
+    |---|---|---|
+    | Key prefix | `test_` | `live_` |
+    | Data persistence | Isolated sandbox | Production database |
+    | Billing | Never billed | Billed per usage |
+    | Webhooks | Delivered to test endpoints | Delivered to live endpoints |
+
+    Test-mode requests never affect live data and are never billed. Use test mode during development and CI. Switch to a `live_` key only when deploying to production.
+
+    <Note>
+      Test-mode and live-mode resources (records, indexes, etc.) are completely separate — you cannot reference a test-mode resource ID from a live-mode request.
+    </Note>
+  </Accordion>
+
+  <Accordion title="How do I enable debug logging?">
+    Pass the `logLevel` option to the SDK client to increase verbosity:
+
+    ```ts
+    import { SDKClient } from "@sdkkb/sdk";
+
+    const client = new SDKClient({
+      apiKey: process.env.SDK_KB_API_KEY,
+      logLevel: "debug", // "silent" | "error" | "warn" | "info" | "debug"
+    });
+    ```
+
+    At the `debug` level the SDK prints every outgoing request URL, headers (with the API key redacted), response status, retry attempts, and timing information to `stderr`.
+
+    You can also set the environment variable `SDK_KB_LOG_LEVEL=debug` without changing code — useful for diagnosing issues in deployed environments without a redeploy.
+
+    <Tip>
+      Pipe debug output through a JSON formatter such as `pino-pretty` or `bunyan` if your application uses structured logging.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Does the SDK support TypeScript?">
+    Yes. The `@sdkkb/sdk` package is **written entirely in TypeScript** and ships bundled type declarations — no `@types/` package is needed. All request parameters, response shapes, and error classes are fully typed.
+
+    The SDK requires TypeScript **4.7 or later** and takes advantage of features such as template literal types, `satisfies`, and variadic tuple types for precise inference.
+
+    Enable `"strict": true` in your `tsconfig.json` to get the full benefit of the type system. If you encounter a type error after upgrading, check the [troubleshooting guide](/support/troubleshooting#typescript-type-errors-after-upgrade) for common solutions.
+  </Accordion>
+
+  <Accordion title="How do I report a bug or request a feature?">
+    - **Bug reports** — Open an issue on the relevant [GitHub repository](https://github.com/sdkkb). Include the SDK version, runtime version, a minimal reproducible example, and the full error message or stack trace.
+    - **Feature requests** — Use the [GitHub Discussions board](https://github.com/sdkkb/sdk/discussions) to propose features and gauge community interest before a formal issue is filed.
+    - **Security vulnerabilities** — Do **not** open a public issue. Email [security@sdkknowledgebase.com](mailto:security@sdkknowledgebase.com) with details. We follow a 90-day coordinated disclosure policy.
+
+    <Tip>
+      Check the [open issues](https://github.com/sdkkb/sdk/issues) list and [roadmap](https://github.com/orgs/sdkkb/projects/1) before filing — your bug or idea may already be tracked.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="What are the SDK's SLA and uptime guarantees?">
+    Uptime and SLA guarantees depend on your plan:
+
+    | Plan | Uptime SLA | Support response time |
+    |---|---|---|
+    | Free | No SLA | Community forums |
+    | Starter | 99.5% monthly | 2 business days |
+    | Pro | 99.9% monthly | 8 business hours |
+    | Enterprise | 99.99% monthly | 1 hour (24/7) |
+
+    SLA credits are applied automatically when measured uptime falls below the guarantee in a given calendar month. Review the full [SLA policy](https://sdkknowledgebase.com/legal/sla) for exclusion details such as scheduled maintenance windows.
+
+    Monitor real-time and historical availability on the [status page](https://status.sdkknowledgebase.com) and subscribe to incident notifications.
+  </Accordion>
+
+  <Accordion title="How do I set a custom timeout?">
+    Pass the `timeout` option (in milliseconds) when creating the client, or override it per-request:
+
+    ```ts
+    // Global timeout for all requests
+    const client = new SDKClient({
+      apiKey: process.env.SDK_KB_API_KEY,
+      timeout: 10_000, // 10 seconds (default: 30 000)
+    });
+
+    // Per-request override
+    const result = await client.documents.get("doc_123", {
+      timeout: 5_000,
+    });
+    ```
+
+    When a request exceeds its timeout the SDK throws a `TimeoutError` (a subclass of `SDKError`), so you can catch it specifically:
+
+    ```ts
+    import { TimeoutError } from "@sdkkb/sdk";
+
+    try {
+      const result = await client.documents.get("doc_123");
+    } catch (err) {
+      if (err instanceof TimeoutError) {
+        console.error("Request timed out — consider increasing the timeout or retrying later.");
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Can I use multiple API keys in the same application?">
+    Yes. Instantiate a separate `SDKClient` for each API key. Each client instance maintains its own connection pool, retry state, and configuration:
+
+    ```ts
+    import { SDKClient } from "@sdkkb/sdk";
+
+    const tenantAClient = new SDKClient({ apiKey: process.env.TENANT_A_KEY });
+    const tenantBClient = new SDKClient({ apiKey: process.env.TENANT_B_KEY });
+
+    // Requests are isolated per client
+    const docsA = await tenantAClient.documents.list();
+    const docsB = await tenantBClient.documents.list();
+    ```
+
+    This pattern is common in multi-tenant SaaS applications where each tenant has a distinct SDK Knowledge Base account. Be mindful of the total number of open connections — call `client.destroy()` to release resources when a client is no longer needed.
+  </Accordion>
+</AccordionGroup>

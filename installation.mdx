@@ -1,0 +1,141 @@
+---
+title: "Installing SDK Knowledge Base – Setup & Requirements"
+sidebarTitle: "Installation"
+description: "Install the SDK Knowledge Base with npm, yarn, or pnpm, verify your setup, and understand the system requirements for Node.js and browser environments."
+---
+
+The SDK Knowledge Base is distributed as a standard npm package and works in any JavaScript runtime that meets the requirements below. Choose the installation method that matches your project's package manager, then follow the verification step to confirm everything is wired up correctly.
+
+## System requirements
+
+Before you install, make sure your environment meets these minimum requirements:
+
+| Requirement | Minimum version |
+|---|---|
+| Node.js | 16.x or later (LTS recommended) |
+| npm | 7.x or later |
+| yarn | 1.22.x or later |
+| pnpm | 7.x or later |
+| TypeScript *(optional)* | 4.7 or later |
+| Browser | Any evergreen browser with `fetch` support |
+
+<Note>
+  The SDK targets ES2020 and uses the native `fetch` API. In Node.js 16 and 17 you may need to pass `--experimental-fetch`. Node.js 18+ ships `fetch` as stable — no flags required.
+</Note>
+
+## Install the package
+
+<CodeGroup>
+  ```bash npm
+  npm install sdk-knowledge-base
+  ```
+
+  ```bash yarn
+  yarn add sdk-knowledge-base
+  ```
+
+  ```bash pnpm
+  pnpm add sdk-knowledge-base
+  ```
+</CodeGroup>
+
+The package is approximately 45 kB unpacked and has **zero mandatory production dependencies**, so it won't bloat your `node_modules` or browser bundle.
+
+## Verify the installation
+
+After installing, run the following snippet to confirm the package resolves and the version matches what you installed:
+
+```typescript
+import { SdkKnowledgeBase, VERSION } from "sdk-knowledge-base";
+
+console.log("SDK version:", VERSION);
+// → SDK version: 1.x.x
+```
+
+Or from the command line:
+
+```bash
+node -e "const { VERSION } = require('sdk-knowledge-base'); console.log(VERSION);"
+```
+
+If the version prints without error, the installation succeeded.
+
+## Optional peer dependencies
+
+Certain features activate automatically when optional packages are present in your project. None of these are required for core SDK functionality.
+
+| Package | Purpose |
+|---|---|
+| `zod` | Enables runtime schema validation on API responses |
+| `opentelemetry-api` | Enables automatic OpenTelemetry span creation per request |
+| `winston` | Pipes SDK log output into your existing Winston logger |
+| `pino` | Pipes SDK log output into your existing Pino logger |
+
+Install whichever you need alongside the SDK:
+
+```bash
+npm install sdk-knowledge-base zod
+```
+
+The SDK detects these packages at runtime via dynamic `require`/`import` and enables the relevant integration automatically — no extra configuration required.
+
+## Node.js vs. browser usage
+
+The SDK supports both Node.js server environments and modern browser applications. The API surface is identical, but a few details differ between the two targets.
+
+<Tabs>
+  <Tab title="Node.js">
+    In Node.js, import or require the SDK normally. The client reads environment variables directly, and all networking goes through the built-in `fetch` implementation (Node.js 18+) or the `node-fetch` polyfill in older runtimes.
+
+    ```typescript
+    // ESM (recommended for Node.js 18+)
+    import { SdkKnowledgeBase } from "sdk-knowledge-base";
+
+    const client = new SdkKnowledgeBase({
+      apiKey: process.env.SDK_KB_API_KEY as string,
+      // Optional: set a custom base URL for local proxies or staging
+      baseUrl: process.env.SDK_KB_BASE_URL ?? "https://api.sdkkb.io/v1",
+    });
+    ```
+
+    ```javascript
+    // CommonJS (compatible with older Node.js toolchains)
+    const { SdkKnowledgeBase } = require("sdk-knowledge-base");
+
+    const client = new SdkKnowledgeBase({
+      apiKey: process.env.SDK_KB_API_KEY,
+    });
+    ```
+
+    **Supported runtimes:** Node.js 16+, AWS Lambda, Google Cloud Functions, Vercel Serverless Functions, Cloudflare Workers (Node.js compatibility mode).
+  </Tab>
+  <Tab title="Browser">
+    In browser environments, import the SDK through your bundler (Vite, webpack, Rollup, esbuild). Do **not** embed your API key in client-side code — proxy all requests through your own backend or a serverless function instead.
+
+    ```typescript
+    // Bundler-based browser project (Vite / webpack / Rollup)
+    import { SdkKnowledgeBase } from "sdk-knowledge-base";
+
+    // In browsers, point the SDK at your own backend proxy,
+    // not directly at the SDK Knowledge Base API.
+    const client = new SdkKnowledgeBase({
+      apiKey: "",             // leave blank — your proxy handles auth
+      baseUrl: "/api/proxy",  // your server-side proxy endpoint
+    });
+    ```
+
+    The SDK's `fetch` calls respect the browser's CORS policy. Make sure your proxy sets the appropriate `Access-Control-Allow-Origin` headers.
+
+    **Supported environments:** Chrome 90+, Firefox 90+, Safari 14+, Edge 90+, any environment with the `fetch` and `Promise` globals available.
+  </Tab>
+</Tabs>
+
+## Upgrading
+
+To upgrade to the latest version, re-run your install command with the `@latest` tag:
+
+```bash
+npm install sdk-knowledge-base@latest
+```
+
+Check the [changelog](/support/changelog) after each upgrade — breaking changes are clearly marked and migration guides are provided for every major version bump.

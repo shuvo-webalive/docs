@@ -1,0 +1,228 @@
+---
+title: "Initializing the SDK Client: Constructor & Patterns Guide"
+sidebarTitle: "Initialization"
+description: "Learn every way to instantiate SDKClient: minimal setup, full configuration, singleton, multi-tenant, and lazy initialization patterns."
+---
+
+Before you can make any API calls, you need an `SDKClient` instance. The client manages your credentials, connection settings, and resource accessors in one place. This page documents the constructor signature in full and walks through the most common initialization patterns you will encounter in real applications.
+
+## Installation
+
+Install the SDK Knowledge Base package from npm before you begin:
+
+<CodeGroup>
+```bash npm
+npm install @your-org/sdk
+```
+
+```bash pnpm
+pnpm add @your-org/sdk
+```
+
+```bash yarn
+yarn add @your-org/sdk
+```
+</CodeGroup>
+
+## Minimal Initialization
+
+Pass only your API key to get started immediately. The client fills in all other options with sensible defaults.
+
+```typescript
+import { SDKClient } from '@your-org/sdk';
+
+const client = new SDKClient({
+  apiKey: process.env.API_KEY!,
+});
+```
+
+<Warning>
+  Never hard-code your API key directly in source code. Always read it from an environment variable or a secrets manager to avoid accidental credential exposure in version control.
+</Warning>
+
+## Full Initialization
+
+The example below sets every available option explicitly. See [SDK Configuration Reference](/sdk/configuration) for a complete description of each field.
+
+```typescript
+import { SDKClient } from '@your-org/sdk';
+
+const client = new SDKClient({
+  apiKey: process.env.API_KEY!,
+  baseUrl: 'https://api.example.com/v1',
+  timeout: 15_000,
+  maxRetries: 5,
+  retryDelay: 500,
+  headers: {
+    'X-App-Version': '2.1.0',
+    'X-Request-Source': 'backend-worker',
+  },
+  logLevel: 'debug',
+});
+```
+
+## Constructor Signature
+
+```typescript
+new SDKClient(config: Config): SDKClient
+```
+
+<ParamField body="apiKey" type="string" required>
+  Your SDK Knowledge Base API key. The client sends this value as a `Bearer` token in the `Authorization` header on every request. Rotate keys in the dashboard — do not share them across environments.
+</ParamField>
+
+<ParamField body="baseUrl" type="string" default="https://api.example.com/v1">
+  The base URL for all API requests. Override this to point at a staging environment, a self-hosted instance, or a local mock server during testing.
+</ParamField>
+
+<ParamField body="timeout" type="number" default={30000}>
+  Request timeout in milliseconds. If the server does not respond within this window, the SDK throws a `TimeoutError`. Set to `0` to disable the timeout entirely (not recommended for production).
+</ParamField>
+
+<ParamField body="maxRetries" type="number" default={3}>
+  Maximum number of automatic retry attempts for transient failures (network errors, 429 rate-limit responses, and 5xx server errors). Set to `0` to disable retries.
+</ParamField>
+
+<ParamField body="retryDelay" type="number" default={1000}>
+  Base delay in milliseconds between retry attempts. The SDK uses exponential back-off: attempt *n* waits `retryDelay * 2^(n-1)` ms before retrying.
+</ParamField>
+
+<ParamField body="headers" type="Record<string, string>">
+  Additional HTTP headers to attach to every request. Use this for app-level metadata (version tags, trace IDs, tenant identifiers) that you want sent on every call without repeating them per-request.
+</ParamField>
+
+<ParamField body="logLevel" type="'debug' | 'info' | 'warn' | 'error' | 'silent'" default="'warn'">
+  Controls the verbosity of SDK-internal log output. Use `'debug'` during development to inspect request/response details. Set to `'silent'` in production if you manage observability through other means.
+</ParamField>
+
+<ParamField body="httpClient" type="HttpClient">
+  A custom HTTP client that satisfies the `HttpClient` interface. Provide this to use a specific `fetch` implementation, inject a proxy, or intercept requests in tests without mocking at the network layer.
+</ParamField>
+
+<ParamField body="signal" type="AbortSignal">
+  A global `AbortSignal` that cancels all in-flight requests when triggered. You can also pass a signal per-request; the per-request signal takes precedence. Useful for shutting down gracefully.
+</ParamField>
+
+## Singleton Pattern
+
+Most applications need only one `SDKClient` instance. Creating the client once and exporting it prevents redundant connections and keeps configuration in a single place.
+
+```typescript
+// lib/sdk.ts
+import { SDKClient } from '@your-org/sdk';
+
+let _client: SDKClient | null = null;
+
+export function getClient(): SDKClient {
+  if (!_client) {
+    _client = new SDKClient({
+      apiKey: process.env.API_KEY!,
+      logLevel: process.env.NODE_ENV === 'development' ? 'debug' : 'warn',
+    });
+  }
+  return _client;
+}
+```
+
+```typescript
+// anywhere in your app
+import { getClient } from '@/lib/sdk';
+
+const users = await getClient().users.list();
+```
+
+<Note>
+  `SDKClient` is **thread-safe** for concurrent use. Node.js runs on a single thread, so multiple async operations sharing one client instance will not corrupt shared state. The client does not hold per-request mutable state.
+</Note>
+
+## Lazy Initialization Pattern
+
+If the API key is not available at module load time (for example, it is fetched from a remote secrets manager on startup), defer construction until first use:
+
+```typescript
+// lib/sdk.ts
+import { SDKClient } from '@your-org/sdk';
+
+let _client: SDKClient | undefined;
+
+export async function getClient(): Promise<SDKClient> {
+  if (_client) return _client;
+
+  // Fetch the secret only once
+  const apiKey = await fetchSecretFromVault('SDK_API_KEY');
+
+  _client = new SDKClient({ apiKey });
+  return _client;
+}
+```
+
+<Tip>
+  Wrap the lazy initialization in a mutex or use a shared promise if your server handles many concurrent requests at startup. Otherwise two requests arriving simultaneously before `_client` is set could each trigger the vault fetch.
+</Tip>
+
+## Multi-Tenant Pattern
+
+In multi-tenant applications, you may need one client per tenant so that each tenant's requests use a different API key or custom headers. Create clients on demand and cache them by tenant ID.
+
+```typescript
+// lib/sdk.ts
+import { SDKClient } from '@your-org/sdk';
+
+const clientCache = new Map<string, SDKClient>();
+
+export function getClientForTenant(tenantId: string, apiKey: string): SDKClient {
+  if (clientCache.has(tenantId)) {
+    return clientCache.get(tenantId)!;
+  }
+
+  const client = new SDKClient({
+    apiKey,
+    headers: {
+      'X-Tenant-ID': tenantId,
+    },
+  });
+
+  clientCache.set(tenantId, client);
+  return client;
+}
+```
+
+```typescript
+// In a request handler
+import { getClientForTenant } from '@/lib/sdk';
+
+async function handleRequest(req: Request) {
+  const { tenantId, apiKey } = await resolveTenant(req);
+  const client = getClientForTenant(tenantId, apiKey);
+
+  const projects = await client.projects.list();
+  return Response.json(projects);
+}
+```
+
+<Warning>
+  Caching clients in a long-lived map means API keys are held in memory for the lifetime of the cache entry. Implement a cache eviction policy (LRU, TTL) and ensure you clear the entry when a tenant's key is rotated.
+</Warning>
+
+## Testing with a Custom HTTP Client
+
+Inject a mock HTTP client at initialization time to test your application code without making real network requests:
+
+```typescript
+import { SDKClient, type HttpClient } from '@your-org/sdk';
+
+const mockHttpClient: HttpClient = {
+  async request(req) {
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ data: [], total: 0 }),
+    };
+  },
+};
+
+const client = new SDKClient({
+  apiKey: 'test-key',
+  httpClient: mockHttpClient,
+});
+```

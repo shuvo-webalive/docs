@@ -1,0 +1,369 @@
+---
+title: "Testing Your SDK Knowledge Base Integration Thoroughly"
+sidebarTitle: "Testing"
+description: "Learn how to use test mode API keys, mock the SDK client for unit tests, write integration tests, and manage test data cleanly across your test suite."
+---
+
+A reliable test suite gives you confidence that your integration behaves correctly before changes reach production. The SDK Knowledge Base platform supports two modes — test and live — so you can exercise every code path without touching real data. This guide covers the full testing stack: unit tests with mocks, integration tests against the test environment, and strategies for keeping test data clean.
+
+## Test mode vs live mode
+
+The platform uses two separate environments, distinguished entirely by the prefix of your API key.
+
+| Environment | Key prefix | Data | Billing |
+|---|---|---|---|
+| **Test** | `sk_test_` | Isolated test data, never affects live | Never charged |
+| **Live** | `sk_live_` | Real production data | Charged per usage |
+
+Requests made with a `sk_test_` key never touch your production data and do not generate real charges. The test environment's API surface is identical to production, so any code that works in test mode will work in live mode without changes.
+
+<Tip>
+  Store both keys as environment variables and select the right one based on `NODE_ENV`. A single `SDK_KB_API_KEY` variable set per environment prevents any risk of accidentally using a live key in tests.
+
+  ```bash
+  # .env.test
+  SDK_KB_API_KEY=sk_test_your_test_key_here
+
+  # .env.production
+  SDK_KB_API_KEY=sk_live_your_live_key_here
+  ```
+</Tip>
+
+---
+
+## Mock the SDK client for unit tests
+
+Unit tests should run fast and without network access. Inject a mock HTTP client (or mock individual SDK methods directly) to keep tests deterministic and offline.
+
+<Tabs>
+  <Tab title="Jest">
+    ```typescript src/__tests__/order-service.test.ts
+    import { SdkKnowledgeBase } from "@sdk-knowledge-base/client";
+    import { OrderService } from "../order-service";
+
+    // Auto-mock the entire SDK module
+    jest.mock("@sdk-knowledge-base/client");
+
+    const MockedClient = SdkKnowledgeBase as jest.MockedClass<typeof SdkKnowledgeBase>;
+
+    const MOCK_ORDER = {
+      id: "ord_test_001",
+      status: "pending",
+      total: 149.99,
+      currency: "USD",
+      created_at: "2024-05-12T09:00:00.000Z",
+      updated_at: "2024-05-12T09:00:00.000Z",
+    };
+
+    beforeEach(() => {
+      MockedClient.mockClear();
+
+      // Set up the mock implementation for each method you use
+      MockedClient.prototype.orders = {
+        create: jest.fn().mockResolvedValue(MOCK_ORDER),
+        get: jest.fn().mockResolvedValue(MOCK_ORDER),
+        update: jest.fn().mockResolvedValue({ ...MOCK_ORDER, status: "confirmed" }),
+        delete: jest.fn().mockResolvedValue({ id: "ord_test_001", deleted: true }),
+        list: jest.fn().mockResolvedValue({ items: [MOCK_ORDER], total: 1, next_cursor: null }),
+      } as any;
+    });
+
+    describe("OrderService", () => {
+      it("creates an order and returns its id", async () => {
+        const client = new SdkKnowledgeBase({ apiKey: "sk_test_mock" });
+        const service = new OrderService(client);
+
+        const orderId = await service.placeOrder({ productId: "prod_001", quantity: 2 });
+
+        expect(client.orders.create).toHaveBeenCalledWith(
+          expect.objectContaining({ productId: "prod_001", quantity: 2 })
+        );
+        expect(orderId).toBe("ord_test_001");
+      });
+
+      it("throws when the order is not found", async () => {
+        const client = new SdkKnowledgeBase({ apiKey: "sk_test_mock" });
+        (client.orders.get as jest.Mock).mockRejectedValue(
+          new Error("ResourceNotFoundError")
+        );
+
+        const service = new OrderService(client);
+
+        await expect(service.getOrder("ord_missing")).rejects.toThrow(
+          "ResourceNotFoundError"
+        );
+      });
+    });
+    ```
+  </Tab>
+  <Tab title="Vitest">
+    ```typescript src/__tests__/order-service.test.ts
+    import { vi, describe, it, expect, beforeEach } from "vitest";
+    import { SdkKnowledgeBase } from "@sdk-knowledge-base/client";
+    import { OrderService } from "../order-service";
+
+    vi.mock("@sdk-knowledge-base/client");
+
+    const MOCK_ORDER = {
+      id: "ord_test_001",
+      status: "pending",
+      total: 149.99,
+      currency: "USD",
+      created_at: "2024-05-12T09:00:00.000Z",
+      updated_at: "2024-05-12T09:00:00.000Z",
+    };
+
+    beforeEach(() => {
+      vi.mocked(SdkKnowledgeBase).mockClear();
+
+      vi.mocked(SdkKnowledgeBase).prototype.orders = {
+        create: vi.fn().mockResolvedValue(MOCK_ORDER),
+        get: vi.fn().mockResolvedValue(MOCK_ORDER),
+        update: vi.fn().mockResolvedValue({ ...MOCK_ORDER, status: "confirmed" }),
+        delete: vi.fn().mockResolvedValue({ id: "ord_test_001", deleted: true }),
+        list: vi.fn().mockResolvedValue({ items: [MOCK_ORDER], total: 1, next_cursor: null }),
+      } as any;
+    });
+
+    describe("OrderService", () => {
+      it("creates an order and returns its id", async () => {
+        const client = new SdkKnowledgeBase({ apiKey: "sk_test_mock" });
+        const service = new OrderService(client);
+
+        const orderId = await service.placeOrder({ productId: "prod_001", quantity: 2 });
+
+        expect(client.orders.create).toHaveBeenCalledWith(
+          expect.objectContaining({ productId: "prod_001", quantity: 2 })
+        );
+        expect(orderId).toBe("ord_test_001");
+      });
+
+      it("throws when the order is not found", async () => {
+        const client = new SdkKnowledgeBase({ apiKey: "sk_test_mock" });
+        vi.mocked(client.orders.get).mockRejectedValue(
+          new Error("ResourceNotFoundError")
+        );
+
+        const service = new OrderService(client);
+
+        await expect(service.getOrder("ord_missing")).rejects.toThrow(
+          "ResourceNotFoundError"
+        );
+      });
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Mock response helpers
+
+Keep your test files lean by extracting fixture factories into a shared helper module.
+
+```typescript src/__tests__/fixtures.ts
+import type { Product, Order, User } from "@sdk-knowledge-base/client";
+
+export function makeProduct(overrides: Partial<Product> = {}): Product {
+  return {
+    id: "prod_test_fixture_001",
+    name: "Test Product",
+    sku: "TEST-SKU-001",
+    price: 19.99,
+    currency: "USD",
+    inventory: 100,
+    status: "active",
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+export function makeOrder(overrides: Partial<Order> = {}): Order {
+  return {
+    id: "ord_test_fixture_001",
+    status: "pending",
+    total: 19.99,
+    currency: "USD",
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
+    ...overrides,
+  };
+}
+```
+
+---
+
+## Write integration tests against the test environment
+
+Integration tests make real HTTP calls to the SDK Knowledge Base test environment. They are slower than unit tests but verify the full request/response cycle, including serialisation, auth, and network behaviour.
+
+```typescript src/__tests__/integration/products.integration.test.ts
+import { SdkKnowledgeBase } from "@sdk-knowledge-base/client";
+
+// These tests require SDK_KB_API_KEY to be a sk_test_ key
+const client = new SdkKnowledgeBase({
+  apiKey: process.env.SDK_KB_API_KEY!,
+  logLevel: "silent",
+});
+
+describe("Products API — integration", () => {
+  const createdIds: string[] = [];
+
+  // Track every resource created so we can clean up regardless of test outcome
+  afterAll(async () => {
+    await Promise.allSettled(
+      createdIds.map((id) => client.products.delete(id))
+    );
+  });
+
+  it("creates, reads, updates, and deletes a product", async () => {
+    // Create
+    const created = await client.products.create({
+      name: "Integration Test Product",
+      sku: `INT-TEST-${Date.now()}`,
+      price: 9.99,
+      currency: "USD",
+      inventory: 10,
+    });
+    createdIds.push(created.id);
+
+    expect(created.id).toMatch(/^prod_/);
+    expect(created.name).toBe("Integration Test Product");
+
+    // Read
+    const fetched = await client.products.get(created.id);
+    expect(fetched.id).toBe(created.id);
+
+    // Update
+    const updated = await client.products.update(created.id, { price: 7.99 });
+    expect(updated.price).toBe(7.99);
+
+    // Delete
+    const deleted = await client.products.delete(created.id);
+    expect(deleted.deleted).toBe(true);
+
+    // Remove from cleanup list — already deleted
+    createdIds.splice(createdIds.indexOf(created.id), 1);
+  });
+});
+```
+
+Run integration tests separately from your unit tests so they do not slow down your standard CI pipeline:
+
+```json package.json
+{
+  "scripts": {
+    "test": "jest --testPathIgnorePatterns=integration",
+    "test:integration": "jest --testPathPattern=integration"
+  }
+}
+```
+
+---
+
+## Test data: pre-seeded resources and clean-up
+
+The SDK Knowledge Base test environment comes with a small set of **pre-seeded resources** — read-only fixtures you can use without creating anything first. Their IDs always start with `prod_seed_`, `ord_seed_`, and `usr_seed_`. You can read them freely, but attempts to modify or delete them return a `403 ForbiddenError`.
+
+For test data you create yourself, follow these practices:
+
+- **Name test resources clearly.** Prefix names with `[TEST]` or include a timestamp in the SKU so it is obvious they are disposable.
+- **Clean up in `afterAll`/`afterEach`.** Use `Promise.allSettled` (not `Promise.all`) so one failed deletion does not block the rest.
+- **Use unique identifiers per run.** Append `Date.now()` or a UUID to resource names to avoid collisions when tests run in parallel.
+
+```typescript src/__tests__/setup.ts
+import { SdkKnowledgeBase } from "@sdk-knowledge-base/client";
+
+const client = new SdkKnowledgeBase({ apiKey: process.env.SDK_KB_API_KEY! });
+
+/** Delete all test resources whose names start with "[TEST]". */
+export async function cleanupTestResources(): Promise<void> {
+  let cursor: string | null = null;
+
+  do {
+    const page = await client.products.list({
+      limit: 100,
+      cursor: cursor ?? undefined,
+      filter: { name: { startsWith: "[TEST]" } },
+    });
+
+    await Promise.allSettled(
+      page.items.map((p) => client.products.delete(p.id))
+    );
+
+    cursor = page.next_cursor;
+  } while (cursor);
+}
+```
+
+---
+
+## Simulate error responses
+
+Test how your code handles API errors by configuring mock clients to throw specific error classes.
+
+<Tabs>
+  <Tab title="Jest">
+    ```typescript
+    import {
+      SdkKnowledgeBase,
+      RateLimitError,
+      ResourceNotFoundError,
+    } from "@sdk-knowledge-base/client";
+
+    jest.mock("@sdk-knowledge-base/client");
+
+    it("retries on rate limit and surfaces the error after exhaustion", async () => {
+      const client = new SdkKnowledgeBase({ apiKey: "sk_test_mock" });
+
+      (client.products.get as jest.Mock).mockRejectedValue(
+        new RateLimitError("Rate limit exceeded", { retryAfter: 1 })
+      );
+
+      await expect(client.products.get("prod_123")).rejects.toBeInstanceOf(RateLimitError);
+    });
+    ```
+  </Tab>
+  <Tab title="Vitest">
+    ```typescript
+    import { vi, it, expect } from "vitest";
+    import {
+      SdkKnowledgeBase,
+      RateLimitError,
+      ResourceNotFoundError,
+    } from "@sdk-knowledge-base/client";
+
+    vi.mock("@sdk-knowledge-base/client");
+
+    it("retries on rate limit and surfaces the error after exhaustion", async () => {
+      const client = new SdkKnowledgeBase({ apiKey: "sk_test_mock" });
+
+      vi.mocked(client.products.get).mockRejectedValue(
+        new RateLimitError("Rate limit exceeded", { retryAfter: 1 })
+      );
+
+      await expect(client.products.get("prod_123")).rejects.toBeInstanceOf(RateLimitError);
+    });
+    ```
+  </Tab>
+</Tabs>
+
+With unit tests covering your business logic, integration tests validating full request/response cycles, and error simulations confirming your error-handling paths, you have a robust safety net for your integration. Explore the references below to go deeper on the SDK's error model and retry behaviour.
+
+<CardGroup cols={2}>
+  <Card
+    title="Error Handling"
+    icon="triangle-exclamation"
+    href="/concepts/error-handling"
+  >
+    Explore every error class and status code the SDK surfaces, and learn when to retry vs. surface to the user.
+  </Card>
+  <Card
+    title="Retry Configuration"
+    icon="arrows-rotate"
+    href="/sdk/retries"
+  >
+    Fine-tune backoff strategy, maximum attempts, and which status codes trigger automatic retries.
+  </Card>
+</CardGroup>

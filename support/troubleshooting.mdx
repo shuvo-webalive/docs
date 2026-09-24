@@ -1,0 +1,374 @@
+---
+title: "SDK Knowledge Base Troubleshooting Guide: Common Errors"
+sidebarTitle: "Troubleshooting"
+description: "Diagnose and fix the most frequent SDK Knowledge Base errors — from authentication failures and rate limits to SSL issues and TypeScript type conflicts."
+---
+
+Even well-written integrations run into unexpected errors. This guide walks you through the most common issues reported by SDK Knowledge Base developers, explains why each error occurs, and gives you concrete steps to resolve it. Work through the relevant accordion below, then reach out to support if you're still stuck.
+
+<AccordionGroup>
+
+  <Accordion title="401 Unauthorized — Invalid or expired API key">
+    A `401` response means the server could not authenticate your request. This is almost always caused by a missing, malformed, or revoked API key.
+
+    <Steps>
+      <Step title="Confirm the key is being set">
+        Print the resolved value of your environment variable before the client is created:
+
+        ```ts
+        console.log("Key present:", Boolean(process.env.SDK_KB_API_KEY));
+        ```
+
+        If it logs `false`, your environment variable is not set in the current process. Check `.env` file loading, shell exports, or CI/CD secret configuration.
+      </Step>
+      <Step title="Check for accidental whitespace">
+        Copy-pasting API keys from dashboards often includes a trailing newline or space. Trim the value explicitly:
+
+        ```ts
+        const client = new SDKClient({
+          apiKey: process.env.SDK_KB_API_KEY?.trim(),
+        });
+        ```
+      </Step>
+      <Step title="Verify the key is active in the dashboard">
+        Log in to the [SDK Knowledge Base dashboard](https://dashboard.sdkknowledgebase.com), navigate to **Settings → API Keys**, and confirm the key appears as **Active**. Revoked or expired keys show a red status badge.
+      </Step>
+      <Step title="Check test vs. live mode">
+        A `test_` key cannot authenticate requests made with a `live_` client configuration, and vice versa. Confirm the key prefix matches your intended environment.
+      </Step>
+      <Step title="Rotate the key if necessary">
+        If you suspect the key has been compromised or is corrupted, revoke it and generate a new one. Update all services and environment variables that reference the old key.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="403 Forbidden — Insufficient permissions or scope">
+    A `403` response means the server recognised your API key but the key does not have permission to perform the requested action.
+
+    <Steps>
+      <Step title="Read the error detail field">
+        The SDK surfaces the API's error body in the thrown error object:
+
+        ```ts
+        import { APIError } from "@sdkkb/sdk";
+
+        try {
+          await client.documents.delete("doc_123");
+        } catch (err) {
+          if (err instanceof APIError) {
+            console.error(err.status, err.code, err.message);
+            // e.g. 403 "permission_denied" "Key lacks 'documents:write' scope"
+          }
+        }
+        ```
+
+        The `code` and `message` fields identify the missing scope or restricted resource.
+      </Step>
+      <Step title="Review the key's permission scopes">
+        Go to **Settings → API Keys** in the dashboard, click the key in question, and compare the listed scopes against the scope required by the operation you're attempting.
+      </Step>
+      <Step title="Create a key with the correct scopes">
+        If the existing key cannot be edited (for example, it is shared across services), create a new key with the required scopes and update your application to use it.
+      </Step>
+      <Step title="Check resource ownership">
+        Some resources are locked to the account or organisation that created them. Confirm the resource ID you're targeting belongs to the account associated with your API key.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="429 Too Many Requests — Rate limiting">
+    A `429` response means your application has exceeded the request rate allowed by your plan. The SDK retries `429` responses automatically, but persistent errors indicate a deeper throughput problem.
+
+    <Steps>
+      <Step title="Check retry configuration">
+        Ensure `maxRetries` is not set to `0`, which disables automatic retry:
+
+        ```ts
+        const client = new SDKClient({
+          apiKey: process.env.SDK_KB_API_KEY,
+          maxRetries: 3, // default — do not set to 0 unless intentional
+        });
+        ```
+      </Step>
+      <Step title="Inspect rate-limit headers">
+        Log the raw response headers to understand your current headroom:
+
+        ```ts
+        const { data, response } = await client.documents.list.withResponse();
+        console.log({
+          limit: response.headers.get("X-RateLimit-Limit"),
+          remaining: response.headers.get("X-RateLimit-Remaining"),
+          reset: response.headers.get("X-RateLimit-Reset"),
+        });
+        ```
+      </Step>
+      <Step title="Add client-side throttling">
+        If your application issues requests in tight loops, use a concurrency limiter such as `p-limit` (Node.js) to cap parallel in-flight requests:
+
+        ```ts
+        import pLimit from "p-limit";
+        const limit = pLimit(5); // max 5 concurrent requests
+
+        const results = await Promise.all(
+          ids.map((id) => limit(() => client.documents.get(id)))
+        );
+        ```
+      </Step>
+      <Step title="Upgrade your plan">
+        If legitimate traffic is consistently hitting rate limits, navigate to **Settings → Billing** in the dashboard and upgrade to a higher-tier plan with a larger RPM/TPM allowance.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="408 / ETIMEDOUT — Timeout errors">
+    Timeout errors occur when a request does not complete within the configured time limit. This can be caused by slow networks, large payloads, or temporary API latency.
+
+    <Steps>
+      <Step title="Identify the timeout source">
+        The SDK throws a `TimeoutError` for client-side timeouts and surfaces a `408` `APIError` for server-side timeouts. Log the error class to distinguish them:
+
+        ```ts
+        import { TimeoutError, APIError } from "@sdkkb/sdk";
+
+        try {
+          await client.documents.get("doc_123");
+        } catch (err) {
+          if (err instanceof TimeoutError) {
+            console.error("Client timeout");
+          } else if (err instanceof APIError && err.status === 408) {
+            console.error("Server timeout");
+          }
+        }
+        ```
+      </Step>
+      <Step title="Increase the timeout value">
+        Increase the global or per-request timeout to accommodate slower operations:
+
+        ```ts
+        // Per-request override for known slow operations
+        const result = await client.indexes.rebuild("idx_abc", {
+          timeout: 60_000, // 60 seconds
+        });
+        ```
+      </Step>
+      <Step title="Reduce payload size">
+        Large request bodies (e.g. batch document uploads) take longer to transmit and process. Break them into smaller chunks and issue multiple requests.
+      </Step>
+      <Step title="Check the API status page">
+        Visit [status.sdkknowledgebase.com](https://status.sdkknowledgebase.com) to see if elevated latency is a known platform incident.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="ECONNREFUSED / Network errors">
+    `ECONNREFUSED` and similar network-level errors mean your application cannot establish a TCP connection to the SDK Knowledge Base API servers.
+
+    <Steps>
+      <Step title="Verify the base URL">
+        An incorrectly configured base URL (including a typo or a localhost address left over from development) causes immediate connection refusals:
+
+        ```ts
+        const client = new SDKClient({
+          apiKey: process.env.SDK_KB_API_KEY,
+          baseURL: "https://api.sdkknowledgebase.com", // default — do not override unless using a proxy
+        });
+        ```
+      </Step>
+      <Step title="Check firewall and egress rules">
+        In containerised or cloud environments, outbound HTTPS traffic on port 443 is sometimes blocked by default. Confirm your security group, VPC, or network policy allows egress to `api.sdkknowledgebase.com:443`.
+      </Step>
+      <Step title="Test raw connectivity">
+        From the same host that runs your application, run:
+
+        ```bash
+        curl -I https://api.sdkknowledgebase.com/health
+        ```
+
+        A `200 OK` confirms basic connectivity. A connection error points to a network or DNS issue.
+      </Step>
+      <Step title="Check DNS resolution">
+        Corporate proxies and custom DNS resolvers occasionally fail to resolve external hostnames. Run `nslookup api.sdkknowledgebase.com` to confirm the domain resolves correctly.
+      </Step>
+      <Step title="Configure a proxy if required">
+        If your environment requires outbound traffic to pass through an HTTP proxy, set the `httpProxy` option:
+
+        ```ts
+        const client = new SDKClient({
+          apiKey: process.env.SDK_KB_API_KEY,
+          httpProxy: process.env.HTTPS_PROXY,
+        });
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="SSL/TLS certificate errors">
+    SSL errors indicate that the TLS handshake between your application and the API failed. Common causes include outdated CA bundles, corporate traffic inspection proxies, and misconfigured Node.js versions.
+
+    <Steps>
+      <Step title="Check your Node.js / runtime version">
+        Node.js versions before 18 ship CA bundles that may be missing newer roots. Upgrade to Node.js 18 LTS or later:
+
+        ```bash
+        node --version   # should be ≥ 18.0.0
+        ```
+      </Step>
+      <Step title="Identify corporate TLS inspection">
+        If your organisation uses a traffic-inspection proxy it will present its own certificate to your application. You will see an error such as `UNABLE_TO_VERIFY_LEAF_SIGNATURE` or `SELF_SIGNED_CERT_IN_CHAIN`. Contact your IT/security team to obtain the proxy's root CA certificate and add it to your trusted store:
+
+        ```bash
+        export NODE_EXTRA_CA_CERTS=/path/to/corporate-root.pem
+        ```
+      </Step>
+      <Step title="Never disable certificate verification in production">
+        You may be tempted to set `NODE_TLS_REJECT_UNAUTHORIZED=0` or `rejectUnauthorized: false`. This removes all TLS security and must never be used outside of isolated local debugging.
+
+        <Warning>
+          Disabling TLS verification exposes all API keys and data to interception. Remove this setting before deploying to any shared or production environment.
+        </Warning>
+      </Step>
+      <Step title="Test with curl">
+        ```bash
+        curl -v https://api.sdkknowledgebase.com/health
+        ```
+
+        `curl` output includes the full certificate chain and any verification errors, giving you precise details to act on.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="TypeScript type errors after upgrade">
+    Upgrading to a new major or minor version of `@sdkkb/sdk` occasionally introduces type-level changes that break compilation without changing runtime behaviour.
+
+    <Steps>
+      <Step title="Read the changelog">
+        Before upgrading, check the [changelog](/support/changelog) for any explicitly noted type-breaking changes. Minor versions may tighten generics or add non-optional fields.
+      </Step>
+      <Step title="Run the TypeScript compiler in isolation">
+        Run `tsc --noEmit` to surface all type errors without creating build artefacts:
+
+        ```bash
+        npx tsc --noEmit
+        ```
+
+        Pipe the output to a file for easier review: `npx tsc --noEmit 2>&1 | tee ts-errors.txt`.
+      </Step>
+      <Step title="Update generics at call sites">
+        Version 2.x improved response generics. If you stored references to old generic type arguments (e.g. `ListResponse<any>`), update them to use the explicit resource type:
+
+        ```ts
+        // Before (v1.x)
+        const res: ListResponse<any> = await client.documents.list();
+
+        // After (v2.x)
+        import type { Document } from "@sdkkb/sdk";
+        const res: ListResponse<Document> = await client.documents.list();
+        ```
+      </Step>
+      <Step title="Check for renamed or removed types">
+        The `Client` type was renamed to `SDKClient` in v2.0.0. Search your codebase for the old names:
+
+        ```bash
+        grep -r "Client" src/ --include="*.ts"
+        ```
+      </Step>
+      <Step title="Pin the TypeScript version if needed">
+        If a TypeScript version upgrade is the root cause (not the SDK), pin TypeScript to the previously working version while you migrate:
+
+        ```bash
+        npm install --save-dev typescript@5.3
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Webhook signature verification failures">
+    Webhook signature verification failures mean the computed HMAC digest of the incoming payload does not match the `X-SDK-KB-Signature` header. This can be caused by secret mismatches, payload double-encoding, or clock skew.
+
+    <Steps>
+      <Step title="Confirm you are using the raw request body">
+        Signature verification must use the **raw, unmodified request bytes** — not a parsed JSON object. If your framework parses the body before your handler runs, access the raw buffer directly:
+
+        ```ts
+        // Express example
+        app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
+          const event = client.webhooks.constructEvent(
+            req.body,           // Buffer — not JSON.parse(req.body)
+            req.headers["x-sdk-kb-signature"] as string,
+            process.env.WEBHOOK_SECRET!,
+          );
+        });
+        ```
+      </Step>
+      <Step title="Verify the webhook secret">
+        Go to **Settings → Webhooks** in the dashboard, select your endpoint, and confirm the secret matches `process.env.WEBHOOK_SECRET` in your application. Regenerate the secret if necessary and redeploy.
+      </Step>
+      <Step title="Check for body-parser middleware">
+        Middleware such as `express.json()` running before your webhook route will parse and re-serialise the body, subtly altering whitespace and breaking the signature. Mount `express.raw()` specifically on the webhook route before any JSON middleware.
+      </Step>
+      <Step title="Validate timestamp tolerance">
+        The SDK rejects webhooks with a timestamp older than **5 minutes** by default to prevent replay attacks. If your server clock is significantly skewed, synchronise it via NTP:
+
+        ```bash
+        timedatectl status   # Linux — confirm NTP is active
+        ```
+
+        You can extend tolerance for testing purposes using the `tolerance` option, but keep it at the default (or lower) in production.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Unexpected undefined in responses">
+    Properties that you expect to be present in an API response sometimes come back as `undefined`. This usually means the field is optional, was not requested, or the API version differs from the SDK version.
+
+    <Steps>
+      <Step title="Check the TypeScript type definition">
+        Hover over the property in your IDE or search the type definition. Optional properties (`field?: Type`) may be absent depending on API parameters or resource state. Your code must handle the absent case.
+      </Step>
+      <Step title="Use expand parameters">
+        Some fields are only populated when you explicitly request them via `expand`:
+
+        ```ts
+        const doc = await client.documents.get("doc_123", {
+          expand: ["metadata", "embeddings"],
+        });
+        console.log(doc.metadata); // now populated
+        ```
+      </Step>
+      <Step title="Check the API version header">
+        The SDK sends an `SDK-KB-Version` header pinned to the API version it was built against. If your account is on a different API version, field shapes may differ. Log the version header returned in the response and compare it with the [API changelog](https://docs.sdkknowledgebase.com/api/changelog).
+      </Step>
+      <Step title="Enable debug logging to inspect raw responses">
+        Set `logLevel: "debug"` to print the raw JSON response body and compare it to what the SDK deserialises into:
+
+        ```ts
+        const client = new SDKClient({ apiKey: "...", logLevel: "debug" });
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+
+</AccordionGroup>
+
+## Still stuck?
+
+If none of the steps above resolved your issue, the SDK Knowledge Base support team is here to help.
+
+<CardGroup cols={2}>
+  <Card title="Open a GitHub Issue" icon="github" href="https://github.com/sdkkb/sdk/issues">
+    File a bug report with a minimal reproduction. Include your SDK version, runtime version, and the full error stack trace.
+  </Card>
+  <Card title="Join the Community Forum" icon="comments" href="https://github.com/sdkkb/sdk/discussions">
+    Ask questions, share workarounds, and browse answers from the developer community.
+  </Card>
+  <Card title="Email Support" icon="envelope" href="mailto:support@sdkknowledgebase.com">
+    Pro and Enterprise customers can email support directly for a guaranteed response within their SLA window.
+  </Card>
+  <Card title="Status Page" icon="signal" href="https://status.sdkknowledgebase.com">
+    Check live and historical uptime, view active incidents, and subscribe to outage notifications.
+  </Card>
+</CardGroup>
+
+<Note>
+  When contacting support, always include your **SDK version** (`npm list @sdkkb/sdk`), **runtime version**, the **full error message and stack trace**, and a **minimal code snippet** that reproduces the issue. This dramatically reduces the time to resolution.
+</Note>

@@ -1,0 +1,309 @@
+---
+title: "SDK Data Model & Types: Records, Collections, Cursors"
+sidebarTitle: "Data Model"
+description: "Explore the core data types powering SDK Knowledge Base — how Resources, Records, Collections, and Cursors map to API responses and TypeScript interfaces."
+---
+
+Every value the SDK Knowledge Base SDK returns is grounded in a small set of primitive types. Once you understand how these building blocks relate to each other — and how they map to what the API sends over the wire — you will be able to read and write SDK code with confidence. This page covers the four foundational types and shows the TypeScript interfaces the SDK uses to represent them.
+
+## The Four Core Types
+
+<CardGroup cols={2}>
+  <Card title="Resources" icon="cube" href="/sdk/resources">
+    Namespaced client properties (e.g. `client.users`) that group related methods. Resources hold no data — they are entry points for operations.
+  </Card>
+  <Card title="Records" icon="file-lines" href="/sdk/responses">
+    Individual API objects returned by `create`, `retrieve`, and `update` calls. A Record always has a unique `id` and an `object` discriminator field.
+  </Card>
+  <Card title="Collections" icon="layer-group" href="/concepts/pagination">
+    Paginated lists of Records returned by `list` calls. A Collection wraps an array of Records alongside cursor metadata for iteration.
+  </Card>
+  <Card title="Cursors" icon="arrow-right-arrow-left" href="/concepts/pagination">
+    Opaque string tokens that mark your position in a paginated result set. Pass a Cursor back as the `cursor` parameter to fetch the next page.
+  </Card>
+</CardGroup>
+
+## Base Record Interface
+
+Every Record in the SDK extends `BaseRecord`. This guarantees a common shape across all object types, so code that handles one type of Record can often handle any Record.
+
+```typescript
+/** Shared fields present on every SDK Record */
+interface BaseRecord {
+  /** Unique identifier with a type-specific prefix (e.g. "usr_", "itm_") */
+  id: string;
+
+  /** ISO 8601 timestamp — deserialized to a JavaScript Date by the SDK */
+  createdAt: Date;
+
+  /** ISO 8601 timestamp — deserialized to a JavaScript Date by the SDK */
+  updatedAt: Date;
+
+  /**
+   * String literal that identifies the object type.
+   * Use this field to narrow a union type at runtime.
+   */
+  object: string;
+}
+```
+
+### Shared Field Reference
+
+<ResponseField name="id" type="string" required>
+  Unique identifier for the record. Identifiers are prefixed with an object-type abbreviation followed by an underscore — for example `usr_01hx9z3k` for a User or `itm_7fq2bc` for an Item. The prefix lets you determine the object type from the ID alone.
+</ResponseField>
+
+<ResponseField name="created_at" type="string (ISO 8601)">
+  The UTC timestamp at which the record was created. The API returns this field as a snake_case ISO 8601 string; the SDK deserializes it to a JavaScript `Date` and exposes it as `createdAt`.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string (ISO 8601)">
+  The UTC timestamp of the most recent update to the record. Follows the same serialization rules as `created_at` → `updatedAt`.
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  A string literal that acts as a type discriminator. Use this field to distinguish between object types in a union. Possible values include `"user"`, `"item"`, `"collection"`, `"event"`, and `"webhook"`.
+</ResponseField>
+
+## Concrete Record Types
+
+### User
+
+```typescript
+interface User extends BaseRecord {
+  object: "user";
+  email: string;
+  name: string;
+  status: "active" | "suspended" | "deleted";
+  role: "owner" | "admin" | "member" | "viewer";
+  avatarUrl: string | null;
+  metadata: Record<string, string>;
+}
+```
+
+### Item
+
+```typescript
+interface Item extends BaseRecord {
+  object: "item";
+  name: string;
+  description: string | null;
+  status: "draft" | "published" | "archived";
+  collectionId: string | null;
+  tags: string[];
+  content: ItemContent;
+  author: UserReference;
+  metadata: Record<string, string>;
+}
+```
+
+<ResponseField name="content" type="object">
+  The structured content body of an Item.
+
+  <Expandable title="ItemContent fields">
+    <ResponseField name="format" type='"plain" | "markdown" | "html"'>
+      The markup format of the content body. Determines how `body` should be rendered.
+    </ResponseField>
+
+    <ResponseField name="body" type="string">
+      The raw content string in the format specified by `format`.
+    </ResponseField>
+
+    <ResponseField name="wordCount" type="number">
+      The approximate word count of `body`, calculated server-side at write time.
+    </ResponseField>
+
+    <ResponseField name="assets" type="Asset[]">
+      An array of attached media assets referenced within the content body.
+
+      <Expandable title="Asset fields">
+        <ResponseField name="id" type="string">
+          Unique identifier for this asset, prefixed with `ast_`.
+        </ResponseField>
+
+        <ResponseField name="url" type="string">
+          Absolute HTTPS URL to the asset. URLs are signed and valid for 24 hours.
+        </ResponseField>
+
+        <ResponseField name="mimeType" type="string">
+          MIME type of the asset — for example `image/png` or `application/pdf`.
+        </ResponseField>
+
+        <ResponseField name="sizeBytes" type="number">
+          File size in bytes.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="author" type="object">
+  A lightweight reference to the User who created the Item. This is not the full `User` record — fetch `client.users.retrieve(item.author.id)` if you need all user fields.
+
+  <Expandable title="UserReference fields">
+    <ResponseField name="id" type="string">
+      The `usr_`-prefixed identifier of the author.
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Display name of the author at the time the Item was last updated.
+    </ResponseField>
+
+    <ResponseField name="email" type="string">
+      Email address of the author.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Collection
+
+```typescript
+interface Collection extends BaseRecord {
+  object: "collection";
+  name: string;
+  description: string | null;
+  visibility: "public" | "private";
+  itemCount: number;
+  ownerId: string;
+  settings: CollectionSettings;
+}
+```
+
+<ResponseField name="settings" type="object">
+  Configurable behaviour for this Collection.
+
+  <Expandable title="CollectionSettings fields">
+    <ResponseField name="defaultItemStatus" type='"draft" | "published"'>
+      The status applied to newly created Items that belong to this Collection when no explicit status is provided.
+    </ResponseField>
+
+    <ResponseField name="allowedFormats" type="string[]">
+      The content formats permitted for Items in this Collection. Defaults to `["plain", "markdown", "html"]`.
+    </ResponseField>
+
+    <ResponseField name="webhooksEnabled" type="boolean">
+      When `true`, the Collection emits webhook events for Item create / update / delete lifecycle events.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Page (Collection Wrapper)
+
+List methods return a `Page<T>` rather than a plain array. This generic wrapper carries both the data and the metadata needed for cursor-based iteration.
+
+```typescript
+interface Page<T extends BaseRecord> {
+  /** The array of Records on this page */
+  data: T[];
+
+  /** Whether at least one more page of results exists */
+  hasMore: boolean;
+
+  /**
+   * Pass this value as the `cursor` parameter of your next
+   * list call to fetch the following page. `null` when `hasMore` is false.
+   */
+  nextCursor: string | null;
+
+  /** The number of records in `data` (≤ the requested `limit`) */
+  count: number;
+
+  /** The total number of matching records across all pages, if available */
+  totalCount: number | null;
+}
+```
+
+See [Pagination](/concepts/pagination) for a detailed guide on working with `Page<T>`.
+
+## How Records Map to API Responses
+
+The API always returns snake_case JSON. The SDK automatically transforms every response before returning it to you:
+
+| API JSON (snake_case)      | SDK TypeScript (camelCase)   | Notes                                   |
+|----------------------------|------------------------------|-----------------------------------------|
+| `id`                       | `id`                         | Unchanged                               |
+| `created_at`               | `createdAt`                  | Converted to `Date`                     |
+| `updated_at`               | `updatedAt`                  | Converted to `Date`                     |
+| `object`                   | `object`                     | Unchanged — used as type discriminator  |
+| `collection_id`            | `collectionId`               | camelCased                              |
+| `avatar_url`               | `avatarUrl`                  | camelCased                              |
+| `word_count`               | `wordCount`                  | camelCased                              |
+| `"2024-03-15T12:00:00Z"`   | `new Date("2024-03-15...")`  | ISO strings → `Date` objects            |
+
+### Typed Response Example
+
+```typescript
+import { SDKClient, Item, User } from "@sdk-knowledge-base/sdk";
+
+const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+// Retrieve an item — response is typed as Item
+const item: Item = await client.items.retrieve("itm_7fq2bc");
+
+// TypeScript knows exactly what fields exist
+console.log(item.object);               // "item"
+console.log(item.id);                   // "itm_7fq2bc"
+console.log(item.name);                 // string
+console.log(item.createdAt);            // Date
+console.log(item.content.format);       // "plain" | "markdown" | "html"
+console.log(item.content.assets[0].url); // string
+
+// Narrow a union of records by object type
+function printRecord(record: User | Item) {
+  if (record.object === "user") {
+    // TypeScript narrows to User here
+    console.log(`User: ${record.email}`);
+  } else {
+    // TypeScript narrows to Item here
+    console.log(`Item: ${record.name}`);
+  }
+}
+```
+
+## Using the `object` Discriminator
+
+The `object` field makes it safe to handle mixed arrays of Records without casting.
+
+```typescript
+import { SDKClient, User, Item, Collection } from "@sdk-knowledge-base/sdk";
+
+type AnyRecord = User | Item | Collection;
+
+function describeRecord(record: AnyRecord): string {
+  switch (record.object) {
+    case "user":
+      return `User ${record.name} (${record.email})`;
+    case "item":
+      return `Item "${record.name}" — status: ${record.status}`;
+    case "collection":
+      return `Collection "${record.name}" with ${record.itemCount} items`;
+  }
+}
+```
+
+<Note>
+  The `object` field is always the first key in the raw API JSON response, making it efficient to discriminate types without parsing the full payload.
+</Note>
+
+## Working with Metadata
+
+Every Record type exposes a `metadata` field — a flat `Record<string, string>` map you can populate with up to 50 key/value pairs. Use this field to attach application-specific data without creating custom schemas.
+
+```typescript
+// Write metadata at creation time
+const item = await client.items.create({
+  name: "Onboarding Guide",
+  metadata: {
+    internalId: "doc-42",
+    team: "product",
+    locale: "en-US",
+  },
+});
+
+// Read it back directly from the typed response
+console.log(item.metadata.team); // "product"
+```
+
+<Warning>
+  Metadata values must be strings. Storing JSON-encoded objects inside a metadata value is supported but not recommended — use a dedicated field or a separate data store for complex structured data.
+</Warning>

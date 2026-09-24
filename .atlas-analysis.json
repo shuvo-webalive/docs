@@ -1,0 +1,108 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "SDK Knowledge Base",
+  "projectDescription": "A comprehensive reference and guide for integrating and using the SDK across languages and platforms.",
+  "theme": "luma",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/overview",
+              "concepts/data-model",
+              "concepts/error-handling",
+              "concepts/pagination"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/first-integration",
+              "guides/configuration",
+              "guides/webhooks",
+              "guides/testing"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "support/faq",
+              "support/troubleshooting",
+              "support/changelog"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDK Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "sdk/overview",
+              "sdk/initialization",
+              "sdk/configuration"
+            ]
+          },
+          {
+            "group": "Core Methods",
+            "pages": [
+              "sdk/client",
+              "sdk/resources",
+              "sdk/requests",
+              "sdk/responses"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "sdk/middleware",
+              "sdk/retries",
+              "sdk/logging",
+              "sdk/typescript"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Easy SDK initialization and configuration",
+    "Authentication and API key management",
+    "Typed request and response models",
+    "Automatic retries and error handling",
+    "Webhook support and event handling",
+    "Pagination utilities",
+    "Middleware and extensibility hooks",
+    "TypeScript/type-safe interfaces",
+    "Comprehensive logging and debugging",
+    "Multi-language support"
+  ],
+  "publicApiSurface": [
+    "Client initialization",
+    "Resource methods (create, read, update, delete)",
+    "Request configuration options",
+    "Response models and types",
+    "Error classes and codes",
+    "Webhook event types",
+    "Pagination helpers",
+    "Middleware interface",
+    "Retry configuration",
+    "Logger interface"
+  ]
+}

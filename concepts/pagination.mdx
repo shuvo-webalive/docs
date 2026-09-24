@@ -1,0 +1,274 @@
+---
+title: "SDK Pagination: Cursor-Based Page Iteration in Depth"
+sidebarTitle: "Pagination"
+description: "Learn how SDK Knowledge Base uses cursor-based pagination, how to fetch single pages or iterate all results automatically, and how to tune page size for performance."
+---
+
+The SDK Knowledge Base SDK uses **cursor-based pagination** for all list endpoints. Unlike offset-based pagination, cursors remain stable as your data changes — inserting or deleting records between pages never causes you to skip or duplicate results. Every `list()` call returns a `Page<T>` object that carries both the current page's data and a cursor token you can use to fetch the next page.
+
+## The `Page<T>` Type
+
+Every list method returns a `Page<T>`, where `T` is the specific Record type for that resource.
+
+```typescript
+interface Page<T extends BaseRecord> {
+  /** The records on this page (length ≤ limit) */
+  data: T[];
+
+  /** True when there is at least one more page of results */
+  hasMore: boolean;
+
+  /**
+   * An opaque string token representing the end of this page.
+   * Pass this value as the `cursor` parameter to retrieve the next page.
+   * Null when hasMore is false.
+   */
+  nextCursor: string | null;
+
+  /** Number of records in data on this page */
+  count: number;
+
+  /** Total matching records across all pages, when available */
+  totalCount: number | null;
+}
+```
+
+<Note>
+  Cursor tokens are opaque — do not attempt to parse or construct them manually. Their internal format may change without notice. Always treat a cursor as an unstructured string that you store and pass back verbatim.
+</Note>
+
+## List Method Parameters
+
+All `list()` methods accept the same core set of pagination parameters.
+
+<ParamField query="limit" type="number" default="20">
+  The maximum number of records to return on a single page. Accepted range is `1` to `100`. Requesting more than `100` records per page raises a `ValidationError`.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  An opaque cursor token from the `nextCursor` field of a previous `list()` response. Omit this parameter to start from the beginning of the result set. Pass the token to continue from where you left off.
+</ParamField>
+
+<ParamField query="order" type='"asc" | "desc"' default='"desc"'>
+  The sort order for results, applied to the record's `created_at` timestamp. Use `"asc"` to retrieve oldest-first, and `"desc"` (the default) to retrieve newest-first. The order must stay consistent across pages within a single iteration — changing `order` mid-pagination invalidates prior cursors.
+</ParamField>
+
+## Fetching a Single Page
+
+Call `list()` directly when you only need one page of results — for example, to populate the first page of a UI table.
+
+```typescript
+import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+// Fetch the 10 most recently created items
+const page = await client.items.list({ limit: 10, order: "desc" });
+
+console.log(`Got ${page.count} items`);
+console.log(`More pages available: ${page.hasMore}`);
+
+for (const item of page.data) {
+  console.log(`- [${item.id}] ${item.name}`);
+}
+
+// Store nextCursor in your application state to enable "Load more"
+if (page.hasMore && page.nextCursor) {
+  sessionStorage.setItem("itemsCursor", page.nextCursor);
+}
+```
+
+To load the next page, retrieve the cursor you saved and pass it back:
+
+```typescript
+const savedCursor = sessionStorage.getItem("itemsCursor");
+
+if (savedCursor) {
+  const nextPage = await client.items.list({
+    limit: 10,
+    order: "desc",
+    cursor: savedCursor,
+  });
+
+  // Append nextPage.data to your existing list...
+}
+```
+
+## Iterating All Pages
+
+When you need to process every record in a result set — exporting data, running a batch job, building a search index — use one of the two auto-pagination approaches below.
+
+<CodeGroup>
+  ```typescript Manual Pagination Loop
+  import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+  const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+  async function fetchAllItems() {
+    const allItems = [];
+    let cursor: string | undefined = undefined;
+
+    do {
+      const page = await client.items.list({
+        limit: 100, // Use the maximum page size for efficiency
+        cursor,
+        order: "asc",
+      });
+
+      allItems.push(...page.data);
+      cursor = page.nextCursor ?? undefined;
+
+      console.log(`Fetched ${allItems.length} items so far...`);
+    } while (cursor !== undefined);
+
+    console.log(`Done — ${allItems.length} total items`);
+    return allItems;
+  }
+  ```
+
+  ```typescript Async Iteration (listAll)
+  import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+  const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+  async function fetchAllItems() {
+    const allItems = [];
+
+    // listAll() returns an AsyncIterable<Item> — no cursor management needed
+    for await (const item of client.items.listAll({
+      limit: 100,
+      order: "asc",
+    })) {
+      allItems.push(item);
+    }
+
+    console.log(`Done — ${allItems.length} total items`);
+    return allItems;
+  }
+  ```
+
+  ```typescript Stream Processing (listAll)
+  import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+  const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+  // Process items one at a time — memory-efficient for large datasets
+  async function processAllItems() {
+    let processed = 0;
+
+    for await (const item of client.items.listAll({ limit: 100 })) {
+      // Process each item as it arrives — no need to buffer them all
+      await indexItem(item);
+      processed++;
+
+      if (processed % 500 === 0) {
+        console.log(`Processed ${processed} items`);
+      }
+    }
+  }
+
+  async function indexItem(item: Awaited<ReturnType<typeof client.items.retrieve>>) {
+    // Your processing logic here
+  }
+  ```
+</CodeGroup>
+
+<Tip>
+  When iterating all pages, always set `limit: 100` — the maximum allowed — to minimize the number of HTTP round-trips. For a dataset with 10,000 records, a `limit` of `100` requires 100 requests; a `limit` of `20` requires 500 requests for the same data.
+</Tip>
+
+## Filtering with Pagination
+
+You can combine pagination parameters with resource-specific filter parameters. The cursor stays scoped to the filtered result set.
+
+```typescript
+import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+// Paginate through only published items in a specific collection
+async function fetchPublishedItemsInCollection(collectionId: string) {
+  const results = [];
+
+  for await (const item of client.items.listAll({
+    limit: 50,
+    order: "asc",
+    // Resource-specific filters — vary by endpoint
+    collectionId,
+    status: "published",
+  })) {
+    results.push(item);
+  }
+
+  return results;
+}
+```
+
+## Resumable Pagination
+
+Cursors are persistent — you can store a `nextCursor` value in a database, pick up hours later, and continue from the exact same position. This is useful for long-running background jobs that you want to checkpoint.
+
+```typescript
+import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+async function resumableExport(jobId: string) {
+  // Load the last saved cursor for this job (null means start from the beginning)
+  let cursor = await db.jobs.getCursor(jobId);
+
+  while (true) {
+    const page = await client.items.list({
+      limit: 100,
+      cursor: cursor ?? undefined,
+      order: "asc",
+    });
+
+    // Process this batch
+    await processItems(page.data);
+
+    if (!page.hasMore || !page.nextCursor) {
+      // We have reached the end — clear the saved cursor
+      await db.jobs.clearCursor(jobId);
+      console.log("Export complete");
+      break;
+    }
+
+    // Save progress — if the job crashes, we resume from here
+    cursor = page.nextCursor;
+    await db.jobs.saveCursor(jobId, cursor);
+    console.log(`Checkpointed at cursor ${cursor}`);
+  }
+}
+
+async function processItems(items: Awaited<ReturnType<typeof client.items.list>>["data"]) {
+  // Your export logic here
+}
+```
+
+<Warning>
+  Cursors are tied to a specific query — the same `order`, `limit`, and filter parameters you used when the cursor was generated. Changing any of these parameters while mid-pagination produces a `ValidationError` with code `invalid_cursor`. If you need to change your query, start a new pagination sequence from the beginning.
+</Warning>
+
+## Pagination at a Glance
+
+| Approach | Best For | Memory Usage |
+|---|---|---|
+| `list()` with manual cursor | UI "Load more" buttons, paginated tables | Low — one page at a time |
+| Manual `do/while` loop | Full dataset with custom batching logic | Medium — accumulates results |
+| `listAll()` async iteration | Stream processing, large dataset exports | Low — one record at a time |
+| `listAll()` with `push` | Collect all records into an array | High — entire dataset in memory |
+
+## Related Resources
+
+<CardGroup cols={3}>
+  <Card title="Data Model" icon="database" href="/concepts/data-model">
+    See the full `Page<T>` type definition and how records are typed.
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/concepts/error-handling">
+    Learn how to handle `invalid_cursor` and rate-limit errors during pagination.
+  </Card>
+  <Card title="Architecture Overview" icon="sitemap" href="/concepts/overview">
+    Understand the request lifecycle that underlies every list call.
+  </Card>
+</CardGroup>

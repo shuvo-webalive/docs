@@ -1,0 +1,238 @@
+---
+title: "Build Your First Integration with SDK Knowledge Base"
+sidebarTitle: "First Integration"
+description: "Walk through a complete CRUD integration in minutes — install the SDK, authenticate, then create, read, update, and delete your first resource."
+---
+
+The SDK Knowledge Base client gives you a straightforward way to manage resources programmatically. This guide walks you through every stage of a typical integration: installing the package, wiring up your credentials, and performing a full create-read-update-delete cycle so you understand exactly how the SDK behaves at each step.
+
+<Steps>
+
+  <Step title="Install the SDK">
+    Add the SDK Knowledge Base package to your project using your preferred package manager.
+
+    <CodeGroup>
+      ```bash npm
+      npm install @sdk-knowledge-base/client
+      ```
+
+      ```bash yarn
+      yarn add @sdk-knowledge-base/client
+      ```
+
+      ```bash pnpm
+      pnpm add @sdk-knowledge-base/client
+      ```
+    </CodeGroup>
+
+    The package ships with full TypeScript types — no separate `@types` package needed.
+  </Step>
+
+  <Step title="Set up your credentials">
+    Initialize the client with your API key. Store sensitive values in environment variables rather than hard-coding them in source files.
+
+    ```bash .env
+    SDK_KB_API_KEY=sk_live_your_api_key_here
+    ```
+
+    ```typescript src/client.ts
+    import { SdkKnowledgeBase } from "@sdk-knowledge-base/client";
+
+    export const client = new SdkKnowledgeBase({
+      apiKey: process.env.SDK_KB_API_KEY!,
+    });
+    ```
+
+    <Note>
+      Your API key is available in the **Settings → API Keys** section of your dashboard. Keep it secret — never commit it to version control.
+    </Note>
+  </Step>
+
+  <Step title="Create a resource">
+    Use `client.products.create()` to add your first Product resource. Pass a plain object matching the `CreateProductInput` type — the SDK validates the shape before sending the request.
+
+    ```typescript src/examples/create.ts
+    import { client } from "../client";
+
+    async function createProduct() {
+      const product = await client.products.create({
+        name: "Wireless Noise-Cancelling Headphones",
+        sku: "WNC-HEADPHONES-001",
+        price: 249.99,
+        currency: "USD",
+        inventory: 150,
+      });
+
+      console.log("Created product:", product);
+      return product;
+    }
+
+    createProduct();
+    ```
+
+    **Expected response**
+
+    ```json
+    {
+      "id": "prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E",
+      "name": "Wireless Noise-Cancelling Headphones",
+      "sku": "WNC-HEADPHONES-001",
+      "price": 249.99,
+      "currency": "USD",
+      "inventory": 150,
+      "status": "active",
+      "created_at": "2024-05-12T09:14:03.221Z",
+      "updated_at": "2024-05-12T09:14:03.221Z"
+    }
+    ```
+
+    Save the returned `id` — you'll need it for the subsequent steps.
+  </Step>
+
+  <Step title="Read the resource back">
+    Retrieve the product by its `id` to confirm it was persisted correctly.
+
+    ```typescript src/examples/read.ts
+    import { client } from "../client";
+
+    async function getProduct(productId: string) {
+      const product = await client.products.get(productId);
+
+      console.log("Fetched product:", product);
+      return product;
+    }
+
+    getProduct("prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E");
+    ```
+
+    **Expected response**
+
+    ```json
+    {
+      "id": "prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E",
+      "name": "Wireless Noise-Cancelling Headphones",
+      "sku": "WNC-HEADPHONES-001",
+      "price": 249.99,
+      "currency": "USD",
+      "inventory": 150,
+      "status": "active",
+      "created_at": "2024-05-12T09:14:03.221Z",
+      "updated_at": "2024-05-12T09:14:03.221Z"
+    }
+    ```
+
+    You can also list all products with `client.products.list()`, which returns a paginated response object containing an `items` array and a `next_cursor` field.
+
+    ```typescript src/examples/list.ts
+    import { client } from "../client";
+
+    async function listProducts() {
+      const page = await client.products.list({ limit: 20 });
+
+      console.log(`Found ${page.total} products`);
+      page.items.forEach((p) => console.log(`  - ${p.name} (${p.id})`));
+    }
+
+    listProducts();
+    ```
+  </Step>
+
+  <Step title="Update the resource">
+    Use `client.products.update()` to apply a partial patch. Only include the fields you want to change — all other fields remain untouched.
+
+    ```typescript src/examples/update.ts
+    import { client } from "../client";
+
+    async function updateProduct(productId: string) {
+      const updated = await client.products.update(productId, {
+        price: 229.99,           // run a sale
+        inventory: 120,          // reflect new stock level
+      });
+
+      console.log("Updated product:", updated);
+      return updated;
+    }
+
+    updateProduct("prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E");
+    ```
+
+    **Expected response**
+
+    ```json
+    {
+      "id": "prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E",
+      "name": "Wireless Noise-Cancelling Headphones",
+      "sku": "WNC-HEADPHONES-001",
+      "price": 229.99,
+      "currency": "USD",
+      "inventory": 120,
+      "status": "active",
+      "created_at": "2024-05-12T09:14:03.221Z",
+      "updated_at": "2024-05-12T10:02:47.885Z"
+    }
+    ```
+
+    Notice that `updated_at` has changed while `created_at` remains the same.
+  </Step>
+
+  <Step title="Delete the resource">
+    Call `client.products.delete()` to permanently remove the product. The method resolves with a confirmation object on success.
+
+    ```typescript src/examples/delete.ts
+    import { client } from "../client";
+
+    async function deleteProduct(productId: string) {
+      const result = await client.products.delete(productId);
+
+      console.log("Deleted:", result);
+    }
+
+    deleteProduct("prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E");
+    ```
+
+    **Expected response**
+
+    ```json
+    {
+      "id": "prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E",
+      "deleted": true
+    }
+    ```
+
+    Any subsequent `get()` call for the same ID returns a `404 ResourceNotFoundError`. Wrap deletions in a try/catch if downstream code might attempt to access the deleted resource.
+
+    ```typescript
+    import { ResourceNotFoundError } from "@sdk-knowledge-base/client";
+
+    try {
+      await client.products.get("prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E");
+    } catch (err) {
+      if (err instanceof ResourceNotFoundError) {
+        console.log("Product has been deleted — handling gracefully.");
+      } else {
+        throw err;
+      }
+    }
+    ```
+  </Step>
+
+</Steps>
+
+You have now completed a full CRUD cycle against the SDK Knowledge Base API. From here, explore how to fine-tune the SDK's behaviour and react to server-side events in real time.
+
+<CardGroup cols={2}>
+  <Card
+    title="Configuring the SDK"
+    icon="sliders"
+    href="/guides/configuration"
+  >
+    Customise timeouts, retries, log levels, and bring your own HTTP client.
+  </Card>
+  <Card
+    title="Receiving Webhooks"
+    icon="webhook"
+    href="/guides/webhooks"
+  >
+    React to resource events in real time with verified webhook payloads.
+  </Card>
+</CardGroup>

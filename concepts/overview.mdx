@@ -1,0 +1,187 @@
+---
+title: "SDK Architecture Overview: How the SDK Is Structured"
+sidebarTitle: "Overview"
+description: "Understand how the SDK Knowledge Base SDK is structured, how its core layers interact, and what happens during a complete request lifecycle."
+---
+
+The SDK Knowledge Base SDK is organized into a small set of composable layers. Each layer has a single responsibility — and together they take your application code from a raw method call all the way to a fully typed response object. Understanding how these layers interact will help you write cleaner integrations, debug faster, and make the most of every feature the SDK offers.
+
+## Architecture at a Glance
+
+The SDK follows a **Client → Resources → Requests → Responses** pattern. Every action you perform flows through these four layers in order.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      Your Application                   │
+└───────────────────────────┬─────────────────────────────┘
+                            │  instantiates
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                        Client                           │
+│  Holds credentials, base URL, default options, and      │
+│  a shared HTTP transport layer.                         │
+└───────────────────────────┬─────────────────────────────┘
+                            │  exposes
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                       Resources                         │
+│  Namespaced objects (e.g. client.users, client.items)   │
+│  that group related API methods together.               │
+└───────────────────────────┬─────────────────────────────┘
+                            │  build
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                       Requests                          │
+│  Validated, serialized HTTP requests constructed from   │
+│  your method arguments and the client's configuration.  │
+└───────────────────────────┬─────────────────────────────┘
+                            │  produce
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                      Responses                          │
+│  Parsed JSON deserialized into fully typed objects       │
+│  with IDE autocomplete and compile-time safety.         │
+└─────────────────────────────────────────────────────────┘
+```
+
+Each layer is intentionally thin. The **Client** never talks to a Resource directly — it just holds shared state. **Resources** never construct HTTP details — they delegate to the request layer. This separation keeps the SDK predictable and easy to test.
+
+## The Request Lifecycle
+
+The following steps trace exactly what happens between the moment you call a method and the moment you receive a typed result.
+
+<Steps>
+  <Step title="Client Instantiation">
+    You create a single `SDKClient` instance by supplying your API key and any global options (base URL, timeout, retry policy). The client initializes a shared HTTP transport and stores your credentials securely in memory for the lifetime of the instance.
+
+    ```typescript
+    import { SDKClient } from "@sdk-knowledge-base/sdk";
+
+    const client = new SDKClient({
+      apiKey: process.env.SDK_API_KEY,
+      timeout: 10_000,      // ms — applies to every request
+      maxRetries: 3,        // automatic retry on 429 / 5xx
+    });
+    ```
+
+    <Tip>
+      Create one client instance per application process and reuse it. Each instance maintains its own connection pool — creating many instances wastes resources.
+    </Tip>
+  </Step>
+
+  <Step title="Resource Selection">
+    You access a **Resource** as a property on the client. Resources are lazy — no network call happens simply by accessing them. Think of a resource as a scoped namespace for a set of related API endpoints.
+
+    ```typescript
+    // No network call yet — just a reference to the Users resource
+    const usersResource = client.users;
+    ```
+
+    Available top-level resources mirror the API surface: `client.users`, `client.items`, `client.collections`, `client.events`, and `client.webhooks`.
+  </Step>
+
+  <Step title="Method Call">
+    You call a method on the resource, passing typed arguments. The SDK validates your arguments against the expected schema before any HTTP call is made. If validation fails, a `ValidationError` is thrown synchronously — you never make a wasted network round-trip.
+
+    ```typescript
+    // Arguments are validated immediately; no HTTP yet
+    const promise = client.users.retrieve("usr_01hx9z3k");
+    ```
+  </Step>
+
+  <Step title="HTTP Request">
+    Once arguments pass validation, the SDK serializes them into an HTTP request: query parameters, a JSON body (for mutations), and the required headers including your `Authorization` bearer token. The request is dispatched through the shared transport.
+
+    ```typescript
+    // Internally, the SDK builds and sends:
+    // GET /v1/users/usr_01hx9z3k
+    // Authorization: Bearer <your-api-key>
+    // Content-Type: application/json
+    // SDK-Version: 2.4.0
+    ```
+  </Step>
+
+  <Step title="Response Parsing">
+    When the server responds, the SDK checks the HTTP status code first. Any `4xx` or `5xx` status triggers an appropriate typed error (see [Error Handling](/concepts/error-handling)). On success, the raw JSON body is deserialized and validated against the expected response schema.
+  </Step>
+
+  <Step title="Typed Object Returned">
+    The deserialized data is returned to your code as a fully typed object. Every field is camelCased (the API uses snake_case), every date string is converted to a JavaScript `Date`, and every enum value is narrowed to a TypeScript union type.
+
+    ```typescript
+    const user = await client.users.retrieve("usr_01hx9z3k");
+
+    console.log(user.id);         // string
+    console.log(user.createdAt);  // Date (converted from ISO string)
+    console.log(user.status);     // "active" | "suspended" | "deleted"
+    ```
+  </Step>
+</Steps>
+
+## Full End-to-End Example
+
+The snippet below shows the complete flow — instantiation through typed response — in one place.
+
+```typescript
+import { SDKClient, SDKError } from "@sdk-knowledge-base/sdk";
+
+// Step 1: Instantiate the client (do this once at startup)
+const client = new SDKClient({
+  apiKey: process.env.SDK_API_KEY!,
+  timeout: 15_000,
+  maxRetries: 2,
+});
+
+async function main() {
+  // Step 2 & 3: Select a resource and call a method
+  const item = await client.items.create({
+    name: "Launch Checklist",
+    description: "Pre-launch tasks for v2.0",
+    tags: ["launch", "checklist"],
+  });
+
+  // Step 6: Work with the fully typed response
+  console.log(`Created item: ${item.id}`);
+  console.log(`Object type:  ${item.object}`);    // "item"
+  console.log(`Created at:   ${item.createdAt.toISOString()}`);
+
+  // Resources compose naturally — fetch the collection it belongs to
+  if (item.collectionId) {
+    const collection = await client.collections.retrieve(item.collectionId);
+    console.log(`Part of collection: ${collection.name}`);
+  }
+}
+
+main().catch(console.error);
+```
+
+## Key Design Principles
+
+<CardGroup cols={2}>
+  <Card title="Type Safety First" icon="shield-check" href="/sdk/responses">
+    Every request parameter and response field is typed. Your IDE will autocomplete available options and warn you about missing required fields before you run a single line of code.
+  </Card>
+  <Card title="Fail Fast, Fail Loud" icon="bolt" href="/concepts/error-handling">
+    Argument validation happens synchronously before any network call. Invalid inputs produce a `ValidationError` immediately so you catch mistakes in development, not production.
+  </Card>
+  <Card title="Single Client, Shared Transport" icon="arrows-repeat" href="/sdk/client">
+    One client instance manages connection pooling, keep-alive, and retry state for your entire process. You benefit from connection reuse without any extra configuration.
+  </Card>
+  <Card title="Automatic Retries" icon="rotate" href="/sdk/retries">
+    The SDK retries idempotent requests automatically on `429 Too Many Requests` and transient `5xx` errors, using exponential backoff with jitter. Set `maxRetries: 0` to opt out.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Data Model" icon="database" href="/concepts/data-model">
+    Learn about the core types — Resources, Records, Collections, and Cursors.
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/concepts/error-handling">
+    Explore the error hierarchy and see how to handle every failure mode.
+  </Card>
+  <Card title="Pagination" icon="arrow-right" href="/concepts/pagination">
+    Discover cursor-based pagination and automatic page iteration.
+  </Card>
+</CardGroup>

@@ -1,0 +1,222 @@
+---
+title: "Quickstart: Make Your First SDK Knowledge Base Call"
+sidebarTitle: "Quickstart"
+description: "Install the SDK Knowledge Base, configure your API key, initialize the client, and make your first successful API call — all in under five minutes."
+---
+
+This guide walks you through every step needed to go from a blank project to a working SDK integration. By the end you will have the SDK installed, your credentials configured, and a real API response in your console.
+
+<Steps>
+  <Step title="Install the SDK">
+    Add the `sdk-knowledge-base` package to your project using the package manager you already use.
+
+    <Tabs>
+      <Tab title="TypeScript">
+        ```bash
+        npm install sdk-knowledge-base
+        # TypeScript types are bundled — no @types package needed
+        ```
+      </Tab>
+      <Tab title="JavaScript">
+        ```bash
+        npm install sdk-knowledge-base
+        # Works the same way in plain JavaScript projects
+        ```
+      </Tab>
+    </Tabs>
+
+    The package ships CommonJS and ESM builds, so it works with both `require()` and `import` without any extra configuration.
+  </Step>
+
+  <Step title="Get your API key">
+    Every request to the API must include a valid API key. Retrieve yours from the dashboard before moving on.
+
+    <Note>
+      Find your API key in the **SDK Knowledge Base Dashboard** under **Settings → API Keys**. If you haven't signed up yet, create a free account at [sdkkb.io](https://sdkkb.io) — your first key is generated automatically on sign-up.
+    </Note>
+
+    Once you have your key, store it as an environment variable so it never appears in source code:
+
+    <Tabs>
+      <Tab title="TypeScript">
+        ```bash
+        # Add to your shell profile or .env file
+        export SDK_KB_API_KEY="sk_live_xxxxxxxxxxxxxxxxxxxx"
+        ```
+      </Tab>
+      <Tab title="JavaScript">
+        ```bash
+        # Add to your shell profile or .env file
+        export SDK_KB_API_KEY="sk_live_xxxxxxxxxxxxxxxxxxxx"
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Initialize the client">
+    Import the SDK and create a client instance. Do this once at module level so a single client is reused across your application.
+
+    <Tabs>
+      <Tab title="TypeScript">
+        ```typescript
+        import { SdkKnowledgeBase } from "sdk-knowledge-base";
+
+        const client = new SdkKnowledgeBase({
+          apiKey: process.env.SDK_KB_API_KEY as string,
+        });
+        ```
+      </Tab>
+      <Tab title="JavaScript">
+        ```javascript
+        const { SdkKnowledgeBase } = require("sdk-knowledge-base");
+
+        const client = new SdkKnowledgeBase({
+          apiKey: process.env.SDK_KB_API_KEY,
+        });
+        ```
+      </Tab>
+    </Tabs>
+
+    The client validates your API key format locally on initialization and will throw a `ConfigurationError` immediately if the key is missing or malformed — so you catch misconfigurations at startup, not mid-flight.
+  </Step>
+
+  <Step title="Make your first API call">
+    Use the client to fetch a list of resources. All SDK methods return native Promises, so you can use `async/await` or `.then()` chaining.
+
+    <Tabs>
+      <Tab title="TypeScript">
+        ```typescript
+        async function main() {
+          const response = await client.resources.list({
+            limit: 10,
+            page: 1,
+          });
+
+          // response.data is typed as Resource[]
+          console.log("Resources:", response.data);
+          console.log("Total count:", response.meta.total);
+        }
+
+        main();
+        ```
+      </Tab>
+      <Tab title="JavaScript">
+        ```javascript
+        async function main() {
+          const response = await client.resources.list({
+            limit: 10,
+            page: 1,
+          });
+
+          console.log("Resources:", response.data);
+          console.log("Total count:", response.meta.total);
+        }
+
+        main();
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Handle the response">
+    The SDK returns structured response objects and throws typed errors for any non-2xx status. Wrap your calls in a `try/catch` to handle failures gracefully.
+
+    <Tabs>
+      <Tab title="TypeScript">
+        ```typescript
+        import {
+          SdkKnowledgeBase,
+          SdkKnowledgeBaseError,
+          AuthenticationError,
+          RateLimitError,
+        } from "sdk-knowledge-base";
+
+        const client = new SdkKnowledgeBase({
+          apiKey: process.env.SDK_KB_API_KEY as string,
+        });
+
+        async function fetchResources() {
+          try {
+            const response = await client.resources.list({ limit: 10 });
+
+            for (const resource of response.data) {
+              console.log(`[${resource.id}] ${resource.name}`);
+            }
+          } catch (err) {
+            if (err instanceof AuthenticationError) {
+              console.error("Invalid API key — check your credentials.");
+            } else if (err instanceof RateLimitError) {
+              console.error("Rate limit hit — retry after:", err.retryAfter);
+            } else if (err instanceof SdkKnowledgeBaseError) {
+              console.error("API error:", err.status, err.message);
+            } else {
+              throw err; // re-throw unexpected errors
+            }
+          }
+        }
+
+        fetchResources();
+        ```
+      </Tab>
+      <Tab title="JavaScript">
+        ```javascript
+        const {
+          SdkKnowledgeBase,
+          SdkKnowledgeBaseError,
+          AuthenticationError,
+          RateLimitError,
+        } = require("sdk-knowledge-base");
+
+        const client = new SdkKnowledgeBase({
+          apiKey: process.env.SDK_KB_API_KEY,
+        });
+
+        async function fetchResources() {
+          try {
+            const response = await client.resources.list({ limit: 10 });
+
+            for (const resource of response.data) {
+              console.log(`[${resource.id}] ${resource.name}`);
+            }
+          } catch (err) {
+            if (err instanceof AuthenticationError) {
+              console.error("Invalid API key — check your credentials.");
+            } else if (err instanceof RateLimitError) {
+              console.error("Rate limit hit — retry after:", err.retryAfter);
+            } else if (err instanceof SdkKnowledgeBaseError) {
+              console.error("API error:", err.status, err.message);
+            } else {
+              throw err;
+            }
+          }
+        }
+
+        fetchResources();
+        ```
+      </Tab>
+    </Tabs>
+
+    Run the file and you should see your resource list printed to the console. You've made your first SDK Knowledge Base API call!
+  </Step>
+</Steps>
+
+## Next steps
+
+Now that your integration is running, explore the rest of the documentation to go deeper.
+
+<CardGroup cols={2}>
+  <Card
+    title="Core Concepts"
+    icon="layer-group"
+    href="/sdk/overview"
+  >
+    Understand how the client, resources, pagination, and error hierarchy work together across every part of the SDK.
+  </Card>
+  <Card
+    title="Guides"
+    icon="map"
+    href="/guides/first-integration"
+  >
+    Walk through real-world integration patterns, including webhooks, middleware, and advanced pagination techniques.
+  </Card>
+</CardGroup>

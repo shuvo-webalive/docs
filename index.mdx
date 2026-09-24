@@ -1,0 +1,89 @@
+---
+title: "SDK Knowledge Base: Complete Developer Documentation"
+sidebarTitle: "Home"
+description: "Everything you need to integrate, authenticate, and build with the SDK Knowledge Base — from installation to advanced guides and full API reference."
+---
+
+Welcome to the **SDK Knowledge Base** documentation. This SDK gives you a powerful, fully-typed interface for integrating our platform into your application in minutes — handling authentication, retries, pagination, and webhooks so you can focus on shipping features, not boilerplate.
+
+Whether you're setting up your first integration or exploring advanced middleware hooks, every answer you need lives here. Browse the sections below to jump straight to what matters most.
+
+<CardGroup cols={2}>
+  <Card
+    title="Introduction"
+    icon="book"
+    href="/introduction"
+  >
+    Learn what the SDK Knowledge Base is, the problems it solves, and the key features that make it the right choice for your project.
+  </Card>
+  <Card
+    title="Quickstart"
+    icon="bolt"
+    href="/quickstart"
+  >
+    Go from zero to your first successful API call in under five minutes with our step-by-step quickstart guide.
+  </Card>
+  <Card
+    title="SDK Reference"
+    icon="rocket"
+    href="/sdk/overview"
+  >
+    Explore the complete SDK reference — every client method, option, type, and return value documented in full detail.
+  </Card>
+  <Card
+    title="Guides"
+    icon="map"
+    href="/guides/first-integration"
+  >
+    Follow practical, real-world guides that walk you through common integration patterns and advanced use cases.
+  </Card>
+</CardGroup>
+
+## Get up and running in three steps
+
+<Steps>
+  <Step title="Install the SDK">
+    Add the SDK Knowledge Base package to your project using your preferred package manager.
+
+    ```bash
+    npm install sdk-knowledge-base
+    ```
+  </Step>
+  <Step title="Authenticate your client">
+    Initialize the SDK client with your API key. Store your key in an environment variable so it never touches source control.
+
+    ```bash
+    export SDK_KB_API_KEY="your-api-key-here"
+    ```
+  </Step>
+  <Step title="Make your first call">
+    Create a client instance and call any endpoint. The SDK handles token passing, retries, and response parsing automatically.
+
+    ```typescript
+    import { SdkKnowledgeBase } from "sdk-knowledge-base";
+
+    const client = new SdkKnowledgeBase({
+      apiKey: process.env.SDK_KB_API_KEY,
+    });
+
+    const result = await client.resources.list();
+    console.log(result.data);
+    ```
+  </Step>
+</Steps>
+
+## SDK initialization at a glance
+
+The snippet below shows a fully configured client with the most commonly used options. You only need the `apiKey` to get started — everything else is optional.
+
+```typescript
+import { SdkKnowledgeBase } from "sdk-knowledge-base";
+
+const client = new SdkKnowledgeBase({
+  apiKey: process.env.SDK_KB_API_KEY, // required
+  baseUrl: "https://api.sdkkb.io/v1", // default, override for proxies
+  timeout: 10_000,                    // ms, default 30 000
+  maxRetries: 3,                      // automatic exponential back-off
+  logLevel: "info",                   // "debug" | "info" | "warn" | "error"
+});
+```

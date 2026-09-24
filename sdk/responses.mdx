@@ -1,0 +1,262 @@
+---
+title: "Response Models and Types Reference — SDK Knowledge Base"
+sidebarTitle: "Responses"
+description: "Understand APIResponse<T> and Page<T> wrappers, access raw HTTP responses, use TypeScript generics, and learn how the SDK handles each HTTP status code."
+---
+
+SDK Knowledge Base wraps every API response in a typed envelope that gives you the response body, pagination metadata, request tracing information, and access to the underlying HTTP details — all in a single, consistent object. Understanding the response types helps you write robust error handling, implement pagination correctly, and extract debugging information when something goes wrong.
+
+## The `APIResponse<T>` Type
+
+When you call `client.request<T>()` directly, you receive an `APIResponse<T>` wrapper. Methods on resource namespaces unwrap this automatically and return just the `data` value, but you can opt into the full wrapper when you need metadata.
+
+```typescript
+type APIResponse<T> = {
+  data:      T;
+  meta:      ResponseMeta;
+  requestId: string;
+  status:    number;
+  headers:   Record<string, string>;
+};
+```
+
+### Fields
+
+<ResponseField name="data" type="T">
+  The deserialized response body. The generic parameter `T` controls the TypeScript type of this field. For resource methods like `client.users.get()`, this is the resource object itself.
+</ResponseField>
+
+<ResponseField name="meta" type="ResponseMeta">
+  Server-provided metadata about the response. See the expandable section below for all nested fields.
+
+  <Expandable title="ResponseMeta fields">
+    <ResponseField name="meta.requestId" type="string">
+      A globally unique identifier for this specific API request, generated server-side. Provide this value to support when reporting issues — it allows the team to locate the exact request in server logs.
+    </ResponseField>
+
+    <ResponseField name="meta.region" type="string">
+      The data center region that processed the request, e.g. `"us-east-1"` or `"eu-west-1"`.
+    </ResponseField>
+
+    <ResponseField name="meta.rateLimit" type="RateLimitInfo">
+      Current rate limit state for your API key.
+
+      <Expandable title="RateLimitInfo fields">
+        <ResponseField name="meta.rateLimit.limit" type="number">
+          Your account's maximum requests per window.
+        </ResponseField>
+        <ResponseField name="meta.rateLimit.remaining" type="number">
+          Requests remaining in the current window.
+        </ResponseField>
+        <ResponseField name="meta.rateLimit.resetAt" type="string">
+          ISO 8601 timestamp of when the current rate limit window resets.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="meta.version" type="string">
+      The API version that handled this request, e.g. `"2024-06-01"`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="requestId" type="string">
+  Convenience alias for `meta.requestId`. Surfaced at the top level for easy access in logging and error reporting.
+</ResponseField>
+
+<ResponseField name="status" type="number">
+  The HTTP status code of the response, e.g. `200`, `201`, `204`.
+</ResponseField>
+
+<ResponseField name="headers" type="Record<string, string>">
+  All response headers as a plain key-value object with lower-cased header names.
+</ResponseField>
+
+---
+
+## The `Page<T>` Type
+
+List operations return a `Page<T>` object that bundles the current result set with cursor-based pagination metadata.
+
+```typescript
+type Page<T> = {
+  data:        T[];
+  hasMore:     boolean;
+  nextCursor:  string | null;
+  totalCount?: number;
+};
+```
+
+<ResponseField name="data" type="T[]">
+  The array of resource objects for the current page.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  `true` if there are additional records beyond this page. Use this as the loop condition when implementing manual pagination.
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  An opaque cursor string to pass as the `cursor` param in the next `.list()` call. `null` when `hasMore` is `false`.
+</ResponseField>
+
+<ResponseField name="totalCount" type="number | undefined">
+  The total number of records matching the current filter, across all pages. This field is only present when you pass `includeTotalCount: true` in the list params, as computing the total count requires an additional server-side query.
+</ResponseField>
+
+### Manual Pagination Example
+
+```typescript
+let cursor: string | undefined;
+
+do {
+  const page = await client.orders.list({ limit: 50, cursor });
+
+  for (const order of page.data) {
+    await processOrder(order);
+  }
+
+  cursor = page.nextCursor ?? undefined;
+} while (page.hasMore);
+```
+
+---
+
+## Accessing the Raw HTTP Response
+
+Resource methods return the unwrapped data value for convenience. When you need the full HTTP response — for status codes, headers, or rate-limit metadata — call `client.request()` with the `raw: true` option.
+
+```typescript
+import { SDKClient, APIResponse } from '@sdk-knowledge-base/client';
+
+const response: APIResponse<User> = await client.request<User>({
+  method: 'GET',
+  path:   '/users/usr_01hx',
+  raw:    true,
+});
+
+console.log(response.status);                     // 200
+console.log(response.requestId);                  // 'req_...'
+console.log(response.meta.rateLimit.remaining);   // 98
+console.log(response.headers['x-custom-header']); // '...'
+console.log(response.data.name);                  // 'Ada Lovelace'
+```
+
+---
+
+## TypeScript Generics Usage
+
+The response types are fully generic. Provide the expected response shape as a type argument to get precise IntelliSense and compile-time safety.
+
+<CodeGroup>
+```typescript Typed resource response
+// The type argument flows through automatically from the resource method
+const user: User = await client.users.get('usr_01hx');
+// user.name, user.email, user.role — all autocompleted
+```
+
+```typescript Typed raw request
+type AccountStats = {
+  totalUsers:    number;
+  activeToday:   number;
+  storageUsedMb: number;
+};
+
+const stats = await client.request<AccountStats>({
+  method: 'GET',
+  path:   '/account/stats',
+});
+
+// stats.totalUsers is typed as number
+```
+
+```typescript Typed page response
+const page: Page<Order> = await client.orders.list({ limit: 10 });
+
+page.data.forEach((order: Order) => {
+  console.log(order.total); // typed, not `any`
+});
+```
+
+```typescript Generic utility function
+async function fetchAll<T>(
+  listFn: (cursor?: string) => Promise<Page<T>>
+): Promise<T[]> {
+  const results: T[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const page = await listFn(cursor);
+    results.push(...page.data);
+    cursor = page.nextCursor ?? undefined;
+  } while (page.hasMore);
+
+  return results;
+}
+
+const allUsers = await fetchAll((cursor) =>
+  client.users.list({ cursor })
+);
+```
+</CodeGroup>
+
+---
+
+## HTTP Status Codes and SDK Behavior
+
+The SDK maps HTTP status codes to typed error classes. Successful responses resolve the promise; error responses reject it with a specific error subclass you can catch and inspect.
+
+| Status | Class | Retried? | Description |
+|--------|-------|----------|-------------|
+| `200` | — | — | Success. Promise resolves with the response data. |
+| `201` | — | — | Created. Promise resolves with the new resource. |
+| `204` | — | — | No Content. Promise resolves with `undefined`. |
+| `400` | `BadRequestError` | No | The request body or parameters are invalid. |
+| `401` | `AuthenticationError` | No | The API key is missing or invalid. |
+| `403` | `PermissionError` | No | The API key lacks permission for this operation. |
+| `404` | `NotFoundError` | No | The requested resource does not exist. |
+| `409` | `ConflictError` | No | The operation conflicts with current resource state. |
+| `422` | `UnprocessableError` | No | Validation failed on the server side. |
+| `429` | `RateLimitError` | Yes | Rate limit exceeded. Retried with backoff. |
+| `500` | `InternalServerError` | Yes | Server-side error. Retried automatically. |
+| `502` | `BadGatewayError` | Yes | Upstream gateway error. Retried automatically. |
+| `503` | `ServiceUnavailableError` | Yes | Service temporarily unavailable. Retried automatically. |
+| `504` | `GatewayTimeoutError` | Yes | Gateway timed out. Retried automatically. |
+
+### Error Handling Example
+
+```typescript
+import {
+  NotFoundError,
+  RateLimitError,
+  AuthenticationError,
+  SDKError,
+} from '@sdk-knowledge-base/client';
+
+try {
+  const user = await client.users.get(userId);
+  return user;
+} catch (err) {
+  if (err instanceof NotFoundError) {
+    return null; // Graceful fallback
+  }
+
+  if (err instanceof RateLimitError) {
+    console.warn(`Rate limited. Resets at: ${err.resetAt}`);
+    throw err;
+  }
+
+  if (err instanceof AuthenticationError) {
+    // Trigger re-auth flow
+    await refreshCredentials();
+    throw err;
+  }
+
+  if (err instanceof SDKError) {
+    // Any other SDK error
+    console.error(`Request ${err.requestId} failed:`, err.message);
+    throw err;
+  }
+
+  throw err; // Non-SDK error, re-throw as-is
+}
+```

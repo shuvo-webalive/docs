@@ -1,0 +1,157 @@
+---
+title: "SDK Reference Overview: Classes, Exports & Compatibility"
+sidebarTitle: "Overview"
+description: "Explore every public export the SDK ships — client, resource classes, error types, and utilities — plus Node.js and TypeScript compatibility."
+---
+
+The SDK Reference section is your authoritative guide to every public symbol exported by the SDK Knowledge Base package. Whether you are instantiating the top-level client, working with typed resource classes, handling errors gracefully, or reaching for low-level utility helpers, you will find the full API surface documented here with examples, type signatures, and behavioral notes.
+
+## What This Section Covers
+
+The SDK Knowledge Base library is organized into four primary areas. Each area has its own dedicated reference page, but this overview gives you the full picture of what is available and how the pieces fit together.
+
+<CardGroup cols={2}>
+  <Card title="Client" icon="plug" href="/sdk/client">
+    The `SDKClient` class — your single entry point for every API call. Covers constructor options, authentication, and lifecycle management.
+  </Card>
+  <Card title="Resources" icon="layer-group" href="/sdk/resources">
+    Typed resource classes that map directly to REST resources. Each class exposes `list`, `get`, `create`, `update`, and `delete` methods.
+  </Card>
+  <Card title="Requests" icon="arrow-up-from-bracket" href="/sdk/requests">
+    Request builder types, pagination helpers, filter objects, and the options accepted by every method call.
+  </Card>
+  <Card title="Responses" icon="arrow-down-to-bracket" href="/sdk/responses">
+    Response envelope types, `Page<T>` pagination wrappers, raw response access, and streaming response helpers.
+  </Card>
+</CardGroup>
+
+## Import Structure
+
+The SDK ships a single package entry point. Import only what you need — the package is fully tree-shakeable, so unused exports are eliminated at build time.
+
+<CodeGroup>
+```typescript Runtime imports
+import { SDKClient } from '@your-org/sdk';
+import type { Config, Resource, Page } from '@your-org/sdk';
+```
+
+```typescript Full named imports
+import {
+  SDKClient,
+
+  // Resource classes
+  UsersResource,
+  ProjectsResource,
+  EventsResource,
+  WebhooksResource,
+
+  // Error classes
+  SDKError,
+  AuthenticationError,
+  NotFoundError,
+  RateLimitError,
+  ValidationError,
+  TimeoutError,
+  NetworkError,
+
+  // Utility functions
+  isSDKError,
+  isRetryableError,
+  paginate,
+  withRetry,
+} from '@your-org/sdk';
+
+import type {
+  Config,
+  Resource,
+  Page,
+  RequestOptions,
+  RawResponse,
+} from '@your-org/sdk';
+```
+
+```typescript CommonJS (Node.js)
+const { SDKClient, isSDKError } = require('@your-org/sdk');
+```
+</CodeGroup>
+
+## Major Exports at a Glance
+
+### `SDKClient`
+
+The root client class. Instantiate it once with your `Config` and use it to access every resource. See [Initializing the SDK Client](/sdk/initialization) for the full constructor reference.
+
+```typescript
+const client = new SDKClient({ apiKey: process.env.API_KEY });
+```
+
+### Resource Classes
+
+Resource classes are attached to the client instance as properties. You should not instantiate them directly.
+
+| Property | Class | Description |
+|---|---|---|
+| `client.users` | `UsersResource` | Create, read, update, and delete user records |
+| `client.projects` | `ProjectsResource` | Manage projects and their memberships |
+| `client.events` | `EventsResource` | Ingest and query event streams |
+| `client.webhooks` | `WebhooksResource` | Register and verify webhook endpoints |
+
+### Error Classes
+
+Every error thrown by the SDK extends the base `SDKError` class, giving you a consistent shape to catch and inspect.
+
+| Class | HTTP Status | When It Is Thrown |
+|---|---|---|
+| `AuthenticationError` | 401 | Missing or invalid API key |
+| `PermissionError` | 403 | Valid key lacks required scope |
+| `NotFoundError` | 404 | Requested resource does not exist |
+| `ValidationError` | 422 | Request body failed server-side validation |
+| `RateLimitError` | 429 | Exceeded rate limit; check `retryAfter` |
+| `TimeoutError` | 408 / timeout | Request exceeded the configured `timeout` |
+| `NetworkError` | — | DNS failure, connection refused, etc. |
+
+### Utility Functions
+
+| Function | Signature | Description |
+|---|---|---|
+| `isSDKError` | `(err: unknown) => err is SDKError` | Type-safe check for SDK errors |
+| `isRetryableError` | `(err: unknown) => boolean` | Returns `true` for transient failures |
+| `paginate` | `(page: Page<T>) => AsyncIterable<T>` | Unwraps all pages into an async iterator |
+| `withRetry` | `(fn: () => Promise<T>, opts?) => Promise<T>` | Wraps any async call with configurable retry logic |
+
+## Compatibility Matrix
+
+The SDK Knowledge Base package targets the environments listed below. Using an older runtime is not supported and may produce unexpected behavior.
+
+### Node.js
+
+| Node.js Version | Support Status |
+|---|---|
+| 22.x (LTS) | ✅ Fully supported |
+| 20.x (LTS) | ✅ Fully supported |
+| 18.x (LTS) | ✅ Fully supported |
+| 16.x | ⚠️ Best-effort (EOL) |
+| 14.x and below | ❌ Not supported |
+
+### TypeScript
+
+| TypeScript Version | Support Status |
+|---|---|
+| 5.x | ✅ Fully supported |
+| 4.7 – 4.9 | ✅ Fully supported |
+| 4.4 – 4.6 | ⚠️ Supported, some inferred types may differ |
+| 4.3 and below | ❌ Not supported |
+
+<Note>
+  The SDK is compiled to **ES2020** with `moduleResolution: "bundler"` and ships both CJS and ESM builds. Set `"moduleResolution": "bundler"` or `"node16"` in your `tsconfig.json` to get accurate type resolution.
+</Note>
+
+### Browser & Edge Runtimes
+
+| Runtime | Support Status |
+|---|---|
+| Modern browsers (Chromium, Firefox, Safari) | ✅ Via bundler (Vite, webpack, esbuild) |
+| Cloudflare Workers | ✅ Fully supported |
+| Vercel Edge Functions | ✅ Fully supported |
+| Deno | ⚠️ Via npm specifier (`npm:@your-org/sdk`) |
+| Bun | ✅ Fully supported |

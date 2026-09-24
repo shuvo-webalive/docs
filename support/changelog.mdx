@@ -1,0 +1,253 @@
+---
+title: "SDK Knowledge Base Changelog: Releases and Migration Notes"
+sidebarTitle: "Changelog"
+description: "Track every SDK Knowledge Base release: new features, bug fixes, breaking changes, and step-by-step migration guidance for major version upgrades."
+---
+
+This changelog records every notable change to the SDK Knowledge Base client libraries. Entries follow [Semantic Versioning](https://semver.org): patch releases contain bug fixes, minor releases add backwards-compatible features, and major releases may introduce breaking changes documented explicitly below.
+
+---
+
+## v2.1.0
+
+**Released 2024-11-14** · [npm](https://www.npmjs.com/package/@sdkkb/sdk) · [GitHub diff](https://github.com/sdkkb/sdk/compare/v2.0.0...v2.1.0)
+
+This release improves developer ergonomics with native async iteration support for paginated endpoints, stronger TypeScript generics, and a long-requested `logLevel` configuration option.
+
+### New features
+
+<AccordionGroup>
+  <Accordion title="Async iteration for paginated endpoints">
+    All list endpoints now return an `AsyncIterable`, allowing you to consume pages with a `for await...of` loop without managing cursors manually:
+
+    ```ts
+    import { SDKClient } from "@sdkkb/sdk";
+
+    const client = new SDKClient({ apiKey: process.env.SDK_KB_API_KEY });
+
+    for await (const document of client.documents.list({ pageSize: 50 })) {
+      console.log(document.id, document.title);
+    }
+    ```
+
+    The iterator automatically fetches subsequent pages and stops when the last page is reached. You can still use the `.page()` method for manual pagination if you need direct access to cursor values or page metadata.
+  </Accordion>
+
+  <Accordion title="Improved TypeScript generics">
+    Response types now use conditional generics to narrow return types based on the `expand` parameter you pass at the call site. Your IDE will infer populated fields without requiring non-null assertions:
+
+    ```ts
+    // Without expand — metadata is Document["metadata"] | undefined
+    const doc = await client.documents.get("doc_123");
+
+    // With expand — metadata is guaranteed Document["metadata"]
+    const docExpanded = await client.documents.get("doc_123", {
+      expand: ["metadata"],
+    });
+    // docExpanded.metadata is now typed as DocumentMetadata, not DocumentMetadata | undefined
+    ```
+  </Accordion>
+
+  <Accordion title="New logLevel config option">
+    Control SDK verbosity without environment variables by setting `logLevel` directly in the client constructor. Valid values are `"silent"`, `"error"`, `"warn"`, `"info"`, and `"debug"`:
+
+    ```ts
+    const client = new SDKClient({
+      apiKey: process.env.SDK_KB_API_KEY,
+      logLevel: process.env.NODE_ENV === "development" ? "debug" : "warn",
+    });
+    ```
+
+    The environment variable `SDK_KB_LOG_LEVEL` still works and takes precedence over the constructor option, making it easy to enable debug logging in production without a code change or redeploy.
+  </Accordion>
+</AccordionGroup>
+
+### Bug fixes
+
+- **Fixed race condition in retry logic** — Concurrent requests that triggered simultaneous retries could share a retry counter, causing some requests to exceed `maxRetries` and others to stop early. Each request now maintains an independent retry counter. *(Issue #412)*
+- **Corrected cursor handling in list operations** — When a list response contained an empty `data` array alongside a non-null `nextCursor`, the SDK incorrectly stopped iteration instead of fetching the next page. The iterator now continues fetching until `nextCursor` is `null`. *(Issue #438)*
+
+---
+
+## v2.0.0
+
+**Released 2024-09-03** · [npm](https://www.npmjs.com/package/@sdkkb/sdk) · [GitHub diff](https://github.com/sdkkb/sdk/compare/v1.9.0...v2.0.0) · [Migration guide](#migrating-from-v1x-to-v20)
+
+v2.0.0 is a major release that modernises the SDK's core architecture. It delivers a cleaner error hierarchy, stricter TypeScript types, and improved tree-shaking, at the cost of several breaking changes. Set aside time to work through the migration steps below before upgrading production workloads.
+
+<Warning>
+  **Breaking changes in v2.0.0.** This release contains multiple backwards-incompatible changes. Review every item in the breaking-changes list and follow the migration steps before upgrading.
+</Warning>
+
+### Breaking changes
+
+<AccordionGroup>
+  <Accordion title="Client renamed to SDKClient">
+    The top-level export `Client` has been renamed to `SDKClient` to avoid conflicts with the global `Client` type in browser environments and to better reflect the product name.
+
+    ```ts
+    // Before (v1.x)
+    import { Client } from "@sdkkb/sdk";
+    const client = new Client({ apiKey: "..." });
+
+    // After (v2.x)
+    import { SDKClient } from "@sdkkb/sdk";
+    const client = new SDKClient({ apiKey: "..." });
+    ```
+  </Accordion>
+
+  <Accordion title="Removed deprecated fetch() method — use get()">
+    The `fetch()` method on all resource classes was deprecated in v1.7.0 and has now been removed. Replace all calls with `get()`, which has an identical signature:
+
+    ```ts
+    // Before (v1.x)
+    const doc = await client.documents.fetch("doc_123");
+
+    // After (v2.x)
+    const doc = await client.documents.get("doc_123");
+    ```
+  </Accordion>
+
+  <Accordion title="New error hierarchy">
+    All SDK errors now extend `SDKError` (previously `BaseError`). The full hierarchy is:
+
+    ```
+    SDKError
+    ├── APIError          (HTTP 4xx / 5xx responses)
+    │   ├── AuthError     (HTTP 401 / 403)
+    │   ├── RateLimitError (HTTP 429)
+    │   └── NotFoundError  (HTTP 404)
+    └── TimeoutError
+    └── NetworkError
+    ```
+
+    Update any `instanceof` checks to use the new class names:
+
+    ```ts
+    // Before (v1.x)
+    import { BaseError, HttpError } from "@sdkkb/sdk";
+
+    // After (v2.x)
+    import { SDKError, APIError, RateLimitError } from "@sdkkb/sdk";
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### New features
+
+- **Tree-shakeable named exports** — All resource classes and utility functions are now individually importable, reducing bundle size in browser and edge environments by up to 40%.
+- **Structured error bodies** — `APIError` now exposes `code` (machine-readable string), `message`, `status`, and `requestId` fields for easier programmatic error handling and logging.
+- **Request ID propagation** — Every request attaches a unique `X-Request-ID` header. The ID is included in thrown `APIError` instances and debug logs for faster cross-referencing with API server logs.
+
+### Migrating from v1.x to v2.0 {#migrating-from-v1x-to-v20}
+
+Follow these steps in order to upgrade a v1.x integration to v2.0.0 with minimal disruption.
+
+<Steps>
+  <Step title="Update the package">
+    ```bash
+    npm install @sdkkb/sdk@^2.0.0
+    ```
+
+    If you use a lock file, commit the updated `package-lock.json` or `yarn.lock` alongside the code changes.
+  </Step>
+  <Step title="Run the automated codemod">
+    The migration CLI handles the `Client → SDKClient` rename and `fetch() → get()` replacement automatically:
+
+    ```bash
+    npx @sdkkb/migrate --from 1 --to 2 ./src
+    ```
+
+    Review the diff produced by the codemod before committing.
+  </Step>
+  <Step title="Update error handler imports">
+    Search for imports from `@sdkkb/sdk` that reference `BaseError` or `HttpError` and replace them with the new equivalents:
+
+    ```bash
+    grep -r "BaseError\|HttpError" src/ --include="*.ts"
+    ```
+
+    Update each occurrence using the new hierarchy table above.
+  </Step>
+  <Step title="Run TypeScript checks">
+    ```bash
+    npx tsc --noEmit
+    ```
+
+    Address any remaining type errors. The most common are renamed types and tightened generic constraints on list responses.
+  </Step>
+  <Step title="Run your test suite">
+    Execute your full integration and unit test suite against the updated SDK. Pay particular attention to error-handling branches — the new error classes may not match old `instanceof` checks that were not caught by the codemod.
+  </Step>
+  <Step title="Deploy to staging first">
+    Validate the upgrade in a staging environment with real API traffic before promoting to production. Monitor logs for unexpected `SDKError` instances during the soak period.
+  </Step>
+</Steps>
+
+---
+
+## v1.9.0
+
+**Released 2024-06-20** · [npm](https://www.npmjs.com/package/@sdkkb/sdk) · [GitHub diff](https://github.com/sdkkb/sdk/compare/v1.8.0...v1.9.0)
+
+v1.9.0 is a backwards-compatible feature release focused on extensibility, webhook security, and browser delivery improvements.
+
+### New features
+
+<AccordionGroup>
+  <Accordion title="Middleware support">
+    You can now register request and response middleware on the SDK client, enabling cross-cutting concerns such as custom logging, header injection, and response transformation without subclassing:
+
+    ```ts
+    const client = new Client({ apiKey: "..." });
+
+    // Request middleware — runs before every outgoing request
+    client.use({
+      onRequest(req) {
+        req.headers.set("X-Correlation-ID", generateCorrelationId());
+        return req;
+      },
+      onResponse(res) {
+        metrics.record("sdk_response", { status: res.status });
+        return res;
+      },
+    });
+    ```
+
+    Middleware is executed in registration order for requests and reverse order for responses, following the standard onion model.
+  </Accordion>
+
+  <Accordion title="Webhook signature verification helpers">
+    New first-class utilities make it straightforward to verify that incoming webhook payloads were sent by SDK Knowledge Base and have not been tampered with:
+
+    ```ts
+    import { Client } from "@sdkkb/sdk";
+
+    const client = new Client({ apiKey: process.env.SDK_KB_API_KEY });
+
+    // In your webhook handler
+    const event = client.webhooks.constructEvent(
+      rawBody,        // Buffer or string — must be the raw request body
+      signatureHeader,
+      process.env.WEBHOOK_SECRET!,
+    );
+
+    console.log("Verified event type:", event.type);
+    ```
+
+    The helper validates the HMAC-SHA256 signature and rejects payloads with a timestamp older than 5 minutes to prevent replay attacks.
+  </Accordion>
+
+  <Accordion title="Browser bundle improvements">
+    The browser-specific entry point (`@sdkkb/sdk/browser`) was rebuilt with an improved ESM output:
+
+    - Reduced gzipped bundle size from 34 KB to 21 KB.
+    - Removed the `node:crypto` polyfill dependency — the SDK now uses the Web Crypto API (`globalThis.crypto`) natively, which is available in all modern browsers and edge runtimes.
+    - Added explicit `exports` map entries for Deno and Cloudflare Workers.
+  </Accordion>
+</AccordionGroup>
+
+### Bug fixes
+
+- **Fixed double-encoding of query parameters containing special characters** — URL-encoding was applied twice when query string values contained `+`, `&`, or `=` characters, resulting in `400 Bad Request` errors. *(Issue #389)*
+- **Corrected `Content-Type` header for empty POST bodies** — The SDK now sends `Content-Length: 0` without a `Content-Type` header for requests with no body, preventing `415 Unsupported Media Type` rejections from strict API proxies. *(Issue #371)*

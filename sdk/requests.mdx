@@ -1,0 +1,231 @@
+---
+title: "Request Options Reference — SDK Knowledge Base API"
+sidebarTitle: "Requests"
+description: "Full reference for the RequestOptions interface: per-request headers, timeouts, AbortSignal cancellation, idempotency keys, and raw requests."
+---
+
+Every method in SDK Knowledge Base ultimately builds and dispatches an HTTP request. The `RequestOptions` interface is the underlying shape that controls exactly how that request is formed — the HTTP method, path, query parameters, headers, timeout, and more. You rarely need to construct `RequestOptions` directly when using typed resource methods, but understanding this interface is essential when you use `client.request()` for custom endpoints, need to cancel in-flight requests, or want to ensure safe retries with idempotency keys.
+
+## The `RequestOptions` Interface
+
+```typescript
+type RequestOptions = {
+  method:          'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  path:            string;
+  body?:           unknown;
+  query?:          Record<string, string | number | boolean>;
+  headers?:        Record<string, string>;
+  timeout?:        number;
+  signal?:         AbortSignal;
+  idempotencyKey?: string;
+  raw?:            boolean;
+};
+```
+
+### Fields
+
+<ParamField path="method" type="'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'" required>
+  The HTTP method for this request. Use `GET` for reads, `POST` for creates, `PATCH` for partial updates, `PUT` for full replacements, and `DELETE` for removal.
+</ParamField>
+
+<ParamField path="path" type="string" required>
+  The API path relative to the `baseUrl`. Always start with a leading slash. Path parameters should be interpolated directly into the string before passing to `client.request()`.
+
+  ```typescript
+  // Correct
+  path: `/users/${userId}/orders`
+
+  // Also correct — query params go in the `query` field, not the path
+  path: '/users'
+  ```
+</ParamField>
+
+<ParamField path="body" type="unknown">
+  The request body. The SDK serializes this value as JSON and sets `Content-Type: application/json` automatically. For `GET` and `DELETE` requests, omit this field.
+</ParamField>
+
+<ParamField path="query" type="Record<string, string | number | boolean>">
+  Query string parameters. The SDK URL-encodes these values and appends them to the path. Use this instead of manually appending `?key=value` to the `path` string.
+
+  ```typescript
+  query: { page: 1, limit: 50, active: true }
+  // Results in: ?page=1&limit=50&active=true
+  ```
+</ParamField>
+
+<ParamField path="headers" type="Record<string, string>">
+  Per-request headers. These are merged with the client's default headers; per-request headers take precedence when the same header name exists in both.
+</ParamField>
+
+<ParamField path="timeout" type="number">
+  Request-level timeout in milliseconds. Overrides the client-level default for this single request. When the timeout is exceeded, the request rejects with a `TimeoutError`.
+</ParamField>
+
+<ParamField path="signal" type="AbortSignal">
+  An `AbortSignal` from an `AbortController`. When the signal is aborted, the in-flight request is cancelled and the promise rejects with an `AbortError`. Takes precedence over `timeout` if both are provided and the signal fires first.
+</ParamField>
+
+<ParamField path="idempotencyKey" type="string">
+  A client-generated unique key sent in the `Idempotency-Key` header. The API uses this key to deduplicate requests — if the same key is received twice, the second response returns the cached result of the first without re-executing the operation. Use UUIDs or similarly unique strings.
+</ParamField>
+
+<ParamField path="raw" type="boolean">
+  When `true`, `client.request()` returns the full `APIResponse<T>` wrapper instead of just the unwrapped `data` value. Use this when you need access to response headers, status codes, rate-limit metadata, or the `requestId`. Defaults to `false`.
+</ParamField>
+
+---
+
+## Adding Per-Request Headers
+
+Pass a `headers` object in your `RequestOptions` to attach headers to a single request without affecting other calls. This is useful for conditional logic, A/B test flags, or forwarding a caller's trace context.
+
+```typescript
+const result = await client.request({
+  method:  'GET',
+  path:    '/users',
+  headers: {
+    'X-Request-ID':  crypto.randomUUID(),
+    'X-Tenant-ID':   tenantId,
+  },
+});
+```
+
+Per-request headers are merged on top of the client's default headers. If both define a header with the same name, the per-request value wins.
+
+<Tip>
+  For headers that should appear on every request (like a trace ID or feature flag), use `client.addHeader()` instead of repeating the header in every call.
+</Tip>
+
+---
+
+## Cancelling a Request with `AbortController`
+
+Use the browser-standard `AbortController` API to cancel any in-flight request. This is particularly useful in UI contexts where a user navigates away before a response arrives, or in server-side code where you need to enforce strict deadlines.
+
+```typescript
+const controller = new AbortController();
+
+// Cancel after 5 seconds regardless of the client-level timeout
+const timer = setTimeout(() => controller.abort(), 5_000);
+
+try {
+  const user = await client.request<User>({
+    method: 'GET',
+    path:   '/users/usr_01hx',
+    signal: controller.signal,
+  });
+
+  clearTimeout(timer);
+  return user;
+} catch (err) {
+  if (err instanceof DOMException && err.name === 'AbortError') {
+    console.warn('Request was cancelled');
+  } else {
+    throw err;
+  }
+}
+```
+
+You can also use a single controller to cancel multiple concurrent requests simultaneously:
+
+```typescript
+const controller = new AbortController();
+const { signal } = controller;
+
+const [users, orders] = await Promise.all([
+  client.request({ method: 'GET', path: '/users',  signal }),
+  client.request({ method: 'GET', path: '/orders', signal }),
+]);
+
+// Cancel both at once
+controller.abort();
+```
+
+<Note>
+  Aborting a request that has already received a response has no effect — the promise has already resolved. The `AbortSignal` only cancels requests that are still in flight.
+</Note>
+
+---
+
+## Using Idempotency Keys for Safe Retries
+
+Idempotency keys let you safely retry mutating requests (POST, PUT, PATCH) without risking duplicate side effects. When the API receives a request with an `Idempotency-Key` it has seen before, it returns the original response without re-running the operation.
+
+```typescript
+import { randomUUID } from 'crypto';
+
+const idempotencyKey = randomUUID();
+
+// This is safe to retry — the order is only created once
+async function createOrderSafely(data: CreateOrderParams) {
+  return client.request<Order>({
+    method:         'POST',
+    path:           '/orders',
+    body:           data,
+    idempotencyKey,
+  });
+}
+```
+
+### When to Use Idempotency Keys
+
+| Scenario | Recommendation |
+|----------|---------------|
+| Creating records (POST) | Always use an idempotency key |
+| Triggering financial operations | Always use an idempotency key |
+| Partial updates (PATCH) | Use if the update is not naturally idempotent |
+| Read operations (GET) | Not required — GETs are inherently idempotent |
+| Deletes (DELETE) | Optional — deleting a non-existent resource is usually safe |
+
+<Tip>
+  Generate the idempotency key before your first attempt and reuse the same key for all retries of that logical operation. Generating a new key per retry defeats the purpose.
+</Tip>
+
+---
+
+## Making Raw Requests with `client.request()`
+
+Use `client.request<T>()` to call any endpoint — including ones not covered by the typed resource namespaces — while still benefiting from the client's retry logic, default headers, and error handling.
+
+<CodeGroup>
+```typescript GET request
+const stats = await client.request<AccountStats>({
+  method: 'GET',
+  path:   '/account/stats',
+  query:  { period: '30d' },
+});
+
+console.log(stats.totalRequests);
+```
+
+```typescript POST request with body
+const webhook = await client.request<Webhook>({
+  method: 'POST',
+  path:   '/webhooks',
+  body:   {
+    url:    'https://myapp.com/hooks/sdk',
+    events: ['user.created', 'order.completed'],
+  },
+  idempotencyKey: crypto.randomUUID(),
+});
+```
+
+```typescript PATCH request
+const updated = await client.request<User>({
+  method: 'PATCH',
+  path:   `/users/${userId}`,
+  body:   { role: 'admin' },
+});
+```
+
+```typescript DELETE request
+await client.request<void>({
+  method: 'DELETE',
+  path:   `/webhooks/${webhookId}`,
+});
+```
+</CodeGroup>
+
+<Warning>
+  `client.request<T>()` returns the parsed JSON body cast to `T` without runtime validation. Ensure the type you provide accurately reflects the API response shape to avoid subtle runtime bugs.
+</Warning>

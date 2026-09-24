@@ -1,0 +1,302 @@
+---
+title: "SDK Knowledge Base Resource Methods and Namespaces"
+sidebarTitle: "Resources"
+description: "Learn the resource pattern: access typed namespaces for users, orders, and products, and use standard CRUD methods with full TypeScript examples."
+---
+
+SDK Knowledge Base organizes every API entity into a **resource namespace** — a dedicated object on the client that groups all operations for that entity type. Instead of constructing URLs or picking HTTP verbs yourself, you call semantic methods like `.create()`, `.get()`, and `.list()` on the right namespace. Every resource namespace exposes the same standard set of CRUD methods, so once you learn the pattern for one resource you can apply it to all of them.
+
+## Accessing Resource Namespaces
+
+Each resource is available as a property directly on your `SDKClient` instance.
+
+```typescript
+import { SDKClient } from '@sdk-knowledge-base/client';
+
+const client = new SDKClient({ apiKey: process.env.API_KEY });
+
+// Access resource namespaces
+client.users     // UserResource
+client.orders    // OrderResource
+client.products  // ProductResource
+```
+
+You can also destructure them from `client.resources` if you want to pass individual namespaces to functions:
+
+```typescript
+const { users, orders, products } = client.resources;
+
+async function processNewOrder(userId: string) {
+  const user = await users.get(userId);
+  // ...
+}
+```
+
+---
+
+## Standard CRUD Methods
+
+Every resource namespace implements the following interface. The concrete types (e.g. `User`, `CreateUserParams`) differ per resource, but the method signatures are identical.
+
+### `.create(data: CreateParams): Promise<Resource>`
+
+Creates a new record and returns the persisted resource object with its server-assigned `id` and timestamps.
+
+```typescript
+const user = await client.users.create({
+  name:  'Ada Lovelace',
+  email: 'ada@example.com',
+  role:  'admin',
+});
+
+console.log(user.id);        // 'usr_01hx...'
+console.log(user.createdAt); // '2024-06-01T12:00:00Z'
+```
+
+<ParamField path="data" type="CreateParams" required>
+  The fields required to create the resource. The exact shape depends on the resource type — refer to the individual resource reference pages for required and optional fields.
+</ParamField>
+
+<ResponseField name="Promise<Resource>" type="Resource">
+  The newly created resource, including all server-generated fields such as `id`, `createdAt`, and `updatedAt`.
+</ResponseField>
+
+---
+
+### `.get(id: string): Promise<Resource>`
+
+Fetches a single resource by its unique identifier.
+
+```typescript
+const user = await client.users.get('usr_01hx...');
+
+console.log(user.name);  // 'Ada Lovelace'
+console.log(user.email); // 'ada@example.com'
+```
+
+<ParamField path="id" type="string" required>
+  The unique resource identifier. These are always prefixed with the resource type (e.g. `usr_`, `ord_`, `prd_`) for readability and to prevent accidental cross-resource lookups.
+</ParamField>
+
+<ResponseField name="Promise<Resource>" type="Resource">
+  The full resource object. Throws a `NotFoundError` if no resource with that ID exists in your account.
+</ResponseField>
+
+---
+
+### `.update(id: string, data: UpdateParams): Promise<Resource>`
+
+Performs a partial update (HTTP `PATCH`) on an existing resource. Only the fields you include in `data` are changed; all other fields retain their current values.
+
+```typescript
+const updated = await client.users.update('usr_01hx...', {
+  role: 'viewer',
+});
+
+console.log(updated.role);      // 'viewer'
+console.log(updated.updatedAt); // reflects new timestamp
+```
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the resource to update.
+</ParamField>
+
+<ParamField path="data" type="UpdateParams" required>
+  A partial object containing only the fields you want to change. All fields are optional; passing an empty object is a no-op.
+</ParamField>
+
+<ResponseField name="Promise<Resource>" type="Resource">
+  The resource in its updated state, with a refreshed `updatedAt` timestamp.
+</ResponseField>
+
+---
+
+### `.delete(id: string): Promise<void>`
+
+Permanently deletes a resource. This action cannot be undone.
+
+```typescript
+await client.users.delete('usr_01hx...');
+// Resolves with undefined on success
+```
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the resource to delete.
+</ParamField>
+
+<ResponseField name="Promise<void>" type="void">
+  Resolves with `undefined` on success. Throws a `NotFoundError` if the resource does not exist, and a `ConflictError` if the resource cannot be deleted due to existing dependencies.
+</ResponseField>
+
+<Warning>
+  Deletion is permanent and immediate. If your use case requires soft deletes or an archive state, use `.update()` to set a `status` field instead.
+</Warning>
+
+---
+
+### `.list(params?: ListParams): Promise<Page<Resource>>`
+
+Fetches a single page of resources. Supports filtering, sorting, and cursor-based pagination.
+
+```typescript
+const page = await client.users.list({
+  limit:  20,
+  cursor: 'cursor_abc123',
+  filter: { role: 'admin' },
+  sort:   { field: 'createdAt', direction: 'desc' },
+});
+
+console.log(page.data);       // User[]
+console.log(page.hasMore);    // true | false
+console.log(page.nextCursor); // 'cursor_def456' | null
+```
+
+<ParamField path="params" type="ListParams">
+  Optional pagination and filter parameters.
+
+  <Expandable title="ListParams fields">
+    <ParamField path="limit" type="number">
+      Number of records to return per page. Defaults to `20`, maximum is `100`.
+    </ParamField>
+
+    <ParamField path="cursor" type="string">
+      Opaque cursor string from a previous `page.nextCursor`. Omit to start from the beginning.
+    </ParamField>
+
+    <ParamField path="filter" type="Record<string, unknown>">
+      Key-value pairs to filter results. Only records matching all provided filters are returned.
+    </ParamField>
+
+    <ParamField path="sort" type="{ field: string; direction: 'asc' | 'desc' }">
+      Sort order for the result set. Defaults to `{ field: 'createdAt', direction: 'desc' }`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ResponseField name="Promise<Page<Resource>>" type="Page<Resource>">
+  A page object containing the result array and pagination metadata. See the [Responses reference](/sdk/responses) for the full `Page<T>` type.
+</ResponseField>
+
+---
+
+### `.listAll(params?: ListParams): AsyncIterable<Resource>`
+
+Returns an `AsyncIterable` that automatically fetches successive pages and yields individual resource objects one at a time. Use this when you need to process every record without manually handling pagination cursors.
+
+```typescript
+for await (const user of client.users.listAll({ filter: { role: 'admin' } })) {
+  console.log(user.name);
+}
+```
+
+You can also collect all records into an array, though be cautious with large datasets:
+
+```typescript
+import { collect } from '@sdk-knowledge-base/client/utils';
+
+const allUsers = await collect(client.users.listAll());
+```
+
+<ParamField path="params" type="ListParams">
+  The same filter and sort options as `.list()`. The `cursor` and `limit` fields control the underlying page size; you do not need to manage cursors manually.
+</ParamField>
+
+<ResponseField name="AsyncIterable<Resource>" type="AsyncIterable<Resource>">
+  An async iterable that yields one resource at a time across all pages. The iterable fetches the next page lazily — only when the current page is exhausted.
+</ResponseField>
+
+<Note>
+  `.listAll()` respects the `filter` and `sort` params you pass. It does not have a built-in record cap, so if you have hundreds of thousands of records, consider adding a filter or processing records in chunks using `.list()` with manual cursor management.
+</Note>
+
+---
+
+## Resource Fields
+
+Every resource object shares a common set of base fields.
+
+<ResponseField name="id" type="string">
+  Unique identifier for this resource instance. Prefixed with the resource type (e.g. `usr_`, `ord_`, `prd_`).
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  ISO 8601 timestamp of when the resource was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  ISO 8601 timestamp of the most recent update to this resource.
+</ResponseField>
+
+<ResponseField name="object" type="string">
+  A string literal identifying the resource type, e.g. `"user"`, `"order"`, `"product"`. Useful for discriminated union narrowing in TypeScript.
+</ResponseField>
+
+---
+
+## Complete Lifecycle Example
+
+The following example walks through a full create → list → get → update → delete cycle for a user resource.
+
+```typescript
+import { SDKClient } from '@sdk-knowledge-base/client';
+
+const client = new SDKClient({ apiKey: process.env.API_KEY });
+
+async function userLifecycleDemo() {
+  // 1. Create
+  const user = await client.users.create({
+    name:  'Grace Hopper',
+    email: 'grace@example.com',
+    role:  'editor',
+  });
+  console.log('Created:', user.id);
+
+  // 2. List — verify it appears
+  const page = await client.users.list({ filter: { role: 'editor' }, limit: 5 });
+  console.log('Found on page:', page.data.some((u) => u.id === user.id));
+
+  // 3. Get — fetch it directly
+  const fetched = await client.users.get(user.id);
+  console.log('Fetched name:', fetched.name);
+
+  // 4. Update — promote to admin
+  const updated = await client.users.update(user.id, { role: 'admin' });
+  console.log('New role:', updated.role); // 'admin'
+
+  // 5. Delete — clean up
+  await client.users.delete(user.id);
+  console.log('Deleted successfully');
+}
+
+userLifecycleDemo().catch(console.error);
+```
+
+---
+
+## TypeScript Types
+
+```typescript
+// Base type shared by all resources
+type Resource = {
+  id:        string;
+  object:    string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Pagination wrapper
+type Page<T> = {
+  data:        T[];
+  hasMore:     boolean;
+  nextCursor:  string | null;
+  totalCount?: number;
+};
+
+// Standard list parameters
+type ListParams = {
+  limit?:  number;
+  cursor?: string;
+  filter?: Record<string, unknown>;
+  sort?:   { field: string; direction: 'asc' | 'desc' };
+};
+```

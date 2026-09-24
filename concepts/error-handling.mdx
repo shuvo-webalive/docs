@@ -1,0 +1,451 @@
+---
+title: "SDK Error Handling: Error Types, Codes, and Retries"
+sidebarTitle: "Error Handling"
+description: "Master the SDK Knowledge Base error hierarchy, learn to catch typed errors by class, inspect error metadata, and implement resilient retry logic for transient failures."
+---
+
+Errors are a first-class concern in the SDK Knowledge Base SDK. Rather than returning error objects alongside data or using callback conventions, the SDK throws typed exceptions that you catch with standard `try/catch` blocks. Every error carries structured metadata — status code, machine-readable error code, human-readable message, and a request ID for support — so you always have the context you need to respond correctly and debug quickly.
+
+## Error Hierarchy
+
+All SDK errors extend a single base class, `SDKError`. This lets you catch everything with one handler when you need a safety net, while still allowing you to handle specific failure modes precisely.
+
+```
+SDKError
+├── AuthenticationError   (HTTP 401 / 403)
+├── NotFoundError         (HTTP 404)
+├── RateLimitError        (HTTP 429)
+├── ValidationError       (HTTP 422)
+└── NetworkError          (no HTTP response — timeout, DNS failure, etc.)
+```
+
+### Class Definitions
+
+```typescript
+/** Base class — all SDK errors extend this */
+class SDKError extends Error {
+  /** HTTP status code, or null for NetworkError */
+  status: number | null;
+  /** Machine-readable error code (see table below) */
+  code: string;
+  /** Human-readable description of what went wrong */
+  message: string;
+  /** Unique ID for this request — include in support tickets */
+  requestId: string | null;
+  /** The raw response body from the API, if available */
+  rawResponse: unknown | null;
+}
+
+/** Credentials are missing, malformed, or revoked */
+class AuthenticationError extends SDKError {
+  status: 401 | 403;
+}
+
+/** The requested resource does not exist or is not visible to the caller */
+class NotFoundError extends SDKError {
+  status: 404;
+}
+
+/** The caller has exceeded their rate limit */
+class RateLimitError extends SDKError {
+  status: 429;
+  /** Seconds to wait before retrying, from the Retry-After header */
+  retryAfter: number | null;
+}
+
+/** One or more request parameters failed server-side validation */
+class ValidationError extends SDKError {
+  status: 422;
+  /** Field-level error details, keyed by parameter name */
+  fieldErrors: Record<string, string[]>;
+}
+
+/** The request never reached the server (timeout, DNS, TLS) */
+class NetworkError extends SDKError {
+  status: null;
+  /** The underlying Node.js / fetch error that caused this */
+  cause: Error;
+}
+```
+
+## Catching Errors
+
+Import the error classes you need and use `instanceof` checks to handle each failure mode separately.
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import {
+      SDKClient,
+      SDKError,
+      AuthenticationError,
+      NotFoundError,
+      RateLimitError,
+      ValidationError,
+      NetworkError,
+    } from "@sdk-knowledge-base/sdk";
+
+    const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+    async function fetchItem(itemId: string) {
+      try {
+        const item = await client.items.retrieve(itemId);
+        return item;
+      } catch (err) {
+        if (err instanceof AuthenticationError) {
+          // Credentials are wrong or revoked — do not retry
+          console.error("Check your API key:", err.message);
+          throw err;
+        }
+
+        if (err instanceof NotFoundError) {
+          // The item does not exist — handle gracefully
+          console.warn(`Item ${itemId} not found (request: ${err.requestId})`);
+          return null;
+        }
+
+        if (err instanceof RateLimitError) {
+          // You have been throttled — back off before retrying
+          const wait = err.retryAfter ?? 5;
+          console.warn(`Rate limited — retry in ${wait}s`);
+          await delay(wait * 1000);
+          return fetchItem(itemId); // simple single retry
+        }
+
+        if (err instanceof ValidationError) {
+          // A parameter you sent was invalid
+          console.error("Validation failed:", err.fieldErrors);
+          throw err;
+        }
+
+        if (err instanceof NetworkError) {
+          // No response received — could be transient
+          console.error("Network failure:", err.cause.message);
+          throw err;
+        }
+
+        if (err instanceof SDKError) {
+          // Catch-all for any other SDK error
+          console.error(`SDK error [${err.code}]:`, err.message);
+          throw err;
+        }
+
+        // Re-throw anything that is not an SDK error
+        throw err;
+      }
+    }
+
+    function delay(ms: number) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    const {
+      SDKClient,
+      SDKError,
+      AuthenticationError,
+      NotFoundError,
+      RateLimitError,
+      ValidationError,
+      NetworkError,
+    } = require("@sdk-knowledge-base/sdk");
+
+    const client = new SDKClient({ apiKey: process.env.SDK_API_KEY });
+
+    async function fetchItem(itemId) {
+      try {
+        const item = await client.items.retrieve(itemId);
+        return item;
+      } catch (err) {
+        if (err instanceof AuthenticationError) {
+          console.error("Check your API key:", err.message);
+          throw err;
+        }
+
+        if (err instanceof NotFoundError) {
+          console.warn(`Item ${itemId} not found (request: ${err.requestId})`);
+          return null;
+        }
+
+        if (err instanceof RateLimitError) {
+          const wait = err.retryAfter ?? 5;
+          console.warn(`Rate limited — retry in ${wait}s`);
+          await delay(wait * 1000);
+          return fetchItem(itemId);
+        }
+
+        if (err instanceof ValidationError) {
+          console.error("Validation failed:", err.fieldErrors);
+          throw err;
+        }
+
+        if (err instanceof NetworkError) {
+          console.error("Network failure:", err.cause.message);
+          throw err;
+        }
+
+        if (err instanceof SDKError) {
+          console.error(`SDK error [${err.code}]:`, err.message);
+          throw err;
+        }
+
+        throw err;
+      }
+    }
+
+    function delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Accessing Error Metadata
+
+Every `SDKError` instance exposes four properties that tell you exactly what went wrong and how to trace it.
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import { SDKClient, SDKError } from "@sdk-knowledge-base/sdk";
+
+    const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+    try {
+      await client.items.retrieve("itm_does_not_exist");
+    } catch (err) {
+      if (err instanceof SDKError) {
+        console.log(err.status);    // 404
+        console.log(err.code);      // "not_found"
+        console.log(err.message);   // "No item with id itm_does_not_exist"
+        console.log(err.requestId); // "req_8f3kx92m" — use this in support tickets
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    const { SDKClient, SDKError } = require("@sdk-knowledge-base/sdk");
+
+    const client = new SDKClient({ apiKey: process.env.SDK_API_KEY });
+
+    try {
+      await client.items.retrieve("itm_does_not_exist");
+    } catch (err) {
+      if (err instanceof SDKError) {
+        console.log(err.status);    // 404
+        console.log(err.code);      // "not_found"
+        console.log(err.message);   // "No item with id itm_does_not_exist"
+        console.log(err.requestId); // "req_8f3kx92m"
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Common Error Codes
+
+The `code` property on every `SDKError` is a stable, machine-readable string. Use it in switch statements or lookup tables when `instanceof` checks alone are not specific enough.
+
+| Code | HTTP Status | Class | Description |
+|---|---|---|---|
+| `invalid_api_key` | 401 | `AuthenticationError` | The API key is missing, malformed, or expired. |
+| `insufficient_permissions` | 403 | `AuthenticationError` | The API key exists but lacks permission for this action. |
+| `not_found` | 404 | `NotFoundError` | The requested resource does not exist or is not visible. |
+| `rate_limit_exceeded` | 429 | `RateLimitError` | Too many requests in a short window. Respect the `Retry-After` header. |
+| `validation_error` | 422 | `ValidationError` | One or more request parameters are invalid. Check `fieldErrors`. |
+| `required_field_missing` | 422 | `ValidationError` | A required parameter was omitted from the request body. |
+| `field_too_long` | 422 | `ValidationError` | A string parameter exceeds its maximum allowed length. |
+| `invalid_cursor` | 422 | `ValidationError` | The `cursor` value is malformed or belongs to a different query. |
+| `conflict` | 409 | `SDKError` | The operation conflicts with existing state (e.g. duplicate unique field). |
+| `server_error` | 500 | `SDKError` | An unexpected error occurred on the server. Retrying may succeed. |
+| `service_unavailable` | 503 | `SDKError` | The API is temporarily unavailable. Apply exponential backoff. |
+| `network_timeout` | — | `NetworkError` | The request timed out before receiving a response. |
+| `connection_refused` | — | `NetworkError` | The SDK could not establish a TCP connection to the API host. |
+
+<Warning>
+  Never swallow errors silently with an empty `catch` block. Doing so hides outages, data integrity problems, and misconfigured credentials — issues that are easy to detect at error-handling time but painful to diagnose later from side effects.
+
+  ```typescript
+  // ❌ Never do this — you lose all signal
+  try {
+    await client.items.create({ name: "..." });
+  } catch (_) {
+    // silent swallow
+  }
+
+  // ✅ At minimum, log and re-throw, or handle intentionally
+  try {
+    await client.items.create({ name: "..." });
+  } catch (err) {
+    logger.error("Item creation failed", { err });
+    throw err;
+  }
+  ```
+</Warning>
+
+## Retry Logic for Transient Errors
+
+The SDK retries `429` and `5xx` responses automatically when `maxRetries` is set on the client. However, there are cases where you want finer control — for example, in a background worker that must survive prolonged outages or that processes items from a queue.
+
+The example below shows a self-contained retry wrapper with **exponential backoff and jitter**, appropriate for production use:
+
+<Tabs>
+  <Tab title="TypeScript">
+    ```typescript
+    import {
+      SDKClient,
+      SDKError,
+      RateLimitError,
+      NetworkError,
+    } from "@sdk-knowledge-base/sdk";
+
+    const client = new SDKClient({
+      apiKey: process.env.SDK_API_KEY!,
+      maxRetries: 0, // Disable built-in retries — we handle them ourselves
+    });
+
+    /** Returns true for errors that are worth retrying */
+    function isTransient(err: unknown): err is SDKError {
+      if (err instanceof RateLimitError) return true;
+      if (err instanceof NetworkError) return true;
+      if (err instanceof SDKError && err.status != null && err.status >= 500) {
+        return true;
+      }
+      return false;
+    }
+
+    /** Exponential backoff with full jitter */
+    function backoffMs(attempt: number, baseMs = 500, capMs = 30_000): number {
+      const exp = Math.min(capMs, baseMs * 2 ** attempt);
+      return Math.random() * exp; // full jitter
+    }
+
+    async function withRetry<T>(
+      operation: () => Promise<T>,
+      maxAttempts = 5,
+    ): Promise<T> {
+      let lastError: unknown;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        try {
+          return await operation();
+        } catch (err) {
+          if (!isTransient(err)) throw err; // Non-transient — fail immediately
+
+          lastError = err;
+          const wait =
+            err instanceof RateLimitError && err.retryAfter != null
+              ? err.retryAfter * 1000
+              : backoffMs(attempt);
+
+          console.warn(
+            `Attempt ${attempt + 1}/${maxAttempts} failed — retrying in ${Math.round(wait)}ms`,
+          );
+          await new Promise((r) => setTimeout(r, wait));
+        }
+      }
+
+      throw lastError;
+    }
+
+    // Usage
+    const item = await withRetry(() =>
+      client.items.create({ name: "Resilient Item" }),
+    );
+    ```
+  </Tab>
+  <Tab title="JavaScript">
+    ```javascript
+    const {
+      SDKClient,
+      RateLimitError,
+      NetworkError,
+      SDKError,
+    } = require("@sdk-knowledge-base/sdk");
+
+    const client = new SDKClient({
+      apiKey: process.env.SDK_API_KEY,
+      maxRetries: 0,
+    });
+
+    function isTransient(err) {
+      if (err instanceof RateLimitError) return true;
+      if (err instanceof NetworkError) return true;
+      if (err instanceof SDKError && err.status != null && err.status >= 500) {
+        return true;
+      }
+      return false;
+    }
+
+    function backoffMs(attempt, baseMs = 500, capMs = 30_000) {
+      const exp = Math.min(capMs, baseMs * 2 ** attempt);
+      return Math.random() * exp;
+    }
+
+    async function withRetry(operation, maxAttempts = 5) {
+      let lastError;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        try {
+          return await operation();
+        } catch (err) {
+          if (!isTransient(err)) throw err;
+
+          lastError = err;
+          const wait =
+            err instanceof RateLimitError && err.retryAfter != null
+              ? err.retryAfter * 1000
+              : backoffMs(attempt);
+
+          console.warn(
+            `Attempt ${attempt + 1}/${maxAttempts} failed — retrying in ${Math.round(wait)}ms`,
+          );
+          await new Promise((r) => setTimeout(r, wait));
+        }
+      }
+
+      throw lastError;
+    }
+
+    // Usage
+    const item = await withRetry(() =>
+      client.items.create({ name: "Resilient Item" }),
+    );
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  When you contact support about an error, always include the `requestId` from the caught error. The request ID allows the support team to locate the exact API call in server logs and diagnose the root cause quickly.
+</Note>
+
+## Handling ValidationError Field Errors
+
+`ValidationError` exposes a `fieldErrors` map so you can surface validation messages directly in your UI rather than showing a generic error.
+
+```typescript
+import { SDKClient, ValidationError } from "@sdk-knowledge-base/sdk";
+
+const client = new SDKClient({ apiKey: process.env.SDK_API_KEY! });
+
+try {
+  await client.items.create({
+    name: "", // invalid — name is required and cannot be empty
+    tags: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"], // too many
+  });
+} catch (err) {
+  if (err instanceof ValidationError) {
+    // fieldErrors is keyed by the parameter name in snake_case
+    // {
+    //   name: ["Name is required and cannot be empty."],
+    //   tags: ["A maximum of 10 tags are allowed per item."],
+    // }
+    for (const [field, messages] of Object.entries(err.fieldErrors)) {
+      console.error(`  ${field}: ${messages.join(", ")}`);
+    }
+  }
+}
+```

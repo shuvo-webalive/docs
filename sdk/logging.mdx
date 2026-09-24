@@ -1,0 +1,233 @@
+---
+title: "Logging Configuration, Debug Mode, and Custom Loggers"
+sidebarTitle: "Logging"
+description: "Configure SDK log levels, enable debug mode to inspect requests and responses, and route output through custom loggers like Winston or Pino."
+---
+
+SDK Knowledge Base includes a built-in logging system that gives you visibility into every request, response, retry attempt, and error without requiring a network proxy or packet inspector. You control the verbosity through the `logLevel` configuration option and can route all SDK log output through any logger your application already uses — including structured loggers like Winston and Pino.
+
+## The `logLevel` Option
+
+Set `logLevel` in the client constructor to control the minimum severity of messages the SDK emits. Only messages at or above the configured level are output.
+
+```typescript
+const client = new SDKClient({
+  apiKey:   process.env.API_KEY,
+  logLevel: 'debug', // 'debug' | 'info' | 'warn' | 'error' | 'silent'
+});
+```
+
+### Log Levels
+
+<Tabs>
+  <Tab title="debug">
+    **Most verbose.** Logs the full detail of every outgoing request and incoming response, including headers and body payloads. Use this during local development to understand exactly what the SDK is sending to the API.
+
+    ```
+    [SDK debug] → POST /users
+    [SDK debug] headers: { "Authorization": "Bearer sk_...", "Content-Type": "application/json" }
+    [SDK debug] body: { "name": "Ada Lovelace", "email": "ada@example.com" }
+    [SDK debug] ← 201 Created in 142ms
+    [SDK debug] response body: { "id": "usr_01hx", "name": "Ada Lovelace", ... }
+    ```
+  </Tab>
+  <Tab title="info">
+    Logs high-level request lifecycle events: request dispatched, response received, retry scheduled. No body or header content is included.
+
+    ```
+    [SDK info] → POST /users
+    [SDK info] ← 201 Created in 142ms (requestId: req_abc123)
+    ```
+  </Tab>
+  <Tab title="warn">
+    **Default level.** Logs actionable warnings — rate limit approach, deprecated API usage, retry attempts, and non-fatal configuration issues. Your application should monitor these.
+
+    ```
+    [SDK warn] Rate limit at 90% capacity (10 remaining). Resets at 14:32:00 UTC.
+    [SDK warn] Retrying request (attempt 2/3) after 2143ms — 503 Service Unavailable
+    ```
+  </Tab>
+  <Tab title="error">
+    Logs only terminal failures — requests that have exhausted all retries and authentication errors. Minimal noise for production environments where you handle errors in application code.
+
+    ```
+    [SDK error] Request failed after 3 retries: 500 Internal Server Error (requestId: req_xyz)
+    ```
+  </Tab>
+  <Tab title="silent">
+    Disables all SDK log output. Useful in test environments where SDK log noise interferes with test output, or when you handle all observability via middleware and events instead.
+  </Tab>
+</Tabs>
+
+---
+
+## What Gets Logged at Each Level
+
+| Event | debug | info | warn | error |
+|-------|:-----:|:----:|:----:|:-----:|
+| Request dispatched (method + path) | ✅ | ✅ | — | — |
+| Request headers and body | ✅ | — | — | — |
+| Response received (status + duration) | ✅ | ✅ | — | — |
+| Response headers and body | ✅ | — | — | — |
+| Retry attempt scheduled | ✅ | ✅ | ✅ | — |
+| Rate limit warning (>80% used) | ✅ | ✅ | ✅ | — |
+| Deprecated API usage | ✅ | ✅ | ✅ | — |
+| Request ultimately failed | ✅ | ✅ | ✅ | ✅ |
+| Authentication error | ✅ | ✅ | ✅ | ✅ |
+
+---
+
+## Enabling Debug Logging
+
+Switch to `'debug'` during local development to inspect the raw request and response traffic. This is often faster than using a network proxy.
+
+```typescript
+const client = new SDKClient({
+  apiKey:   process.env.API_KEY,
+  logLevel: process.env.NODE_ENV === 'production' ? 'warn' : 'debug',
+});
+```
+
+Or override the level dynamically at runtime (useful in REPL sessions or one-off scripts):
+
+```typescript
+client.setLogLevel('debug');
+
+// Inspect one specific call
+const user = await client.users.get('usr_01hx');
+
+client.setLogLevel('warn'); // Restore
+```
+
+<Warning>
+  Debug logs include full request and response bodies, which may contain API keys, personal data, access tokens, or other sensitive information. Never write debug logs to persistent storage in production, and ensure debug output is excluded from log aggregation pipelines that are accessible to unauthorized parties.
+</Warning>
+
+---
+
+## Providing a Custom Logger
+
+By default, the SDK writes to `console`. Provide a `logger` object to route all SDK log output through your application's existing logging infrastructure. The object must implement four methods: `debug`, `info`, `warn`, and `error`.
+
+```typescript
+const client = new SDKClient({
+  apiKey: process.env.API_KEY,
+  logger: {
+    debug: console.debug,
+    info:  console.info,
+    warn:  console.warn,
+    error: console.error,
+  },
+});
+```
+
+Each method receives a message string and an optional metadata object:
+
+```typescript
+type Logger = {
+  debug: (msg: string, meta?: Record<string, unknown>) => void;
+  info:  (msg: string, meta?: Record<string, unknown>) => void;
+  warn:  (msg: string, meta?: Record<string, unknown>) => void;
+  error: (msg: string, meta?: Record<string, unknown>) => void;
+};
+```
+
+---
+
+## Integrating with Winston
+
+Pass a Winston logger instance by creating a thin adapter object. Set the `logLevel` on the SDK client to match your Winston transport level.
+
+```typescript
+import winston from 'winston';
+import { SDKClient } from '@sdk-knowledge-base/client';
+
+const winstonLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json(),
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'sdk.log' }),
+  ],
+});
+
+const client = new SDKClient({
+  apiKey:   process.env.API_KEY,
+  logLevel: 'info',
+  logger: {
+    debug: (msg, meta) => winstonLogger.debug(msg, meta),
+    info:  (msg, meta) => winstonLogger.info(msg, meta),
+    warn:  (msg, meta) => winstonLogger.warn(msg, meta),
+    error: (msg, meta) => winstonLogger.error(msg, meta),
+  },
+});
+```
+
+Because Winston's logger methods already match the SDK's `Logger` interface signature, you can also bind them directly:
+
+```typescript
+const client = new SDKClient({
+  apiKey:   process.env.API_KEY,
+  logLevel: 'info',
+  logger: {
+    debug: winstonLogger.debug.bind(winstonLogger),
+    info:  winstonLogger.info.bind(winstonLogger),
+    warn:  winstonLogger.warn.bind(winstonLogger),
+    error: winstonLogger.error.bind(winstonLogger),
+  },
+});
+```
+
+---
+
+## Integrating with Pino
+
+Pino's API is compatible with the SDK logger interface. Pass a child logger with an SDK-specific name to keep SDK logs identifiable in your log stream.
+
+```typescript
+import pino from 'pino';
+import { SDKClient } from '@sdk-knowledge-base/client';
+
+const logger = pino({ level: 'info' });
+const sdkLogger = logger.child({ module: 'sdk-knowledge-base' });
+
+const client = new SDKClient({
+  apiKey:   process.env.API_KEY,
+  logLevel: 'info',
+  logger: {
+    debug: (msg, meta) => sdkLogger.debug(meta ?? {}, msg),
+    info:  (msg, meta) => sdkLogger.info(meta ?? {}, msg),
+    warn:  (msg, meta) => sdkLogger.warn(meta ?? {}, msg),
+    error: (msg, meta) => sdkLogger.error(meta ?? {}, msg),
+  },
+});
+```
+
+<Note>
+  Pino's method signature is `logger.info(mergingObject, message)` — note that the object and message arguments are reversed compared to Winston and the SDK's default interface. The adapter functions above handle this transposition.
+</Note>
+
+---
+
+## Structured Log Output Example
+
+When using a structured logger, the SDK emits metadata alongside each message. Here is an example of what a `warn`-level retry event looks like as structured JSON:
+
+```json
+{
+  "level": "warn",
+  "time": "2024-06-01T14:31:58.042Z",
+  "module": "sdk-knowledge-base",
+  "msg": "Retrying request (attempt 2/3) after 4087ms",
+  "attempt": 2,
+  "maxRetries": 3,
+  "delayMs": 4087,
+  "method": "POST",
+  "path": "/orders",
+  "errorCode": "INTERNAL_SERVER_ERROR",
+  "requestId": "req_01hx9abc"
+}
+```

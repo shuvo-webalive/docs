@@ -1,0 +1,277 @@
+---
+title: "TypeScript Types, Generics, and tsconfig Reference"
+sidebarTitle: "TypeScript"
+description: "Explore full TypeScript coverage: exported types, strict generics, discriminated unions, tsconfig recommendations, and SDK type augmentation."
+---
+
+SDK Knowledge Base is written in TypeScript and ships its own type declarations — no `@types/` package required. Every method, parameter, response, and error class is fully typed, giving you autocomplete, inline documentation, and compile-time safety across your entire integration. This page covers the exported type surface, TypeScript configuration recommendations, and advanced patterns like type augmentation and custom generics.
+
+## Exported Types
+
+Import types directly from the package root:
+
+```typescript
+import {
+  SDKClient,
+  Config,
+  Resource,
+  Page,
+  APIResponse,
+  RequestOptions,
+  SDKError,
+  BadRequestError,
+  AuthenticationError,
+  PermissionError,
+  NotFoundError,
+  ConflictError,
+  RateLimitError,
+  InternalServerError,
+  Middleware,
+  Logger,
+} from '@sdk-knowledge-base/client';
+```
+
+### Type Reference
+
+| Type | Description |
+|------|-------------|
+| `Config` | Constructor options for `SDKClient` |
+| `SDKClient` | The main client class |
+| `Resource` | Base type shared by all resource objects |
+| `Page<T>` | Paginated list response wrapper |
+| `APIResponse<T>` | Full HTTP response envelope including metadata |
+| `RequestOptions` | Options for `client.request()` |
+| `ListParams` | Parameters for `.list()` and `.listAll()` |
+| `SDKError` | Base class for all SDK errors |
+| `BadRequestError` | `400` — invalid request parameters |
+| `AuthenticationError` | `401` — missing or invalid credentials |
+| `PermissionError` | `403` — insufficient permissions |
+| `NotFoundError` | `404` — resource does not exist |
+| `ConflictError` | `409` — state conflict |
+| `RateLimitError` | `429` — rate limit exceeded |
+| `InternalServerError` | `500` — server-side failure |
+| `Middleware` | Middleware hook interface |
+| `Logger` | Custom logger interface |
+
+---
+
+## Using Generics for Typed Requests
+
+Pass a type argument to `client.request<T>()` to type the resolved value precisely. TypeScript will enforce the shape at compile time and provide full autocomplete on the result.
+
+```typescript
+type AccountStats = {
+  totalUsers:    number;
+  activeToday:   number;
+  storageUsedMb: number;
+  planTier:      'free' | 'pro' | 'enterprise';
+};
+
+const stats = await client.request<AccountStats>({
+  method: 'GET',
+  path:   '/account/stats',
+});
+
+// TypeScript knows stats.planTier is 'free' | 'pro' | 'enterprise'
+if (stats.planTier === 'free') {
+  console.log('Consider upgrading for higher limits.');
+}
+```
+
+---
+
+## Typing Custom Resource Data
+
+If you have extended resource shapes specific to your application, define them as intersections of the base `Resource` type:
+
+```typescript
+import { Resource, Page } from '@sdk-knowledge-base/client';
+
+// Extend the base Resource type with your fields
+type User = Resource & {
+  object:    'user';
+  name:      string;
+  email:     string;
+  role:      'admin' | 'editor' | 'viewer';
+  avatarUrl: string | null;
+};
+
+type Order = Resource & {
+  object:    'order';
+  userId:    string;
+  total:     number;
+  currency:  string;
+  status:    'pending' | 'paid' | 'cancelled' | 'refunded';
+  lineItems: LineItem[];
+};
+
+type LineItem = {
+  productId: string;
+  quantity:  number;
+  unitPrice: number;
+};
+
+// Use with resource methods
+const user: User   = await client.request<User>({ method: 'GET', path: `/users/${id}` });
+const page: Page<Order> = await client.request<Page<Order>>({ method: 'GET', path: '/orders' });
+```
+
+---
+
+## Discriminated Unions for Resource Narrowing
+
+The `object` field on every resource is a string literal type, making it ideal for discriminated union narrowing. This pattern lets you write a single handler for mixed resource arrays returned by event streams or webhook payloads.
+
+```typescript
+type AnyResource = User | Order | Product;
+
+function handleResource(resource: AnyResource) {
+  switch (resource.object) {
+    case 'user':
+      // TypeScript narrows to User here
+      console.log(`User: ${resource.name} (${resource.role})`);
+      break;
+
+    case 'order':
+      // TypeScript narrows to Order here
+      console.log(`Order: $${resource.total} — ${resource.status}`);
+      break;
+
+    case 'product':
+      // TypeScript narrows to Product here
+      console.log(`Product: ${resource.title}`);
+      break;
+  }
+}
+```
+
+---
+
+## Error Type Narrowing
+
+`SDKError` subclasses are standard TypeScript classes, so `instanceof` narrowing works as expected:
+
+```typescript
+import {
+  SDKError,
+  NotFoundError,
+  RateLimitError,
+  AuthenticationError,
+} from '@sdk-knowledge-base/client';
+
+async function safeGetUser(id: string): Promise<User | null> {
+  try {
+    return await client.request<User>({ method: 'GET', path: `/users/${id}` });
+  } catch (err) {
+    if (err instanceof NotFoundError) return null;
+    if (err instanceof RateLimitError) {
+      // err.resetAt and err.retryAfterMs are typed
+      throw new Error(`Rate limited until ${err.resetAt}`);
+    }
+    if (err instanceof AuthenticationError) {
+      await refreshApiKey();
+    }
+    throw err;
+  }
+}
+```
+
+---
+
+## Augmenting SDK Types
+
+If you need to add properties to built-in SDK types — for example, to track custom metadata on `Resource` objects — use TypeScript module augmentation:
+
+```typescript
+// types/sdk-augmentation.d.ts
+
+import '@sdk-knowledge-base/client';
+
+declare module '@sdk-knowledge-base/client' {
+  interface Resource {
+    // Add a custom field present in your API responses
+    tenantId: string;
+  }
+
+  interface Config {
+    // Add a custom config option you handle via middleware
+    tenantId?: string;
+  }
+}
+```
+
+Include this file in your `tsconfig.json` `include` array so TypeScript picks it up:
+
+```json
+{
+  "include": ["src/**/*", "types/**/*"]
+}
+```
+
+<Note>
+  Module augmentation adds fields to all instances of the augmented type. Only use this pattern for fields that are genuinely present on every resource in your API environment. If you only need to extend one resource type, define a local intersection type instead.
+</Note>
+
+---
+
+## `tsconfig.json` Recommendations
+
+The following configuration gives you the best experience with SDK Knowledge Base and modern TypeScript:
+
+```json
+{
+  "compilerOptions": {
+    "target":           "ES2020",
+    "module":           "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib":              ["ES2020"],
+    "strict":           true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess":   true,
+    "noImplicitOverride":         true,
+    "esModuleInterop":  true,
+    "skipLibCheck":     false,
+    "outDir":           "dist",
+    "declaration":      true,
+    "sourceMap":        true
+  },
+  "include": ["src/**/*", "types/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Key Options Explained
+
+| Option | Why it matters for SDK usage |
+|--------|------------------------------|
+| `"strict": true` | Enables all strict checks. Required to get full type safety from SDK generics. |
+| `"exactOptionalPropertyTypes": true` | Prevents accidentally passing `undefined` where a property is optional but not `undefined`-able. |
+| `"noUncheckedIndexedAccess": true` | Makes accessing `page.data[0]` return `User \| undefined` instead of `User`, avoiding silent runtime errors on empty pages. |
+| `"moduleResolution": "NodeNext"` | Correctly resolves the SDK's dual ESM/CJS exports. |
+| `"skipLibCheck": false` | Validates the SDK's own type declarations to catch version mismatches early. |
+
+---
+
+## IDE Autocompletion
+
+Because SDK Knowledge Base ships first-party type declarations, you get rich IntelliSense without any additional configuration in VS Code, WebStorm, or any other TypeScript-aware editor.
+
+<Tip>
+  Hover over any SDK method in your editor to see its full signature, parameter descriptions, and return type inline — the same information that appears in this documentation is embedded in the JSDoc comments of the type declarations. You don't need to leave your editor to look up method signatures.
+</Tip>
+
+---
+
+## Checking the Installed Type Declarations
+
+Verify that the type declarations are present after installation:
+
+```bash
+# Check that .d.ts files are present
+ls node_modules/@sdk-knowledge-base/client/dist/*.d.ts
+
+# Or inspect the types entry point in package.json
+cat node_modules/@sdk-knowledge-base/client/package.json | grep types
+```
+
+If TypeScript cannot resolve the types, ensure your `moduleResolution` is set to `"NodeNext"` or `"Bundler"` and that your TypeScript version is 4.7 or higher.

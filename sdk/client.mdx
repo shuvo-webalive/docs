@@ -1,0 +1,279 @@
+---
+title: "SDKClient Class Reference — SDK Knowledge Base SDK"
+sidebarTitle: "SDKClient"
+description: "Complete API reference for the SDKClient class, covering the constructor, all methods, event listeners, and TypeScript type signatures with usage examples."
+---
+
+The `SDKClient` class is the main entry point for every interaction with SDK Knowledge Base. You instantiate it once, configure it with your API key and options, then call methods on it or on the resource namespaces it exposes. All network activity flows through this single object, which makes it straightforward to add headers, change timeouts, or attach event listeners in one place.
+
+## Constructor
+
+```typescript
+import { SDKClient } from '@sdk-knowledge-base/client';
+
+const client = new SDKClient({
+  apiKey: process.env.API_KEY,
+  baseUrl: 'https://api.sdkknowledgebase.com/v1',
+  timeout: 30_000,
+  maxRetries: 3,
+});
+```
+
+### Config
+
+<ParamField path="apiKey" type="string" required>
+  Your SDK Knowledge Base API key. Always load this from an environment variable — never hard-code it in source files.
+</ParamField>
+
+<ParamField path="baseUrl" type="string">
+  Override the default API base URL. Defaults to `https://api.sdkknowledgebase.com/v1`. Useful for pointing at a staging environment or a self-hosted proxy.
+</ParamField>
+
+<ParamField path="timeout" type="number">
+  Default request timeout in milliseconds. Defaults to `30000` (30 seconds). Individual requests can override this value.
+</ParamField>
+
+<ParamField path="maxRetries" type="number">
+  Number of automatic retries on transient failures. Defaults to `3`. Set to `0` to disable retries entirely.
+</ParamField>
+
+<ParamField path="headers" type="Record<string, string>">
+  Default headers attached to every request. Merged with per-request headers, which take precedence on conflicts.
+</ParamField>
+
+<ParamField path="logLevel" type="'debug' | 'info' | 'warn' | 'error' | 'silent'">
+  Minimum severity level for log output. Defaults to `'warn'`. Set to `'debug'` during development to inspect full request and response details.
+</ParamField>
+
+<ParamField path="logger" type="Logger">
+  Custom logger object. Provide an object with `debug`, `info`, `warn`, and `error` methods to route SDK logs into your existing logging infrastructure.
+</ParamField>
+
+### Full Config Type
+
+```typescript
+type Config = {
+  apiKey: string;
+  baseUrl?: string;
+  timeout?: number;
+  maxRetries?: number;
+  retryDelay?: number | ((attempt: number) => number);
+  headers?: Record<string, string>;
+  logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'silent';
+  logger?: {
+    debug: (msg: string, meta?: unknown) => void;
+    info:  (msg: string, meta?: unknown) => void;
+    warn:  (msg: string, meta?: unknown) => void;
+    error: (msg: string, meta?: unknown) => void;
+  };
+};
+```
+
+---
+
+## `.resources`
+
+Returns an object containing all resource namespace accessors. Use this when you need to pass the resource collection as a value rather than accessing individual namespaces directly on the client.
+
+```typescript
+const { users, orders, products } = client.resources;
+
+// Equivalent to:
+client.users
+client.orders
+client.products
+```
+
+<ResponseField name="resources" type="ResourceCollection">
+  An object with one property per resource type. Each property is a fully-configured resource namespace with `.create`, `.get`, `.update`, `.delete`, `.list`, and `.listAll` methods.
+</ResponseField>
+
+---
+
+## `.request<T>(options: RequestOptions): Promise<T>`
+
+Makes a raw HTTP request and returns the parsed JSON body cast to `T`. Use this method when you need to call an endpoint not covered by the typed resource namespaces, or when you need full control over the request shape.
+
+```typescript
+const result = await client.request<{ version: string }>({
+  method: 'GET',
+  path: '/meta/version',
+});
+
+console.log(result.version); // '2.4.1'
+```
+
+<ParamField path="options" type="RequestOptions" required>
+  The request configuration object. See the [Request Options reference](/sdk/requests) for all available fields.
+</ParamField>
+
+<ResponseField name="Promise<T>" type="T">
+  Resolves with the parsed JSON response body typed as `T`. Rejects with an `SDKError` subclass on non-2xx responses or network failures.
+</ResponseField>
+
+---
+
+## `.setApiKey(key: string): void`
+
+Replaces the API key used for all subsequent requests. Call this method when you need to rotate credentials at runtime — for example, after a token refresh or when switching between tenant contexts.
+
+```typescript
+// Initial setup
+const client = new SDKClient({ apiKey: process.env.API_KEY });
+
+// Rotate at runtime
+client.setApiKey(await fetchNewApiKey());
+```
+
+<ParamField path="key" type="string" required>
+  The new API key. Replaces the current key immediately; in-flight requests already in progress are not affected.
+</ParamField>
+
+---
+
+## `.setTimeout(ms: number): void`
+
+Updates the default timeout for all subsequent requests. Requests that have already been dispatched are not affected.
+
+```typescript
+// Switch to a longer timeout before a known slow operation
+client.setTimeout(120_000);
+const report = await client.reports.generate({ type: 'full' });
+
+// Restore the default
+client.setTimeout(30_000);
+```
+
+<ParamField path="ms" type="number" required>
+  New timeout in milliseconds. Set to `0` to disable the timeout entirely (not recommended for production).
+</ParamField>
+
+---
+
+## `.addHeader(name: string, value: string): void`
+
+Adds or replaces a default header that is sent with every subsequent request. Use this to inject tracing headers, feature flags, or custom metadata consistently across all calls.
+
+```typescript
+client.addHeader('X-Trace-ID', crypto.randomUUID());
+client.addHeader('X-Feature-Flag', 'new-ranking-model');
+```
+
+<ParamField path="name" type="string" required>
+  The header name. Header names are case-insensitive per HTTP spec, but the SDK preserves the casing you provide.
+</ParamField>
+
+<ParamField path="value" type="string" required>
+  The header value. Overwrites any existing header with the same name.
+</ParamField>
+
+---
+
+## `.removeHeader(name: string): void`
+
+Removes a previously added default header. After calling this method, the header is no longer sent on future requests.
+
+```typescript
+client.addHeader('X-Beta-User', 'true');
+
+// ... beta operations ...
+
+client.removeHeader('X-Beta-User');
+```
+
+<ParamField path="name" type="string" required>
+  The header name to remove. The match is case-insensitive.
+</ParamField>
+
+---
+
+## `.on(event: string, handler: Function): void`
+
+Registers an event listener on the client. Use events to observe request lifecycle without modifying behavior — ideal for metrics, tracing, or audit logging.
+
+```typescript
+client.on('request', (req) => {
+  console.log(`→ ${req.method} ${req.path}`);
+});
+
+client.on('response', (res) => {
+  console.log(`← ${res.status} in ${res.durationMs}ms`);
+});
+
+client.on('error', (err) => {
+  Sentry.captureException(err);
+});
+```
+
+### Supported Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `request` | `RequestEvent` | Fires before each request is dispatched |
+| `response` | `ResponseEvent` | Fires after a successful response is received |
+| `error` | `SDKError` | Fires when a request ultimately fails after all retries |
+| `retry` | `RetryEvent` | Fires before each retry attempt |
+
+<ParamField path="event" type="string" required>
+  The event name to listen for. See the table above for supported events.
+</ParamField>
+
+<ParamField path="handler" type="Function" required>
+  The callback function invoked when the event fires. The argument type depends on the event — see the table above.
+</ParamField>
+
+---
+
+## `.off(event: string, handler: Function): void`
+
+Removes a previously registered event listener. Pass the exact same function reference that you passed to `.on()`.
+
+```typescript
+const handleRequest = (req: RequestEvent) => {
+  console.log(`→ ${req.method} ${req.path}`);
+};
+
+client.on('request', handleRequest);
+
+// Later, when you no longer need it:
+client.off('request', handleRequest);
+```
+
+<ParamField path="event" type="string" required>
+  The event name from which to remove the listener.
+</ParamField>
+
+<ParamField path="handler" type="Function" required>
+  The exact function reference that was passed to `.on()`. Passing a different reference (e.g. an anonymous function) has no effect.
+</ParamField>
+
+<Warning>
+  If you register an anonymous function with `.on()`, you cannot remove it with `.off()` because you have no reference to it. Always assign your handler to a named variable if you plan to remove it later.
+</Warning>
+
+---
+
+## Complete Setup Example
+
+The following example shows a production-ready client setup with environment-based configuration, a tracing header, and an error event hook.
+
+```typescript
+import { SDKClient } from '@sdk-knowledge-base/client';
+import { logger } from './logger';
+
+export const client = new SDKClient({
+  apiKey:     process.env.SDK_API_KEY!,
+  timeout:    30_000,
+  maxRetries: 3,
+  logLevel:   'info',
+  logger,
+});
+
+// Attach a per-process trace ID to every request
+client.addHeader('X-Process-ID', process.pid.toString());
+
+// Forward all SDK errors to your error tracker
+client.on('error', (err) => {
+  logger.error('SDK request failed', { message: err.message, code: err.code });
+});
+```

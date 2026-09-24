@@ -1,0 +1,269 @@
+---
+title: "Receiving and Verifying SDK Knowledge Base Webhooks"
+sidebarTitle: "Webhooks"
+description: "Learn how to register an endpoint, verify webhook signatures, parse event payloads, and handle retries and duplicate delivery reliably in production."
+---
+
+Webhooks let the SDK Knowledge Base platform push notifications to your server the moment something meaningful happens — a resource is created, updated, deleted, or enters an error state. Rather than polling the API on a timer, your application reacts in real time to events as they occur. This guide walks you through everything you need to receive, verify, and process webhooks correctly.
+
+## How webhooks work
+
+When a triggering event occurs in the platform, the SDK Knowledge Base server sends an HTTP `POST` request to the URL you registered in your dashboard under **Settings → Webhooks**. The request body contains a JSON payload describing the event. Your endpoint must respond with a `2xx` status code within **5 seconds** — if it does not, the platform treats the delivery as failed and schedules a retry.
+
+## Event types
+
+The platform emits the following event types. Subscribe to individual events or use a wildcard (`*`) to receive all of them.
+
+| Event type | When it fires |
+|---|---|
+| `resource.created` | A new resource is successfully persisted. |
+| `resource.updated` | One or more fields on an existing resource change. |
+| `resource.deleted` | A resource is permanently removed. |
+| `resource.error` | A background operation on a resource fails (e.g., a sync or export job). |
+
+---
+
+## Set up a webhook endpoint
+
+The example below uses **Express.js**. The key requirement is that you read the raw request body — before any JSON parsing middleware — so the signature verification step can hash exactly what the platform sent.
+
+```typescript src/webhooks/handler.ts
+import express, { Request, Response } from "express";
+import { verifyWebhookSignature } from "@sdk-knowledge-base/client";
+
+const app = express();
+
+// IMPORTANT: Use express.raw() on the webhook route, not express.json().
+// Signature verification requires the exact bytes the server sent.
+app.post(
+  "/webhooks/sdk-kb",
+  express.raw({ type: "application/json" }),
+  async (req: Request, res: Response) => {
+    const signature = req.headers["x-sdkkb-signature"] as string;
+    const rawBody = req.body as Buffer;
+
+    // Verify the signature before doing anything else
+    let event;
+    try {
+      event = verifyWebhookSignature({
+        payload: rawBody,
+        signature,
+        secret: process.env.SDK_KB_WEBHOOK_SECRET!,
+      });
+    } catch (err) {
+      console.error("Webhook signature verification failed:", err);
+      return res.status(400).send("Invalid signature");
+    }
+
+    // Acknowledge receipt immediately — process asynchronously if needed
+    res.status(200).send("OK");
+
+    // Handle the event
+    await handleEvent(event);
+  }
+);
+
+app.listen(3000, () => console.log("Webhook listener running on port 3000"));
+```
+
+<Warning>
+  Always verify the webhook signature before trusting or acting on the payload. Without verification, any party that knows your endpoint URL can send forged events and manipulate your application's state.
+</Warning>
+
+---
+
+## Verify webhook signatures
+
+The platform signs every request using **HMAC-SHA256** with a secret you configure in the dashboard. The `verifyWebhookSignature` helper from the SDK handles the cryptography for you, but understanding the underlying mechanism helps when you need to implement verification in an environment where the SDK is not available (such as an edge function).
+
+```typescript src/webhooks/verify.ts
+import crypto from "crypto";
+
+/**
+ * Manual signature verification — use when you can't import the SDK.
+ * The header value is formatted as: "t=<timestamp>,v1=<hmac_hex>"
+ */
+export function verifyManually(
+  rawBody: Buffer,
+  signatureHeader: string,
+  secret: string
+): boolean {
+  const parts = Object.fromEntries(
+    signatureHeader.split(",").map((p) => p.split("="))
+  );
+
+  const timestamp = parts["t"];
+  const receivedHmac = parts["v1"];
+
+  if (!timestamp || !receivedHmac) return false;
+
+  // Reject payloads older than 5 minutes to prevent replay attacks
+  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 300;
+  if (Number(timestamp) < fiveMinutesAgo) return false;
+
+  const signedPayload = `${timestamp}.${rawBody.toString("utf8")}`;
+  const expectedHmac = crypto
+    .createHmac("sha256", secret)
+    .update(signedPayload)
+    .digest("hex");
+
+  // Use timingSafeEqual to prevent timing attacks
+  return crypto.timingSafeEqual(
+    Buffer.from(expectedHmac),
+    Buffer.from(receivedHmac)
+  );
+}
+```
+
+---
+
+## Webhook payload structure
+
+Every event payload shares the same top-level envelope. The `data` field contains the resource snapshot relevant to the event.
+
+<ResponseField name="id" type="string">
+  A unique identifier for this specific delivery of the event (e.g., `evt_01HX5KFQZ3N8VTYRCWBGJ2MD4E`). Use this field to deduplicate events when building an idempotent handler.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The event type string, such as `resource.created` or `resource.deleted`. Use this to route the event to the correct handler in your application.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp indicating when the event was generated on the server (e.g., `2024-05-12T09:14:03.221Z`).
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  The full resource snapshot at the time the event fired. For `resource.deleted` events, this contains the resource's final state immediately before deletion.
+</ResponseField>
+
+**Example payload**
+
+```json
+{
+  "id": "evt_01HX5KFQZ3N8VTYRCWBGJ2MD4E",
+  "type": "resource.updated",
+  "created_at": "2024-05-12T10:02:47.885Z",
+  "data": {
+    "id": "prod_01HX5KFQZ3N8VTYRCWBGJ2MD4E",
+    "name": "Wireless Noise-Cancelling Headphones",
+    "price": 229.99,
+    "currency": "USD",
+    "inventory": 120,
+    "status": "active",
+    "updated_at": "2024-05-12T10:02:47.885Z"
+  }
+}
+```
+
+---
+
+## Respond within 5 seconds
+
+The platform waits up to **5 seconds** for your endpoint to return a `2xx` response. If your event processing logic takes longer — for example, writing to a database or calling a third-party API — respond immediately and process the event in a background job.
+
+```typescript src/webhooks/handler.ts
+import { enqueueJob } from "../queue";
+
+// ✅ Correct — acknowledge first, process asynchronously
+app.post("/webhooks/sdk-kb", express.raw({ type: "application/json" }), async (req, res) => {
+  const event = verifyAndParse(req);   // fast, synchronous verification
+
+  res.status(200).send("OK");          // respond before the 5-second window closes
+
+  await enqueueJob("process-webhook-event", { event });  // hand off to a worker
+});
+
+// ❌ Incorrect — risks timeout if processing is slow
+app.post("/webhooks/sdk-kb", express.raw({ type: "application/json" }), async (req, res) => {
+  const event = verifyAndParse(req);
+  await slowDatabaseWrite(event);      // might exceed 5 seconds
+  res.status(200).send("OK");          // response may never arrive
+});
+```
+
+---
+
+## Retry behaviour
+
+If your endpoint returns a non-`2xx` response or does not respond within 5 seconds, the platform retries the delivery up to **3 times** using exponential backoff:
+
+| Attempt | Delay |
+|---|---|
+| 1st retry | 30 seconds |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+
+After three failed retries, the event is marked as `failed` and visible in the **Webhook Logs** section of your dashboard. You can manually replay individual failed events from there.
+
+---
+
+## Handle duplicate events
+
+Because the platform retries on failure, your endpoint may receive the same event more than once. Design your handler to be **idempotent** — processing the same event twice should produce the same result as processing it once.
+
+Use the event's `id` field as an idempotency key. Record processed event IDs in a fast store (such as Redis) and skip events you have already handled.
+
+```typescript src/webhooks/idempotency.ts
+import { redis } from "../redis";
+
+const EVENT_TTL_SECONDS = 60 * 60 * 24; // 24 hours
+
+export async function isAlreadyProcessed(eventId: string): Promise<boolean> {
+  return (await redis.exists(`webhook:processed:${eventId}`)) === 1;
+}
+
+export async function markAsProcessed(eventId: string): Promise<void> {
+  await redis.setex(`webhook:processed:${eventId}`, EVENT_TTL_SECONDS, "1");
+}
+```
+
+```typescript src/webhooks/handler.ts
+import { isAlreadyProcessed, markAsProcessed } from "./idempotency";
+
+async function handleEvent(event: WebhookEvent): Promise<void> {
+  if (await isAlreadyProcessed(event.id)) {
+    console.log(`Skipping duplicate event: ${event.id}`);
+    return;
+  }
+
+  // Process the event...
+  switch (event.type) {
+    case "resource.created":
+      await onResourceCreated(event.data);
+      break;
+    case "resource.updated":
+      await onResourceUpdated(event.data);
+      break;
+    case "resource.deleted":
+      await onResourceDeleted(event.data);
+      break;
+    case "resource.error":
+      await onResourceError(event.data);
+      break;
+    default:
+      console.warn(`Unhandled event type: ${event.type}`);
+  }
+
+  await markAsProcessed(event.id);
+}
+```
+
+Your webhook endpoint is now production-ready: it verifies signatures, responds within the deadline, and handles duplicate deliveries safely. Next, learn how to write automated tests for your integration and simulate webhook events in your test suite.
+
+<CardGroup cols={2}>
+  <Card
+    title="Testing Your Integration"
+    icon="flask"
+    href="/guides/testing"
+  >
+    Write unit and integration tests, mock the SDK client, and simulate error conditions.
+  </Card>
+  <Card
+    title="Error Handling"
+    icon="triangle-exclamation"
+    href="/concepts/error-handling"
+  >
+    Understand every error class, status code, and retry strategy the SDK exposes.
+  </Card>
+</CardGroup>

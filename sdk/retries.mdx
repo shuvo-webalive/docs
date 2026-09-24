@@ -1,0 +1,238 @@
+---
+title: "Retry Configuration and Backoff — SDK Knowledge Base"
+sidebarTitle: "Retries"
+description: "Configure automatic SDK retries with exponential backoff, custom retry logic, per-request overrides, and idempotency keys for safe mutations."
+---
+
+SDK Knowledge Base retries failed requests automatically so that transient network hiccups and temporary server errors don't cause unnecessary failures in your application. The default configuration is suitable for most production workloads, but you have full control over retry counts, backoff timing, and the logic that decides whether a given error should be retried at all.
+
+## Default Retry Behavior
+
+Out of the box, the SDK retries up to **3 times** on eligible errors, using **exponential backoff with jitter** between attempts. The retry logic is transparent — your `await` simply takes longer before either resolving or ultimately throwing.
+
+```typescript
+// Default config — these are implicit, you don't need to specify them
+const client = new SDKClient({
+  apiKey:      process.env.API_KEY,
+  maxRetries:  3,
+  retryDelay:  (attempt) => Math.min(1000 * 2 ** attempt + Math.random() * 100, 30_000),
+});
+```
+
+### Retry Timing Table
+
+| Attempt | Formula | Approximate Wait |
+|---------|---------|-----------------|
+| 1st retry | `1000 × 2¹ + jitter` | ~2 seconds |
+| 2nd retry | `1000 × 2² + jitter` | ~4 seconds |
+| 3rd retry | `1000 × 2³ + jitter` | ~8 seconds |
+| Max cap | — | 30 seconds |
+
+The random jitter (0–100 ms) prevents synchronized retry storms when many clients fail simultaneously.
+
+---
+
+## Which Errors Trigger Retries
+
+The SDK only retries errors that are likely to succeed on a subsequent attempt. Client errors that indicate a problem with your request are never retried.
+
+### Retried Automatically
+
+| Error | Status / Type | Reason |
+|-------|--------------|--------|
+| Internal Server Error | `500` | Transient server fault |
+| Bad Gateway | `502` | Upstream dependency issue |
+| Service Unavailable | `503` | Server overloaded or restarting |
+| Gateway Timeout | `504` | Request timed out at the gateway |
+| Rate Limit | `429` | Backoff and retry after `Retry-After` |
+| Network Error | — | Connection reset, DNS failure, etc. |
+| Request Timeout | — | Client-side timeout exceeded |
+
+### Never Retried
+
+| Error | Status | Reason |
+|-------|--------|--------|
+| Bad Request | `400` | Your request is malformed — retrying won't fix it |
+| Unauthorized | `401` | Invalid or missing credentials |
+| Forbidden | `403` | Insufficient permissions |
+| Not Found | `404` | The resource doesn't exist |
+| Conflict | `409` | State conflict — requires application logic |
+| Unprocessable | `422` | Server-side validation failed |
+
+<Note>
+  `429 Too Many Requests` is retried, but the SDK respects the `Retry-After` header value from the server. The backoff wait is set to whichever is larger: the `Retry-After` value or the computed exponential delay.
+</Note>
+
+---
+
+## Configuring Retry Options
+
+Set `maxRetries` and `retryDelay` in the client constructor to apply a global default for all requests.
+
+```typescript
+const client = new SDKClient({
+  apiKey:     process.env.API_KEY,
+  maxRetries: 5,                       // Increase retry count
+  retryDelay: 2_000,                   // Fixed 2-second delay (number)
+});
+```
+
+You can also provide `retryDelay` as a function for fully custom backoff logic:
+
+```typescript
+const client = new SDKClient({
+  apiKey:     process.env.API_KEY,
+  maxRetries: 4,
+  retryDelay: (attempt, error) => {
+    // For rate limits, use the Retry-After header if present
+    if (error instanceof RateLimitError && error.retryAfterMs) {
+      return error.retryAfterMs;
+    }
+    // Otherwise, linear backoff capped at 10 seconds
+    return Math.min(attempt * 1_500, 10_000);
+  },
+});
+```
+
+<ParamField path="maxRetries" type="number">
+  Maximum number of retry attempts after the initial request. Set to `0` to disable retries. Defaults to `3`.
+</ParamField>
+
+<ParamField path="retryDelay" type="number | ((attempt: number, error: SDKError) => number)">
+  Delay in milliseconds between retries. Provide a number for a fixed delay, or a function that returns the delay based on the attempt number (1-indexed) and the error that caused the retry. Defaults to exponential backoff with jitter.
+</ParamField>
+
+---
+
+## Custom Retry Logic
+
+For complete control, provide a `shouldRetry` function that returns `true` if a given error should trigger another attempt.
+
+```typescript
+import { SDKError, RateLimitError, InternalServerError } from '@sdk-knowledge-base/client';
+
+const client = new SDKClient({
+  apiKey:     process.env.API_KEY,
+  maxRetries: 3,
+  shouldRetry: (error: SDKError, attempt: number): boolean => {
+    // Never retry if we've already tried 3 times
+    if (attempt >= 3) return false;
+
+    // Retry rate limits and server errors
+    if (error instanceof RateLimitError) return true;
+    if (error instanceof InternalServerError) return true;
+
+    // Retry network errors
+    if (error.code === 'NETWORK_ERROR') return true;
+
+    // Don't retry anything else
+    return false;
+  },
+});
+```
+
+---
+
+## Per-Request Retry Override
+
+Override `maxRetries` for a single request by including it in the request options. This is useful for long-running mutations where you want more persistence, or for idempotent reads where you want to fail fast.
+
+<CodeGroup>
+```typescript Increase retries for a single request
+const report = await client.request({
+  method:     'POST',
+  path:       '/reports/generate',
+  body:       { type: 'annual' },
+  maxRetries: 5,             // Override just for this call
+  idempotencyKey: reportKey,
+});
+```
+
+```typescript Disable retries for a single request
+// Fail fast — don't wait for retries
+const result = await client.request({
+  method:     'GET',
+  path:       '/health',
+  maxRetries: 0,
+});
+```
+</CodeGroup>
+
+---
+
+## The Backoff Formula
+
+The default retry delay uses **exponential backoff with capped jitter**:
+
+```
+delay = min(baseDelay × 2^attempt + random(0, jitter), maxDelay)
+```
+
+Where:
+- `baseDelay` = 1000 ms
+- `attempt` = 1, 2, 3, …
+- `jitter` = 100 ms (random, prevents thundering herd)
+- `maxDelay` = 30 000 ms
+
+```typescript
+// The built-in default implementation
+const defaultRetryDelay = (attempt: number): number => {
+  const base    = 1_000;
+  const max     = 30_000;
+  const jitter  = Math.random() * 100;
+  return Math.min(base * Math.pow(2, attempt) + jitter, max);
+};
+```
+
+---
+
+## Idempotency Keys and Retries
+
+Retrying a mutation (POST, PUT, PATCH) without an idempotency key risks creating duplicate records or charging a customer twice. Always generate an idempotency key before your first attempt and pass the same key on every retry.
+
+<Tip>
+  The SDK does **not** automatically attach idempotency keys to retried mutation requests. You are responsible for generating a key and passing it in `RequestOptions`. Generate it before the first attempt so all retries share the same key.
+</Tip>
+
+```typescript
+import { randomUUID } from 'crypto';
+
+async function createOrderWithRetry(data: CreateOrderParams) {
+  const idempotencyKey = randomUUID(); // Generate once, reuse on retries
+
+  return client.request<Order>({
+    method:         'POST',
+    path:           '/orders',
+    body:           data,
+    idempotencyKey,              // Safe to retry with this key
+    maxRetries:     3,
+  });
+}
+```
+
+If you use resource namespace methods (`.create()`, `.update()`), pass the idempotency key as part of the options argument:
+
+```typescript
+const order = await client.orders.create(
+  { productId: 'prd_xyz', quantity: 2 },
+  { idempotencyKey: randomUUID() },
+);
+```
+
+---
+
+## Monitoring Retry Events
+
+Listen to the `retry` event on the client to track retry activity in your metrics and logs:
+
+```typescript
+client.on('retry', ({ attempt, error, delayMs }) => {
+  logger.warn('SDK retry attempt', {
+    attempt,
+    errorCode: error.code,
+    delayMs,
+  });
+
+  metrics.increment('sdk.retry', { error_code: error.code });
+});
+```

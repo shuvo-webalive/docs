@@ -1,0 +1,104 @@
+---
+title: "Introduction to SDK Knowledge Base – Features & Goals"
+sidebarTitle: "Introduction"
+description: "Discover what the SDK Knowledge Base is, the problems it solves for developers, and the key features that make integrating our platform fast and reliable."
+---
+
+The SDK Knowledge Base is a developer-first software toolkit that wraps our REST API in a clean, fully-typed interface for TypeScript and JavaScript. Instead of hand-crafting HTTP requests, parsing raw responses, and writing retry logic from scratch, you get a single package that handles all of that automatically — letting you build integrations in a fraction of the time.
+
+Developers reach for the SDK when they need reliable, maintainable connections to our platform. It ships with sensible defaults you can override at any point, strong TypeScript generics that catch mismatches at compile time, and built-in observability hooks so you always know exactly what the SDK is doing in production.
+
+## Why the SDK Knowledge Base?
+
+Integrating a new API without an SDK usually means wrestling with authentication edge cases, inconsistent error shapes, and pagination loops that look different for every endpoint. The SDK Knowledge Base eliminates that friction by providing a consistent, predictable programming model across every resource in the API — so the pattern you learn on day one applies everywhere.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card
+    title="Easy Initialization"
+    icon="play"
+    href="/quickstart"
+  >
+    One constructor call, one required option. Pass your API key and you're ready — no configuration files, no environment bootstrapping.
+  </Card>
+  <Card
+    title="Typed Requests & Responses"
+    icon="code"
+    href="/sdk/overview"
+  >
+    Every method parameter and return value carries a TypeScript type. Catch integration mistakes in your editor before they ever reach production.
+  </Card>
+  <Card
+    title="Automatic Retries"
+    icon="arrows-rotate"
+    href="/guides/first-integration"
+  >
+    Transient network errors and rate-limit responses trigger exponential back-off retries automatically. Configure the maximum retry count to match your SLA.
+  </Card>
+  <Card
+    title="Webhook Support"
+    icon="webhook"
+    href="/guides/first-integration"
+  >
+    Receive and verify inbound webhook payloads with a single helper. Signature validation and timestamp checks are handled for you out of the box.
+  </Card>
+  <Card
+    title="Pagination Helpers"
+    icon="list"
+    href="/sdk/overview"
+  >
+    Iterate over large result sets with `autoPaginate` or use cursor-based helpers to fetch exactly the page you need — no manual offset math required.
+  </Card>
+  <Card
+    title="Middleware Hooks"
+    icon="plug"
+    href="/guides/first-integration"
+  >
+    Attach `onRequest` and `onResponse` middleware to inspect, modify, or log every call. Perfect for adding custom headers or telemetry spans.
+  </Card>
+  <Card
+    title="TypeScript Support"
+    icon="t"
+    href="/sdk/overview"
+  >
+    Built in TypeScript and shipped with full type declarations. Works equally well in plain JavaScript projects — no extra steps needed.
+  </Card>
+  <Card
+    title="Comprehensive Logging"
+    icon="magnifying-glass"
+    href="/guides/first-integration"
+  >
+    Set a `logLevel` at initialization or per-request to stream structured log lines for every request, response, retry, and error the SDK encounters.
+  </Card>
+</CardGroup>
+
+## How the SDK fits into your stack
+
+The SDK Knowledge Base runs anywhere JavaScript runs — Node.js services, serverless functions, edge runtimes, and modern browsers. It has zero mandatory peer dependencies and a tree-shakeable build, so it adds minimal weight to bundle-sensitive environments.
+
+A typical integration looks like this:
+
+1. **Install** the package from npm.
+2. **Initialize** the client once (e.g., as a module-level singleton).
+3. **Call** resource methods directly — the client manages auth headers, serialization, retries, and response parsing.
+4. **Handle** typed responses or catch typed errors with predictable shapes.
+
+## What's next?
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart"
+    icon="bolt"
+    href="/quickstart"
+  >
+    Follow the step-by-step quickstart to install the SDK and make your first API call in under five minutes.
+  </Card>
+  <Card
+    title="Authentication"
+    icon="lock"
+    href="/authentication"
+  >
+    Learn how to obtain your API key, pass it securely to the client, and understand how the SDK handles auth failures.
+  </Card>
+</CardGroup>

@@ -1,0 +1,202 @@
+---
+title: "SDK Knowledge Base Configuration Options Reference"
+sidebarTitle: "Configuration"
+description: "Master every client configuration option — timeouts, retries, custom headers, log levels, and environment-specific setups for development and production."
+---
+
+The SDK Knowledge Base client accepts a configuration object when you instantiate it. Most options have sensible defaults so you can get started with just an API key, but understanding the full surface area lets you tune the client precisely for your environment — whether that's a high-traffic production service or a local development setup that routes through a proxy.
+
+## Configuration reference
+
+<ParamField body="apiKey" type="string" required>
+  Your SDK Knowledge Base API key. Use a `sk_live_` prefixed key for production and a `sk_test_` prefixed key for testing. Always load this value from an environment variable — never hard-code it.
+</ParamField>
+
+<ParamField body="baseUrl" type="string">
+  Override the default API base URL (`https://api.sdkknowledgebase.com/v1`). Use this when routing requests through a proxy, pointing at a staging environment, or self-hosting the API.
+
+  ```
+  Default: "https://api.sdkknowledgebase.com/v1"
+  ```
+</ParamField>
+
+<ParamField body="timeout" type="number">
+  Maximum time in milliseconds to wait for a response before the request is aborted and a `TimeoutError` is thrown. Increase this for operations that return large payloads, or decrease it if you need strict SLA guarantees in a latency-sensitive path.
+
+  ```
+  Default: 30000  (30 seconds)
+  ```
+</ParamField>
+
+<ParamField body="maxRetries" type="number">
+  Number of times the client automatically retries a failed request before surfacing the error to your code. The client only retries on network errors and `5xx` server responses — it never retries `4xx` client errors.
+
+  ```
+  Default: 3
+  ```
+</ParamField>
+
+<ParamField body="headers" type="Record<string, string>">
+  A plain object of key-value pairs merged into every outgoing request. Use this to forward a correlation ID, pass a custom tenant header, or inject any header your infrastructure requires.
+
+  ```
+  Default: {}
+  ```
+</ParamField>
+
+<ParamField body="logLevel" type="'debug' | 'info' | 'warn' | 'error' | 'silent'">
+  Controls the verbosity of the SDK's built-in logger. Set to `'debug'` to see full request/response details during development. Set to `'silent'` to suppress all output in production or testing.
+
+  ```
+  Default: "warn"
+  ```
+</ParamField>
+
+<ParamField body="httpClient" type="HttpClient">
+  Provide a custom HTTP client that implements the `HttpClient` interface. This is useful when you need to route requests through a specific fetch implementation, add observability middleware, or inject a mock during tests.
+
+  ```
+  Default: built-in fetch-based client
+  ```
+</ParamField>
+
+---
+
+## Complete configuration example
+
+The snippet below shows every option in one place. In practice you only need to set the values that differ from their defaults.
+
+```typescript src/client.ts
+import { SdkKnowledgeBase } from "@sdk-knowledge-base/client";
+
+export const client = new SdkKnowledgeBase({
+  // Required
+  apiKey: process.env.SDK_KB_API_KEY!,
+
+  // Network
+  baseUrl: process.env.SDK_KB_BASE_URL ?? "https://api.sdkknowledgebase.com/v1",
+  timeout: 15_000,       // 15 seconds
+  maxRetries: 3,
+
+  // Request enrichment
+  headers: {
+    "X-Correlation-Id": generateCorrelationId(),
+    "X-App-Version": process.env.npm_package_version ?? "unknown",
+  },
+
+  // Observability
+  logLevel: "info",
+});
+
+function generateCorrelationId(): string {
+  return `req_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+}
+```
+
+---
+
+## Environment-specific configuration
+
+Your development and production environments have different requirements. Use a factory function that reads environment variables to build the appropriate client at startup.
+
+```typescript src/client.ts
+import { SdkKnowledgeBase, LogLevel } from "@sdk-knowledge-base/client";
+
+function createClient(): SdkKnowledgeBase {
+  const env = process.env.NODE_ENV ?? "development";
+  const isProd = env === "production";
+
+  return new SdkKnowledgeBase({
+    apiKey: process.env.SDK_KB_API_KEY!,
+    baseUrl: process.env.SDK_KB_BASE_URL,   // falls back to the default when undefined
+
+    // Be more patient in production where cold starts can be slow
+    timeout: isProd ? 30_000 : 10_000,
+
+    // Retry more aggressively in production; fail fast locally for a tight feedback loop
+    maxRetries: isProd ? 5 : 1,
+
+    // Verbose logs locally, quieter in production
+    logLevel: (process.env.SDK_KB_LOG_LEVEL as LogLevel) ?? (isProd ? "warn" : "debug"),
+  });
+}
+
+export const client = createClient();
+```
+
+Set the relevant environment variables for each environment:
+
+```bash .env.development
+SDK_KB_API_KEY=sk_test_your_test_key_here
+SDK_KB_LOG_LEVEL=debug
+```
+
+```bash .env.production
+SDK_KB_API_KEY=sk_live_your_live_key_here
+SDK_KB_LOG_LEVEL=warn
+```
+
+<Note>
+  If you use a staging environment, point `SDK_KB_BASE_URL` at your staging API host and supply a `sk_test_` key. This lets you exercise real network paths without touching production data.
+</Note>
+
+---
+
+## Configuring for testing and mocking
+
+When writing unit tests you usually want to avoid real HTTP calls entirely. Inject a mock HTTP client to intercept requests and return controlled responses without any network activity.
+
+```typescript src/client.test-utils.ts
+import {
+  SdkKnowledgeBase,
+  type HttpClient,
+  type HttpRequest,
+  type HttpResponse,
+} from "@sdk-knowledge-base/client";
+
+/** Build a test client whose HTTP layer you fully control. */
+export function createTestClient(
+  handler: (req: HttpRequest) => HttpResponse | Promise<HttpResponse>
+): SdkKnowledgeBase {
+  const mockHttpClient: HttpClient = {
+    send: (req) => Promise.resolve(handler(req)),
+  };
+
+  return new SdkKnowledgeBase({
+    apiKey: "sk_test_mock_key",
+    logLevel: "silent",   // suppress noise during test runs
+    httpClient: mockHttpClient,
+  });
+}
+```
+
+Use `createTestClient` in your tests to return whatever payload you need:
+
+```typescript src/__tests__/products.test.ts
+import { createTestClient } from "../client.test-utils";
+
+test("products.get returns the product for a valid id", async () => {
+  const client = createTestClient((req) => ({
+    status: 200,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      id: "prod_123",
+      name: "Test Product",
+      price: 9.99,
+      currency: "USD",
+      status: "active",
+      created_at: "2024-01-01T00:00:00.000Z",
+      updated_at: "2024-01-01T00:00:00.000Z",
+    }),
+  }));
+
+  const product = await client.products.get("prod_123");
+
+  expect(product.id).toBe("prod_123");
+  expect(product.name).toBe("Test Product");
+});
+```
+
+<Tip>
+  For more complex scenarios — such as simulating retries or timeouts — see the [Testing guide](/guides/testing), which covers end-to-end test strategies alongside mock patterns.
+</Tip>

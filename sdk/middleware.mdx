@@ -1,0 +1,239 @@
+---
+title: "Middleware: Intercepting SDK Requests and Responses"
+sidebarTitle: "Middleware"
+description: "Add middleware to intercept requests, responses, and errors in the SDK lifecycle. Covers auth injection, timing, tracing, and error transformation."
+---
+
+Middleware gives you a structured way to intercept the request and response lifecycle without modifying your application code at every call site. You register middleware once on the client, and the SDK invokes it automatically for every request that passes through. Common uses include injecting authentication headers, logging request durations, transforming errors into domain-specific types, and adding distributed tracing context.
+
+## The Middleware Interface
+
+A middleware is a plain object with up to three optional hook functions. You only need to implement the hooks you care about.
+
+```typescript
+type Middleware = {
+  onRequest?:  (req: Request)  => Request  | Promise<Request>;
+  onResponse?: (res: Response) => Response | Promise<Response>;
+  onError?:    (err: SDKError) => SDKError | Promise<SDKError>;
+};
+```
+
+<ParamField path="onRequest" type="(req: Request) => Request | Promise<Request>">
+  Called before the request is dispatched to the network. Receives the outgoing `Request` object and must return a (possibly modified) `Request`. Use this hook to add headers, rewrite URLs, or attach tracing context.
+</ParamField>
+
+<ParamField path="onResponse" type="(res: Response) => Response | Promise<Response>">
+  Called after a successful response is received and before it is parsed. Receives the raw `Response` object and must return a (possibly modified) `Response`. Use this hook to log response metadata or strip sensitive fields.
+</ParamField>
+
+<ParamField path="onError" type="(err: SDKError) => SDKError | Promise<SDKError>">
+  Called when a request ultimately fails (after all retries). Receives the `SDKError` and must return an `SDKError`. Use this hook to transform, enrich, or re-classify errors before they reach your application code.
+</ParamField>
+
+---
+
+## Adding Middleware
+
+Register middleware with `client.use()`. You can call `client.use()` multiple times to add several middleware objects.
+
+```typescript
+import { SDKClient } from '@sdk-knowledge-base/client';
+
+const client = new SDKClient({ apiKey: process.env.API_KEY });
+
+client.use({
+  onRequest(req) {
+    console.log(`→ ${req.method} ${req.url}`);
+    return req;
+  },
+  onResponse(res) {
+    console.log(`← ${res.status}`);
+    return res;
+  },
+});
+```
+
+---
+
+## Middleware Examples
+
+### Logging Middleware
+
+Log the method, URL, and response status for every request. Useful during development and for production audit trails.
+
+```typescript
+const loggingMiddleware: Middleware = {
+  onRequest(req) {
+    console.log(`[SDK] → ${req.method} ${new URL(req.url).pathname}`);
+    return req;
+  },
+  onResponse(res) {
+    console.log(`[SDK] ← ${res.status} ${res.statusText}`);
+    return res;
+  },
+  onError(err) {
+    console.error(`[SDK] ✗ ${err.code}: ${err.message}`);
+    return err;
+  },
+};
+
+client.use(loggingMiddleware);
+```
+
+---
+
+### Auth Header Injection
+
+Dynamically inject a short-lived bearer token rather than storing it in the client config. This is useful when your auth tokens expire frequently and need to be refreshed per-request.
+
+```typescript
+const authMiddleware: Middleware = {
+  async onRequest(req) {
+    const token = await getValidAccessToken(); // your token refresh logic
+    const headers = new Headers(req.headers);
+    headers.set('Authorization', `Bearer ${token}`);
+    return new Request(req, { headers });
+  },
+};
+
+client.use(authMiddleware);
+```
+
+---
+
+### Request Timing
+
+Measure and record the duration of every SDK request. Pair this with your metrics system to build latency dashboards.
+
+```typescript
+const timingMiddleware: Middleware = {
+  onRequest(req) {
+    // Attach start time as a custom header so onResponse can read it
+    const headers = new Headers(req.headers);
+    headers.set('X-SDK-Start-Time', Date.now().toString());
+    return new Request(req, { headers });
+  },
+  onResponse(res) {
+    const startTime = Number(res.headers.get('X-SDK-Start-Time') ?? 0);
+    const durationMs = Date.now() - startTime;
+    metrics.histogram('sdk.request.duration_ms', durationMs);
+    return res;
+  },
+};
+
+client.use(timingMiddleware);
+```
+
+---
+
+### Error Transformation
+
+Map SDK errors to your application's own error types so that higher-level code doesn't need to import SDK-specific classes.
+
+```typescript
+import { NotFoundError, RateLimitError } from '@sdk-knowledge-base/client';
+import { ResourceNotFoundError, TooManyRequestsError } from './errors';
+
+const errorTransformMiddleware: Middleware = {
+  onError(err) {
+    if (err instanceof NotFoundError) {
+      return Object.assign(new ResourceNotFoundError(err.message), {
+        requestId: err.requestId,
+      });
+    }
+    if (err instanceof RateLimitError) {
+      return Object.assign(new TooManyRequestsError(err.message), {
+        resetAt: err.resetAt,
+      });
+    }
+    return err;
+  },
+};
+
+client.use(errorTransformMiddleware);
+```
+
+---
+
+### Distributed Tracing
+
+Forward an OpenTelemetry trace context to the API so that server-side spans are linked to your client-side traces.
+
+```typescript
+import { context, propagation, trace } from '@opentelemetry/api';
+
+const tracingMiddleware: Middleware = {
+  onRequest(req) {
+    const headers = new Headers(req.headers);
+    const carrier: Record<string, string> = {};
+    propagation.inject(context.active(), carrier);
+    for (const [key, value] of Object.entries(carrier)) {
+      headers.set(key, value);
+    }
+    return new Request(req, { headers });
+  },
+};
+
+client.use(tracingMiddleware);
+```
+
+---
+
+## Removing Middleware
+
+Use `client.unuse()` to remove a middleware that was previously registered. Pass the same object reference you passed to `client.use()`.
+
+```typescript
+const myMiddleware: Middleware = {
+  onRequest(req) {
+    console.log('intercepted');
+    return req;
+  },
+};
+
+client.use(myMiddleware);
+
+// Later, when you no longer need it:
+client.unuse(myMiddleware);
+```
+
+<Note>
+  Like event listeners, middleware must be removed by reference. If you need to conditionally disable a middleware, consider using a flag variable inside the hook rather than adding and removing the middleware repeatedly.
+</Note>
+
+```typescript
+// Preferred: toggle with a flag instead of adding/removing
+let debugEnabled = false;
+
+client.use({
+  onRequest(req) {
+    if (debugEnabled) {
+      console.log('[debug]', req.method, req.url);
+    }
+    return req;
+  },
+});
+
+// Toggle at runtime
+debugEnabled = true;
+```
+
+---
+
+## Middleware Execution Order
+
+Middleware is executed in the order it was registered. The `onRequest` hooks run from first-registered to last before the request is dispatched. The `onResponse` and `onError` hooks run in reverse order (last-registered to first) after the response arrives.
+
+```
+Registration order:  A  →  B  →  C
+
+onRequest  execution:  A.onRequest  →  B.onRequest  →  C.onRequest  →  [network]
+onResponse execution:  [network]    →  C.onResponse →  B.onResponse →  A.onResponse
+onError    execution:  [network]    →  C.onError    →  B.onError    →  A.onError
+```
+
+This wrapping order means that the first middleware you register is the outermost layer — it sees the request before any other middleware modifies it, and it sees the response after all other middleware has processed it.
+
+<Tip>
+  Register your logging or tracing middleware first so it observes the fully decorated request (including auth headers added by later middleware) on the way out, and the raw response on the way back.
+</Tip>

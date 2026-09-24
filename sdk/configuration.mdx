@@ -1,0 +1,295 @@
+---
+title: "SDK Configuration Reference: All Config Options Explained"
+sidebarTitle: "Configuration"
+description: "Complete reference for the Config interface — every option, its type, default value, and environment variable equivalent for SDKClient."
+---
+
+The `Config` interface controls every aspect of how the SDK Knowledge Base client connects to the API, handles errors, and emits logs. You pass a `Config` object when constructing an `SDKClient`, and the SDK merges your values with the built-in defaults. This page documents every field you can set, how to supply values through environment variables, and the full TypeScript interface for use in your own type definitions.
+
+## Full TypeScript Interface
+
+Copy this interface into your codebase if you need to type configuration objects before passing them to the client, or if you are building a wrapper around `SDKClient`.
+
+```typescript
+import type { HttpClient } from '@your-org/sdk';
+
+interface Config {
+  // Required
+  apiKey: string;
+
+  // Network
+  baseUrl?: string;
+  timeout?: number;
+  headers?: Record<string, string>;
+  httpClient?: HttpClient;
+  signal?: AbortSignal;
+
+  // Retry
+  maxRetries?: number;
+  retryDelay?: number;
+
+  // Observability
+  logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'silent';
+}
+```
+
+## Configuration Options
+
+### Authentication
+
+<ParamField body="apiKey" type="string" required>
+  Your SDK Knowledge Base API key. The client attaches this as a `Bearer` token on every request:
+
+  ```
+  Authorization: Bearer <apiKey>
+  ```
+
+  Generate and rotate keys in the **Settings → API Keys** section of your dashboard. Use separate keys for development, staging, and production environments.
+
+  ```typescript
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+  });
+  ```
+</ParamField>
+
+### Network
+
+<ParamField body="baseUrl" type="string" default="https://api.example.com/v1">
+  The root URL that all resource paths are appended to. The client never adds a trailing slash — ensure your custom URL does not end with one either, or you will produce double-slash paths.
+
+  ```typescript
+  // Point at a local development mock
+  const client = new SDKClient({
+    apiKey: 'dev-key',
+    baseUrl: 'http://localhost:4010',
+  });
+  ```
+
+  <Tip>
+    Use a staging `baseUrl` in your CI environment so integration tests never touch production data.
+  </Tip>
+</ParamField>
+
+<ParamField body="timeout" type="number" default={30000}>
+  Maximum time in milliseconds to wait for the server to respond before the SDK throws a `TimeoutError`. The timer starts when the request is dispatched and stops when the first byte of the response is received.
+
+  ```typescript
+  // Tight timeout for a latency-sensitive endpoint
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    timeout: 5_000, // 5 seconds
+  });
+  ```
+
+  Set to `0` to wait indefinitely. Avoid this in production — a hung request will block the call site forever unless you manage cancellation yourself via `signal`.
+</ParamField>
+
+<ParamField body="headers" type="Record<string, string>">
+  A map of additional HTTP headers sent on **every** request made by this client instance. Headers you supply here are merged with the SDK's own headers (`Authorization`, `Content-Type`, `User-Agent`). If you supply a header that conflicts with an SDK-managed header, your value takes precedence — except for `Authorization`, which is always set from `apiKey`.
+
+  ```typescript
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    headers: {
+      'X-App-Name': 'my-service',
+      'X-App-Version': '3.0.1',
+      'X-Correlation-ID': correlationId,
+    },
+  });
+  ```
+</ParamField>
+
+<ParamField body="httpClient" type="HttpClient">
+  A custom object that satisfies the `HttpClient` interface. When provided, the SDK delegates all HTTP I/O to your implementation instead of its built-in `fetch`-based client.
+
+  Use this to:
+  - Swap in a specific `fetch` polyfill (e.g., `node-fetch` v2 in older Node environments)
+  - Route requests through an HTTP proxy
+  - Intercept and record requests in tests without network mocking libraries
+
+  ```typescript
+  import { HttpClient } from '@your-org/sdk';
+
+  const loggingClient: HttpClient = {
+    async request(req) {
+      console.log(`→ ${req.method} ${req.url}`);
+      const res = await fetch(req.url, req);
+      console.log(`← ${res.status}`);
+      return res;
+    },
+  };
+
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    httpClient: loggingClient,
+  });
+  ```
+</ParamField>
+
+<ParamField body="signal" type="AbortSignal">
+  A global `AbortSignal` that cancels every in-flight request managed by this client when the signal fires. You can also pass a signal on individual method calls; when both are present, whichever fires first wins.
+
+  ```typescript
+  const controller = new AbortController();
+
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    signal: controller.signal,
+  });
+
+  // Abort all pending requests on SIGTERM
+  process.on('SIGTERM', () => controller.abort());
+  ```
+</ParamField>
+
+### Retry Behavior
+
+<ParamField body="maxRetries" type="number" default={3}>
+  The maximum number of times the SDK retries a failed request before re-throwing the error. The SDK only retries on transient failures:
+
+  - Network-level errors (DNS failure, connection reset)
+  - `429 Too Many Requests` responses
+  - `502`, `503`, `504` server errors
+
+  It never retries `4xx` client errors (except `429`) because those indicate a problem with the request itself.
+
+  ```typescript
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    maxRetries: 0, // Disable automatic retries
+  });
+  ```
+</ParamField>
+
+<ParamField body="retryDelay" type="number" default={1000}>
+  The base delay in milliseconds between retry attempts. The SDK applies **exponential back-off with full jitter**, so the actual wait time for attempt *n* is a random value in the range `[0, retryDelay * 2^(n-1)]` ms.
+
+  When the server returns a `Retry-After` header (common with `429` responses), the SDK respects that value instead of calculating its own delay.
+
+  ```typescript
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    retryDelay: 250, // Faster retries for low-latency services
+  });
+  ```
+</ParamField>
+
+### Observability
+
+<ParamField body="logLevel" type="'debug' | 'info' | 'warn' | 'error' | 'silent'" default="'warn'">
+  Controls which internal SDK log messages are emitted to `console`. Log levels are hierarchical — setting a level includes all levels above it.
+
+  | Level | What is logged |
+  |---|---|
+  | `'debug'` | Full request/response details, retry decisions, cache hits |
+  | `'info'` | High-level lifecycle events (client created, request sent) |
+  | `'warn'` | Deprecation notices, non-fatal configuration issues |
+  | `'error'` | Unrecoverable errors before they are thrown |
+  | `'silent'` | Nothing — all SDK logging suppressed |
+
+  ```typescript
+  const client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    logLevel: process.env.NODE_ENV === 'production' ? 'error' : 'debug',
+  });
+  ```
+
+  <Note>
+    The SDK logs through the global `console` object. If you use a structured logging library (Winston, Pino), set `logLevel: 'silent'` and subscribe to SDK events instead to funnel output through your own logger.
+  </Note>
+</ParamField>
+
+## Environment Variables
+
+You can pre-configure several options through environment variables. When a `Config` field is also set in the constructor, the constructor value always takes precedence.
+
+| Environment Variable | Corresponding Field | Expected Format |
+|---|---|---|
+| `SDK_API_KEY` | `apiKey` | String |
+| `SDK_BASE_URL` | `baseUrl` | Valid URL string |
+| `SDK_TIMEOUT` | `timeout` | Integer (milliseconds) |
+| `SDK_MAX_RETRIES` | `maxRetries` | Integer ≥ 0 |
+| `SDK_RETRY_DELAY` | `retryDelay` | Integer (milliseconds) |
+| `SDK_LOG_LEVEL` | `logLevel` | `debug` \| `info` \| `warn` \| `error` \| `silent` |
+
+Example `.env` file:
+
+```bash
+SDK_API_KEY=sk_live_xxxxxxxxxxxxxxxxxxxx
+SDK_BASE_URL=https://api.example.com/v1
+SDK_TIMEOUT=10000
+SDK_MAX_RETRIES=3
+SDK_RETRY_DELAY=500
+SDK_LOG_LEVEL=warn
+```
+
+<Tip>
+  Use a tool like [dotenv](https://github.com/motdotla/dotenv) or your platform's native secret injection (e.g., Vercel Environment Variables, AWS Parameter Store) to populate these variables. Never commit a `.env` file containing live API keys to version control.
+</Tip>
+
+## Configuration by Environment
+
+A common pattern is to build your config from the current `NODE_ENV` value:
+
+```typescript
+import { SDKClient, type Config } from '@your-org/sdk';
+
+function buildConfig(): Config {
+  const base: Config = {
+    apiKey: process.env.SDK_API_KEY!,
+  };
+
+  if (process.env.NODE_ENV === 'development') {
+    return {
+      ...base,
+      baseUrl: 'http://localhost:4010',
+      logLevel: 'debug',
+      maxRetries: 0, // Fail fast during local development
+    };
+  }
+
+  if (process.env.NODE_ENV === 'test') {
+    return {
+      ...base,
+      baseUrl: 'http://localhost:4010',
+      logLevel: 'silent',
+      maxRetries: 0,
+      timeout: 2_000,
+    };
+  }
+
+  // Production defaults
+  return {
+    ...base,
+    logLevel: 'warn',
+    maxRetries: 3,
+    timeout: 15_000,
+  };
+}
+
+export const client = new SDKClient(buildConfig());
+```
+
+## Validating Your Configuration
+
+The SDK throws a synchronous `ConfigurationError` during construction if required fields are missing or if field values are of the wrong type. Wrap construction in a try/catch during application startup to surface misconfiguration early:
+
+```typescript
+import { SDKClient, ConfigurationError } from '@your-org/sdk';
+
+let client: SDKClient;
+
+try {
+  client = new SDKClient({
+    apiKey: process.env.SDK_API_KEY!,
+    timeout: Number(process.env.SDK_TIMEOUT ?? 30_000),
+  });
+} catch (err) {
+  if (err instanceof ConfigurationError) {
+    console.error('SDK misconfigured:', err.message);
+    process.exit(1);
+  }
+  throw err;
+}
+```
