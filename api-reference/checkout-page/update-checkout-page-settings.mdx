@@ -1,0 +1,9 @@
+---
+title: "Update checkout page settings"
+description: "Changes the fields you send in one or more sections and returns all settings."
+openapi: "PATCH /admin/settings/page_settings/checkout_page"
+---
+
+Send the fields to change inside `checkout_page`, grouped by section name; one body can name several sections. Only the fields you send change: other fields in the same block, and sections you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get checkout page settings](/api-reference/checkout-page/get-checkout-page-settings) does. A body that is not wrapped in `checkout_page` is rejected with `400 invalid_request`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

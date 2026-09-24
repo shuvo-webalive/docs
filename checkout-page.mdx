@@ -1,0 +1,56 @@
+---
+title: "Checkout page"
+sidebarTitle: "Overview"
+description: "Read your checkout page's address forms, and read and change its sign-in, delivery, order summary and other settings."
+---
+
+The Checkout page API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/checkout_page`.
+
+<Warning>
+  **After a `400`, the next call on the same client gets the wrong response.** That call returns the
+  previous call's response instead of its own: the same `400` again, or a `200` with the body of the
+  path you called before. The request you sent never reaches the store, so a write in it is not saved.
+  The call after that works normally. After a `400`, make your next call from a new client.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get checkout page settings](/api-reference/checkout-page/get-checkout-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/checkout_page` | Returns all six checkout page settings sections, and a `group_meta` block describing each one. |
+| [Update checkout page settings](/api-reference/checkout-page/update-checkout-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/checkout_page` | Changes the fields you send in one or more sections and returns all settings. |
+| [Get checkout page settings headers](/api-reference/checkout-page/get-checkout-page-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/checkout_page` | Returns the headers for the checkout page settings, with no body. |
+| [Get a settings section](/api-reference/checkout-page/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/checkout_page/{section}` | Returns one settings section under its own key, such as `order_summary`. |
+| [Update a settings section](/api-reference/checkout-page/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/checkout_page/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into six sections, and two of them are read-only.** The sections are
+  `billing_address`, `shipping_address`, `customer_checkout`, `delivery_options`, `order_summary` and
+  `others`. `group_meta` marks `billing_address` and `shipping_address` `writable: false`, so write only
+  the other four. Read all six through `/checkout_page`, or one through `/checkout_page/{section}`.
+- **Every write body must be wrapped, and the wrapper depends on the path.** On `/checkout_page`, wrap
+  the fields in `checkout_page` and then in the section name. On `/checkout_page/{section}`, wrap them
+  in the section's own name only, such as `order_summary`. A body without the right wrapper is
+  rejected with `400 invalid_request`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields you leave out
+  keep their stored values, including other fields in the same block and sections you did not name.
+  `PUT`, `POST` and `DELETE` are rejected on every path with `405 method_not_allowed` and an
+  `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **Some combinations of settings are rejected.** In `customer_checkout`, at least one of `allow_sign_in`,
+  `allow_sign_up` and `checkout_as_guest` must stay on. In `delivery_options`, at least one of the four
+  delivery options must stay on. A body that breaks a rule is rejected with `400 invalid_request`, and
+  `details[0].code` is `constraint_violation`. Read the section with `field_metadata=true` to get its
+  rules in `_rules`.
+- **Writes and reads are rate limited.** The eleventh write in a short window is rejected with
+  `429 rate_limited` and the message `Too many writes to this resource`. Until the window ends, writes
+  to `/checkout_page`, to other sections and to the product page settings are rejected too, while
+  reads still return `200`. The `Retry-After` header counts down the seconds left, so wait that long before you
+  write again. Reads have their own limit: the twenty-first read in about one second is rejected, with
+  `Retry-After: 10`.

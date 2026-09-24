@@ -1,0 +1,9 @@
+---
+title: "Get a settings section"
+description: "Returns one settings section under its own key, such as `order_summary`."
+openapi: "GET /admin/settings/page_settings/checkout_page/{section}"
+---
+
+Returns one section, wrapped in the section's own name rather than in `checkout_page`, and without `group_meta`. For `billing_address` and `shipping_address` it returns `fields`: each form field with its `key`, `label`, `active`, `required`, `order` and `group`, inactive fields included. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

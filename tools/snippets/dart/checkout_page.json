@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "getCheckoutPage",
+      "code": "final response = await client.checkoutPage.getCheckoutPage();\nfinal checkoutPage = (response.map as Map)['checkout_page'] as Map;\nprint(checkoutPage['customer_checkout']);\nprint(checkoutPage['order_summary']);"
+    },
+    "patch_checkout_page": {
+      "function": "patchCheckoutPage",
+      "code": "final response = await client.checkoutPage.patchCheckoutPage({\n  'checkout_page': {\n    'order_summary': {'enable_payment_expand_view': false},\n    'customer_checkout': {'multiple_shipping_methods': true},\n  },\n});\nfinal checkoutPage = (response.map as Map)['checkout_page'] as Map;\nprint(checkoutPage['order_summary']);\nprint(checkoutPage['customer_checkout']);"
+    },
+    "head_checkout_page": {
+      "function": "headCheckoutPage",
+      "code": "final response = await client.checkoutPage.headCheckoutPage();\nprint(response.statusCode);"
+    },
+    "get_checkout_page_section": {
+      "function": "getCheckoutPageSection",
+      "code": "final response =\n    await client.checkoutPage.getCheckoutPageSection('order_summary');\nfinal section = (response.map as Map)['order_summary'] as Map;\nprint(section['show_product_thumbnail']);\nprint(section['enable_payment_expand_view']);"
+    },
+    "patch_checkout_page_section": {
+      "function": "patchCheckoutPageSection",
+      "code": "final response =\n    await client.checkoutPage.patchCheckoutPageSection('order_summary', {\n  'order_summary': {'show_product_thumbnail': false},\n});\nfinal section = (response.map as Map)['order_summary'] as Map;\nprint(section['show_product_thumbnail']);"
+    }
+  }
+}

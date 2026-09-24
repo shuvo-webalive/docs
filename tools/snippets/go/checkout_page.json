@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "GetCheckoutPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CheckoutPageSettings().GetCheckoutPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"checkout_page\"].(map[string]any)\ncheckout := settings[\"customer_checkout\"].(map[string]any)\nsummary := settings[\"order_summary\"].(map[string]any)\nfmt.Println(checkout[\"allow_sign_in\"], checkout[\"multiple_shipping_methods\"], summary[\"enable_payment_expand_view\"])"
+    },
+    "patch_checkout_page": {
+      "function": "PatchCheckoutPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CheckoutPageSettings().PatchCheckoutPage(ctx, map[string]any{\n\t\"checkout_page\": map[string]any{\n\t\t\"order_summary\":     map[string]any{\"enable_payment_expand_view\": false},\n\t\t\"customer_checkout\": map[string]any{\"multiple_shipping_methods\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"checkout_page\"].(map[string]any)\nfmt.Println(settings[\"order_summary\"].(map[string]any)[\"enable_payment_expand_view\"], settings[\"customer_checkout\"].(map[string]any)[\"multiple_shipping_methods\"])"
+    },
+    "head_checkout_page": {
+      "function": "HeadCheckoutPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CheckoutPageSettings().HeadCheckoutPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_checkout_page_section": {
+      "function": "GetCheckoutPageSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CheckoutPageSettings().GetCheckoutPageSection(ctx, \"order_summary\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsummary := resp.Map().(map[string]any)[\"order_summary\"].(map[string]any)\nfmt.Println(summary[\"show_product_thumbnail\"], summary[\"show_quantity\"], summary[\"enable_payment_expand_view\"])"
+    },
+    "patch_checkout_page_section": {
+      "function": "PatchCheckoutPageSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CheckoutPageSettings().PatchCheckoutPageSection(ctx, \"order_summary\", map[string]any{\n\t\"order_summary\": map[string]any{\"show_product_thumbnail\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"order_summary\"].(map[string]any)[\"show_product_thumbnail\"])"
+    }
+  }
+}

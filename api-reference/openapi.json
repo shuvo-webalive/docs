@@ -31,6 +31,9 @@
       "name": "Category page"
     },
     {
+      "name": "Checkout page"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -2989,6 +2992,782 @@
         }
       }
     },
+    "/admin/settings/page_settings/checkout_page": {
+      "get": {
+        "tags": [
+          "Checkout page"
+        ],
+        "summary": "Get checkout page settings",
+        "operationId": "get_checkout_page",
+        "description": "Returns all six sections under `checkout_page`. The two address sections list only their active field keys, in `active_fields`; [Get a settings section](/api-reference/checkout-page/get-a-settings-section) returns their full field list. Beside the settings, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of each section's fields, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, keyed by section. It describes the fields of the four writable sections one by one, and each address section as a single `resource` entry with `read_only: true`. It also has a `_legacy_field_map` entry, which gives the flat name the older admin save uses for twelve of the fields. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All six sections and `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "checkout_page": {
+                      "$ref": "#/components/schemas/CheckoutPageSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CheckoutGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CheckoutFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section, with a `_legacy_field_map` entry beside the six."
+                    }
+                  }
+                },
+                "example": {
+                  "checkout_page": {
+                    "billing_address": {
+                      "active_fields": [
+                        "first_name",
+                        "last_name",
+                        "country",
+                        "address_line_1",
+                        "post_code",
+                        "city",
+                        "phone",
+                        "email"
+                      ]
+                    },
+                    "shipping_address": {
+                      "active_fields": [
+                        "first_name",
+                        "last_name",
+                        "country",
+                        "address_line_1",
+                        "post_code",
+                        "city",
+                        "phone",
+                        "email"
+                      ]
+                    },
+                    "customer_checkout": {
+                      "allow_sign_in": true,
+                      "allow_sign_up": {
+                        "enabled": true,
+                        "required": false
+                      },
+                      "checkout_as_guest": {
+                        "enabled": true,
+                        "quick_signup": false
+                      },
+                      "newsletter_subscription": true,
+                      "multiple_shipping_methods": false
+                    },
+                    "delivery_options": {
+                      "enable_shipping": true,
+                      "enable_store_pickup": true,
+                      "enable_shipping_quote": true,
+                      "enable_delivery_service": true
+                    },
+                    "order_summary": {
+                      "show_product_thumbnail": true,
+                      "show_quantity": true,
+                      "enable_payment_expand_view": true,
+                      "order_confirm_captcha": false
+                    },
+                    "others": {
+                      "show_logo": false,
+                      "login_url": "https://your-store.example.com/customer/login?referer=/shop/checkout",
+                      "custom_html": "<div class=\"help-policy\"><p>Need help? <a href=\"/contact-us\">Contact Us</a></p></div>",
+                      "comment": {
+                        "enabled": false,
+                        "send_notification": false
+                      },
+                      "terms_and_condition": {
+                        "enabled": true,
+                        "text": "By placing this order, I agree to be bound by the ",
+                        "link_label": "Terms and Conditions.",
+                        "type": "link",
+                        "ref": {
+                          "link": "https://your-store.example.com/terms-and-conditions"
+                        }
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "billing_address": {
+                      "kind": "setting",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/billing_address"
+                    },
+                    "shipping_address": {
+                      "kind": "setting",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/shipping_address"
+                    },
+                    "customer_checkout": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/customer_checkout"
+                    },
+                    "delivery_options": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/delivery_options"
+                    },
+                    "order_summary": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/order_summary"
+                    },
+                    "others": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/others"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/checkout_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.checkout_page.get_checkout_page()\nsettings = response.map[\"checkout_page\"]\nprint(settings[\"billing_address\"][\"active_fields\"])\nprint(settings[\"customer_checkout\"][\"allow_sign_in\"])\nprint(settings[\"order_summary\"][\"show_quantity\"])\nprint(response.map[\"group_meta\"][\"billing_address\"][\"writable\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.checkoutPage.getCheckoutPage();\nconst settings = response.map.checkout_page;\nconsole.log(settings.customer_checkout.allow_sign_in, settings.delivery_options.enable_store_pickup);\nconsole.log(settings.order_summary.show_product_thumbnail);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = CheckoutPage::getCheckoutPage($client);\n\n$settings = $response->map['checkout_page'];\necho 'Billing fields: ', implode(', ', $settings['billing_address']['active_fields']), PHP_EOL;\necho 'Guest checkout: ', $settings['customer_checkout']['checkout_as_guest']['enabled'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.checkoutPage().getCheckoutPage();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"checkout_page\");\nMap<?, ?> orderSummary = (Map<?, ?>) settings.get(\"order_summary\");\nSystem.out.println(orderSummary.get(\"show_product_thumbnail\") + \" \" + orderSummary.get(\"show_quantity\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"billing_address\")).get(\"active_fields\"));\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"billing_address\")).get(\"writable\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CheckoutPage.GetCheckoutPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkoutPage = (IReadOnlyDictionary<string, object?>)body[\"checkout_page\"]!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)checkoutPage[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"enable_payment_expand_view\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.checkoutPage.getCheckoutPage();\nfinal checkoutPage = (response.map as Map)['checkout_page'] as Map;\nprint(checkoutPage['customer_checkout']);\nprint(checkoutPage['order_summary']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CheckoutPageSettings().GetCheckoutPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"checkout_page\"].(map[string]any)\ncheckout := settings[\"customer_checkout\"].(map[string]any)\nsummary := settings[\"order_summary\"].(map[string]any)\nfmt.Println(checkout[\"allow_sign_in\"], checkout[\"multiple_shipping_methods\"], summary[\"enable_payment_expand_view\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Checkout page"
+        ],
+        "summary": "Update checkout page settings",
+        "operationId": "patch_checkout_page",
+        "description": "Send the fields to change inside `checkout_page`, grouped by section name; one body can name several sections. Only the fields you send change: other fields in the same block, and sections you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get checkout page settings](/api-reference/checkout-page/get-checkout-page-settings) does. A body that is not wrapped in `checkout_page` is rejected with `400 invalid_request`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "checkout_page": {
+                      "$ref": "#/components/schemas/CheckoutPageSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CheckoutGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "checkout_page": {
+                    "billing_address": {
+                      "active_fields": [
+                        "first_name",
+                        "last_name",
+                        "country",
+                        "address_line_1",
+                        "post_code",
+                        "city",
+                        "phone",
+                        "email"
+                      ]
+                    },
+                    "shipping_address": {
+                      "active_fields": [
+                        "first_name",
+                        "last_name",
+                        "country",
+                        "address_line_1",
+                        "post_code",
+                        "city",
+                        "phone",
+                        "email"
+                      ]
+                    },
+                    "customer_checkout": {
+                      "allow_sign_in": true,
+                      "allow_sign_up": {
+                        "enabled": true,
+                        "required": false
+                      },
+                      "checkout_as_guest": {
+                        "enabled": true,
+                        "quick_signup": false
+                      },
+                      "newsletter_subscription": true,
+                      "multiple_shipping_methods": true
+                    },
+                    "delivery_options": {
+                      "enable_shipping": true,
+                      "enable_store_pickup": true,
+                      "enable_shipping_quote": true,
+                      "enable_delivery_service": true
+                    },
+                    "order_summary": {
+                      "show_product_thumbnail": true,
+                      "show_quantity": true,
+                      "enable_payment_expand_view": false,
+                      "order_confirm_captcha": false
+                    },
+                    "others": {
+                      "show_logo": false,
+                      "login_url": "https://your-store.example.com/customer/login?referer=/shop/checkout",
+                      "custom_html": "<div class=\"help-policy\"><p>Need help? <a href=\"/contact-us\">Contact Us</a></p></div>",
+                      "comment": {
+                        "enabled": false,
+                        "send_notification": false
+                      },
+                      "terms_and_condition": {
+                        "enabled": true,
+                        "text": "By placing this order, I agree to be bound by the ",
+                        "link_label": "Terms and Conditions.",
+                        "type": "link",
+                        "ref": {
+                          "link": "https://your-store.example.com/terms-and-conditions"
+                        }
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "billing_address": {
+                      "kind": "setting",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/billing_address"
+                    },
+                    "shipping_address": {
+                      "kind": "setting",
+                      "writable": false,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/shipping_address"
+                    },
+                    "customer_checkout": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/customer_checkout"
+                    },
+                    "delivery_options": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/delivery_options"
+                    },
+                    "order_summary": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/order_summary"
+                    },
+                    "others": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/checkout_page/others"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `checkout_page`: `details[0].field` is `checkout_page` and `details[0].code` is `required`. Or the body breaks one of the rules listed under `_rules` in `field_metadata`: `details[0].code` is `constraint_violation` and the message quotes the rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "request body must be wrapped in a 'checkout_page' object",
+                    "details": [
+                      {
+                        "field": "checkout_page",
+                        "code": "required",
+                        "message": "the request body must be wrapped in a 'checkout_page' object"
+                      }
+                    ],
+                    "request_id": "552dcbb3-a758-48e5-bff8-3df2225d3b69"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. The error code is `rate_limited`, the message is `Too many writes to this resource`, and the `Retry-After` header counts down the seconds until you can write again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/checkout_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"checkout_page\": {\n      \"order_summary\": {\n        \"enable_payment_expand_view\": false\n      },\n      \"customer_checkout\": {\n        \"multiple_shipping_methods\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.checkout_page.patch_checkout_page({\n    \"checkout_page\": {\n        \"order_summary\": {\"enable_payment_expand_view\": False},\n        \"customer_checkout\": {\"multiple_shipping_methods\": True},\n    },\n})\nsettings = response.map[\"checkout_page\"]\nprint(settings[\"order_summary\"][\"enable_payment_expand_view\"])\nprint(settings[\"customer_checkout\"][\"multiple_shipping_methods\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.checkoutPage.patchCheckoutPage({\n    checkout_page: {\n        order_summary: {enable_payment_expand_view: false},\n        customer_checkout: {multiple_shipping_methods: true},\n    },\n});\nconst settings = response.map.checkout_page;\nconsole.log(settings.order_summary.enable_payment_expand_view, settings.customer_checkout.multiple_shipping_methods);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = CheckoutPage::patchCheckoutPage($client, [\n    'checkout_page' => [\n        'order_summary' => ['enable_payment_expand_view' => false],\n        'customer_checkout' => ['multiple_shipping_methods' => true],\n    ],\n]);\n\n$settings = $response->map['checkout_page'];\necho $settings['order_summary']['enable_payment_expand_view'] ? 'true' : 'false', PHP_EOL;\necho $settings['customer_checkout']['multiple_shipping_methods'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.checkoutPage().patchCheckoutPage(Map.of(\"checkout_page\", Map.of(\n        \"order_summary\", Map.of(\"enable_payment_expand_view\", false),\n        \"customer_checkout\", Map.of(\"multiple_shipping_methods\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"checkout_page\");\nSystem.out.println(((Map<?, ?>) settings.get(\"order_summary\")).get(\"enable_payment_expand_view\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"customer_checkout\")).get(\"multiple_shipping_methods\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CheckoutPage.PatchCheckoutPageAsync(new Dictionary<string, object?>\n{\n    [\"checkout_page\"] = new Dictionary<string, object?>\n    {\n        [\"order_summary\"] = new Dictionary<string, object?> { [\"enable_payment_expand_view\"] = false },\n        [\"customer_checkout\"] = new Dictionary<string, object?> { [\"multiple_shipping_methods\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkoutPage = (IReadOnlyDictionary<string, object?>)body[\"checkout_page\"]!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)checkoutPage[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"enable_payment_expand_view\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.checkoutPage.patchCheckoutPage({\n  'checkout_page': {\n    'order_summary': {'enable_payment_expand_view': false},\n    'customer_checkout': {'multiple_shipping_methods': true},\n  },\n});\nfinal checkoutPage = (response.map as Map)['checkout_page'] as Map;\nprint(checkoutPage['order_summary']);\nprint(checkoutPage['customer_checkout']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CheckoutPageSettings().PatchCheckoutPage(ctx, map[string]any{\n\t\"checkout_page\": map[string]any{\n\t\t\"order_summary\":     map[string]any{\"enable_payment_expand_view\": false},\n\t\t\"customer_checkout\": map[string]any{\"multiple_shipping_methods\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"checkout_page\"].(map[string]any)\nfmt.Println(settings[\"order_summary\"].(map[string]any)[\"enable_payment_expand_view\"], settings[\"customer_checkout\"].(map[string]any)[\"multiple_shipping_methods\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "checkout_page"
+                ],
+                "properties": {
+                  "checkout_page": {
+                    "type": "object",
+                    "description": "The fields to change, grouped by section. Send only the fields that change. Only the four sections `group_meta` marks `writable: true` can be written.",
+                    "properties": {
+                      "customer_checkout": {
+                        "$ref": "#/components/schemas/CheckoutCustomerCheckout"
+                      },
+                      "delivery_options": {
+                        "$ref": "#/components/schemas/CheckoutDeliveryOptions"
+                      },
+                      "order_summary": {
+                        "$ref": "#/components/schemas/CheckoutOrderSummary"
+                      },
+                      "others": {
+                        "$ref": "#/components/schemas/CheckoutOthers"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Checkout page"
+        ],
+        "summary": "Get checkout page settings headers",
+        "operationId": "head_checkout_page",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/page_settings/checkout_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.checkout_page.head_checkout_page()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.checkoutPage.headCheckoutPage();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = CheckoutPage::headCheckoutPage($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.checkoutPage().headCheckoutPage();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CheckoutPage.HeadCheckoutPageAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.checkoutPage.headCheckoutPage();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CheckoutPageSettings().HeadCheckoutPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/page_settings/checkout_page/{section}": {
+      "get": {
+        "tags": [
+          "Checkout page"
+        ],
+        "summary": "Get a settings section",
+        "operationId": "get_checkout_page_section",
+        "description": "Returns one section, wrapped in the section's own name rather than in `checkout_page`, and without `group_meta`. For `billing_address` and `shipping_address` it returns `fields`: each form field with its `key`, `label`, `active`, `required`, `order` and `group`, inactive fields included. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read: `billing_address`, `shipping_address`, `customer_checkout`, `delivery_options`, `order_summary` or `others`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "billing_address",
+                "shipping_address",
+                "customer_checkout",
+                "delivery_options",
+                "order_summary",
+                "others"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields, keyed by field name. For `customer_checkout` and `delivery_options` it also has `_rules`, the list of rules the store enforces: a write that breaks one is rejected with `400`. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "billing_address": {
+                      "$ref": "#/components/schemas/CheckoutAddressForm"
+                    },
+                    "shipping_address": {
+                      "$ref": "#/components/schemas/CheckoutAddressForm"
+                    },
+                    "customer_checkout": {
+                      "$ref": "#/components/schemas/CheckoutCustomerCheckout"
+                    },
+                    "delivery_options": {
+                      "$ref": "#/components/schemas/CheckoutDeliveryOptions"
+                    },
+                    "order_summary": {
+                      "$ref": "#/components/schemas/CheckoutOrderSummary"
+                    },
+                    "others": {
+                      "$ref": "#/components/schemas/CheckoutOthers"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CheckoutFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name, with a `_rules` entry for `customer_checkout` and `delivery_options`."
+                    }
+                  }
+                },
+                "example": {
+                  "order_summary": {
+                    "show_product_thumbnail": true,
+                    "show_quantity": true,
+                    "enable_payment_expand_view": true,
+                    "order_confirm_captcha": false
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The error `code` is `not_found` and the message is `Unknown page-settings section: checkout_page/<section>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown page-settings section: checkout_page/bogus",
+                    "details": [],
+                    "request_id": "4d7a2c18-9e3b-4f65-b1d0-6a8e5c2f7b39"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/checkout_page/order_summary\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.checkout_page.get_checkout_page_section(\"order_summary\")\nsummary = response.map[\"order_summary\"]\nprint(summary[\"show_product_thumbnail\"], summary[\"show_quantity\"])\nprint(summary[\"enable_payment_expand_view\"], summary[\"order_confirm_captcha\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.checkoutPage.getCheckoutPageSection('order_summary');\nconst summary = response.map.order_summary;\nconsole.log(summary.show_product_thumbnail, summary.show_quantity, summary.order_confirm_captcha);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = CheckoutPage::getCheckoutPageSection($client, 'order_summary');\n\nforeach ($response->map['order_summary'] as $field => $value) {\n    echo $field, ': ', $value ? 'true' : 'false', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.checkoutPage().getCheckoutPageSection(\"order_summary\");\nMap<?, ?> orderSummary = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_summary\");\nSystem.out.println(orderSummary.get(\"show_product_thumbnail\") + \" \" + orderSummary.get(\"show_quantity\"));\nSystem.out.println(orderSummary.get(\"enable_payment_expand_view\") + \" \" + orderSummary.get(\"order_confirm_captcha\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CheckoutPage.GetCheckoutPageSectionAsync(\"order_summary\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)body[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"show_product_thumbnail\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.checkoutPage.getCheckoutPageSection('order_summary');\nfinal section = (response.map as Map)['order_summary'] as Map;\nprint(section['show_product_thumbnail']);\nprint(section['enable_payment_expand_view']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CheckoutPageSettings().GetCheckoutPageSection(ctx, \"order_summary\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsummary := resp.Map().(map[string]any)[\"order_summary\"].(map[string]any)\nfmt.Println(summary[\"show_product_thumbnail\"], summary[\"show_quantity\"], summary[\"enable_payment_expand_view\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Checkout page"
+        ],
+        "summary": "Update a settings section",
+        "operationId": "patch_checkout_page_section",
+        "description": "Send the fields to change, wrapped in the section's own name, such as `order_summary`. That is the only wrapper accepted: a body wrapped in `checkout_page`, or not wrapped at all, is rejected with `400 invalid_request`, and `details[0].field` names the section. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change, under the same key and without `group_meta`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to write: `customer_checkout`, `delivery_options`, `order_summary` or `others`. `group_meta` marks `billing_address` and `shipping_address` `writable: false`, so they are not listed.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "customer_checkout",
+                "delivery_options",
+                "order_summary",
+                "others"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_checkout": {
+                      "$ref": "#/components/schemas/CheckoutCustomerCheckout"
+                    },
+                    "delivery_options": {
+                      "$ref": "#/components/schemas/CheckoutDeliveryOptions"
+                    },
+                    "order_summary": {
+                      "$ref": "#/components/schemas/CheckoutOrderSummary"
+                    },
+                    "others": {
+                      "$ref": "#/components/schemas/CheckoutOthers"
+                    }
+                  }
+                },
+                "example": {
+                  "order_summary": {
+                    "show_product_thumbnail": false,
+                    "show_quantity": true,
+                    "enable_payment_expand_view": true,
+                    "order_confirm_captcha": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in the section's own name: `details[0].field` names the section and `details[0].code` is `required`. Or the body breaks one of the section's `_rules`: `details[0].code` is `constraint_violation` and the message quotes the rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPageError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. The error code is `rate_limited`, the message is `Too many writes to this resource`, and the `Retry-After` header counts down the seconds until you can write again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/checkout_page/order_summary\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"order_summary\": {\n      \"show_product_thumbnail\": false\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.checkout_page.patch_checkout_page_section(\n    \"order_summary\", {\"order_summary\": {\"show_product_thumbnail\": False}}\n)\nprint(response.map[\"order_summary\"][\"show_product_thumbnail\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.checkoutPage.patchCheckoutPageSection('order_summary', {\n    order_summary: {show_product_thumbnail: false},\n});\nconsole.log(response.map.order_summary.show_product_thumbnail);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\CheckoutPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = CheckoutPage::patchCheckoutPageSection($client, 'order_summary', [\n    'order_summary' => ['show_product_thumbnail' => false],\n]);\n\necho $response->map['order_summary']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.checkoutPage().patchCheckoutPageSection(\"order_summary\",\n        Map.of(\"order_summary\", Map.of(\"show_product_thumbnail\", false)));\nMap<?, ?> orderSummary = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_summary\");\nSystem.out.println(orderSummary.get(\"show_product_thumbnail\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CheckoutPage.PatchCheckoutPageSectionAsync(\"order_summary\", new Dictionary<string, object?>\n{\n    [\"order_summary\"] = new Dictionary<string, object?> { [\"show_product_thumbnail\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderSummary = (IReadOnlyDictionary<string, object?>)body[\"order_summary\"]!;\nConsole.WriteLine(orderSummary[\"show_product_thumbnail\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.checkoutPage.patchCheckoutPageSection('order_summary', {\n  'order_summary': {'show_product_thumbnail': false},\n});\nfinal section = (response.map as Map)['order_summary'] as Map;\nprint(section['show_product_thumbnail']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CheckoutPageSettings().PatchCheckoutPageSection(ctx, \"order_summary\", map[string]any{\n\t\"order_summary\": map[string]any{\"show_product_thumbnail\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"order_summary\"].(map[string]any)[\"show_product_thumbnail\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the section named in the path. No other wrapper is accepted.",
+                "properties": {
+                  "customer_checkout": {
+                    "$ref": "#/components/schemas/CheckoutCustomerCheckout"
+                  },
+                  "delivery_options": {
+                    "$ref": "#/components/schemas/CheckoutDeliveryOptions"
+                  },
+                  "order_summary": {
+                    "$ref": "#/components/schemas/CheckoutOrderSummary"
+                  },
+                  "others": {
+                    "$ref": "#/components/schemas/CheckoutOthers"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -4929,6 +5708,455 @@
               "request_id": {
                 "type": "string",
                 "description": "An id for this request."
+              }
+            }
+          }
+        }
+      },
+      "CheckoutPageSettings": {
+        "type": "object",
+        "description": "All six sections, as [Get checkout page settings](/api-reference/checkout-page/get-checkout-page-settings) returns them.",
+        "properties": {
+          "billing_address": {
+            "$ref": "#/components/schemas/CheckoutAddressFieldKeys",
+            "description": "The billing address form's active field keys. Read-only."
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/CheckoutAddressFieldKeys",
+            "description": "The shipping address form's active field keys. Read-only."
+          },
+          "customer_checkout": {
+            "$ref": "#/components/schemas/CheckoutCustomerCheckout"
+          },
+          "delivery_options": {
+            "$ref": "#/components/schemas/CheckoutDeliveryOptions"
+          },
+          "order_summary": {
+            "$ref": "#/components/schemas/CheckoutOrderSummary"
+          },
+          "others": {
+            "$ref": "#/components/schemas/CheckoutOthers"
+          }
+        }
+      },
+      "CheckoutAddressFieldKeys": {
+        "type": "object",
+        "description": "An address section as `/checkout_page` returns it.",
+        "properties": {
+          "active_fields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "first_name",
+                "last_name",
+                "country",
+                "address_line_1",
+                "address_line_2",
+                "post_code",
+                "city",
+                "state",
+                "phone",
+                "mobile",
+                "fax",
+                "email",
+                "confirm_email",
+                "company_name"
+              ]
+            },
+            "description": "The keys of the fields that show on the form, such as `first_name` and `post_code`."
+          }
+        }
+      },
+      "CheckoutAddressForm": {
+        "type": "object",
+        "description": "An address section as `/checkout_page/{section}` returns it. Read-only: `group_meta` marks it `writable: false`.",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutAddressField"
+            },
+            "description": "Each form field, inactive fields included."
+          }
+        }
+      },
+      "CheckoutAddressField": {
+        "type": "object",
+        "description": "One field of an address form, and how it shows.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The field's key.",
+            "enum": [
+              "first_name",
+              "last_name",
+              "country",
+              "address_line_1",
+              "address_line_2",
+              "post_code",
+              "city",
+              "state",
+              "phone",
+              "mobile",
+              "fax",
+              "email",
+              "confirm_email",
+              "company_name"
+            ]
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The label shown for the field. `null` means the field's default label."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the field shows on the form."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the customer must fill in the field."
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99,
+            "description": "The field's position on the form."
+          },
+          "group": {
+            "type": "string",
+            "description": "The layout group the field belongs to: `name`, `postcity`, or an empty string for none. The store sets it from its field catalog, and `field_metadata` marks it `read_only`.",
+            "enum": [
+              "name",
+              "postcity",
+              ""
+            ]
+          }
+        }
+      },
+      "CheckoutCustomerCheckout": {
+        "type": "object",
+        "description": "How customers sign in, sign up or check out as a guest. At least one of `allow_sign_in`, `allow_sign_up` and `checkout_as_guest` must stay on.",
+        "properties": {
+          "allow_sign_in": {
+            "type": "boolean",
+            "description": "Let returning customers sign in during checkout."
+          },
+          "allow_sign_up": {
+            "$ref": "#/components/schemas/CheckoutSignUp"
+          },
+          "checkout_as_guest": {
+            "$ref": "#/components/schemas/CheckoutGuestCheckout"
+          },
+          "newsletter_subscription": {
+            "type": "boolean",
+            "description": "Show a newsletter opt-in on the checkout page."
+          },
+          "multiple_shipping_methods": {
+            "type": "boolean",
+            "description": "Show only multi-select options."
+          }
+        }
+      },
+      "CheckoutSignUp": {
+        "type": "object",
+        "description": "Whether customers can, or must, create an account during checkout.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Let customers create an account during checkout."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Make customers create an account to place an order."
+          }
+        }
+      },
+      "CheckoutGuestCheckout": {
+        "type": "object",
+        "description": "Whether customers can order without an account.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Let customers order without an account."
+          },
+          "quick_signup": {
+            "type": "boolean",
+            "description": "Offer guests a one-click account creation."
+          }
+        }
+      },
+      "CheckoutDeliveryOptions": {
+        "type": "object",
+        "description": "The delivery options offered at checkout. At least one of the four must stay on.",
+        "properties": {
+          "enable_shipping": {
+            "type": "boolean",
+            "description": "Offer shipping."
+          },
+          "enable_store_pickup": {
+            "type": "boolean",
+            "description": "Offer in-store pickup."
+          },
+          "enable_shipping_quote": {
+            "type": "boolean",
+            "description": "Offer a request-a-shipping-quote option."
+          },
+          "enable_delivery_service": {
+            "type": "boolean",
+            "description": "Offer on-demand delivery: a delivery date picker shows at checkout."
+          }
+        }
+      },
+      "CheckoutOrderSummary": {
+        "type": "object",
+        "description": "What the checkout's order summary shows.",
+        "properties": {
+          "show_product_thumbnail": {
+            "type": "boolean",
+            "description": "Show product images in the order summary."
+          },
+          "show_quantity": {
+            "type": "boolean",
+            "description": "Show the quantity column or label."
+          },
+          "enable_payment_expand_view": {
+            "type": "boolean",
+            "description": "Expand the payment section by default."
+          },
+          "order_confirm_captcha": {
+            "type": "boolean",
+            "description": "Ask for a CAPTCHA before the order is confirmed."
+          }
+        }
+      },
+      "CheckoutOthers": {
+        "type": "object",
+        "description": "The checkout page's logo, login link, custom HTML, order comments and terms and conditions.",
+        "properties": {
+          "show_logo": {
+            "type": "boolean",
+            "description": "Show the store logo on the checkout page."
+          },
+          "login_url": {
+            "type": "string",
+            "description": "The URL of the customer login page. When it is not set, the store returns the login URL it works out itself. It cannot be cleared.",
+            "maxLength": 255
+          },
+          "custom_html": {
+            "type": "string",
+            "description": "Custom HTML shown on the checkout page.",
+            "maxLength": 65535
+          },
+          "comment": {
+            "$ref": "#/components/schemas/CheckoutOrderComment"
+          },
+          "terms_and_condition": {
+            "$ref": "#/components/schemas/CheckoutTermsAndCondition"
+          }
+        }
+      },
+      "CheckoutOrderComment": {
+        "type": "object",
+        "description": "Whether customers can add a comment to an order, and whether staff get an email about it.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Let customers add a comment to their order."
+          },
+          "send_notification": {
+            "type": "boolean",
+            "description": "Email staff when an order comment is added. Reads `false` while `enabled` is `false`."
+          }
+        }
+      },
+      "CheckoutTermsAndCondition": {
+        "type": "object",
+        "description": "Whether customers must accept terms and conditions before ordering, and where the terms are.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Make customers accept the terms and conditions before ordering."
+          },
+          "text": {
+            "type": "string",
+            "description": "The text shown before the terms link."
+          },
+          "link_label": {
+            "type": "string",
+            "description": "The text of the terms link."
+          },
+          "type": {
+            "type": "string",
+            "description": "Where the terms come from: `page`, `link` or `text`.",
+            "enum": [
+              "page",
+              "link",
+              "text"
+            ]
+          },
+          "ref": {
+            "$ref": "#/components/schemas/CheckoutTermsReference"
+          }
+        }
+      },
+      "CheckoutTermsReference": {
+        "type": "object",
+        "description": "Where the terms are. Holds only the one key that matches `type`.",
+        "properties": {
+          "page": {
+            "description": "The terms page, when `type` is `page`: an object with the page's `id` and the page's `name`."
+          },
+          "link": {
+            "type": "string",
+            "description": "The URL of the terms, when `type` is `link`."
+          },
+          "text": {
+            "type": "string",
+            "description": "The terms text, when `type` is `text`."
+          }
+        }
+      },
+      "CheckoutGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get checkout page settings](/api-reference/checkout-page/get-checkout-page-settings) and [Update checkout page settings](/api-reference/checkout-page/update-checkout-page-settings) return it.",
+        "properties": {
+          "billing_address": {
+            "$ref": "#/components/schemas/CheckoutSectionMeta"
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/CheckoutSectionMeta"
+          },
+          "customer_checkout": {
+            "$ref": "#/components/schemas/CheckoutSectionMeta"
+          },
+          "delivery_options": {
+            "$ref": "#/components/schemas/CheckoutSectionMeta"
+          },
+          "order_summary": {
+            "$ref": "#/components/schemas/CheckoutSectionMeta"
+          },
+          "others": {
+            "$ref": "#/components/schemas/CheckoutSectionMeta"
+          }
+        }
+      },
+      "CheckoutSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is. `setting` for all six sections."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `false` for `billing_address` and `shipping_address`, `true` for the other four."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/page_settings/checkout_page/order_summary`."
+          }
+        }
+      },
+      "CheckoutFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Has the same nesting as the settings, with a `CheckoutFieldMetadataEntry` in place of each value. On `/checkout_page` it also has `_legacy_field_map`, and it describes each address section as one `resource` entry with `read_only: true`. On `customer_checkout` and `delivery_options` it also has `_rules`, the list of rules the store enforces on a write."
+      },
+      "CheckoutFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field does."
+          },
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes: `boolean`, `string`, `enum`, `array` for an address section's `fields`, or `resource` for an address section on `/checkout_page`."
+          },
+          "default": {
+            "description": "The field's default value."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {},
+            "description": "The values the field accepts. `others.terms_and_condition.type` is the one `enum` field and lists `page`, `link` and `text`."
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "The longest value accepted, for a `string` field."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "`true` when the field must have a value. On `/checkout_page`, `others.login_url` is the one field marked required."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "`true` when you cannot write the field or section."
+          },
+          "href": {
+            "type": "string",
+            "description": "For an address section on `/checkout_page`: the section's own path, such as `/api/v4/admin/settings/page_settings/checkout_page/billing_address`."
+          },
+          "item_schema": {
+            "type": "object",
+            "description": "For an address section's `fields`: a description of each of the six keys of a field record."
+          },
+          "catalog": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "For an address section's `fields`: every field key the form can use."
+          }
+        }
+      },
+      "CheckoutPageError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `method_not_allowed`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `required` or `constraint_violation`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "The id the store gave this request."
               }
             }
           }

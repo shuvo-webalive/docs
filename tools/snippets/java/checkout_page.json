@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "checkout_page",
+  "endpoints": {
+    "get_checkout_page": {
+      "function": "getCheckoutPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.checkoutPage().getCheckoutPage();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"checkout_page\");\nMap<?, ?> orderSummary = (Map<?, ?>) settings.get(\"order_summary\");\nSystem.out.println(orderSummary.get(\"show_product_thumbnail\") + \" \" + orderSummary.get(\"show_quantity\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"billing_address\")).get(\"active_fields\"));\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"billing_address\")).get(\"writable\"));"
+    },
+    "patch_checkout_page": {
+      "function": "patchCheckoutPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.checkoutPage().patchCheckoutPage(Map.of(\"checkout_page\", Map.of(\n        \"order_summary\", Map.of(\"enable_payment_expand_view\", false),\n        \"customer_checkout\", Map.of(\"multiple_shipping_methods\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"checkout_page\");\nSystem.out.println(((Map<?, ?>) settings.get(\"order_summary\")).get(\"enable_payment_expand_view\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"customer_checkout\")).get(\"multiple_shipping_methods\"));"
+    },
+    "head_checkout_page": {
+      "function": "headCheckoutPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.checkoutPage().headCheckoutPage();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_checkout_page_section": {
+      "function": "getCheckoutPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.checkoutPage().getCheckoutPageSection(\"order_summary\");\nMap<?, ?> orderSummary = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_summary\");\nSystem.out.println(orderSummary.get(\"show_product_thumbnail\") + \" \" + orderSummary.get(\"show_quantity\"));\nSystem.out.println(orderSummary.get(\"enable_payment_expand_view\") + \" \" + orderSummary.get(\"order_confirm_captcha\"));"
+    },
+    "patch_checkout_page_section": {
+      "function": "patchCheckoutPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.checkoutPage().patchCheckoutPageSection(\"order_summary\",\n        Map.of(\"order_summary\", Map.of(\"show_product_thumbnail\", false)));\nMap<?, ?> orderSummary = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_summary\");\nSystem.out.println(orderSummary.get(\"show_product_thumbnail\"));"
+    }
+  }
+}
