@@ -1,0 +1,9 @@
+---
+title: "Create a domain alias"
+description: "Adds a hostname as an alias. Returns the new alias, whose `id` delete takes as `alias_id`."
+openapi: "POST /admin/aliases"
+---
+
+Adds a hostname to your store's domain aliases and returns the new alias as a record under `alias`. The alias's `id` is what [Delete a domain alias](/api-reference/domain-aliases/delete-a-domain-alias) takes as `alias_id`. Send the hostname as a plain string: `{"alias": "shop.example.com"}`. The store ignores unknown fields, `created_at` and `updated_at` in the body, but a body with an `id` field returns `500` and creates nothing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

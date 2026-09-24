@@ -1,0 +1,9 @@
+---
+title: "Delete a domain alias"
+description: "Deletes the domain alias whose `id` you pass as `alias_id`. Returns `204` with no body."
+openapi: "DELETE /admin/aliases/{alias_id}"
+---
+
+Deletes the domain alias whose `id` you pass as `alias_id` and returns `204` with no body. The delete is permanent: the alias leaves the listing and `pagination.total` goes down by one. No call reads one alias, so to confirm the delete, check that the alias's `id` is gone from [List domain aliases](/api-reference/domain-aliases/list-domain-aliases).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

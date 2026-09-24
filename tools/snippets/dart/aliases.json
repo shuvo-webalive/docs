@@ -1,0 +1,22 @@
+{
+  "sdk": "dart",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "listAliases",
+      "code": "final response = await client.aliases.listAliases(queryParams: {'limit': 20});\nfinal aliases = (response.map as Map)['aliases'] as List;\nfor (final alias in aliases) {\n  print('${(alias as Map)['id']} ${alias['alias']}');\n}"
+    },
+    "head_aliases": {
+      "function": "headAliases",
+      "code": "final response = await client.aliases.headAliases();\nprint(response.statusCode);"
+    },
+    "create_alias": {
+      "function": "createAlias",
+      "code": "final response = await client.aliases.createAlias({\n  'alias': 'shop.example.com',\n});\nfinal alias = (response.map as Map)['alias'] as Map;\nprint('${alias['id']} ${alias['alias']}');"
+    },
+    "delete_alias": {
+      "function": "deleteAlias",
+      "code": "final response = await client.aliases.deleteAlias(115);\nprint(response.statusCode);"
+    }
+  }
+}

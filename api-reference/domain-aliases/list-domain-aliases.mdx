@@ -1,0 +1,9 @@
+---
+title: "List domain aliases"
+description: "Returns up to 20 domain aliases per call, with paging details."
+openapi: "GET /admin/aliases"
+---
+
+Returns your store's domain aliases, up to 20 per call, with a `pagination` block. Only `limit`, `offset`, `page` and `field_metadata` are accepted; any other parameter, such as `q` or `sort`, is rejected with `400 unknown_parameter`. After a rejected `limit`, the next request on the same client returns that rejection's body instead of its own. A client you create after the rejection is not affected.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

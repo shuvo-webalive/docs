@@ -1,0 +1,22 @@
+{
+  "sdk": "python",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "list_aliases",
+      "code": "response = client.aliases.list_aliases({\"limit\": 20})\nfor alias in response.map[\"aliases\"]:\n    print(alias[\"id\"], alias[\"alias\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_aliases": {
+      "function": "head_aliases",
+      "code": "response = client.aliases.head_aliases()\nprint(response.status_code)\n"
+    },
+    "create_alias": {
+      "function": "create_alias",
+      "code": "response = client.aliases.create_alias({\"alias\": \"shop.example.com\"})\nalias = response.map[\"alias\"]\nprint(alias[\"id\"], alias[\"alias\"])\n"
+    },
+    "delete_alias": {
+      "function": "delete_alias",
+      "code": "response = client.aliases.delete_alias(115)\nprint(response.status_code)\n"
+    }
+  }
+}

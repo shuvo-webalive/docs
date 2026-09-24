@@ -1,0 +1,22 @@
+{
+  "sdk": "js",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "listAliases",
+      "code": "import {aliases} from 'webcommander-sdk';\n\nconst response = await aliases.listAliases(client, {limit: 20});\nfor (const alias of response.map.aliases) {\n    console.log(alias.id, alias.alias);\n}\n"
+    },
+    "head_aliases": {
+      "function": "headAliases",
+      "code": "import {aliases} from 'webcommander-sdk';\n\nconst response = await aliases.headAliases(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_alias": {
+      "function": "createAlias",
+      "code": "import {aliases} from 'webcommander-sdk';\n\nconst response = await aliases.createAlias(client, {alias: 'shop.example.com'});\nconsole.log(response.map.alias.id, response.map.alias.alias);\n"
+    },
+    "delete_alias": {
+      "function": "deleteAlias",
+      "code": "import {aliases} from 'webcommander-sdk';\n\nconst response = await aliases.deleteAlias(client, 115);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+---
+title: "Domain aliases"
+sidebarTitle: "Overview"
+description: "List, create and delete your store's domain aliases, the extra hostnames your store responds to."
+---
+
+The Domain aliases API has four endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/aliases`.
+
+<Warning>
+  **Send the hostname in `alias` as a plain string, with no wrapper.** The create body is
+  `{"alias": "shop.example.com"}`. The create response returns the new alias as a record under the
+  same `alias` key, but a body in that record shape, `{"alias": {"alias": "shop.example.com"}}`, is
+  rejected with `400 invalid_hostname`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List domain aliases](/api-reference/domain-aliases/list-domain-aliases) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/aliases` | Returns up to 20 domain aliases per call, with paging details. |
+| [Check the domain aliases list](/api-reference/domain-aliases/check-the-domain-aliases-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/aliases` | Checks that the domain aliases list is reachable. Returns headers only, with no body. |
+| [Create a domain alias](/api-reference/domain-aliases/create-a-domain-alias) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/aliases` | Adds a hostname as an alias. Returns the new alias, whose `id` delete takes as `alias_id`. |
+| [Delete a domain alias](/api-reference/domain-aliases/delete-a-domain-alias) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/aliases/{alias_id}` | Deletes the domain alias whose `id` you pass as `alias_id`. Returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **You can list, create and delete aliases, but you cannot read or change one alias.**
+  `/admin/aliases/{alias_id}` allows only `DELETE` and `OPTIONS`. `GET`, `HEAD`, `PUT`, `PATCH` and
+  `POST` on it return `405` with the header `Allow: DELETE, OPTIONS`, and a `PUT` or `PATCH` changes
+  nothing. To find one alias, page through [List domain aliases](/api-reference/domain-aliases/list-domain-aliases) and match the
+  hostname in `alias` or the alias's `id`. There is no count call: `GET /admin/aliases/count` also
+  returns `405`, because the store reads `count` as an `alias_id`.
+- **The site settings show the same hostnames under `domain_settings.aliases`.** There they are a
+  read-only list of strings. Creating an alias here adds its hostname to that list, and deleting
+  the alias removes it.
+- **`alias` must be a well-formed hostname that no other alias has, in any letter case.** A hostname
+  with a space, a scheme, an underscore, a leading hyphen or an 87-character label is rejected with
+  `400 invalid_hostname`, and so is an `alias` that is a number or a list. A hostname another alias
+  already has, in the same or another letter case, is rejected with `409` and the message
+  `alias already exists`. The store trims whitespace around the hostname and keeps the letter case you send.
+- **A listing returns at most 20 aliases per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get more, send the next `page` or a higher `offset` while
+  `pagination.has_next` is `true`. The listing accepts only `limit`, `offset`, `page` and
+  `field_metadata`, and rejects any other parameter with `400 unknown_parameter`. `field_metadata`
+  adds nothing to the response.
+- **Every error body has `status`, `code` and `message` at the top level.** `status` is `error`, and
+  `code` is the HTTP status, such as `404`. Some errors also have `error`, a machine-readable reason
+  such as `invalid_hostname` or `method_not_allowed`. A `400` for a bad hostname or a bad query
+  parameter also has an `errors` list, and each entry names the rejected `field` and a `code`.

@@ -52,6 +52,13 @@
         "inventory_locations",
         "order_flags"
       ]
+    },
+    {
+      "name": "Domain aliases",
+      "icon": "globe",
+      "modules": [
+        "aliases"
+      ]
     }
   ]
 }
