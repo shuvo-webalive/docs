@@ -68,6 +68,9 @@
     },
     {
       "name": "Tax zones"
+    },
+    {
+      "name": "Inventory locations"
     }
   ],
   "paths": {
@@ -14479,6 +14482,1078 @@
           }
         ]
       }
+    },
+    "/admin/inventory_locations": {
+      "get": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "List inventory locations",
+        "operationId": "list_inventory_locations",
+        "description": "Returns the inventory locations, up to 20 per call, with a `pagination` block. The default location comes first, then the rest, newest `created` first. Send `q` to keep only locations whose `name` contains that text. `field_metadata` and unknown parameters change nothing and are not rejected. After a rejected `limit=0`, the next request on the same client returns that rejection's body instead of its own.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Keeps only locations whose `name` contains this text, in any letter case. It does not search `address`.",
+            "schema": {
+              "type": "string",
+              "example": "Sydney"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The store checks `limit` but does not apply it: every page holds up to 20 locations, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`. A value that is not an integer is rejected with `400` and the message `'limit' must be a non-negative integer`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of locations to skip. When you send both `offset` and `page`, `offset` wins.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * 20` whatever `limit` you send. When you send both `offset` and `page`, `offset` wins.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 20 inventory locations in `inventory_locations`, and the paging details in `pagination`. The response has no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_locations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/InventoryLocation"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/InventoryLocationPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_locations": [
+                    {
+                      "id": 1,
+                      "name": "Sydney Warehouse",
+                      "address": "1 Example Street, Sydney NSW 2000",
+                      "is_active": true,
+                      "is_default": true,
+                      "created": "2026-07-16T06:24:24",
+                      "updated": "2026-08-19T11:14:38"
+                    },
+                    {
+                      "id": 4,
+                      "name": "Sydney Store Room",
+                      "address": "2 Example Road, Sydney NSW 2000",
+                      "is_active": true,
+                      "is_default": false,
+                      "created": "2026-07-17T05:16:21",
+                      "updated": "2026-08-16T14:19:53"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent `limit=0`: the message is `'limit' must be a positive integer`. Or you sent a `limit` that is not an integer: the message is `'limit' must be a non-negative integer`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/inventory_locations?q=Sydney\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.list_inventory_locations({\"q\": \"Sydney\"})\nfor location in response.map[\"inventory_locations\"]:\n    print(location[\"id\"], location[\"name\"], location[\"is_default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.listInventoryLocations(client, {q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.is_default);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::listInventoryLocations($client, ['q' => 'Sydney']);\n\nforeach ($response->map['inventory_locations'] as $location) {\n    echo $location['id'], ' ', $location['name'], $location['is_default'] ? ' (default)' : '', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().listInventoryLocations(Map.of(\"q\", \"Sydney\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"inventory_locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"id\") + \" \" + location.get(\"name\") + \" \" + location.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.ListInventoryLocationsAsync(\n    new Dictionary<string, object?> { [\"q\"] = \"Sydney\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var inventoryLocation in ((IReadOnlyList<object?>)body[\"inventory_locations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{inventoryLocation[\"id\"]} {inventoryLocation[\"name\"]} {inventoryLocation[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations\n    .listInventoryLocations(queryParams: {'q': 'Sydney'});\nfinal locations = (response.map as Map)['inventory_locations'] as List;\nfor (final location in locations) {\n  print('${(location as Map)['id']} ${location['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().ListInventoryLocations(ctx, map[string]any{\"q\": \"Sydney\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"inventory_locations\"].([]any) {\n\tlocation := row.(map[string]any)\n\tfmt.Println(location[\"id\"], location[\"name\"], location[\"is_default\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Check the inventory locations list",
+        "operationId": "head_inventory_locations",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/inventory_locations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.head_inventory_locations()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.headInventoryLocations(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::headInventoryLocations($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().headInventoryLocations();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.HeadInventoryLocationsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.headInventoryLocations();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().HeadInventoryLocations(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Create an inventory location",
+        "operationId": "create_inventory_location",
+        "description": "Send the fields at the top level of the body, not wrapped in `inventory_location`; only `name` is required. A new location has `is_active` and `is_default` set to `false` unless you send `true`, and sending `\"is_default\": true` takes the flag from the location that had it. The store sets the location's `id`, `created` and `updated` itself, and ignores any values you send for them and any unknown field. A `name` another location already has is accepted.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new inventory location, with the location's `id`, which the other calls take as `inventory_location_id`. The response has no `Location` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 19,
+                    "name": "Perth Warehouse",
+                    "address": "4 Example Street, Perth WA 6000",
+                    "is_active": false,
+                    "is_default": false,
+                    "created": "2026-09-24T09:15:02",
+                    "updated": "2026-09-24T09:15:02"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`name` is missing or blank, or the body is wrapped in `inventory_location`. The message is `name is required`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`address` is an object instead of a string.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/inventory_locations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"4 Example Street, Perth WA 6000\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.create_inventory_location({\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"4 Example Street, Perth WA 6000\",\n})\nprint(response.map[\"inventory_location\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.createInventoryLocation(client, {\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.is_active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::createInventoryLocation($client, [\n    'name' => 'Perth Warehouse',\n    'address' => '4 Example Street, Perth WA 6000',\n]);\n\necho $response->map['inventory_location']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().createInventoryLocation(\n        Map.of(\"name\", \"Perth Warehouse\", \"address\", \"4 Example Street, Perth WA 6000\"));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"id\") + \" \" + location.get(\"name\") + \" \" + location.get(\"is_active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.CreateInventoryLocationAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Perth Warehouse\", [\"address\"] = \"4 Example Street, Perth WA 6000\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine(inventoryLocation[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.createInventoryLocation({\n  'name': 'Perth Warehouse',\n  'address': '4 Example Street, Perth WA 6000',\n});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint(location['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().CreateInventoryLocation(ctx, map[string]any{\n\t\"name\":    \"Perth Warehouse\",\n\t\"address\": \"4 Example Street, Perth WA 6000\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"id\"], location[\"name\"], location[\"is_active\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryLocationInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/inventory_locations/{inventory_location_id}": {
+      "get": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Retrieve an inventory location",
+        "operationId": "get_inventory_location",
+        "description": "Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `is_active`, `is_default`, `created` and `updated`. The response has no `ETag` header. Unknown query parameters are ignored.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The inventory location.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 4,
+                    "name": "Sydney Store Room",
+                    "address": "2 Example Road, Sydney NSW 2000",
+                    "is_active": true,
+                    "is_default": false,
+                    "created": "2026-07-17T05:16:21",
+                    "updated": "2026-08-16T14:19:53"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No inventory location has that `inventory_location_id`. The message is `Inventory location not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryLocationError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 404,
+                  "message": "Inventory location not found"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/inventory_locations/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.get_inventory_location(4)\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"address\"], location[\"is_default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.getInventoryLocation(client, 4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.is_active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::getInventoryLocation($client, 4);\n\n$location = $response->map['inventory_location'];\necho $location['name'], ', ', $location['address'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().getInventoryLocation(4);\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\nSystem.out.println(location.get(\"is_active\") + \" \" + location.get(\"is_default\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.GetInventoryLocationAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.getInventoryLocation(4);\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['address']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().GetInventoryLocation(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"address\"], location[\"is_active\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Check an inventory location",
+        "operationId": "head_inventory_location",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. It returns `200` even when no location has that `inventory_location_id`, so it does not tell you whether the location exists. To read the location's fields, or to get `404` for a location that does not exist, use [Retrieve an inventory location](/api-reference/inventory-locations/retrieve-an-inventory-location).",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body. You get `200` for any `inventory_location_id`, including one no location has."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/inventory_locations/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.head_inventory_location(4)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.headInventoryLocation(client, 4);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::headInventoryLocation($client, 4);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().headInventoryLocation(4);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.HeadInventoryLocationAsync(4);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.headInventoryLocation(4);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().HeadInventoryLocation(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Replace an inventory location",
+        "operationId": "update_inventory_location",
+        "description": "Send every field you want to keep, at the top level of the body. This call replaces the location rather than merging: a field you leave out is reset, so `address` becomes `\"\"` and `is_active` and `is_default` become `false`. Leaving out `is_default` on the default location leaves the store with no default location. `name` is required, and a body without it returns `500`, not `400`.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The inventory location after the replace, with the values you sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 19,
+                    "name": "Perth Warehouse",
+                    "address": "10 Example Street, Perth WA 6000",
+                    "is_active": true,
+                    "is_default": false,
+                    "created": "2026-09-24T09:15:02",
+                    "updated": "2026-09-24T09:20:41"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has no `name`, for example `{}` or a body with only `address`. The message is `Unexpected Error Occurred`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/inventory_locations/19\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"10 Example Street, Perth WA 6000\",\n    \"is_active\": true,\n    \"is_default\": false\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.update_inventory_location(19, {\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"10 Example Street, Perth WA 6000\",\n    \"is_active\": True,\n    \"is_default\": False,\n})\nlocation = response.map[\"inventory_location\"]\nprint(location[\"address\"], location[\"is_active\"], location[\"is_default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.updateInventoryLocation(client, 19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    is_active: true,\n    is_default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.is_active, inventoryLocation.is_default);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::updateInventoryLocation($client, 19, [\n    'name' => 'Perth Warehouse',\n    'address' => '10 Example Street, Perth WA 6000',\n    'is_active' => true,\n    'is_default' => false,\n]);\n\necho $response->map['inventory_location']['address'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().updateInventoryLocation(19, Map.of(\n        \"name\", \"Perth Warehouse\", \"address\", \"10 Example Street, Perth WA 6000\",\n        \"is_active\", true, \"is_default\", false));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\nSystem.out.println(location.get(\"is_active\") + \" \" + location.get(\"is_default\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.UpdateInventoryLocationAsync(19, new Dictionary<string, object?>\n{\n    [\"name\"] = \"Perth Warehouse\", [\"address\"] = \"10 Example Street, Perth WA 6000\",\n    [\"is_active\"] = true, [\"is_default\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"address\"]} {inventoryLocation[\"is_active\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.updateInventoryLocation(19, {\n  'name': 'Perth Warehouse',\n  'address': '10 Example Street, Perth WA 6000',\n  'is_active': true,\n  'is_default': false,\n});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['address']} ${location['is_active']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().UpdateInventoryLocation(ctx, 19, map[string]any{\n\t\"name\":       \"Perth Warehouse\",\n\t\"address\":    \"10 Example Street, Perth WA 6000\",\n\t\"is_active\":  true,\n\t\"is_default\": false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"address\"], location[\"is_active\"], location[\"is_default\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryLocationInput"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Delete an inventory location",
+        "operationId": "delete_inventory_location",
+        "description": "Deletes the location permanently and returns `204` with no body. The location leaves the listing, and retrieving or deleting it again returns `404`. You cannot delete the default location: make another location the default first, or the call is rejected with `409`.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No inventory location has that `inventory_location_id`, for example because you already deleted it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The location is the default. The message is `the default inventory location can not be deleted`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryLocationError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 409,
+                  "message": "the default inventory location can not be deleted"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/inventory_locations/19\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.delete_inventory_location(19)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.deleteInventoryLocation(client, 19);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::deleteInventoryLocation($client, 19);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().deleteInventoryLocation(19);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.DeleteInventoryLocationAsync(19);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.deleteInventoryLocation(19);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().DeleteInventoryLocation(ctx, 19, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/inventory_locations/{inventory_location_id}/stock": {
+      "get": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "List stock at an inventory location",
+        "operationId": "get_inventory_location_stock",
+        "description": "Returns the location under `inventory_location`, up to 20 of its products under `products`, and a `pagination` block that counts products. A location that holds no products returns an empty `products` list, with `total` and `total_pages` set to `0`. Send `offset` or `page` to get the next products. This call is read-only: no call on this API changes stock.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The store does not apply `limit`: every page holds up to 20 products, and `pagination.limit` shows `20`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of products to skip. When you send both `offset` and `page`, `offset` wins.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * 20` whatever `limit` you send. When you send both `offset` and `page`, `offset` wins.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The inventory location in `inventory_location`, up to 20 of its products in `products`, and the paging details in `pagination`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    },
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/InventoryLocationStockItem"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/InventoryLocationPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 4,
+                    "name": "Sydney Store Room",
+                    "address": "2 Example Road, Sydney NSW 2000",
+                    "is_active": true,
+                    "is_default": false,
+                    "created": "2026-07-17T05:16:21",
+                    "updated": "2026-08-16T14:19:53"
+                  },
+                  "products": [
+                    {
+                      "product_id": 101,
+                      "name": "Cotton T-Shirt",
+                      "sku": "TSHIRT-001",
+                      "is_variation": false,
+                      "stock": 25,
+                      "low_stock_level": 5,
+                      "is_default": false
+                    },
+                    {
+                      "product_id": 102,
+                      "name": "Canvas Tote Bag",
+                      "sku": "TOTE-001",
+                      "is_variation": false,
+                      "stock": 8,
+                      "low_stock_level": null,
+                      "is_default": false
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/inventory_locations/4/stock\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.get_inventory_location_stock(4)\nprint(response.map[\"inventory_location\"][\"name\"])\nfor product in response.map[\"products\"]:\n    print(product[\"sku\"], product[\"name\"], product[\"stock\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.getInventoryLocationStock(client, 4);\nfor (const product of response.map.products) {\n    console.log(product.product_id, product.name, product.stock);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::getInventoryLocationStock($client, 4);\n\nforeach ($response->map['products'] as $product) {\n    echo $product['sku'], ' ', $product['name'], ': ', $product['stock'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().getInventoryLocationStock(4);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((Map<?, ?>) body.get(\"inventory_location\")).get(\"name\"));\nfor (Object row : (List<?>) body.get(\"products\")) {\n    Map<?, ?> product = (Map<?, ?>) row;\n    System.out.println(product.get(\"product_id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"stock\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.GetInventoryLocationStockAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var product in ((IReadOnlyList<object?>)body[\"products\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{product[\"product_id\"]} {product[\"sku\"]} {product[\"stock\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.getInventoryLocationStock(4);\nfinal products = (response.map as Map)['products'] as List;\nfor (final product in products) {\n  print('${(product as Map)['sku']} ${product['stock']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().GetInventoryLocationStock(ctx, 4, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"inventory_location\"].(map[string]any)[\"name\"])\nfor _, row := range body[\"products\"].([]any) {\n\tproduct := row.(map[string]any)\n\tfmt.Println(product[\"product_id\"], product[\"name\"], product[\"stock\"])\n}\n"
+          }
+        ]
+      }
+    },
+    "/admin/inventory_locations/{inventory_location_id}/default": {
+      "put": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Set the default inventory location",
+        "operationId": "set_inventory_location_default",
+        "description": "Makes this location the default and returns it with `is_default` and `is_active` both `true`. The location that had the flag loses it, so this call also changes a location you did not name. The call reads no body, so anything you send is ignored.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The inventory location, now the default and active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 4,
+                    "name": "Sydney Store Room",
+                    "address": "2 Example Road, Sydney NSW 2000",
+                    "is_active": true,
+                    "is_default": true,
+                    "created": "2026-07-17T05:16:21",
+                    "updated": "2026-09-24T09:25:10"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No inventory location has that `inventory_location_id`. The message is `Inventory location not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryLocationError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 404,
+                  "message": "Inventory location not found"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/inventory_locations/4/default\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.set_inventory_location_default(4)\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"is_default\"], location[\"is_active\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.setInventoryLocationDefault(client, 4);\nconsole.log(response.map.inventory_location.is_default, response.map.inventory_location.is_active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::setInventoryLocationDefault($client, 4);\n\necho $response->map['inventory_location']['is_default'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().setInventoryLocationDefault(4);\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"is_default\") + \" \" + location.get(\"is_active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.SetInventoryLocationDefaultAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.inventoryLocations.setInventoryLocationDefault(4);\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['is_default']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().SetInventoryLocationDefault(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"is_default\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/inventory_locations/{inventory_location_id}/status": {
+      "put": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Activate or deactivate an inventory location",
+        "operationId": "update_inventory_location_status",
+        "description": "Send `{\"is_active\": true}` to activate the location or `{\"is_active\": false}` to deactivate it. The store reads only `is_active`: `name`, `is_default` and any other field stay as they are, even if you send them. A value that is not a boolean is read as true or false, so `1` and `\"yes\"` both activate. You can deactivate the default location with this call.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The inventory location with its new `is_active` value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 19,
+                    "name": "Perth Warehouse",
+                    "address": "4 Example Street, Perth WA 6000",
+                    "is_active": true,
+                    "is_default": false,
+                    "created": "2026-09-24T09:15:02",
+                    "updated": "2026-09-24T09:18:30"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`is_active` is missing. The message is `is_active is required`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/inventory_locations/19/status\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"is_active\": true\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.update_inventory_location_status(\n    19, {\"is_active\": True}\n)\nprint(response.map[\"inventory_location\"][\"is_active\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.updateInventoryLocationStatus(client, 19, {is_active: true});\nconsole.log(response.map.inventory_location.is_active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::updateInventoryLocationStatus($client, 19, ['is_active' => true]);\n\necho $response->map['inventory_location']['is_active'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().updateInventoryLocationStatus(19,\n        Map.of(\"is_active\", true));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"is_active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.UpdateInventoryLocationStatusAsync(19, new Dictionary<string, object?>\n{\n    [\"is_active\"] = true,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"is_active\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations\n    .updateInventoryLocationStatus(19, {'is_active': true});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['is_active']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().UpdateInventoryLocationStatus(ctx, 19, map[string]any{\"is_active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"is_active\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryLocationStatusInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -20659,6 +21734,180 @@
               "null"
             ],
             "description": "The URL of the next page, or `null` on the last page."
+          }
+        }
+      },
+      "InventoryLocation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The inventory location's id, assigned by the store. Pass it as `inventory_location_id` in a path."
+          },
+          "name": {
+            "type": "string",
+            "description": "The location's name. Two locations can have the same name."
+          },
+          "address": {
+            "type": "string",
+            "description": "The location's address, as free text. `\"\"` when none is set."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Whether the location is active. `false` on a new location unless you send `true`."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "`true` on the default location. At most one location has it."
+          },
+          "created": {
+            "type": "string",
+            "description": "When the location was created, such as `2026-07-16T06:24:24`."
+          },
+          "updated": {
+            "type": "string",
+            "description": "When the location last changed."
+          }
+        }
+      },
+      "InventoryLocationInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "description": "Send these fields at the top level of the body. On a replace, a field you leave out is reset.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required. On create, a blank `name` is rejected with `400`."
+          },
+          "address": {
+            "type": "string",
+            "description": "Free text. Defaults to `\"\"`, and a replace without it sets it to `\"\"`. On create, an object here returns `500`."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Defaults to `false`, and a replace without it sets it to `false`."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "On create, send `true` to make the new location the default; the location that had the flag loses it. Defaults to `false`, and a replace without it sets it to `false`."
+          }
+        }
+      },
+      "InventoryLocationStatusInput": {
+        "type": "object",
+        "required": [
+          "is_active"
+        ],
+        "properties": {
+          "is_active": {
+            "type": "boolean",
+            "description": "Required. `true` activates the location and `false` deactivates it. Other values are read as true or false: `1` and `\"yes\"` both activate."
+          }
+        }
+      },
+      "InventoryLocationStockItem": {
+        "type": "object",
+        "description": "One product held at the location.",
+        "properties": {
+          "product_id": {
+            "type": "integer",
+            "description": "The product's id."
+          },
+          "name": {
+            "type": "string",
+            "description": "The product's name."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The product's SKU."
+          },
+          "stock": {
+            "type": "integer",
+            "description": "How many of the product this location holds."
+          },
+          "low_stock_level": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The product's low-stock level, or `null`."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "A flag on the product itself. It does not say whether this location is the default."
+          },
+          "is_variation": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InventoryLocationPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "On the listing, the number of locations that match your request. On the stock listing, the number of products at the location."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. Always `20`, whatever `limit` you send."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of items skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of items on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The number of this page, counting from `1`."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "The number of pages. `0` when nothing matches."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there is a page after this one."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when there is a page before this one."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the previous page, such as `https://your-store.example.com/api/v4/admin/inventory_locations?limit=20&offset=0`, or `null` when `has_previous` is `false`. It is set whenever `offset` is more than `0`, even when `current_page` is `1`."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The next page, or `null` when `has_next` is `false`. Check `has_next` before you request it."
+          }
+        }
+      },
+      "InventoryLocationError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`error`."
+          },
+          "code": {
+            "type": "integer",
+            "description": "The HTTP status, such as `404` or `409`."
+          },
+          "message": {
+            "type": "string",
+            "description": "What went wrong, such as `Inventory location not found`."
           }
         }
       }

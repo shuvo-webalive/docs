@@ -1,0 +1,46 @@
+{
+  "sdk": "go",
+  "module": "inventory_locations",
+  "endpoints": {
+    "list_inventory_locations": {
+      "function": "ListInventoryLocations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().ListInventoryLocations(ctx, map[string]any{\"q\": \"Sydney\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"inventory_locations\"].([]any) {\n\tlocation := row.(map[string]any)\n\tfmt.Println(location[\"id\"], location[\"name\"], location[\"is_default\"])\n}"
+    },
+    "head_inventory_locations": {
+      "function": "HeadInventoryLocations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().HeadInventoryLocations(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_inventory_location": {
+      "function": "CreateInventoryLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().CreateInventoryLocation(ctx, map[string]any{\n\t\"name\":    \"Perth Warehouse\",\n\t\"address\": \"4 Example Street, Perth WA 6000\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"id\"], location[\"name\"], location[\"is_active\"])"
+    },
+    "get_inventory_location": {
+      "function": "GetInventoryLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().GetInventoryLocation(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"address\"], location[\"is_active\"])"
+    },
+    "head_inventory_location": {
+      "function": "HeadInventoryLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().HeadInventoryLocation(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_inventory_location": {
+      "function": "UpdateInventoryLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().UpdateInventoryLocation(ctx, 19, map[string]any{\n\t\"name\":       \"Perth Warehouse\",\n\t\"address\":    \"10 Example Street, Perth WA 6000\",\n\t\"is_active\":  true,\n\t\"is_default\": false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"address\"], location[\"is_active\"], location[\"is_default\"])"
+    },
+    "delete_inventory_location": {
+      "function": "DeleteInventoryLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().DeleteInventoryLocation(ctx, 19, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_inventory_location_stock": {
+      "function": "GetInventoryLocationStock",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().GetInventoryLocationStock(ctx, 4, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"inventory_location\"].(map[string]any)[\"name\"])\nfor _, row := range body[\"products\"].([]any) {\n\tproduct := row.(map[string]any)\n\tfmt.Println(product[\"product_id\"], product[\"name\"], product[\"stock\"])\n}"
+    },
+    "set_inventory_location_default": {
+      "function": "SetInventoryLocationDefault",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().SetInventoryLocationDefault(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"is_default\"])"
+    },
+    "update_inventory_location_status": {
+      "function": "UpdateInventoryLocationStatus",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().UpdateInventoryLocationStatus(ctx, 19, map[string]any{\"is_active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"is_active\"])"
+    }
+  }
+}

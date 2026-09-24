@@ -1,0 +1,9 @@
+---
+title: "List stock at an inventory location"
+description: "Returns an inventory location and up to 20 of the products it holds, with paging details."
+openapi: "GET /admin/inventory_locations/{inventory_location_id}/stock"
+---
+
+Returns the location under `inventory_location`, up to 20 of its products under `products`, and a `pagination` block that counts products. A location that holds no products returns an empty `products` list, with `total` and `total_pages` set to `0`. Send `offset` or `page` to get the next products. This call is read-only: no call on this API changes stock.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

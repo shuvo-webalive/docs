@@ -1,0 +1,9 @@
+---
+title: "Delete an inventory location"
+description: "Deletes an inventory location permanently. You cannot delete the default location."
+openapi: "DELETE /admin/inventory_locations/{inventory_location_id}"
+---
+
+Deletes the location permanently and returns `204` with no body. The location leaves the listing, and retrieving or deleting it again returns `404`. You cannot delete the default location: make another location the default first, or the call is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,9 @@
+---
+title: "Check an inventory location"
+description: "Returns headers only, with no body, for the location you pass as `inventory_location_id`."
+openapi: "HEAD /admin/inventory_locations/{inventory_location_id}"
+---
+
+Returns `200` with headers only and no body. The response has no `ETag` header. It returns `200` even when no location has that `inventory_location_id`, so it does not tell you whether the location exists. To read the location's fields, or to get `404` for a location that does not exist, use [Retrieve an inventory location](/api-reference/inventory-locations/retrieve-an-inventory-location).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

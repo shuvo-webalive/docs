@@ -272,6 +272,30 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Inventory and orders",
+            "icon": "boxes-stacked",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Inventory locations",
+                "expanded": false,
+                "pages": [
+                  "inventory-locations",
+                  "api-reference/inventory-locations/list-inventory-locations",
+                  "api-reference/inventory-locations/check-the-inventory-locations-list",
+                  "api-reference/inventory-locations/create-an-inventory-location",
+                  "api-reference/inventory-locations/retrieve-an-inventory-location",
+                  "api-reference/inventory-locations/check-an-inventory-location",
+                  "api-reference/inventory-locations/replace-an-inventory-location",
+                  "api-reference/inventory-locations/delete-an-inventory-location",
+                  "api-reference/inventory-locations/list-stock-at-an-inventory-location",
+                  "api-reference/inventory-locations/set-the-default-inventory-location",
+                  "api-reference/inventory-locations/activate-or-deactivate-an-inventory-location"
+                ]
+              }
+            ]
           }
         ]
       }

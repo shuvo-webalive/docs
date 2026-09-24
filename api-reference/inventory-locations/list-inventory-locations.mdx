@@ -1,0 +1,9 @@
+---
+title: "List inventory locations"
+description: "Returns up to 20 inventory locations per call, default location first, with paging details."
+openapi: "GET /admin/inventory_locations"
+---
+
+Returns the inventory locations, up to 20 per call, with a `pagination` block. The default location comes first, then the rest, newest `created` first. Send `q` to keep only locations whose `name` contains that text. `field_metadata` and unknown parameters change nothing and are not rejected. After a rejected `limit=0`, the next request on the same client returns that rejection's body instead of its own.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

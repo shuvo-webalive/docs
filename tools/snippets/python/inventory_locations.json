@@ -1,0 +1,46 @@
+{
+  "sdk": "python",
+  "module": "inventory_locations",
+  "endpoints": {
+    "list_inventory_locations": {
+      "function": "list_inventory_locations",
+      "code": "response = client.inventory_locations.list_inventory_locations({\"q\": \"Sydney\"})\nfor location in response.map[\"inventory_locations\"]:\n    print(location[\"id\"], location[\"name\"], location[\"is_default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_inventory_locations": {
+      "function": "head_inventory_locations",
+      "code": "response = client.inventory_locations.head_inventory_locations()\nprint(response.status_code)\n"
+    },
+    "create_inventory_location": {
+      "function": "create_inventory_location",
+      "code": "response = client.inventory_locations.create_inventory_location({\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"4 Example Street, Perth WA 6000\",\n})\nprint(response.map[\"inventory_location\"][\"id\"])\n"
+    },
+    "get_inventory_location": {
+      "function": "get_inventory_location",
+      "code": "response = client.inventory_locations.get_inventory_location(4)\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"address\"], location[\"is_default\"])\n"
+    },
+    "head_inventory_location": {
+      "function": "head_inventory_location",
+      "code": "response = client.inventory_locations.head_inventory_location(4)\nprint(response.status_code)\n"
+    },
+    "update_inventory_location": {
+      "function": "update_inventory_location",
+      "code": "response = client.inventory_locations.update_inventory_location(19, {\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"10 Example Street, Perth WA 6000\",\n    \"is_active\": True,\n    \"is_default\": False,\n})\nlocation = response.map[\"inventory_location\"]\nprint(location[\"address\"], location[\"is_active\"], location[\"is_default\"])\n"
+    },
+    "delete_inventory_location": {
+      "function": "delete_inventory_location",
+      "code": "response = client.inventory_locations.delete_inventory_location(19)\nprint(response.status_code)\n"
+    },
+    "get_inventory_location_stock": {
+      "function": "get_inventory_location_stock",
+      "code": "response = client.inventory_locations.get_inventory_location_stock(4)\nprint(response.map[\"inventory_location\"][\"name\"])\nfor product in response.map[\"products\"]:\n    print(product[\"sku\"], product[\"name\"], product[\"stock\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "set_inventory_location_default": {
+      "function": "set_inventory_location_default",
+      "code": "response = client.inventory_locations.set_inventory_location_default(4)\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"is_default\"], location[\"is_active\"])\n"
+    },
+    "update_inventory_location_status": {
+      "function": "update_inventory_location_status",
+      "code": "response = client.inventory_locations.update_inventory_location_status(\n    19, {\"is_active\": True}\n)\nprint(response.map[\"inventory_location\"][\"is_active\"])\n"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Set the default inventory location"
+description: "Makes an inventory location the default and removes the flag from the previous one."
+openapi: "PUT /admin/inventory_locations/{inventory_location_id}/default"
+---
+
+Makes this location the default and returns it with `is_default` and `is_active` both `true`. The location that had the flag loses it, so this call also changes a location you did not name. The call reads no body, so anything you send is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

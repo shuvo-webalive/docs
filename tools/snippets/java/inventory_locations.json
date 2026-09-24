@@ -1,0 +1,46 @@
+{
+  "sdk": "java",
+  "module": "inventory_locations",
+  "endpoints": {
+    "list_inventory_locations": {
+      "function": "listInventoryLocations",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().listInventoryLocations(Map.of(\"q\", \"Sydney\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"inventory_locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"id\") + \" \" + location.get(\"name\") + \" \" + location.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "head_inventory_locations": {
+      "function": "headInventoryLocations",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.inventoryLocations().headInventoryLocations();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_inventory_location": {
+      "function": "createInventoryLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().createInventoryLocation(\n        Map.of(\"name\", \"Perth Warehouse\", \"address\", \"4 Example Street, Perth WA 6000\"));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"id\") + \" \" + location.get(\"name\") + \" \" + location.get(\"is_active\"));"
+    },
+    "get_inventory_location": {
+      "function": "getInventoryLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().getInventoryLocation(4);\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\nSystem.out.println(location.get(\"is_active\") + \" \" + location.get(\"is_default\"));"
+    },
+    "head_inventory_location": {
+      "function": "headInventoryLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.inventoryLocations().headInventoryLocation(4);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_inventory_location": {
+      "function": "updateInventoryLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().updateInventoryLocation(19, Map.of(\n        \"name\", \"Perth Warehouse\", \"address\", \"10 Example Street, Perth WA 6000\",\n        \"is_active\", true, \"is_default\", false));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\nSystem.out.println(location.get(\"is_active\") + \" \" + location.get(\"is_default\"));"
+    },
+    "delete_inventory_location": {
+      "function": "deleteInventoryLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.inventoryLocations().deleteInventoryLocation(19);\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_inventory_location_stock": {
+      "function": "getInventoryLocationStock",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().getInventoryLocationStock(4);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((Map<?, ?>) body.get(\"inventory_location\")).get(\"name\"));\nfor (Object row : (List<?>) body.get(\"products\")) {\n    Map<?, ?> product = (Map<?, ?>) row;\n    System.out.println(product.get(\"product_id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"stock\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "set_inventory_location_default": {
+      "function": "setInventoryLocationDefault",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().setInventoryLocationDefault(4);\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"is_default\") + \" \" + location.get(\"is_active\"));"
+    },
+    "update_inventory_location_status": {
+      "function": "updateInventoryLocationStatus",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().updateInventoryLocationStatus(19,\n        Map.of(\"is_active\", true));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"is_active\"));"
+    }
+  }
+}
