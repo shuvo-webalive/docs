@@ -1,0 +1,2573 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WebCommander API",
+    "version": "v4"
+  },
+  "servers": [
+    {
+      "url": "https://{store}/api/v4",
+      "variables": {
+        "store": {
+          "default": "your-store.example.com",
+          "description": "Your store's host name."
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Customers"
+    }
+  ],
+  "paths": {
+    "/admin/customers": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "List customers",
+        "operationId": "list_customers",
+        "description": "Returns customers one page at a time. Filters narrow the page; `sort` reorders it and must name a real field, or the call is refused with `400 invalid_sort_field`. Parameter names are case-sensitive and an unknown one is refused with `400 unknown_parameter`. The date-range parameters `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo` are accepted but not applied.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Rows per page. Capped at 20: a larger value is accepted and the cap is echoed back in `pagination.limit`.",
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of rows to skip. Takes precedence over `page` when both are sent.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read against the applied `limit`.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Free-text search. `searchText`, `query` and `keyword` are accepted spellings of the same parameter.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Filter by email address.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyName",
+            "in": "query",
+            "description": "Filter by company name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "description": "Filter by phone number.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mobile",
+            "in": "query",
+            "description": "Filter by mobile number.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Filter by country.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Filter by state.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Filter by city.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "postCode",
+            "in": "query",
+            "description": "Filter by post code. Parameter names are case-sensitive, so `postcode` is refused.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerGroup",
+            "in": "query",
+            "description": "Filter by customer group.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status, matched case-insensitively. Any other value is refused with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "pending",
+                "approval_awaiting",
+                "awaiting_verification"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Field to sort by. An unknown field is refused with `400 invalid_sort_field`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of customers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customers": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Customer"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                },
+                "example": {
+                  "customers": [
+                    {
+                      "customer_id": 123,
+                      "internal_id": 45,
+                      "first_name": "Jane",
+                      "last_name": "Doe",
+                      "name": "Jane Doe",
+                      "email": "jane@example.com",
+                      "status": "active",
+                      "company_name": null,
+                      "store_credit": 0.0,
+                      "customer_groups": [],
+                      "addresses": [
+                        {
+                          "id": 901,
+                          "type": "primary",
+                          "first_name": "Jane",
+                          "last_name": "Doe",
+                          "address_line_1": "1 Example Street",
+                          "city": "Sydney",
+                          "post_code": "2000"
+                        }
+                      ],
+                      "custom_properties": [],
+                      "created_at": "2026-09-01T10:00:00Z",
+                      "updated_at": "2026-09-01T10:00:00Z"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 42,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 20,
+                    "current_page": 1,
+                    "total_pages": 3,
+                    "has_next": true,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": "2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "An unknown parameter, sort field or status value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customers?limit=20&status=active\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.get_customers({\"limit\": 20, \"status\": \"active\"})\nfor customer in response.map[\"customers\"]:\n    print(customer[\"customer_id\"], customer[\"email\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.getCustomers({limit: 20, status: 'active'});\nfor (const customer of response.map.customers) {\n    console.log(customer.customer_id, customer.email);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::getCustomers($client, ['limit' => 20, 'status' => 'active']);\n\nforeach ($response->map['customers'] as $customer) {\n    echo $customer['customer_id'], ' ', $customer['email'], PHP_EOL;\n}"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().getCustomers(Map.of(\"limit\", 20, \"status\", \"active\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"customers\")) {\n    Map<?, ?> customer = (Map<?, ?>) row;\n    System.out.println(customer.get(\"customer_id\") + \" \" + customer.get(\"email\"));\n}"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.GetCustomersAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20, [\"status\"] = \"active\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customer in ((IReadOnlyList<object?>)body[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"customer_id\"]} {customer[\"email\"]}\");"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers.getCustomers(\n    queryParams: {'limit': 20, 'status': 'active'});\nfor (final customer in (response.map as Map)['customers'] as List) {\n  print('${(customer as Map)['customer_id']} ${customer['email']}');\n}"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().GetCustomers(ctx, map[string]any{\"limit\": 20, \"status\": \"active\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"customer_id\"], customer[\"email\"])\n}"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Create a customer",
+        "operationId": "create_customer",
+        "description": "Creates a customer and returns it with its new `customer_id`. Without `status`, a new customer is `awaiting_verification` and has no usable login, whatever `password` was sent; send `status: \"active\"` with a `password` for a customer who can sign in. Address fields sent inline are accepted and discarded: use [Add addresses](/api-reference/customers/add-addresses) instead. The answer always carries three addresses of the store's own making: primary, shipping and billing.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer": {
+                      "$ref": "#/components/schemas/Customer"
+                    }
+                  }
+                },
+                "example": {
+                  "customer": {
+                    "customer_id": 123,
+                    "internal_id": 45,
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "name": "Jane Doe",
+                    "email": "jane@example.com",
+                    "status": "active",
+                    "company_name": null,
+                    "store_credit": 0.0,
+                    "customer_groups": [],
+                    "addresses": [
+                      {
+                        "id": 901,
+                        "type": "primary",
+                        "first_name": "Jane",
+                        "last_name": "Doe",
+                        "address_line_1": "1 Example Street",
+                        "city": "Sydney",
+                        "post_code": "2000"
+                      }
+                    ],
+                    "custom_properties": [],
+                    "created_at": "2026-09-01T10:00:00Z",
+                    "updated_at": "2026-09-01T10:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A required field is missing, for example `Customer name is required`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The email address is already registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"customer\": {\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane@example.com\", \"company\": false}}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.create_customer({\n    \"customer\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane@example.com\",\n        \"company\": False,\n    },\n})\nprint(response.map[\"customer\"][\"customer_id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n});\nconsole.log(response.map.customer.customer_id);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::createCustomer($client, [\n    'customer' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane@example.com',\n        'company' => false,\n    ],\n]);\n\necho $response->map['customer']['customer_id'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.CreateCustomerAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane@example.com\", [\"company\"] = false,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"customer_id\"]);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers.createCustomer({\n  'customer': {\n    'first_name': 'Jane',\n    'last_name': 'Doe',\n    'email': 'jane@example.com',\n    'company': false,\n  },\n});\nfinal customer = (response.map as Map)['customer'] as Map;\nprint(customer['customer_id']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer"
+                ],
+                "properties": {
+                  "customer": {
+                    "$ref": "#/components/schemas/CustomerInput"
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional reference for this write."
+                  }
+                }
+              },
+              "example": {
+                "customer": {
+                  "first_name": "Jane",
+                  "last_name": "Doe",
+                  "email": "jane@example.com",
+                  "company": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customers/{customer_id}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Retrieve a customer",
+        "operationId": "get_customer",
+        "description": "Returns one customer. Use the `customer_id` from a listing. `internal_id` is a second id space over the same records: sending it can return a different customer with a `200` rather than a `404`, so check the record you get back is the one you asked for.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer": {
+                      "$ref": "#/components/schemas/Customer"
+                    }
+                  }
+                },
+                "example": {
+                  "customer": {
+                    "customer_id": 123,
+                    "internal_id": 45,
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "name": "Jane Doe",
+                    "email": "jane@example.com",
+                    "status": "active",
+                    "company_name": null,
+                    "store_credit": 0.0,
+                    "customer_groups": [],
+                    "addresses": [
+                      {
+                        "id": 901,
+                        "type": "primary",
+                        "first_name": "Jane",
+                        "last_name": "Doe",
+                        "address_line_1": "1 Example Street",
+                        "city": "Sydney",
+                        "post_code": "2000"
+                      }
+                    ],
+                    "custom_properties": [],
+                    "created_at": "2026-09-01T10:00:00Z",
+                    "updated_at": "2026-09-01T10:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No customer has that id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customers/123\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.get_customer(123)\nprint(response.map[\"customer\"][\"email\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.getCustomer(123);\nconsole.log(response.map.customer.email);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::getCustomer($client, 123);\n\necho $response->map['customer']['email'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().getCustomer(123);\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"email\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.GetCustomerAsync(123);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"email\"]);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers.getCustomer(123);\nfinal customer = (response.map as Map)['customer'] as Map;\nprint(customer['email']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().GetCustomer(ctx, 123, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncustomer := resp.Map().(map[string]any)[\"customer\"].(map[string]any)\nfmt.Println(customer[\"email\"])"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Update a customer",
+        "operationId": "update_customer",
+        "description": "Send only the fields that change; the rest are left alone. Sending `custom_properties` replaces the whole list rather than adding to it.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer": {
+                      "$ref": "#/components/schemas/Customer"
+                    }
+                  }
+                },
+                "example": {
+                  "customer": {
+                    "customer_id": 123,
+                    "internal_id": 45,
+                    "first_name": "Jane",
+                    "last_name": "Smith",
+                    "name": "Jane Smith",
+                    "email": "jane@example.com",
+                    "status": "active",
+                    "company_name": null,
+                    "store_credit": 0.0,
+                    "customer_groups": [],
+                    "addresses": [
+                      {
+                        "id": 901,
+                        "type": "primary",
+                        "first_name": "Jane",
+                        "last_name": "Doe",
+                        "address_line_1": "1 Example Street",
+                        "city": "Sydney",
+                        "post_code": "2000"
+                      }
+                    ],
+                    "custom_properties": [],
+                    "created_at": "2026-09-01T10:00:00Z",
+                    "updated_at": "2026-09-01T10:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No customer has that id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/customers/123\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"customer\": {\"last_name\": \"Smith\"}}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.update_customer(123, {\"customer\": {\"last_name\": \"Smith\"}})\nprint(response.map[\"customer\"][\"last_name\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.updateCustomer(123, {customer: {last_name: 'Smith'}});\nconsole.log(response.map.customer.last_name);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::updateCustomer($client, 123, [\n    'customer' => ['last_name' => 'Smith'],\n]);\n\necho $response->map['customer']['last_name'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().updateCustomer(123,\n        Map.of(\"customer\", Map.of(\"last_name\", \"Smith\")));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"last_name\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "await client.AdminCustomers.UpdateCustomerAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?> { [\"last_name\"] = \"Smith\" },\n});"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "await client.adminCustomers.updateCustomer(123, {\n  'customer': {'last_name': 'Smith'},\n});"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().UpdateCustomer(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\"last_name\": \"Smith\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"last_name\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer"
+                ],
+                "properties": {
+                  "customer": {
+                    "$ref": "#/components/schemas/CustomerInput"
+                  }
+                }
+              },
+              "example": {
+                "customer": {
+                  "last_name": "Smith"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Delete a customer",
+        "operationId": "delete_customer",
+        "description": "Deletes the customer. The answer has no body.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No customer has that id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/customers/123\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.delete_customer(123)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.deleteCustomer(123);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::deleteCustomer($client, 123);\n\necho $response->statusCode, PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().deleteCustomer(123);\nSystem.out.println(response.getStatusCode());"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.DeleteCustomerAsync(123);\nConsole.WriteLine(response.StatusCode);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers.deleteCustomer(123);\nprint(response.statusCode);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().DeleteCustomer(ctx, 123, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+          }
+        ]
+      }
+    },
+    "/admin/customers/count": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Count customers",
+        "operationId": "count_customers",
+        "description": "Returns the total as one key. `email`, `search`, `status`, `companyName`, `phone`, `city`, `state` and `customerGroup` narrow the total. `country`, the paging parameters, `sort` and the date ranges are accepted and ignored, so they return the unfiltered total.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Free-text search. `searchText`, `query` and `keyword` are accepted spellings of the same parameter.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Filter by email address.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyName",
+            "in": "query",
+            "description": "Filter by company name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "description": "Filter by phone number.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Filter by state.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Filter by city.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerGroup",
+            "in": "query",
+            "description": "Filter by customer group.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status, matched case-insensitively. Any other value is refused with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "pending",
+                "approval_awaiting",
+                "awaiting_verification"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The total.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "total": 42
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customers/count?status=active\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.get_customer_count({\"status\": \"active\"})\nprint(response.map[\"total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.getCustomerCount({status: 'active'});\nconsole.log(response.map.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::getCustomerCount($client, ['status' => 'active']);\n\necho $response->map['total'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().getCustomerCount(Map.of(\"status\", \"active\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.GetCustomerCountAsync(\n    new Dictionary<string, object?> { [\"status\"] = \"active\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers\n    .getCustomerCount(queryParams: {'status': 'active'});\nprint((response.map as Map)['total']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().GetCustomerCount(ctx, map[string]any{\"status\": \"active\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])"
+          }
+        ]
+      }
+    },
+    "/admin/customers/check-email": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Check an email address",
+        "operationId": "check_email",
+        "description": "Answers `exists`. For a free address that is the only key. For a taken one the answer also carries that customer's `customer_id` and `internal_id`.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "description": "The address to check.",
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "example": "jane@example.com"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Whether the address is taken.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {
+                      "type": "boolean"
+                    },
+                    "customer_id": {
+                      "type": "integer"
+                    },
+                    "internal_id": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "exists": true,
+                  "customer_id": 123,
+                  "internal_id": 45
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customers/check-email?email=jane@example.com\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.get_customer_email_exists(\"jane@example.com\")\nprint(response.map[\"exists\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.getCustomerEmailExists('jane@example.com');\nconsole.log(response.map.exists);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::getCustomerEmailExists($client, 'jane@example.com');\n\necho $response->map['exists'] ? 'true' : 'false', PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().getCustomerEmailExists(\"jane@example.com\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"exists\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.GetCustomerEmailExistsAsync(\"jane@example.com\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"exists\"]);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response =\n    await client.adminCustomers.getCustomerEmailExists('jane@example.com');\nprint((response.map as Map)['exists']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().GetCustomerEmailExists(ctx, \"jane@example.com\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"exists\"])"
+          }
+        ]
+      }
+    },
+    "/admin/customers/export": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Export customers",
+        "operationId": "export_customers",
+        "description": "Returns a spreadsheet of every customer. Filters are not applied: `status=active` does not narrow the export. Each of the 18 column parameters keeps its column when omitted or sent as `1`, `true`, `on` or `yes`, and removes it for any other value.",
+        "parameters": [
+          {
+            "name": "firstName",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "lastName",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "customerType",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "addressLine1",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "addressLine2",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "postCode",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "mobile",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "fax",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "abn",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "storeCredit",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "groups",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "parentGroup",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "companyName",
+            "in": "query",
+            "description": "Keep or remove this column.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An XLSX file.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customers/export\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -o customers.xlsx"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.get_customer_export()\nwith open(\"customers.xlsx\", \"wb\") as file:\n    file.write(response.map)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {writeFileSync} from 'node:fs';\n\nconst response = await client.adminCustomers.getCustomerExport();\nwriteFileSync('customers.xlsx', response.map);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::getCustomerExport($client);\n\nfile_put_contents('customers.xlsx', $response->map);"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().getCustomerExport();\nbyte[] xlsx = (byte[]) response.getMap();\nFiles.write(Path.of(\"customers.xlsx\"), xlsx);"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.GetCustomerExportAsync();\nFile.WriteAllBytes(\"customers.xlsx\", (byte[])response.Map!);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers.getCustomerExport();\nawait File('customers.xlsx').writeAsBytes(response.map as List<int>);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().GetCustomerExport(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndata := resp.Map().([]byte)\nif err := os.WriteFile(\"customers.xlsx\", data, 0o644); err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(\"wrote\", len(data), \"bytes to customers.xlsx\")"
+          }
+        ]
+      }
+    },
+    "/admin/customers/{customer_id}/addresses": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Add addresses",
+        "operationId": "add_addresses",
+        "description": "Adds one or more addresses. `type` is `primary`, `shipping` or `billing`; any other value is refused with `400 invalid_enum`. A `state` that is not in the `country` is refused with `400 state_country_mismatch`.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The customer with its addresses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer": {
+                      "$ref": "#/components/schemas/Customer"
+                    }
+                  }
+                },
+                "example": {
+                  "customer": {
+                    "customer_id": 123,
+                    "internal_id": 45,
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "name": "Jane Doe",
+                    "email": "jane@example.com",
+                    "status": "active",
+                    "company_name": null,
+                    "store_credit": 0.0,
+                    "customer_groups": [],
+                    "addresses": [
+                      {
+                        "id": 901,
+                        "type": "primary",
+                        "first_name": "Jane",
+                        "last_name": "Doe",
+                        "address_line_1": "1 Example Street",
+                        "city": "Sydney",
+                        "post_code": "2000"
+                      }
+                    ],
+                    "custom_properties": [],
+                    "created_at": "2026-09-01T10:00:00Z",
+                    "updated_at": "2026-09-01T10:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "An invalid address `type`, or a state outside the country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers/123/addresses\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"customer\": {\"addresses\": [{\"type\": \"shipping\", \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"address_line_1\": \"1 Example Street\", \"city\": \"Sydney\", \"post_code\": \"2000\"}]}}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.create_customer_addresses(123, {\n    \"customer\": {\n        \"addresses\": [{\n            \"type\": \"shipping\",\n            \"first_name\": \"Jane\",\n            \"last_name\": \"Doe\",\n            \"address_line_1\": \"1 Example Street\",\n            \"city\": \"Sydney\",\n            \"post_code\": \"2000\",\n        }],\n    },\n})\nfor address in response.map[\"customer\"][\"addresses\"]:\n    print(address[\"type\"], address[\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const address = {\n    type: 'shipping',\n    first_name: 'Jane',\n    last_name: 'Doe',\n    address_line_1: '1 Example Street',\n    city: 'Sydney',\n    post_code: '2000',\n};\nconst response = await client.adminCustomers.createCustomerAddresses(123, {customer: {addresses: [address]}});\nconsole.log(response.map.customer.addresses);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$address = [\n    'type' => 'shipping', 'first_name' => 'Jane', 'last_name' => 'Doe',\n    'address_line_1' => '1 Example Street', 'city' => 'Sydney', 'post_code' => '2000',\n];\n$response = AdminCustomers::createCustomerAddresses($client, 123, ['customer' => ['addresses' => [$address]]]);\n\necho count($response->map['customer']['addresses']), PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().createCustomerAddresses(123, Map.of(\"customer\", Map.of(\n        \"addresses\", List.of(Map.of(\n                \"type\", \"shipping\", \"first_name\", \"Jane\", \"last_name\", \"Doe\",\n                \"address_line_1\", \"1 Example Street\", \"city\", \"Sydney\", \"post_code\", \"2000\")))));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"addresses\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "await client.AdminCustomers.CreateCustomerAddressesAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"addresses\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"type\"] = \"shipping\", [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\",\n                [\"address_line_1\"] = \"1 Example Street\", [\"city\"] = \"Sydney\", [\"post_code\"] = \"2000\",\n            },\n        },\n    },\n});"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "await client.adminCustomers.createCustomerAddresses(123, {\n  'customer': {\n    'addresses': [\n      {\n        'type': 'shipping',\n        'first_name': 'Jane',\n        'last_name': 'Doe',\n        'address_line_1': '1 Example Street',\n        'city': 'Sydney',\n        'post_code': '2000',\n      },\n    ],\n  },\n});"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().CreateCustomerAddresses(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"addresses\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"type\":           \"shipping\",\n\t\t\t\t\"first_name\":     \"Jane\",\n\t\t\t\t\"last_name\":      \"Doe\",\n\t\t\t\t\"address_line_1\": \"1 Example Street\",\n\t\t\t\t\"city\":           \"Sydney\",\n\t\t\t\t\"post_code\":      \"2000\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"addresses\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer"
+                ],
+                "properties": {
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "addresses": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/AddressInput"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "customer": {
+                  "addresses": [
+                    {
+                      "type": "shipping",
+                      "first_name": "Jane",
+                      "last_name": "Doe",
+                      "address_line_1": "1 Example Street",
+                      "city": "Sydney",
+                      "post_code": "2000"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customers/{customer_id}/reset-password": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Reset a password",
+        "operationId": "reset_password",
+        "description": "Sets the customer's password. The old password is not needed.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The password was reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Password has been changed successfully"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers/123/reset-password\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"customer\": {\"password\": \"NewPassw0rd!\"}}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.reset_customer_password(\n    123, {\"customer\": {\"password\": \"NewPassw0rd!\"}}\n)\nprint(response.map[\"status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.resetCustomerPassword(123, {customer: {password: 'NewPassw0rd!'}});\nconsole.log(response.map.status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::resetCustomerPassword($client, 123, [\n    'customer' => ['password' => 'NewPassw0rd!'],\n]);\n\necho $response->map['status'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().resetCustomerPassword(123,\n        Map.of(\"customer\", Map.of(\"password\", \"NewPassw0rd!\")));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "await client.AdminCustomers.ResetCustomerPasswordAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?> { [\"password\"] = \"NewPassw0rd!\" },\n});"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "await client.adminCustomers.resetCustomerPassword(123, {\n  'customer': {'password': 'NewPassw0rd!'},\n});"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().ResetCustomerPassword(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\"password\": \"NewPassw0rd!\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"status\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer"
+                ],
+                "properties": {
+                  "customer": {
+                    "type": "object",
+                    "required": [
+                      "password"
+                    ],
+                    "properties": {
+                      "password": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional reference for this write."
+                  }
+                }
+              },
+              "example": {
+                "customer": {
+                  "password": "NewPassw0rd!"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customers/{customer_id}/change-password": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Change a password",
+        "operationId": "change_password",
+        "description": "Changes the password when `old_password` matches. A wrong old password is answered `401`, and so is a customer who is still `awaiting_verification`, even straight after a reset. The SDKs return that `401` as it is and do not retry it.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The password was changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Password has been changed successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The old password is wrong, or the customer has no usable login yet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers/123/change-password\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"customer\": {\"email\": \"jane@example.com\", \"old_password\": \"OldPassw0rd!\", \"password\": \"NewPassw0rd!\"}}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.change_customer_password(123, {\n    \"customer\": {\n        \"email\": \"jane@example.com\",\n        \"old_password\": \"OldPassw0rd!\",\n        \"password\": \"NewPassw0rd!\",\n    },\n})\nprint(response.map[\"status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.changeCustomerPassword(123, {\n    customer: {email: 'jane@example.com', old_password: 'OldPassw0rd!', password: 'NewPassw0rd!'},\n});\nconsole.log(response.map.status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::changeCustomerPassword($client, 123, [\n    'customer' => [\n        'email' => 'jane@example.com',\n        'old_password' => 'OldPassw0rd!',\n        'password' => 'NewPassw0rd!',\n    ],\n]);\n\necho $response->map['status'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().changeCustomerPassword(123, Map.of(\"customer\", Map.of(\n        \"email\", \"jane@example.com\", \"old_password\", \"OldPassw0rd!\", \"password\", \"NewPassw0rd!\")));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "await client.AdminCustomers.ChangeCustomerPasswordAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"email\"] = \"jane@example.com\", [\"old_password\"] = \"OldPassw0rd!\", [\"password\"] = \"NewPassw0rd!\",\n    },\n});"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "await client.adminCustomers.changeCustomerPassword(123, {\n  'customer': {\n    'email': 'jane@example.com',\n    'old_password': 'OldPassw0rd!',\n    'password': 'NewPassw0rd!',\n  },\n});"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().ChangeCustomerPassword(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"email\":        \"jane@example.com\",\n\t\t\"old_password\": \"OldPassw0rd!\",\n\t\t\"password\":     \"NewPassw0rd!\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"status\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer"
+                ],
+                "properties": {
+                  "customer": {
+                    "type": "object",
+                    "required": [
+                      "email",
+                      "old_password",
+                      "password"
+                    ],
+                    "properties": {
+                      "email": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "old_password": {
+                        "type": "string"
+                      },
+                      "password": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional reference for this write."
+                  }
+                }
+              },
+              "example": {
+                "customer": {
+                  "email": "jane@example.com",
+                  "old_password": "OldPassw0rd!",
+                  "password": "NewPassw0rd!"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customers/bulk-reset-password": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Bulk reset passwords",
+        "operationId": "bulk_reset_passwords",
+        "description": "Queues a password reset email for each id. Ids that match no customer are returned in `skipped` with a reason rather than failing the call. An empty list, or ids that are not integers, is refused with `400`.",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "The resets were queued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "queued": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "skipped": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "customer_id": {
+                            "type": "integer"
+                          },
+                          "reason": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_queued": {
+                      "type": "integer"
+                    },
+                    "requested": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "queued": [
+                    123,
+                    124
+                  ],
+                  "skipped": [],
+                  "total_queued": 2,
+                  "requested": 2,
+                  "status": "queued",
+                  "message": "Password reset emails queued for 2 of 2 customers."
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers/bulk-reset-password\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"customer_ids\": [123, 124]}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.bulk_reset_customer_passwords({\"customer_ids\": [123, 124]})\nprint(response.map[\"total_queued\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.bulkResetCustomerPasswords({customer_ids: [123, 124]});\nconsole.log(response.map.total_queued);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::bulkResetCustomerPasswords($client, ['customer_ids' => [123, 124]]);\n\necho $response->map['total_queued'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().bulkResetCustomerPasswords(\n        Map.of(\"customer_ids\", List.of(123, 124)));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total_queued\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.BulkResetCustomerPasswordsAsync(\n    new Dictionary<string, object?> { [\"customer_ids\"] = new List<object?> { 123, 124 } });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total_queued\"]);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers.bulkResetCustomerPasswords({\n  'customer_ids': [123, 124],\n});\nprint((response.map as Map)['total_queued']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().BulkResetCustomerPasswords(ctx, map[string]any{\n\t\"customer_ids\": []any{123, 124},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nqueued := resp.Map().(map[string]any)[\"queued\"].([]any)\nfmt.Println(len(queued), \"queued\")"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer_ids"
+                ],
+                "properties": {
+                  "customer_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "customer_ids": [
+                  123,
+                  124
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customers/import": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Import customers",
+        "operationId": "import_customers",
+        "description": "Upload one file in a multipart part named exactly `file`. The filename's extension picks the parser: `.csv`, `.xls` or `.xlsx`. A row with a `customer_id` updates that customer; a row without one creates a customer. The call can answer `201` even when rows failed, so check `failed` and `errors`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The import result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    },
+                    "created": {
+                      "type": "integer"
+                    },
+                    "updated": {
+                      "type": "integer"
+                    },
+                    "failed": {
+                      "type": "integer"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "total": 1,
+                  "created": 0,
+                  "updated": 1,
+                  "failed": 0,
+                  "errors": []
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers/import\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@customers.csv\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "with open(\"customers.csv\", \"rb\") as handle:\n    response = client.admin_customers.import_customers({\"file\": handle})\nprint(response.map[\"created\"], response.map[\"updated\"], response.map[\"failed\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\n\nconst response = await client.adminCustomers.importCustomers({\n    file: ['customers.csv', readFileSync('customers.csv'), 'text/csv'],\n});\nconsole.log(response.map.created, response.map.updated, response.map.failed);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$handle = fopen('customers.csv', 'rb');\n$response = AdminCustomers::importCustomers($client, ['file' => ['customers.csv', $handle, 'text/csv']]);\nfclose($handle);\n\necho $response->map['created'], ' created, ', $response->map['updated'], ' updated', PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().importCustomers(Map.of(\"file\", Path.of(\"customers.csv\")));\nMap<?, ?> report = (Map<?, ?>) response.getMap();\nSystem.out.println(report.get(\"created\") + \" created, \" + report.get(\"updated\") + \" updated, \"\n        + report.get(\"failed\") + \" failed\");"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.ImportCustomersAsync(new Dictionary<string, object?>\n{\n    [\"file\"] = new List<object?> { \"customers.csv\", File.ReadAllBytes(\"customers.csv\"), \"text/csv\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"created {body[\"created\"]}, updated {body[\"updated\"]}, failed {body[\"failed\"]}\");"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final csv = await File('customers.csv').readAsBytes();\nfinal response = await client.adminCustomers.importCustomers({\n  'file': ['customers.csv', csv, 'text/csv'],\n});\nprint((response.map as Map)['created']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "contents, err := os.ReadFile(\"customers.csv\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresp, err := client.AdminCustomers().ImportCustomers(ctx, map[string]any{\n\t\"file\": []any{\"customers.csv\", contents, \"text/csv\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nreport := resp.Map().(map[string]any)\nfmt.Println(report[\"created\"], report[\"updated\"], report[\"failed\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The file to import."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customers/{customer_id}/store-credit/adjustments": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "List store credit adjustments",
+        "operationId": "list_store_credit_adjustments",
+        "description": "Returns the customer's store credit adjustments one page at a time, newest first. Only the paging parameters apply: other parameters, including `sort` and a filter on `action`, are accepted and ignored.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Rows per page. Capped at 20: a larger value is accepted and the cap is echoed back in `pagination.limit`.",
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of rows to skip. Takes precedence over `page` when both are sent.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read against the applied `limit`.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of adjustments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "store_credit_adjustments": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StoreCreditAdjustment"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                },
+                "example": {
+                  "store_credit_adjustments": [
+                    {
+                      "id": 7,
+                      "customer_id": 123,
+                      "action": "add",
+                      "amount": 20.0,
+                      "note": "Refund",
+                      "balance_before": 0.0,
+                      "balance_after": 20.0,
+                      "created_at": "2026-09-01T10:00:00Z"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 1,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 1,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customers/123/store-credit/adjustments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.get_customer_store_credit_adjustments(123, {\"limit\": 20})\nfor adjustment in response.map[\"store_credit_adjustments\"]:\n    print(adjustment[\"action\"], adjustment[\"amount\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.getCustomerStoreCreditAdjustments(123, {limit: 20});\nfor (const adjustment of response.map.store_credit_adjustments) {\n    console.log(adjustment.action, adjustment.amount);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::getCustomerStoreCreditAdjustments($client, 123, ['limit' => 20]);\n\nforeach ($response->map['store_credit_adjustments'] as $adjustment) {\n    echo $adjustment['action'], ' ', $adjustment['amount'], PHP_EOL;\n}"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().getCustomerStoreCreditAdjustments(123, Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"store_credit_adjustments\")) {\n    Map<?, ?> adjustment = (Map<?, ?>) row;\n    System.out.println(adjustment.get(\"action\") + \" \" + adjustment.get(\"amount\"));\n}"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.GetCustomerStoreCreditAdjustmentsAsync(\n    123, new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var adjustment in ((IReadOnlyList<object?>)body[\"store_credit_adjustments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{adjustment[\"action\"]} {adjustment[\"amount\"]}\");"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers\n    .getCustomerStoreCreditAdjustments(123, queryParams: {'limit': 20});\nfinal adjustments =\n    (response.map as Map)['store_credit_adjustments'] as List;\nfor (final adjustment in adjustments) {\n  print('${(adjustment as Map)['action']} ${adjustment['amount']}');\n}"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().GetCustomerStoreCreditAdjustments(ctx, 123, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"store_credit_adjustments\"].([]any) {\n\tadjustment := row.(map[string]any)\n\tfmt.Println(adjustment[\"action\"], adjustment[\"amount\"])\n}"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Adjust store credit",
+        "operationId": "adjust_store_credit",
+        "description": "The body is the adjustment itself, with no wrapping key. `action` is `add` or `deduct` and carries the direction; `amount` is always positive. The answer carries the adjustment and the balance it left.",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The adjustment and the new balance.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "store_credit_adjustment": {
+                      "$ref": "#/components/schemas/StoreCreditAdjustment"
+                    },
+                    "store_credit": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "example": {
+                  "store_credit_adjustment": {
+                    "id": 8,
+                    "customer_id": 123,
+                    "action": "add",
+                    "amount": 20.0,
+                    "note": "Refund",
+                    "balance_before": 0.0,
+                    "balance_after": 20.0
+                  },
+                  "store_credit": 20.0
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customers/123/store-credit/adjustments\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"action\": \"add\", \"amount\": 20, \"note\": \"Refund\"}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "response = client.admin_customers.create_customer_store_credit_adjustment(\n    123, {\"action\": \"add\", \"amount\": 20, \"note\": \"Refund\"}\n)\nprint(response.map[\"store_credit\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "const response = await client.adminCustomers.createCustomerStoreCreditAdjustment(123, {\n    action: 'add',\n    amount: 20,\n    note: 'Refund',\n});\nconsole.log(response.map.store_credit);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "$response = AdminCustomers::createCustomerStoreCreditAdjustment($client, 123, [\n    'action' => 'add',\n    'amount' => 20,\n    'note' => 'Refund',\n]);\n\necho $response->map['store_credit'], PHP_EOL;"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "ApiResponse response = client.adminCustomers().createCustomerStoreCreditAdjustment(123,\n        Map.of(\"action\", \"add\", \"amount\", 20, \"note\", \"Refund\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"store_credit\"));"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "var response = await client.AdminCustomers.CreateCustomerStoreCreditAdjustmentAsync(\n    123, new Dictionary<string, object?> { [\"action\"] = \"add\", [\"amount\"] = 20, [\"note\"] = \"Refund\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"store_credit\"]);"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "final response = await client.adminCustomers\n    .createCustomerStoreCreditAdjustment(\n        123, {'action': 'add', 'amount': 20, 'note': 'Refund'});\nprint((response.map as Map)['store_credit']);"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "resp, err := client.AdminCustomers().CreateCustomerStoreCreditAdjustment(ctx, 123, map[string]any{\n\t\"action\": \"add\",\n\t\"amount\": 20,\n\t\"note\":   \"Refund\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"store_credit\"])"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreCreditAdjustmentInput"
+              },
+              "example": {
+                "action": "add",
+                "amount": 20,
+                "note": "Refund"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "An access token from `POST /api/v4/oauth2/token`. The SDKs get and renew it for you."
+      }
+    },
+    "schemas": {
+      "Reference": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string",
+            "description": "`primary`, `shipping` or `billing`."
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "address_line_1": {
+            "type": "string"
+          },
+          "address_line_2": {
+            "type": "string"
+          },
+          "country": {
+            "$ref": "#/components/schemas/Reference"
+          },
+          "state": {
+            "$ref": "#/components/schemas/Reference"
+          },
+          "city": {
+            "type": "string"
+          },
+          "post_code": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "fax": {
+            "type": "string"
+          }
+        }
+      },
+      "AddressInput": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "shipping",
+              "billing"
+            ]
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "address_line_1": {
+            "type": "string"
+          },
+          "address_line_2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "post_code": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomProperty": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "integer",
+            "description": "The id every `{customer_id}` path takes."
+          },
+          "internal_id": {
+            "type": "integer",
+            "description": "A second id space over the same records. No path takes it."
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "pending",
+              "approval_awaiting",
+              "awaiting_verification"
+            ]
+          },
+          "gender": {
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "store_credit": {
+            "type": "number"
+          },
+          "customer_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reference"
+            }
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Address"
+            }
+          },
+          "custom_properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomProperty"
+            }
+          },
+          "abn": {
+            "type": "string"
+          },
+          "credit_limit": {
+            "type": "number"
+          },
+          "allow_credit_limit": {
+            "type": "boolean"
+          },
+          "account_hold": {
+            "type": "boolean"
+          },
+          "hide_price": {
+            "type": "boolean"
+          },
+          "sms_subscribed": {
+            "type": "boolean"
+          },
+          "default_tax_code": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerInput": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "description": "Required on create."
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "pending",
+              "approval_awaiting",
+              "awaiting_verification"
+            ],
+            "description": "Omit on create and the customer is `awaiting_verification`."
+          },
+          "company": {
+            "type": "boolean"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "custom_properties": {
+            "type": "array",
+            "description": "Replaces the whole list.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "StoreCreditAdjustment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "customer_id": {
+            "type": "integer"
+          },
+          "internal_id": {
+            "type": "integer"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "deduct"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "balance_before": {
+            "type": "number"
+          },
+          "balance_after": {
+            "type": "number"
+          }
+        }
+      },
+      "StoreCreditAdjustmentInput": {
+        "type": "object",
+        "required": [
+          "action",
+          "amount"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "deduct"
+            ],
+            "description": "The direction of the movement."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Always positive; `action` carries the sign."
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "current_page": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_previous": {
+            "type": "boolean"
+          },
+          "previous_page": {
+            "type": "string"
+          },
+          "next_page": {
+            "type": "string"
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string",
+            "description": "A machine-readable reason, when the API gives one."
+          },
+          "errors": {
+            "type": "array",
+            "description": "One entry per rejected field, when the API gives them.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

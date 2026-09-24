@@ -1,0 +1,67 @@
+{
+  "sdk": "python",
+  "language": "python",
+  "setup": "import os\n\nfrom webcommander import AuthConfig, build_client, register_instances\n\nregister_instances([\n    AuthConfig(\n        client_name=\"default\",\n        base_url=os.environ[\"WC_BASE_URL\"],\n        client_id=os.environ[\"WC_CLIENT_ID\"],\n        client_secret=os.environ[\"WC_CLIENT_SECRET\"],\n        redirect_uri=os.environ[\"WC_REDIRECT_URI\"],\n        auth_string=os.environ[\"WC_AUTH_STRING\"],\n    ),\n])\n\nclient = build_client(raise_on_error=True)\n",
+  "endpoints": {
+    "list_customers": {
+      "function": "get_customers",
+      "code": "response = client.admin_customers.get_customers({\"limit\": 20, \"status\": \"active\"})\nfor customer in response.map[\"customers\"]:\n    print(customer[\"customer_id\"], customer[\"email\"])\n"
+    },
+    "get_customer": {
+      "function": "get_customer",
+      "code": "response = client.admin_customers.get_customer(123)\nprint(response.map[\"customer\"][\"email\"])\n"
+    },
+    "count_customers": {
+      "function": "get_customer_count",
+      "code": "response = client.admin_customers.get_customer_count({\"status\": \"active\"})\nprint(response.map[\"total\"])\n"
+    },
+    "check_email": {
+      "function": "get_customer_email_exists",
+      "code": "response = client.admin_customers.get_customer_email_exists(\"jane@example.com\")\nprint(response.map[\"exists\"])\n"
+    },
+    "export_customers": {
+      "function": "get_customer_export",
+      "code": "response = client.admin_customers.get_customer_export()\nwith open(\"customers.xlsx\", \"wb\") as file:\n    file.write(response.map)\n"
+    },
+    "create_customer": {
+      "function": "create_customer",
+      "code": "response = client.admin_customers.create_customer({\n    \"customer\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane@example.com\",\n        \"company\": False,\n    },\n})\nprint(response.map[\"customer\"][\"customer_id\"])\n"
+    },
+    "update_customer": {
+      "function": "update_customer",
+      "code": "response = client.admin_customers.update_customer(123, {\"customer\": {\"last_name\": \"Smith\"}})\nprint(response.map[\"customer\"][\"last_name\"])\n"
+    },
+    "delete_customer": {
+      "function": "delete_customer",
+      "code": "response = client.admin_customers.delete_customer(123)\nprint(response.status_code)\n"
+    },
+    "add_addresses": {
+      "function": "create_customer_addresses",
+      "code": "response = client.admin_customers.create_customer_addresses(123, {\n    \"customer\": {\n        \"addresses\": [{\n            \"type\": \"shipping\",\n            \"first_name\": \"Jane\",\n            \"last_name\": \"Doe\",\n            \"address_line_1\": \"1 Example Street\",\n            \"city\": \"Sydney\",\n            \"post_code\": \"2000\",\n        }],\n    },\n})\nfor address in response.map[\"customer\"][\"addresses\"]:\n    print(address[\"type\"], address[\"id\"])\n"
+    },
+    "reset_password": {
+      "function": "reset_customer_password",
+      "code": "response = client.admin_customers.reset_customer_password(\n    123, {\"customer\": {\"password\": \"NewPassw0rd!\"}}\n)\nprint(response.map[\"status\"])\n"
+    },
+    "change_password": {
+      "function": "change_customer_password",
+      "code": "response = client.admin_customers.change_customer_password(123, {\n    \"customer\": {\n        \"email\": \"jane@example.com\",\n        \"old_password\": \"OldPassw0rd!\",\n        \"password\": \"NewPassw0rd!\",\n    },\n})\nprint(response.map[\"status\"])\n"
+    },
+    "bulk_reset_passwords": {
+      "function": "bulk_reset_customer_passwords",
+      "code": "response = client.admin_customers.bulk_reset_customer_passwords({\"customer_ids\": [123, 124]})\nprint(response.map[\"total_queued\"])\n"
+    },
+    "import_customers": {
+      "function": "import_customers",
+      "code": "with open(\"customers.csv\", \"rb\") as handle:\n    response = client.admin_customers.import_customers({\"file\": handle})\nprint(response.map[\"created\"], response.map[\"updated\"], response.map[\"failed\"])\n"
+    },
+    "list_store_credit_adjustments": {
+      "function": "get_customer_store_credit_adjustments",
+      "code": "response = client.admin_customers.get_customer_store_credit_adjustments(123, {\"limit\": 20})\nfor adjustment in response.map[\"store_credit_adjustments\"]:\n    print(adjustment[\"action\"], adjustment[\"amount\"])\n"
+    },
+    "adjust_store_credit": {
+      "function": "create_customer_store_credit_adjustment",
+      "code": "response = client.admin_customers.create_customer_store_credit_adjustment(\n    123, {\"action\": \"add\", \"amount\": 20, \"note\": \"Refund\"}\n)\nprint(response.map[\"store_credit\"])\n"
+    }
+  }
+}

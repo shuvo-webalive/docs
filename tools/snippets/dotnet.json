@@ -1,0 +1,67 @@
+{
+  "sdk": "dotnet",
+  "language": "csharp",
+  "setup": "using WebCommander.Sdk.Client;\nusing WebCommander.Sdk.Config;\n\nvar auth = new AuthConfig(\n    baseUrl: Environment.GetEnvironmentVariable(\"WC_BASE_URL\")!,\n    clientId: Environment.GetEnvironmentVariable(\"WC_CLIENT_ID\")!,\n    clientSecret: Environment.GetEnvironmentVariable(\"WC_CLIENT_SECRET\")!,\n    redirectUri: Environment.GetEnvironmentVariable(\"WC_REDIRECT_URI\")!,\n    authString: Environment.GetEnvironmentVariable(\"WC_AUTH_STRING\")!,\n    clientName: \"default\");\n\nawait using var client = new WebCommanderClient(new SdkConfig(auth, raiseOnError: true));",
+  "endpoints": {
+    "list_customers": {
+      "function": "GetCustomersAsync",
+      "code": "var response = await client.AdminCustomers.GetCustomersAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20, [\"status\"] = \"active\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customer in ((IReadOnlyList<object?>)body[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"customer_id\"]} {customer[\"email\"]}\");"
+    },
+    "get_customer": {
+      "function": "GetCustomerAsync",
+      "code": "var response = await client.AdminCustomers.GetCustomerAsync(123);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"email\"]);"
+    },
+    "count_customers": {
+      "function": "GetCustomerCountAsync",
+      "code": "var response = await client.AdminCustomers.GetCustomerCountAsync(\n    new Dictionary<string, object?> { [\"status\"] = \"active\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "check_email": {
+      "function": "GetCustomerEmailExistsAsync",
+      "code": "var response = await client.AdminCustomers.GetCustomerEmailExistsAsync(\"jane@example.com\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"exists\"]);"
+    },
+    "export_customers": {
+      "function": "GetCustomerExportAsync",
+      "code": "var response = await client.AdminCustomers.GetCustomerExportAsync();\nFile.WriteAllBytes(\"customers.xlsx\", (byte[])response.Map!);"
+    },
+    "create_customer": {
+      "function": "CreateCustomerAsync",
+      "code": "var response = await client.AdminCustomers.CreateCustomerAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane@example.com\", [\"company\"] = false,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"customer_id\"]);"
+    },
+    "update_customer": {
+      "function": "UpdateCustomerAsync",
+      "code": "await client.AdminCustomers.UpdateCustomerAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?> { [\"last_name\"] = \"Smith\" },\n});"
+    },
+    "delete_customer": {
+      "function": "DeleteCustomerAsync",
+      "code": "var response = await client.AdminCustomers.DeleteCustomerAsync(123);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "add_addresses": {
+      "function": "CreateCustomerAddressesAsync",
+      "code": "await client.AdminCustomers.CreateCustomerAddressesAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"addresses\"] = new List<object?>\n        {\n            new Dictionary<string, object?>\n            {\n                [\"type\"] = \"shipping\", [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\",\n                [\"address_line_1\"] = \"1 Example Street\", [\"city\"] = \"Sydney\", [\"post_code\"] = \"2000\",\n            },\n        },\n    },\n});"
+    },
+    "reset_password": {
+      "function": "ResetCustomerPasswordAsync",
+      "code": "await client.AdminCustomers.ResetCustomerPasswordAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?> { [\"password\"] = \"NewPassw0rd!\" },\n});"
+    },
+    "change_password": {
+      "function": "ChangeCustomerPasswordAsync",
+      "code": "await client.AdminCustomers.ChangeCustomerPasswordAsync(123, new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"email\"] = \"jane@example.com\", [\"old_password\"] = \"OldPassw0rd!\", [\"password\"] = \"NewPassw0rd!\",\n    },\n});"
+    },
+    "bulk_reset_passwords": {
+      "function": "BulkResetCustomerPasswordsAsync",
+      "code": "var response = await client.AdminCustomers.BulkResetCustomerPasswordsAsync(\n    new Dictionary<string, object?> { [\"customer_ids\"] = new List<object?> { 123, 124 } });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total_queued\"]);"
+    },
+    "import_customers": {
+      "function": "ImportCustomersAsync",
+      "code": "var response = await client.AdminCustomers.ImportCustomersAsync(new Dictionary<string, object?>\n{\n    [\"file\"] = new List<object?> { \"customers.csv\", File.ReadAllBytes(\"customers.csv\"), \"text/csv\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"created {body[\"created\"]}, updated {body[\"updated\"]}, failed {body[\"failed\"]}\");"
+    },
+    "list_store_credit_adjustments": {
+      "function": "GetCustomerStoreCreditAdjustmentsAsync",
+      "code": "var response = await client.AdminCustomers.GetCustomerStoreCreditAdjustmentsAsync(\n    123, new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var adjustment in ((IReadOnlyList<object?>)body[\"store_credit_adjustments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{adjustment[\"action\"]} {adjustment[\"amount\"]}\");"
+    },
+    "adjust_store_credit": {
+      "function": "CreateCustomerStoreCreditAdjustmentAsync",
+      "code": "var response = await client.AdminCustomers.CreateCustomerStoreCreditAdjustmentAsync(\n    123, new Dictionary<string, object?> { [\"action\"] = \"add\", [\"amount\"] = 20, [\"note\"] = \"Refund\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"store_credit\"]);"
+    }
+  }
+}

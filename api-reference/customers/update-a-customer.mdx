@@ -1,0 +1,9 @@
+---
+title: "Update a customer"
+description: "Change a customer's fields."
+openapi: "PUT /admin/customers/{customer_id}"
+---
+
+Send only the fields that change; the rest are left alone. Sending `custom_properties` replaces the whole list rather than adding to it.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

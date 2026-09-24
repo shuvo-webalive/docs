@@ -1,0 +1,9 @@
+---
+title: "Import customers"
+description: "Create or update customers from a CSV or spreadsheet file."
+openapi: "POST /admin/customers/import"
+---
+
+Upload one file in a multipart part named exactly `file`. The filename's extension picks the parser: `.csv`, `.xls` or `.xlsx`. A row with a `customer_id` updates that customer; a row without one creates a customer. The call can answer `201` even when rows failed, so check `failed` and `errors`.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

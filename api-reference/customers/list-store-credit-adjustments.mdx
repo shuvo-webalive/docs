@@ -1,0 +1,9 @@
+---
+title: "List store credit adjustments"
+description: "A customer's store credit movements, newest first."
+openapi: "GET /admin/customers/{customer_id}/store-credit/adjustments"
+---
+
+Returns the customer's store credit adjustments one page at a time, newest first. Only the paging parameters apply: other parameters, including `sort` and a filter on `action`, are accepted and ignored.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

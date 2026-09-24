@@ -1,0 +1,9 @@
+---
+title: "Retrieve a customer"
+description: "One customer by `customer_id`."
+openapi: "GET /admin/customers/{customer_id}"
+---
+
+Returns one customer. Use the `customer_id` from a listing. `internal_id` is a second id space over the same records: sending it can return a different customer with a `200` rather than a `404`, so check the record you get back is the one you asked for.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

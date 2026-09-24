@@ -1,0 +1,9 @@
+---
+title: "Create a customer"
+description: "Create a customer."
+openapi: "POST /admin/customers"
+---
+
+Creates a customer and returns it with its new `customer_id`. Without `status`, a new customer is `awaiting_verification` and has no usable login, whatever `password` was sent; send `status: "active"` with a `password` for a customer who can sign in. Address fields sent inline are accepted and discarded: use [Add addresses](/api-reference/customers/add-addresses) instead. The answer always carries three addresses of the store's own making: primary, shipping and billing.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

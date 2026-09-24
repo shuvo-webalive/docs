@@ -1,0 +1,9 @@
+---
+title: "Adjust store credit"
+description: "Add to or deduct from a customer's store credit."
+openapi: "POST /admin/customers/{customer_id}/store-credit/adjustments"
+---
+
+The body is the adjustment itself, with no wrapping key. `action` is `add` or `deduct` and carries the direction; `amount` is always positive. The answer carries the adjustment and the balance it left.
+
+<Note>Every SDK sample assumes a client set up once, as shown on the [Customers overview](./overview).</Note>

@@ -1,0 +1,67 @@
+{
+  "sdk": "dart",
+  "language": "dart",
+  "setup": "import 'dart:io';\nimport 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal env = Platform.environment;\nfinal client = WebCommanderClient(SdkConfig(\n  AuthConfig(\n    clientName: 'default',\n    baseUrl: env['WC_BASE_URL']!,\n    clientId: env['WC_CLIENT_ID']!,\n    clientSecret: env['WC_CLIENT_SECRET']!,\n    redirectUri: env['WC_REDIRECT_URI']!,\n    authString: env['WC_AUTH_STRING']!,\n  ),\n  raiseOnError: true,\n));",
+  "endpoints": {
+    "list_customers": {
+      "function": "getCustomers",
+      "code": "final response = await client.adminCustomers.getCustomers(\n    queryParams: {'limit': 20, 'status': 'active'});\nfor (final customer in (response.map as Map)['customers'] as List) {\n  print('${(customer as Map)['customer_id']} ${customer['email']}');\n}"
+    },
+    "get_customer": {
+      "function": "getCustomer",
+      "code": "final response = await client.adminCustomers.getCustomer(123);\nfinal customer = (response.map as Map)['customer'] as Map;\nprint(customer['email']);"
+    },
+    "count_customers": {
+      "function": "getCustomerCount",
+      "code": "final response = await client.adminCustomers\n    .getCustomerCount(queryParams: {'status': 'active'});\nprint((response.map as Map)['total']);"
+    },
+    "check_email": {
+      "function": "getCustomerEmailExists",
+      "code": "final response =\n    await client.adminCustomers.getCustomerEmailExists('jane@example.com');\nprint((response.map as Map)['exists']);"
+    },
+    "export_customers": {
+      "function": "getCustomerExport",
+      "code": "final response = await client.adminCustomers.getCustomerExport();\nawait File('customers.xlsx').writeAsBytes(response.map as List<int>);"
+    },
+    "create_customer": {
+      "function": "createCustomer",
+      "code": "final response = await client.adminCustomers.createCustomer({\n  'customer': {\n    'first_name': 'Jane',\n    'last_name': 'Doe',\n    'email': 'jane@example.com',\n    'company': false,\n  },\n});\nfinal customer = (response.map as Map)['customer'] as Map;\nprint(customer['customer_id']);"
+    },
+    "update_customer": {
+      "function": "updateCustomer",
+      "code": "await client.adminCustomers.updateCustomer(123, {\n  'customer': {'last_name': 'Smith'},\n});"
+    },
+    "delete_customer": {
+      "function": "deleteCustomer",
+      "code": "final response = await client.adminCustomers.deleteCustomer(123);\nprint(response.statusCode);"
+    },
+    "add_addresses": {
+      "function": "createCustomerAddresses",
+      "code": "await client.adminCustomers.createCustomerAddresses(123, {\n  'customer': {\n    'addresses': [\n      {\n        'type': 'shipping',\n        'first_name': 'Jane',\n        'last_name': 'Doe',\n        'address_line_1': '1 Example Street',\n        'city': 'Sydney',\n        'post_code': '2000',\n      },\n    ],\n  },\n});"
+    },
+    "reset_password": {
+      "function": "resetCustomerPassword",
+      "code": "await client.adminCustomers.resetCustomerPassword(123, {\n  'customer': {'password': 'NewPassw0rd!'},\n});"
+    },
+    "change_password": {
+      "function": "changeCustomerPassword",
+      "code": "await client.adminCustomers.changeCustomerPassword(123, {\n  'customer': {\n    'email': 'jane@example.com',\n    'old_password': 'OldPassw0rd!',\n    'password': 'NewPassw0rd!',\n  },\n});"
+    },
+    "bulk_reset_passwords": {
+      "function": "bulkResetCustomerPasswords",
+      "code": "final response = await client.adminCustomers.bulkResetCustomerPasswords({\n  'customer_ids': [123, 124],\n});\nprint((response.map as Map)['total_queued']);"
+    },
+    "import_customers": {
+      "function": "importCustomers",
+      "code": "final csv = await File('customers.csv').readAsBytes();\nfinal response = await client.adminCustomers.importCustomers({\n  'file': ['customers.csv', csv, 'text/csv'],\n});\nprint((response.map as Map)['created']);"
+    },
+    "list_store_credit_adjustments": {
+      "function": "getCustomerStoreCreditAdjustments",
+      "code": "final response = await client.adminCustomers\n    .getCustomerStoreCreditAdjustments(123, queryParams: {'limit': 20});\nfinal adjustments =\n    (response.map as Map)['store_credit_adjustments'] as List;\nfor (final adjustment in adjustments) {\n  print('${(adjustment as Map)['action']} ${adjustment['amount']}');\n}"
+    },
+    "adjust_store_credit": {
+      "function": "createCustomerStoreCreditAdjustment",
+      "code": "final response = await client.adminCustomers\n    .createCustomerStoreCreditAdjustment(\n        123, {'action': 'add', 'amount': 20, 'note': 'Refund'});\nprint((response.map as Map)['store_credit']);"
+    }
+  }
+}
