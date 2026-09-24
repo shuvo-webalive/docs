@@ -1,0 +1,38 @@
+{
+  "sdk": "php",
+  "module": "search_settings",
+  "endpoints": {
+    "get_search_settings": {
+      "function": "getSearchSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::getSearchSettings($client);\n\n$settings = $response->map['search_settings'];\necho 'placeholder: ', $settings['searchable_content']['placeholder_text'], PHP_EOL;\nforeach ($settings['search_fields']['fields'] as $row) {\n    echo $row['priority'], ' ', $row['field'], PHP_EOL;\n}"
+    },
+    "patch_search_settings": {
+      "function": "patchSearchSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::patchSearchSettings($client, [\n    'search_settings' => [\n        'searchable_content' => ['placeholder_text' => 'Search products'],\n        'search_fields' => ['match_keywords_exactly' => true],\n    ],\n]);\n\n$settings = $response->map['search_settings'];\necho $settings['searchable_content']['placeholder_text'], PHP_EOL;\necho $settings['search_fields']['match_keywords_exactly'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "put_search_settings": {
+      "function": "putSearchSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$settings = SearchSettings::getSearchSettings($client)->map['search_settings'];\n$settings['searchable_content']['placeholder_text'] = 'Search products';\n\n$response = SearchSettings::putSearchSettings($client, ['search_settings' => $settings]);\n\necho $response->map['search_settings']['searchable_content']['placeholder_text'], PHP_EOL;"
+    },
+    "head_search_settings": {
+      "function": "headSearchSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::headSearchSettings($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_search_settings_section": {
+      "function": "getSearchSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::getSearchSettingsSection($client, 'search_fields');\n\nforeach ($response->map['search_fields']['fields'] as $row) {\n    echo $row['priority'], ' ', $row['field'], PHP_EOL;\n}"
+    },
+    "patch_search_settings_section": {
+      "function": "patchSearchSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::patchSearchSettingsSection($client, 'search_fields', [\n    'search_fields' => ['match_keywords_exactly' => true],\n]);\n\necho $response->map['search_fields']['match_keywords_exactly'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "put_search_settings_section": {
+      "function": "putSearchSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::putSearchSettingsSection($client, 'search_fields', [\n    'search_fields' => ['match_keywords_exactly' => true, 'match_full_sentences' => false, 'fields' => [\n        ['field' => 'title', 'priority' => 1], ['field' => 'tags', 'priority' => 2],\n        ['field' => 'category', 'priority' => 3], ['field' => 'description', 'priority' => 4],\n        ['field' => 'sku', 'priority' => 5], ['field' => 'brand', 'priority' => 6],\n    ]],\n]);\n\necho count($response->map['search_fields']['fields']), ' fields', PHP_EOL;"
+    },
+    "get_search_settings_reindex_status": {
+      "function": "getSearchSettingsReindexStatus",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::getSearchSettingsReindexStatus($client);\n\n$status = $response->map;\necho 'state: ', $status['state'], PHP_EOL;\necho 'finished: ', $status['finished_at'] ?? 'not yet', PHP_EOL;"
+    }
+  }
+}

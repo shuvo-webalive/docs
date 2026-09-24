@@ -198,6 +198,21 @@
                   "api-reference/product-listing/update-product-listing-settings",
                   "api-reference/product-listing/check-the-product-listing-settings"
                 ]
+              },
+              {
+                "group": "Search settings",
+                "expanded": false,
+                "pages": [
+                  "search-settings",
+                  "api-reference/search-settings/get-search-settings",
+                  "api-reference/search-settings/update-search-settings",
+                  "api-reference/search-settings/replace-search-settings",
+                  "api-reference/search-settings/check-search-settings",
+                  "api-reference/search-settings/get-a-search-settings-section",
+                  "api-reference/search-settings/update-a-search-settings-section",
+                  "api-reference/search-settings/replace-a-search-settings-section",
+                  "api-reference/search-settings/get-the-reindex-status"
+                ]
               }
             ]
           },

@@ -1,0 +1,38 @@
+{
+  "sdk": "dotnet",
+  "module": "search_settings",
+  "endpoints": {
+    "get_search_settings": {
+      "function": "GetSearchSettingsAsync",
+      "code": "var response = await client.SearchSettings.GetSearchSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchSettings = (IReadOnlyDictionary<string, object?>)body[\"search_settings\"]!;\nvar searchFields = (IReadOnlyDictionary<string, object?>)searchSettings[\"search_fields\"]!;\nforeach (var field in ((IReadOnlyList<object?>)searchFields[\"fields\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{field[\"priority\"]} {field[\"field\"]}\");"
+    },
+    "patch_search_settings": {
+      "function": "PatchSearchSettingsAsync",
+      "code": "var response = await client.SearchSettings.PatchSearchSettingsAsync(new Dictionary<string, object?>\n{\n    [\"search_settings\"] = new Dictionary<string, object?>\n    {\n        [\"searchable_content\"] = new Dictionary<string, object?> { [\"placeholder_text\"] = \"Search products\" },\n        [\"search_fields\"] = new Dictionary<string, object?> { [\"match_keywords_exactly\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchSettings = (IReadOnlyDictionary<string, object?>)body[\"search_settings\"]!;\nvar searchFields = (IReadOnlyDictionary<string, object?>)searchSettings[\"search_fields\"]!;\nConsole.WriteLine(searchFields[\"match_keywords_exactly\"]);"
+    },
+    "put_search_settings": {
+      "function": "PutSearchSettingsAsync",
+      "code": "var response = await client.SearchSettings.PutSearchSettingsAsync(new Dictionary<string, object?>\n{\n    [\"search_settings\"] = new Dictionary<string, object?>\n    {\n        [\"searchable_content\"] = new Dictionary<string, object?>\n        {\n            [\"placeholder_text\"] = \"Search products\",\n            [\"product\"] = new Dictionary<string, object?>\n            {\n                [\"enabled\"] = true, [\"display_heading\"] = \"Product\",\n                [\"excluded\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 4, [\"name\"] = \"Gift Card\" } },\n            },\n            [\"product_categories\"] = new Dictionary<string, object?>\n            {\n                [\"enabled\"] = true, [\"hide_parent_category\"] = true, [\"display_heading\"] = \"Product Categories\",\n                [\"excluded\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 16, [\"name\"] = \"Clearance\" } },\n            },\n            [\"blog\"] = new Dictionary<string, object?>\n            {\n                [\"enabled\"] = true, [\"display_heading\"] = \"Blog Posts\",\n                [\"excluded\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 13, [\"name\"] = \"Store News\" } },\n            },\n            [\"other_pages\"] = new Dictionary<string, object?>\n            {\n                [\"enabled\"] = true, [\"display_heading\"] = \"Other Pages\",\n                [\"excluded\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 4, [\"name\"] = \"Home - Copy\" } },\n            },\n        },\n        [\"search_fields\"] = new Dictionary<string, object?>\n        {\n            [\"match_keywords_exactly\"] = false, [\"match_full_sentences\"] = false,\n            [\"fields\"] = new List<object?>\n            {\n                new Dictionary<string, object?> { [\"field\"] = \"title\", [\"priority\"] = 1 },\n                new Dictionary<string, object?> { [\"field\"] = \"tags\", [\"priority\"] = 2 },\n                new Dictionary<string, object?> { [\"field\"] = \"category\", [\"priority\"] = 3 },\n                new Dictionary<string, object?> { [\"field\"] = \"description\", [\"priority\"] = 4 },\n                new Dictionary<string, object?> { [\"field\"] = \"sku\", [\"priority\"] = 5 },\n                new Dictionary<string, object?> { [\"field\"] = \"brand\", [\"priority\"] = 6 },\n            },\n        },\n        [\"synonyms\"] = new Dictionary<string, object?>\n        {\n            [\"groups\"] = new List<object?>\n            {\n                new Dictionary<string, object?> { [\"keywords\"] = new List<object?> { \"mobile\", \"phone\", \"telephone\" } },\n                new Dictionary<string, object?> { [\"keywords\"] = new List<object?> { \"shoe\", \"footwear\", \"sneaker\" } },\n            },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchSettings = (IReadOnlyDictionary<string, object?>)body[\"search_settings\"]!;\nvar searchableContent = (IReadOnlyDictionary<string, object?>)searchSettings[\"searchable_content\"]!;\nConsole.WriteLine(searchableContent[\"placeholder_text\"]);"
+    },
+    "head_search_settings": {
+      "function": "HeadSearchSettingsAsync",
+      "code": "var response = await client.SearchSettings.HeadSearchSettingsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_search_settings_section": {
+      "function": "GetSearchSettingsSectionAsync",
+      "code": "var response = await client.SearchSettings.GetSearchSettingsSectionAsync(\"search_fields\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchFields = (IReadOnlyDictionary<string, object?>)body[\"search_fields\"]!;\nConsole.WriteLine($\"{searchFields[\"match_keywords_exactly\"]} {searchFields[\"match_full_sentences\"]}\");"
+    },
+    "patch_search_settings_section": {
+      "function": "PatchSearchSettingsSectionAsync",
+      "code": "var response = await client.SearchSettings.PatchSearchSettingsSectionAsync(\"search_fields\", new Dictionary<string, object?>\n{\n    [\"search_fields\"] = new Dictionary<string, object?> { [\"match_keywords_exactly\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchFields = (IReadOnlyDictionary<string, object?>)body[\"search_fields\"]!;\nConsole.WriteLine(searchFields[\"match_keywords_exactly\"]);"
+    },
+    "put_search_settings_section": {
+      "function": "PutSearchSettingsSectionAsync",
+      "code": "var response = await client.SearchSettings.PutSearchSettingsSectionAsync(\"search_fields\", new Dictionary<string, object?>\n{\n    [\"search_fields\"] = new Dictionary<string, object?>\n    {\n        [\"match_keywords_exactly\"] = true, [\"match_full_sentences\"] = false,\n        [\"fields\"] = new List<object?>\n        {\n            new Dictionary<string, object?> { [\"field\"] = \"title\", [\"priority\"] = 1 },\n            new Dictionary<string, object?> { [\"field\"] = \"tags\", [\"priority\"] = 2 },\n            new Dictionary<string, object?> { [\"field\"] = \"category\", [\"priority\"] = 3 },\n            new Dictionary<string, object?> { [\"field\"] = \"description\", [\"priority\"] = 4 },\n            new Dictionary<string, object?> { [\"field\"] = \"sku\", [\"priority\"] = 5 },\n            new Dictionary<string, object?> { [\"field\"] = \"brand\", [\"priority\"] = 6 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar searchFields = (IReadOnlyDictionary<string, object?>)body[\"search_fields\"]!;\nConsole.WriteLine($\"{searchFields[\"match_keywords_exactly\"]} {searchFields[\"match_full_sentences\"]}\");"
+    },
+    "get_search_settings_reindex_status": {
+      "function": "GetSearchSettingsReindexStatusAsync",
+      "code": "var response = await client.SearchSettings.GetSearchSettingsReindexStatusAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"state\"]} {body[\"started_at\"]} {body[\"finished_at\"]}\");"
+    }
+  }
+}

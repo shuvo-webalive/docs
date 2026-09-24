@@ -1,0 +1,9 @@
+---
+title: "Get the reindex status"
+description: "Returns where the search reindex stands: its `state`, start and finish times, and any `error`."
+openapi: "GET /admin/settings/search_settings/reindex_status"
+---
+
+Returns where the Elasticsearch reindex stands. The four fields `state`, `started_at`, `finished_at` and `error` sit at the top level of the response, not wrapped in any key, and there is no `group_meta`. A change to `synonyms` triggers this reindex. The path is read-only: an `OPTIONS` request on it returns `Allow: GET, HEAD, OPTIONS`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

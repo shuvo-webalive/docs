@@ -1,0 +1,38 @@
+{
+  "sdk": "java",
+  "module": "search_settings",
+  "endpoints": {
+    "get_search_settings": {
+      "function": "getSearchSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().getSearchSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_settings\");\nMap<?, ?> searchableContent = (Map<?, ?>) settings.get(\"searchable_content\");\nMap<?, ?> searchFields = (Map<?, ?>) settings.get(\"search_fields\");\nSystem.out.println(searchableContent.get(\"placeholder_text\"));\nSystem.out.println(searchFields.get(\"match_keywords_exactly\") + \" \" + searchFields.get(\"match_full_sentences\"));\nfor (Object row : (List<?>) searchFields.get(\"fields\")) {\n    Map<?, ?> field = (Map<?, ?>) row;\n    System.out.println(field.get(\"priority\") + \" \" + field.get(\"field\"));\n}"
+    },
+    "patch_search_settings": {
+      "function": "patchSearchSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().patchSearchSettings(Map.of(\"search_settings\", Map.of(\n        \"searchable_content\", Map.of(\"placeholder_text\", \"Search products\"),\n        \"search_fields\", Map.of(\"match_keywords_exactly\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_settings\");\nSystem.out.println(((Map<?, ?>) settings.get(\"searchable_content\")).get(\"placeholder_text\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"search_fields\")).get(\"match_keywords_exactly\"));"
+    },
+    "put_search_settings": {
+      "function": "putSearchSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nMap<String, Object> searchableContent = Map.of(\"placeholder_text\", \"Search products\",\n        \"product\", Map.of(\"enabled\", true, \"display_heading\", \"Product\", \"excluded\", List.of(Map.of(\"id\", 4, \"name\", \"Gift Card\"))),\n        \"product_categories\", Map.of(\"enabled\", true, \"hide_parent_category\", true, \"display_heading\", \"Product Categories\",\n                \"excluded\", List.of(Map.of(\"id\", 16, \"name\", \"Clearance\"))),\n        \"blog\", Map.of(\"enabled\", true, \"display_heading\", \"Blog Posts\", \"excluded\", List.of(Map.of(\"id\", 13, \"name\", \"Store News\"))),\n        \"other_pages\", Map.of(\"enabled\", true, \"display_heading\", \"Other Pages\", \"excluded\", List.of(Map.of(\"id\", 4, \"name\", \"Home - Copy\"))));\nMap<String, Object> searchFields = Map.of(\"match_keywords_exactly\", false, \"match_full_sentences\", false, \"fields\", List.of(\n        Map.of(\"field\", \"title\", \"priority\", 1), Map.of(\"field\", \"tags\", \"priority\", 2), Map.of(\"field\", \"category\", \"priority\", 3),\n        Map.of(\"field\", \"description\", \"priority\", 4), Map.of(\"field\", \"sku\", \"priority\", 5), Map.of(\"field\", \"brand\", \"priority\", 6)));\nMap<String, Object> synonyms = Map.of(\"groups\", List.of(Map.of(\"keywords\", List.of(\"mobile\", \"phone\", \"telephone\")),\n        Map.of(\"keywords\", List.of(\"shoe\", \"footwear\", \"sneaker\"))));\nApiResponse response = client.searchSettings().putSearchSettings(Map.of(\"search_settings\",\n        Map.of(\"searchable_content\", searchableContent, \"search_fields\", searchFields, \"synonyms\", synonyms)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_settings\");\nSystem.out.println(((Map<?, ?>) settings.get(\"searchable_content\")).get(\"placeholder_text\"));"
+    },
+    "head_search_settings": {
+      "function": "headSearchSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.searchSettings().headSearchSettings();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_search_settings_section": {
+      "function": "getSearchSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().getSearchSettingsSection(\"search_fields\");\nMap<?, ?> searchFields = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_fields\");\nSystem.out.println(searchFields.get(\"match_keywords_exactly\") + \" \" + searchFields.get(\"match_full_sentences\"));\nfor (Object row : (List<?>) searchFields.get(\"fields\")) {\n    Map<?, ?> field = (Map<?, ?>) row;\n    System.out.println(field.get(\"priority\") + \" \" + field.get(\"field\"));\n}"
+    },
+    "patch_search_settings_section": {
+      "function": "patchSearchSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().patchSearchSettingsSection(\"search_fields\",\n        Map.of(\"search_fields\", Map.of(\"match_keywords_exactly\", true)));\nMap<?, ?> searchFields = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_fields\");\nSystem.out.println(searchFields.get(\"match_keywords_exactly\"));"
+    },
+    "put_search_settings_section": {
+      "function": "putSearchSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().putSearchSettingsSection(\"search_fields\", Map.of(\"search_fields\", Map.of(\n        \"match_keywords_exactly\", true, \"match_full_sentences\", false, \"fields\", List.of(\n                Map.of(\"field\", \"title\", \"priority\", 1), Map.of(\"field\", \"tags\", \"priority\", 2),\n                Map.of(\"field\", \"category\", \"priority\", 3), Map.of(\"field\", \"description\", \"priority\", 4),\n                Map.of(\"field\", \"sku\", \"priority\", 5), Map.of(\"field\", \"brand\", \"priority\", 6)))));\nMap<?, ?> searchFields = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"search_fields\");\nSystem.out.println(searchFields.get(\"match_keywords_exactly\") + \" \" + searchFields.get(\"match_full_sentences\"));\nSystem.out.println(((List<?>) searchFields.get(\"fields\")).size());"
+    },
+    "get_search_settings_reindex_status": {
+      "function": "getSearchSettingsReindexStatus",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().getSearchSettingsReindexStatus();\nMap<?, ?> status = (Map<?, ?>) response.getMap();\nSystem.out.println(status.get(\"state\") + \" \" + status.get(\"started_at\") + \" \" + status.get(\"finished_at\"));\nSystem.out.println(status.get(\"error\"));"
+    }
+  }
+}

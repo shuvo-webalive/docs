@@ -26,7 +26,8 @@
         "customer_portal",
         "ecommerce_settings",
         "price_display_settings",
-        "product_listing"
+        "product_listing",
+        "search_settings"
       ]
     },
     {

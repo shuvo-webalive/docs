@@ -1,0 +1,38 @@
+{
+  "sdk": "dart",
+  "module": "search_settings",
+  "endpoints": {
+    "get_search_settings": {
+      "function": "getSearchSettings",
+      "code": "final response = await client.searchSettings.getSearchSettings();\nfinal searchSettings = (response.map as Map)['search_settings'] as Map;\nprint(searchSettings['searchable_content']);\nprint(searchSettings['search_fields']);\nprint(searchSettings['synonyms']);"
+    },
+    "patch_search_settings": {
+      "function": "patchSearchSettings",
+      "code": "final response = await client.searchSettings.patchSearchSettings({\n  'search_settings': {\n    'searchable_content': {'placeholder_text': 'Search products'},\n    'search_fields': {'match_keywords_exactly': true},\n  },\n});\nfinal searchSettings = (response.map as Map)['search_settings'] as Map;\nprint(searchSettings['searchable_content']);\nprint(searchSettings['search_fields']);"
+    },
+    "put_search_settings": {
+      "function": "putSearchSettings",
+      "code": "final response = await client.searchSettings.putSearchSettings({\n  'search_settings': {\n    'searchable_content': {\n      'placeholder_text': 'Search products',\n      'product': {\n        'enabled': true,\n        'display_heading': 'Product',\n        'excluded': [\n          {'id': 4, 'name': 'Gift Card'},\n        ],\n      },\n      'product_categories': {\n        'enabled': true,\n        'hide_parent_category': true,\n        'display_heading': 'Product Categories',\n        'excluded': [\n          {'id': 16, 'name': 'Clearance'},\n        ],\n      },\n      'blog': {\n        'enabled': true,\n        'display_heading': 'Blog Posts',\n        'excluded': [\n          {'id': 13, 'name': 'Store News'},\n        ],\n      },\n      'other_pages': {\n        'enabled': true,\n        'display_heading': 'Other Pages',\n        'excluded': [\n          {'id': 4, 'name': 'Home - Copy'},\n        ],\n      },\n    },\n    'search_fields': {\n      'match_keywords_exactly': false,\n      'match_full_sentences': false,\n      'fields': [\n        {'field': 'title', 'priority': 1},\n        {'field': 'tags', 'priority': 2},\n        {'field': 'category', 'priority': 3},\n        {'field': 'description', 'priority': 4},\n        {'field': 'sku', 'priority': 5},\n        {'field': 'brand', 'priority': 6},\n      ],\n    },\n    'synonyms': {\n      'groups': [\n        {\n          'keywords': ['mobile', 'phone', 'telephone'],\n        },\n        {\n          'keywords': ['shoe', 'footwear', 'sneaker'],\n        },\n      ],\n    },\n  },\n});\nfinal searchSettings = (response.map as Map)['search_settings'] as Map;\nprint(searchSettings['searchable_content']);"
+    },
+    "head_search_settings": {
+      "function": "headSearchSettings",
+      "code": "final response = await client.searchSettings.headSearchSettings();\nprint(response.statusCode);"
+    },
+    "get_search_settings_section": {
+      "function": "getSearchSettingsSection",
+      "code": "final response =\n    await client.searchSettings.getSearchSettingsSection('search_fields');\nfinal searchFields = (response.map as Map)['search_fields'] as Map;\nprint(searchFields['match_keywords_exactly']);\nprint(searchFields['fields']);"
+    },
+    "patch_search_settings_section": {
+      "function": "patchSearchSettingsSection",
+      "code": "final response =\n    await client.searchSettings.patchSearchSettingsSection('search_fields', {\n  'search_fields': {'match_keywords_exactly': true},\n});\nfinal searchFields = (response.map as Map)['search_fields'] as Map;\nprint(searchFields['match_keywords_exactly']);"
+    },
+    "put_search_settings_section": {
+      "function": "putSearchSettingsSection",
+      "code": "final response =\n    await client.searchSettings.putSearchSettingsSection('search_fields', {\n  'search_fields': {\n    'match_keywords_exactly': true,\n    'match_full_sentences': false,\n    'fields': [\n      {'field': 'title', 'priority': 1},\n      {'field': 'tags', 'priority': 2},\n      {'field': 'category', 'priority': 3},\n      {'field': 'description', 'priority': 4},\n      {'field': 'sku', 'priority': 5},\n      {'field': 'brand', 'priority': 6},\n    ],\n  },\n});\nfinal searchFields = (response.map as Map)['search_fields'] as Map;\nprint(searchFields['fields']);"
+    },
+    "get_search_settings_reindex_status": {
+      "function": "getSearchSettingsReindexStatus",
+      "code": "final response = await client.searchSettings.getSearchSettingsReindexStatus();\nfinal status = response.map as Map;\nprint('${status['state']} ${status['finished_at']}');\nprint(status['error']);"
+    }
+  }
+}

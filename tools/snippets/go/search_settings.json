@@ -1,0 +1,38 @@
+{
+  "sdk": "go",
+  "module": "search_settings",
+  "endpoints": {
+    "get_search_settings": {
+      "function": "GetSearchSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().GetSearchSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"search_settings\"].(map[string]any)\nfmt.Println(settings[\"searchable_content\"].(map[string]any)[\"placeholder_text\"])\nfor _, row := range settings[\"search_fields\"].(map[string]any)[\"fields\"].([]any) {\n\tfield := row.(map[string]any)\n\tfmt.Println(field[\"field\"], field[\"priority\"])\n}"
+    },
+    "patch_search_settings": {
+      "function": "PatchSearchSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().PatchSearchSettings(ctx, map[string]any{\n\t\"search_settings\": map[string]any{\n\t\t\"searchable_content\": map[string]any{\"placeholder_text\": \"Search products\"},\n\t\t\"search_fields\":      map[string]any{\"match_keywords_exactly\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"search_settings\"].(map[string]any)\nfmt.Println(settings[\"searchable_content\"].(map[string]any)[\"placeholder_text\"], settings[\"search_fields\"].(map[string]any)[\"match_keywords_exactly\"])"
+    },
+    "put_search_settings": {
+      "function": "PutSearchSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().PutSearchSettings(ctx, map[string]any{\n\t\"search_settings\": map[string]any{\n\t\t\"searchable_content\": map[string]any{\n\t\t\t\"placeholder_text\": \"Search products\",\n\t\t\t\"product\":          map[string]any{\"enabled\": true, \"display_heading\": \"Product\", \"excluded\": []any{map[string]any{\"id\": 4, \"name\": \"Gift Card\"}}},\n\t\t\t\"product_categories\": map[string]any{\n\t\t\t\t\"enabled\": true, \"hide_parent_category\": true, \"display_heading\": \"Product Categories\",\n\t\t\t\t\"excluded\": []any{map[string]any{\"id\": 16, \"name\": \"Clearance\"}},\n\t\t\t},\n\t\t\t\"blog\":        map[string]any{\"enabled\": true, \"display_heading\": \"Blog Posts\", \"excluded\": []any{map[string]any{\"id\": 13, \"name\": \"Store News\"}}},\n\t\t\t\"other_pages\": map[string]any{\"enabled\": true, \"display_heading\": \"Other Pages\", \"excluded\": []any{map[string]any{\"id\": 4, \"name\": \"Home - Copy\"}}},\n\t\t},\n\t\t\"search_fields\": map[string]any{\n\t\t\t\"match_keywords_exactly\": false,\n\t\t\t\"match_full_sentences\":   false,\n\t\t\t\"fields\": []any{\n\t\t\t\tmap[string]any{\"field\": \"title\", \"priority\": 1},\n\t\t\t\tmap[string]any{\"field\": \"tags\", \"priority\": 2},\n\t\t\t\tmap[string]any{\"field\": \"category\", \"priority\": 3},\n\t\t\t\tmap[string]any{\"field\": \"description\", \"priority\": 4},\n\t\t\t\tmap[string]any{\"field\": \"sku\", \"priority\": 5},\n\t\t\t\tmap[string]any{\"field\": \"brand\", \"priority\": 6},\n\t\t\t},\n\t\t},\n\t\t\"synonyms\": map[string]any{\n\t\t\t\"groups\": []any{\n\t\t\t\tmap[string]any{\"keywords\": []any{\"mobile\", \"phone\", \"telephone\"}},\n\t\t\t\tmap[string]any{\"keywords\": []any{\"shoe\", \"footwear\", \"sneaker\"}},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"search_settings\"].(map[string]any)\nfmt.Println(settings[\"searchable_content\"].(map[string]any)[\"placeholder_text\"], len(settings[\"search_fields\"].(map[string]any)[\"fields\"].([]any)))"
+    },
+    "head_search_settings": {
+      "function": "HeadSearchSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().HeadSearchSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_search_settings_section": {
+      "function": "GetSearchSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().GetSearchSettingsSection(ctx, \"search_fields\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfields := resp.Map().(map[string]any)[\"search_fields\"].(map[string]any)\nfmt.Println(fields[\"match_keywords_exactly\"], fields[\"match_full_sentences\"])\nfor _, row := range fields[\"fields\"].([]any) {\n\tfield := row.(map[string]any)\n\tfmt.Println(field[\"field\"], field[\"priority\"])\n}"
+    },
+    "patch_search_settings_section": {
+      "function": "PatchSearchSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().PatchSearchSettingsSection(ctx, \"search_fields\", map[string]any{\n\t\"search_fields\": map[string]any{\"match_keywords_exactly\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"search_fields\"].(map[string]any)[\"match_keywords_exactly\"])"
+    },
+    "put_search_settings_section": {
+      "function": "PutSearchSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().PutSearchSettingsSection(ctx, \"search_fields\", map[string]any{\n\t\"search_fields\": map[string]any{\n\t\t\"match_keywords_exactly\": true,\n\t\t\"match_full_sentences\":   false,\n\t\t\"fields\": []any{\n\t\t\tmap[string]any{\"field\": \"title\", \"priority\": 1},\n\t\t\tmap[string]any{\"field\": \"tags\", \"priority\": 2},\n\t\t\tmap[string]any{\"field\": \"category\", \"priority\": 3},\n\t\t\tmap[string]any{\"field\": \"description\", \"priority\": 4},\n\t\t\tmap[string]any{\"field\": \"sku\", \"priority\": 5},\n\t\t\tmap[string]any{\"field\": \"brand\", \"priority\": 6},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfields := resp.Map().(map[string]any)[\"search_fields\"].(map[string]any)\nfmt.Println(fields[\"match_keywords_exactly\"], len(fields[\"fields\"].([]any)))"
+    },
+    "get_search_settings_reindex_status": {
+      "function": "GetSearchSettingsReindexStatus",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().GetSearchSettingsReindexStatus(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nstatus := resp.Map().(map[string]any)\nfmt.Println(status[\"state\"], status[\"started_at\"], status[\"finished_at\"], status[\"error\"])"
+    }
+  }
+}

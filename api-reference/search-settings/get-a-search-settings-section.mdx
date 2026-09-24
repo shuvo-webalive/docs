@@ -1,0 +1,9 @@
+---
+title: "Get a search settings section"
+description: "Returns one search settings section under its own key, such as `search_fields`."
+openapi: "GET /admin/settings/search_settings/{section}"
+---
+
+Returns one section, wrapped in the section's own name rather than in `search_settings`, and without `group_meta`. The section is the same as the one [Get search settings](/api-reference/search-settings/get-search-settings) returns for it. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
