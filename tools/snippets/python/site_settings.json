@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "get_site_settings",
+      "code": "response = client.site_settings.get_site_settings()\nsettings = response.map[\"site_settings\"]\nprint(settings[\"store_details\"][\"company_name\"], settings[\"brand_kit\"][\"palette_name\"])\nprint(settings[\"date_time\"][\"admin\"][\"time_zone\"])\n"
+    },
+    "patch_site_settings": {
+      "function": "patch_site_settings",
+      "code": "response = client.site_settings.patch_site_settings({\n    \"site_settings\": {\n        \"brand_kit\": {\"palette_name\": \"Autumn\"},\n        \"date_time\": {\"hide_time_zone\": False},\n    },\n})\nsettings = response.map[\"site_settings\"]\nprint(settings[\"brand_kit\"][\"palette_name\"])\nprint(settings[\"date_time\"][\"hide_time_zone\"])\n"
+    },
+    "head_site_settings": {
+      "function": "head_site_settings",
+      "code": "response = client.site_settings.head_site_settings()\nprint(response.status_code)\n"
+    },
+    "get_site_settings_section": {
+      "function": "get_site_settings_section",
+      "code": "response = client.site_settings.get_site_settings_section(\"brand_kit\")\nbrand_kit = response.map[\"brand_kit\"]\nprint(brand_kit[\"enabled\"], brand_kit[\"palette_name\"])\nprint(brand_kit[\"colors\"][\"primary\"], brand_kit[\"colors\"][\"accent\"])\n"
+    },
+    "patch_site_settings_section": {
+      "function": "patch_site_settings_section",
+      "code": "response = client.site_settings.patch_site_settings_section(\n    \"brand_kit\", {\"brand_kit\": {\"palette_name\": \"Autumn\"}}\n)\nprint(response.map[\"brand_kit\"][\"palette_name\"])\n"
+    }
+  }
+}

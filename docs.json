@@ -245,6 +245,18 @@
                   "api-reference/shipping-settings/update-shipping-settings",
                   "api-reference/shipping-settings/check-the-shipping-settings"
                 ]
+              },
+              {
+                "group": "Site settings",
+                "expanded": false,
+                "pages": [
+                  "site-settings",
+                  "api-reference/site-settings/get-site-settings",
+                  "api-reference/site-settings/update-site-settings",
+                  "api-reference/site-settings/get-site-settings-headers",
+                  "api-reference/site-settings/get-a-settings-section",
+                  "api-reference/site-settings/update-a-settings-section"
+                ]
               }
             ]
           },

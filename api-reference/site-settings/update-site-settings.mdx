@@ -1,0 +1,9 @@
+---
+title: "Update site settings"
+description: "Changes the fields you send in one or more sections and returns all settings."
+openapi: "PATCH /admin/settings/site_settings"
+---
+
+Send the fields to change grouped by section name, inside `site_settings` or bare at the top level. One body can name several sections, and only the fields you send change. Returns all the settings after the change, with `group_meta`, as [Get site settings](/api-reference/site-settings/get-site-settings) does. A key whose value is not an object, such as `{"site_settings": {"palette_name": "Autumn"}}`, is ignored and the call still returns `200`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

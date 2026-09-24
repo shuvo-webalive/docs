@@ -29,7 +29,8 @@
         "product_listing",
         "search_settings",
         "seo_configuration",
-        "shipping_settings"
+        "shipping_settings",
+        "site_settings"
       ]
     },
     {

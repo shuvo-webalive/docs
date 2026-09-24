@@ -1,0 +1,58 @@
+---
+title: "Site settings"
+sidebarTitle: "Overview"
+description: "Read and change your store's details, logo, favicon, brand colours, date and time formats, units of measure, CAPTCHA, and domain and email settings."
+---
+
+The Site settings API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/site_settings`.
+
+<Warning>
+  **On `/site_settings`, a key whose value is not an object is ignored, and the call still returns `200`.**
+  So a field sent outside its section, as in `{"site_settings": {"palette_name": "Autumn"}}` or
+  `{"palette_name": "Autumn"}`, returns `200` and changes nothing. Put each field under its section's
+  name: `{"site_settings": {"brand_kit": {"palette_name": "Autumn"}}}`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get site settings](/api-reference/site-settings/get-site-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/site_settings` | Returns all eight settings sections and a `group_meta` block describing each one. |
+| [Update site settings](/api-reference/site-settings/update-site-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/site_settings` | Changes the fields you send in one or more sections and returns all settings. |
+| [Get site settings headers](/api-reference/site-settings/get-site-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/site_settings` | Returns the headers for the site settings, with no body. |
+| [Get a settings section](/api-reference/site-settings/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/site_settings/{section}` | Returns one settings section under its own key, such as `brand_kit`. |
+| [Update a settings section](/api-reference/site-settings/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/site_settings/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into eight sections, and each has its own path.** The sections are
+  `administration`, `brand_kit`, `date_time`, `domain_settings`, `email_settings`, `favicon`,
+  `store_details` and `store_logo`. Read all eight through `/site_settings`, or one through
+  `/site_settings/{section}`, which returns exactly what `/site_settings` returns for that section.
+  An unknown section returns `404 not_found`. In `group_meta`, `favicon` and `store_logo` are
+  `kind: "media"`, `store_details` is `kind: "resource"`, the other five are `kind: "setting"`, and all
+  eight are `writable: true`.
+- **Each write path takes two body shapes.** On `/site_settings`, wrap the sections in `site_settings`,
+  or send them bare, as in `{"brand_kit": {"palette_name": "Autumn"}}`. On `/site_settings/{section}`,
+  wrap the fields in the section's own name, or send the fields bare. A section body wrapped in
+  `site_settings` is rejected with `400 invalid_request`. On `/site_settings/brand_kit` the message
+  is `no recognized fields for section 'brand_kit': [site_settings]`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields, blocks and
+  sections you leave out keep their stored values. One body sent to `/site_settings` can name several
+  sections: if the store rejects a value in one of them, none of the named sections is written.
+  `PUT`, `POST` and `DELETE` are rejected on both paths with `405 method_not_allowed` and an
+  `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **Secret fields read back as `***`.** `email_settings.smtp.authentication.password`,
+  `email_settings.sendgrid.api_key`, `domain_settings.security_code.code`,
+  `administration.captcha.private_key` and `administration.captcha.private_key_v3` are marked
+  `secret: true` in `field_metadata`, and each reads back as `***` once it is set. Send a new value
+  to change one, and leave it out to keep it. Send only the fields you change, not a copy of a read.
+- **Calls to this area are slow.** A read of `/site_settings` takes about fifteen seconds, and a write
+  takes thirteen to fifteen seconds, whichever section it names. Allow for that in your client's
+  timeout.

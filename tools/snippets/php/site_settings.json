@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "getSiteSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$response = SiteSettings::getSiteSettings($client);\n\n$settings = $response->map['site_settings'];\necho $settings['store_details']['company_name'], PHP_EOL;\necho 'palette: ', $settings['brand_kit']['palette_name'], PHP_EOL;\necho 'admin time zone: ', $settings['date_time']['admin']['time_zone'], PHP_EOL;"
+    },
+    "patch_site_settings": {
+      "function": "patchSiteSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$response = SiteSettings::patchSiteSettings($client, [\n    'site_settings' => [\n        'brand_kit' => ['palette_name' => 'Autumn'],\n        'date_time' => ['hide_time_zone' => false],\n    ],\n]);\n\n$settings = $response->map['site_settings'];\necho $settings['brand_kit']['palette_name'], PHP_EOL;\necho $settings['date_time']['hide_time_zone'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_site_settings": {
+      "function": "headSiteSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$response = SiteSettings::headSiteSettings($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_site_settings_section": {
+      "function": "getSiteSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$response = SiteSettings::getSiteSettingsSection($client, 'brand_kit');\n\n$brandKit = $response->map['brand_kit'];\necho 'palette: ', $brandKit['palette_name'], PHP_EOL;\nforeach ($brandKit['colors'] as $role => $color) {\n    echo $role, ' ', $color, PHP_EOL;\n}"
+    },
+    "patch_site_settings_section": {
+      "function": "patchSiteSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$response = SiteSettings::patchSiteSettingsSection($client, 'brand_kit', [\n    'brand_kit' => ['palette_name' => 'Autumn'],\n]);\n\necho $response->map['brand_kit']['palette_name'], PHP_EOL;"
+    }
+  }
+}

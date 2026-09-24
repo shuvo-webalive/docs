@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "GetSiteSettingsAsync",
+      "code": "var response = await client.SiteSettings.GetSiteSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar siteSettings = (IReadOnlyDictionary<string, object?>)body[\"site_settings\"]!;\nvar storeDetails = (IReadOnlyDictionary<string, object?>)siteSettings[\"store_details\"]!;\nConsole.WriteLine($\"{storeDetails[\"company_name\"]} {storeDetails[\"email\"]}\");"
+    },
+    "patch_site_settings": {
+      "function": "PatchSiteSettingsAsync",
+      "code": "var response = await client.SiteSettings.PatchSiteSettingsAsync(new Dictionary<string, object?>\n{\n    [\"site_settings\"] = new Dictionary<string, object?>\n    {\n        [\"brand_kit\"] = new Dictionary<string, object?> { [\"palette_name\"] = \"Autumn\" },\n        [\"date_time\"] = new Dictionary<string, object?> { [\"hide_time_zone\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar siteSettings = (IReadOnlyDictionary<string, object?>)body[\"site_settings\"]!;\nvar brandKit = (IReadOnlyDictionary<string, object?>)siteSettings[\"brand_kit\"]!;\nConsole.WriteLine(brandKit[\"palette_name\"]);"
+    },
+    "head_site_settings": {
+      "function": "HeadSiteSettingsAsync",
+      "code": "var response = await client.SiteSettings.HeadSiteSettingsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_site_settings_section": {
+      "function": "GetSiteSettingsSectionAsync",
+      "code": "var response = await client.SiteSettings.GetSiteSettingsSectionAsync(\"brand_kit\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar brandKit = (IReadOnlyDictionary<string, object?>)body[\"brand_kit\"]!;\nvar colors = (IReadOnlyDictionary<string, object?>)brandKit[\"colors\"]!;\nConsole.WriteLine($\"{brandKit[\"palette_name\"]} {colors[\"primary\"]}\");"
+    },
+    "patch_site_settings_section": {
+      "function": "PatchSiteSettingsSectionAsync",
+      "code": "var response = await client.SiteSettings.PatchSiteSettingsSectionAsync(\"brand_kit\", new Dictionary<string, object?>\n{\n    [\"brand_kit\"] = new Dictionary<string, object?> { [\"palette_name\"] = \"Autumn\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar brandKit = (IReadOnlyDictionary<string, object?>)body[\"brand_kit\"]!;\nConsole.WriteLine(brandKit[\"palette_name\"]);"
+    }
+  }
+}

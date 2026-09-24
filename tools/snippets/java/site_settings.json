@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "getSiteSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.siteSettings().getSiteSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"site_settings\");\nMap<?, ?> storeDetails = (Map<?, ?>) settings.get(\"store_details\");\nMap<?, ?> brandKit = (Map<?, ?>) settings.get(\"brand_kit\");\nMap<?, ?> dateTime = (Map<?, ?>) settings.get(\"date_time\");\nSystem.out.println(storeDetails.get(\"company_name\") + \" \" + storeDetails.get(\"email\"));\nSystem.out.println(brandKit.get(\"palette_name\") + \" \" + ((Map<?, ?>) brandKit.get(\"colors\")).get(\"primary\"));\nSystem.out.println(((Map<?, ?>) dateTime.get(\"admin\")).get(\"time_zone\"));"
+    },
+    "patch_site_settings": {
+      "function": "patchSiteSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.siteSettings().patchSiteSettings(Map.of(\"site_settings\", Map.of(\n        \"brand_kit\", Map.of(\"palette_name\", \"Autumn\"),\n        \"date_time\", Map.of(\"hide_time_zone\", false))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"site_settings\");\nSystem.out.println(((Map<?, ?>) settings.get(\"brand_kit\")).get(\"palette_name\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"date_time\")).get(\"hide_time_zone\"));"
+    },
+    "head_site_settings": {
+      "function": "headSiteSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.siteSettings().headSiteSettings();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_site_settings_section": {
+      "function": "getSiteSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.siteSettings().getSiteSettingsSection(\"brand_kit\");\nMap<?, ?> brandKit = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"brand_kit\");\nMap<?, ?> colors = (Map<?, ?>) brandKit.get(\"colors\");\nSystem.out.println(brandKit.get(\"enabled\") + \" \" + brandKit.get(\"palette_name\"));\nSystem.out.println(colors.get(\"primary\") + \" \" + colors.get(\"secondary\") + \" \" + colors.get(\"accent\"));"
+    },
+    "patch_site_settings_section": {
+      "function": "patchSiteSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.siteSettings().patchSiteSettingsSection(\"brand_kit\",\n        Map.of(\"brand_kit\", Map.of(\"palette_name\", \"Autumn\")));\nMap<?, ?> brandKit = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"brand_kit\");\nSystem.out.println(brandKit.get(\"palette_name\"));"
+    }
+  }
+}
