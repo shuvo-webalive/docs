@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "GetSiteSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SiteSettings().GetSiteSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"site_settings\"].(map[string]any)\ndetails := settings[\"store_details\"].(map[string]any)\nfmt.Println(details[\"company_name\"], details[\"email\"])\nfmt.Println(settings[\"brand_kit\"].(map[string]any)[\"palette_name\"], settings[\"date_time\"].(map[string]any)[\"admin\"].(map[string]any)[\"time_zone\"])"
+    },
+    "patch_site_settings": {
+      "function": "PatchSiteSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SiteSettings().PatchSiteSettings(ctx, map[string]any{\n\t\"site_settings\": map[string]any{\n\t\t\"brand_kit\": map[string]any{\"palette_name\": \"Autumn\"},\n\t\t\"date_time\": map[string]any{\"hide_time_zone\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"site_settings\"].(map[string]any)\nfmt.Println(settings[\"brand_kit\"].(map[string]any)[\"palette_name\"], settings[\"date_time\"].(map[string]any)[\"hide_time_zone\"])"
+    },
+    "head_site_settings": {
+      "function": "HeadSiteSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SiteSettings().HeadSiteSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_site_settings_section": {
+      "function": "GetSiteSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SiteSettings().GetSiteSettingsSection(ctx, \"brand_kit\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbrandKit := resp.Map().(map[string]any)[\"brand_kit\"].(map[string]any)\ncolors := brandKit[\"colors\"].(map[string]any)\nfmt.Println(brandKit[\"enabled\"], brandKit[\"palette_name\"], colors[\"primary\"], colors[\"accent\"])"
+    },
+    "patch_site_settings_section": {
+      "function": "PatchSiteSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SiteSettings().PatchSiteSettingsSection(ctx, \"brand_kit\", map[string]any{\n\t\"brand_kit\": map[string]any{\"palette_name\": \"Autumn\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"brand_kit\"].(map[string]any)[\"palette_name\"])"
+    }
+  }
+}

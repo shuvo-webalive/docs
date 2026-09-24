@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "getSiteSettings",
+      "code": "const response = await client.siteSettings.getSiteSettings();\nconst settings = response.map.site_settings;\nconsole.log(settings.store_details.company_name, settings.domain_settings.website_address);\nconsole.log(settings.brand_kit.palette_name, settings.date_time.admin.time_zone);\n"
+    },
+    "patch_site_settings": {
+      "function": "patchSiteSettings",
+      "code": "const response = await client.siteSettings.patchSiteSettings({\n    site_settings: {brand_kit: {palette_name: 'Autumn'}, date_time: {hide_time_zone: false}},\n});\nconst settings = response.map.site_settings;\nconsole.log(settings.brand_kit.palette_name, settings.date_time.hide_time_zone);\n"
+    },
+    "head_site_settings": {
+      "function": "headSiteSettings",
+      "code": "const response = await client.siteSettings.headSiteSettings();\nconsole.log(response.statusCode);\n"
+    },
+    "get_site_settings_section": {
+      "function": "getSiteSettingsSection",
+      "code": "const response = await client.siteSettings.getSiteSettingsSection('brand_kit');\nconst brandKit = response.map.brand_kit;\nconsole.log(brandKit.enabled, brandKit.palette_name);\nconsole.log(brandKit.colors.primary, brandKit.colors.secondary, brandKit.colors.accent);\n"
+    },
+    "patch_site_settings_section": {
+      "function": "patchSiteSettingsSection",
+      "code": "const response = await client.siteSettings.patchSiteSettingsSection('brand_kit', {\n    brand_kit: {palette_name: 'Autumn'},\n});\nconsole.log(response.map.brand_kit.palette_name);\n"
+    }
+  }
+}

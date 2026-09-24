@@ -67,6 +67,9 @@
       "name": "Shipping settings"
     },
     {
+      "name": "Site settings"
+    },
+    {
       "name": "Shipping methods"
     },
     {
@@ -14825,6 +14828,1144 @@
         ]
       }
     },
+    "/admin/settings/site_settings": {
+      "get": {
+        "tags": [
+          "Site settings"
+        ],
+        "summary": "Get site settings",
+        "operationId": "get_site_settings",
+        "description": "Returns every site setting under `site_settings`, with all eight sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field in all eight sections, keyed by section. Beside the sections, an `enums` key lists the `time_zone` and `locale` values. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All eight sections and `group_meta`. With `field_metadata=true`, a `field_metadata` key is added beside them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "site_settings": {
+                      "$ref": "#/components/schemas/SiteSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/SiteSettingsGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/SiteSettingsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section, with an `enums` key beside the eight."
+                    }
+                  }
+                },
+                "example": {
+                  "site_settings": {
+                    "administration": {
+                      "page_404": "page-404",
+                      "page_403": null,
+                      "default_country": {
+                        "id": 12,
+                        "code": "AU",
+                        "name": "Australia"
+                      },
+                      "default_state": {
+                        "id": 67,
+                        "code": "NSW",
+                        "name": "New South Wales"
+                      },
+                      "max_precision": 2,
+                      "unit_length": "centimeters",
+                      "unit_weight": "kilograms",
+                      "ecommerce_enabled": true,
+                      "captcha": {
+                        "enabled": false,
+                        "version": "V2",
+                        "type": "re_captcha",
+                        "use_own": false,
+                        "public_key": null,
+                        "private_key": null,
+                        "public_key_v3": null,
+                        "private_key_v3": null,
+                        "public_key_turnstile": null,
+                        "private_key_turnstile": null,
+                        "minimum_score": 0.5
+                      },
+                      "auto_suggest": {
+                        "addresses": {
+                          "enabled": false,
+                          "validate": true
+                        },
+                        "suburbs_cities": true
+                      }
+                    },
+                    "brand_kit": {
+                      "enabled": false,
+                      "palette_name": "My Palette",
+                      "colors": {
+                        "primary": "#1a1a1a",
+                        "secondary": "#4d4d4d",
+                        "accent": "#808080",
+                        "background": "#ffffff",
+                        "surface": "#f4f4f5",
+                        "text": "#111111"
+                      }
+                    },
+                    "date_time": {
+                      "admin": {
+                        "date_format": "d/M/yyyy",
+                        "time_format": "HH:mm:ss",
+                        "time_zone": "Australia/Adelaide",
+                        "first_day_of_week": "Monday"
+                      },
+                      "email": {
+                        "date_format": "d/M/yyyy",
+                        "time_format": "HH:mm:ss",
+                        "time_zone": "Australia/Adelaide",
+                        "separate": false
+                      },
+                      "user": {
+                        "date_format": "d/M/yyyy",
+                        "time_format": "HH:mm:ss",
+                        "time_zone": "Australia/Adelaide",
+                        "separate": false
+                      },
+                      "hide_time_zone": true
+                    },
+                    "domain_settings": {
+                      "website_address": "https://your-store.example.com/",
+                      "https_enabled": true,
+                      "maintenance": {
+                        "enabled": false,
+                        "message": ""
+                      },
+                      "security_code": {
+                        "enabled": false,
+                        "code": null,
+                        "number_only": false
+                      },
+                      "aliases": [],
+                      "ssl": {
+                        "key_file": {
+                          "uploaded": true,
+                          "file_name": "ssl-private-key.pem"
+                        },
+                        "certificate_file": {
+                          "uploaded": true,
+                          "file_name": "ssl-certificate.pem",
+                          "subject": null,
+                          "expires_at": null
+                        }
+                      }
+                    },
+                    "email_settings": {
+                      "service_provider": "SMTP",
+                      "available": [
+                        {
+                          "key": "SMTP",
+                          "label": "SMTP",
+                          "type": "direct"
+                        },
+                        {
+                          "key": "DEFAULT",
+                          "label": "Default",
+                          "type": "direct"
+                        },
+                        {
+                          "key": "GMAIL",
+                          "label": "Gmail",
+                          "type": "oauth",
+                          "connect_url": "/setting/authorizeGmail"
+                        },
+                        {
+                          "key": "OFFICE365",
+                          "label": "Office 365",
+                          "type": "oauth",
+                          "connect_url": "/setting/authorizeOffice365"
+                        },
+                        {
+                          "key": "SENDGRID",
+                          "label": "SendGrid",
+                          "type": "direct"
+                        }
+                      ],
+                      "smtp": {
+                        "sender_name": "Your Store",
+                        "sender_email": "orders@your-store.example.com",
+                        "host": "your-store.example.com",
+                        "port": 587,
+                        "encryption": "starttls",
+                        "authentication": {
+                          "enabled": true,
+                          "username": "mailer@your-store.example.com",
+                          "password": "***"
+                        }
+                      },
+                      "sendgrid": {
+                        "api_key": "***",
+                        "sender_name": "Your Store",
+                        "sender_email": "orders@your-store.example.com",
+                        "reply": {
+                          "different": false,
+                          "to_name": "Your Store",
+                          "to_email": "support@your-store.example.com"
+                        }
+                      },
+                      "gmail": {
+                        "connect_url": "/setting/authorizeGmail"
+                      },
+                      "office365": {
+                        "connect_url": "/setting/authorizeOffice365"
+                      },
+                      "default": {
+                        "domains": [
+                          {
+                            "domain": "your-store.example.com",
+                            "configure": false,
+                            "sender_name": "Your Store",
+                            "email_prefix": "orders",
+                            "reply": {
+                              "different": false,
+                              "to_name": "Your Store",
+                              "to_email": "support@your-store.example.com"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "favicon": {
+                      "enabled": false,
+                      "image": null
+                    },
+                    "store_details": {
+                      "company_name": "Your Store Pty Ltd",
+                      "email": "info@your-store.example.com",
+                      "address": {
+                        "address_line_1": "1 Example Street",
+                        "address_line_2": "Level 4",
+                        "city": "Sydney",
+                        "post_code": "2000",
+                        "state": {
+                          "id": 67,
+                          "code": "NSW",
+                          "name": "New South Wales"
+                        },
+                        "country": {
+                          "id": 12,
+                          "code": "AU",
+                          "name": "Australia"
+                        }
+                      },
+                      "contact": {
+                        "phone": "+61 2 9000 0000",
+                        "mobile": "+61 400 000 000",
+                        "fax": "+61 2 9000 0001"
+                      },
+                      "abn": "12 345 678 901"
+                    },
+                    "store_logo": {
+                      "image": {
+                        "file_name": "store-logo.png",
+                        "url": "https://your-store.example.com/store/store-logo.png",
+                        "content_type": "image/png",
+                        "size_bytes": 4096,
+                        "width": 200,
+                        "height": 60
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "administration": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/administration"
+                    },
+                    "brand_kit": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/brand_kit"
+                    },
+                    "date_time": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/date_time"
+                    },
+                    "domain_settings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/domain_settings"
+                    },
+                    "email_settings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/email_settings"
+                    },
+                    "favicon": {
+                      "kind": "media",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/favicon"
+                    },
+                    "store_details": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/store_details"
+                    },
+                    "store_logo": {
+                      "kind": "media",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/store_logo"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/site_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.site_settings.get_site_settings()\nsettings = response.map[\"site_settings\"]\nprint(settings[\"store_details\"][\"company_name\"], settings[\"brand_kit\"][\"palette_name\"])\nprint(settings[\"date_time\"][\"admin\"][\"time_zone\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.siteSettings.getSiteSettings();\nconst settings = response.map.site_settings;\nconsole.log(settings.store_details.company_name, settings.domain_settings.website_address);\nconsole.log(settings.brand_kit.palette_name, settings.date_time.admin.time_zone);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = SiteSettings::getSiteSettings($client);\n\n$settings = $response->map['site_settings'];\necho $settings['store_details']['company_name'], PHP_EOL;\necho 'palette: ', $settings['brand_kit']['palette_name'], PHP_EOL;\necho 'admin time zone: ', $settings['date_time']['admin']['time_zone'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.siteSettings().getSiteSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"site_settings\");\nMap<?, ?> storeDetails = (Map<?, ?>) settings.get(\"store_details\");\nMap<?, ?> brandKit = (Map<?, ?>) settings.get(\"brand_kit\");\nMap<?, ?> dateTime = (Map<?, ?>) settings.get(\"date_time\");\nSystem.out.println(storeDetails.get(\"company_name\") + \" \" + storeDetails.get(\"email\"));\nSystem.out.println(brandKit.get(\"palette_name\") + \" \" + ((Map<?, ?>) brandKit.get(\"colors\")).get(\"primary\"));\nSystem.out.println(((Map<?, ?>) dateTime.get(\"admin\")).get(\"time_zone\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SiteSettings.GetSiteSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar siteSettings = (IReadOnlyDictionary<string, object?>)body[\"site_settings\"]!;\nvar storeDetails = (IReadOnlyDictionary<string, object?>)siteSettings[\"store_details\"]!;\nConsole.WriteLine($\"{storeDetails[\"company_name\"]} {storeDetails[\"email\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.siteSettings.getSiteSettings();\nfinal siteSettings = (response.map as Map)['site_settings'] as Map;\nprint(siteSettings['store_details']);\nprint(siteSettings['brand_kit']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SiteSettings().GetSiteSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"site_settings\"].(map[string]any)\ndetails := settings[\"store_details\"].(map[string]any)\nfmt.Println(details[\"company_name\"], details[\"email\"])\nfmt.Println(settings[\"brand_kit\"].(map[string]any)[\"palette_name\"], settings[\"date_time\"].(map[string]any)[\"admin\"].(map[string]any)[\"time_zone\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Site settings"
+        ],
+        "summary": "Update site settings",
+        "operationId": "patch_site_settings",
+        "description": "Send the fields to change grouped by section name, inside `site_settings` or bare at the top level. One body can name several sections, and only the fields you send change. Returns all the settings after the change, with `group_meta`, as [Get site settings](/api-reference/site-settings/get-site-settings) does. A key whose value is not an object, such as `{\"site_settings\": {\"palette_name\": \"Autumn\"}}`, is ignored and the call still returns `200`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "site_settings": {
+                      "$ref": "#/components/schemas/SiteSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/SiteSettingsGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "site_settings": {
+                    "administration": {
+                      "page_404": "page-404",
+                      "page_403": null,
+                      "default_country": {
+                        "id": 12,
+                        "code": "AU",
+                        "name": "Australia"
+                      },
+                      "default_state": {
+                        "id": 67,
+                        "code": "NSW",
+                        "name": "New South Wales"
+                      },
+                      "max_precision": 2,
+                      "unit_length": "centimeters",
+                      "unit_weight": "kilograms",
+                      "ecommerce_enabled": true,
+                      "captcha": {
+                        "enabled": false,
+                        "version": "V2",
+                        "type": "re_captcha",
+                        "use_own": false,
+                        "public_key": null,
+                        "private_key": null,
+                        "public_key_v3": null,
+                        "private_key_v3": null,
+                        "public_key_turnstile": null,
+                        "private_key_turnstile": null,
+                        "minimum_score": 0.5
+                      },
+                      "auto_suggest": {
+                        "addresses": {
+                          "enabled": false,
+                          "validate": true
+                        },
+                        "suburbs_cities": true
+                      }
+                    },
+                    "brand_kit": {
+                      "enabled": false,
+                      "palette_name": "Autumn",
+                      "colors": {
+                        "primary": "#1a1a1a",
+                        "secondary": "#4d4d4d",
+                        "accent": "#808080",
+                        "background": "#ffffff",
+                        "surface": "#f4f4f5",
+                        "text": "#111111"
+                      }
+                    },
+                    "date_time": {
+                      "admin": {
+                        "date_format": "d/M/yyyy",
+                        "time_format": "HH:mm:ss",
+                        "time_zone": "Australia/Adelaide",
+                        "first_day_of_week": "Monday"
+                      },
+                      "email": {
+                        "date_format": "d/M/yyyy",
+                        "time_format": "HH:mm:ss",
+                        "time_zone": "Australia/Adelaide",
+                        "separate": false
+                      },
+                      "user": {
+                        "date_format": "d/M/yyyy",
+                        "time_format": "HH:mm:ss",
+                        "time_zone": "Australia/Adelaide",
+                        "separate": false
+                      },
+                      "hide_time_zone": false
+                    },
+                    "domain_settings": {
+                      "website_address": "https://your-store.example.com/",
+                      "https_enabled": true,
+                      "maintenance": {
+                        "enabled": false,
+                        "message": ""
+                      },
+                      "security_code": {
+                        "enabled": false,
+                        "code": null,
+                        "number_only": false
+                      },
+                      "aliases": [],
+                      "ssl": {
+                        "key_file": {
+                          "uploaded": true,
+                          "file_name": "ssl-private-key.pem"
+                        },
+                        "certificate_file": {
+                          "uploaded": true,
+                          "file_name": "ssl-certificate.pem",
+                          "subject": null,
+                          "expires_at": null
+                        }
+                      }
+                    },
+                    "email_settings": {
+                      "service_provider": "SMTP",
+                      "available": [
+                        {
+                          "key": "SMTP",
+                          "label": "SMTP",
+                          "type": "direct"
+                        },
+                        {
+                          "key": "DEFAULT",
+                          "label": "Default",
+                          "type": "direct"
+                        },
+                        {
+                          "key": "GMAIL",
+                          "label": "Gmail",
+                          "type": "oauth",
+                          "connect_url": "/setting/authorizeGmail"
+                        },
+                        {
+                          "key": "OFFICE365",
+                          "label": "Office 365",
+                          "type": "oauth",
+                          "connect_url": "/setting/authorizeOffice365"
+                        },
+                        {
+                          "key": "SENDGRID",
+                          "label": "SendGrid",
+                          "type": "direct"
+                        }
+                      ],
+                      "smtp": {
+                        "sender_name": "Your Store",
+                        "sender_email": "orders@your-store.example.com",
+                        "host": "your-store.example.com",
+                        "port": 587,
+                        "encryption": "starttls",
+                        "authentication": {
+                          "enabled": true,
+                          "username": "mailer@your-store.example.com",
+                          "password": "***"
+                        }
+                      },
+                      "sendgrid": {
+                        "api_key": "***",
+                        "sender_name": "Your Store",
+                        "sender_email": "orders@your-store.example.com",
+                        "reply": {
+                          "different": false,
+                          "to_name": "Your Store",
+                          "to_email": "support@your-store.example.com"
+                        }
+                      },
+                      "gmail": {
+                        "connect_url": "/setting/authorizeGmail"
+                      },
+                      "office365": {
+                        "connect_url": "/setting/authorizeOffice365"
+                      },
+                      "default": {
+                        "domains": [
+                          {
+                            "domain": "your-store.example.com",
+                            "configure": false,
+                            "sender_name": "Your Store",
+                            "email_prefix": "orders",
+                            "reply": {
+                              "different": false,
+                              "to_name": "Your Store",
+                              "to_email": "support@your-store.example.com"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "favicon": {
+                      "enabled": false,
+                      "image": null
+                    },
+                    "store_details": {
+                      "company_name": "Your Store Pty Ltd",
+                      "email": "info@your-store.example.com",
+                      "address": {
+                        "address_line_1": "1 Example Street",
+                        "address_line_2": "Level 4",
+                        "city": "Sydney",
+                        "post_code": "2000",
+                        "state": {
+                          "id": 67,
+                          "code": "NSW",
+                          "name": "New South Wales"
+                        },
+                        "country": {
+                          "id": 12,
+                          "code": "AU",
+                          "name": "Australia"
+                        }
+                      },
+                      "contact": {
+                        "phone": "+61 2 9000 0000",
+                        "mobile": "+61 400 000 000",
+                        "fax": "+61 2 9000 0001"
+                      },
+                      "abn": "12 345 678 901"
+                    },
+                    "store_logo": {
+                      "image": {
+                        "file_name": "store-logo.png",
+                        "url": "https://your-store.example.com/store/store-logo.png",
+                        "content_type": "image/png",
+                        "size_bytes": 4096,
+                        "width": 200,
+                        "height": 60
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "administration": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/administration"
+                    },
+                    "brand_kit": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/brand_kit"
+                    },
+                    "date_time": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/date_time"
+                    },
+                    "domain_settings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/domain_settings"
+                    },
+                    "email_settings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/email_settings"
+                    },
+                    "favicon": {
+                      "kind": "media",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/favicon"
+                    },
+                    "store_details": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/store_details"
+                    },
+                    "store_logo": {
+                      "kind": "media",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/site_settings/store_logo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body names a section that does not exist: the message is `<name>: is not a recognized site-settings section` and `details[0].code` is `unknown_section`. Or a named section has a value the store does not accept, with the reason in `details[].code`, as on [Update a settings section](/api-reference/site-settings/update-a-settings-section). When one value is rejected, none of the sections named in the body is written.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "not_a_section: is not a recognized site-settings section",
+                    "details": [
+                      {
+                        "field": "not_a_section",
+                        "code": "unknown_section",
+                        "message": "is not a recognized site-settings section"
+                      }
+                    ],
+                    "request_id": "e1b28569-e2a7-45ba-b4ab-366a340ba1ea"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/site_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"site_settings\": {\n      \"brand_kit\": {\n        \"palette_name\": \"Autumn\"\n      },\n      \"date_time\": {\n        \"hide_time_zone\": false\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.site_settings.patch_site_settings({\n    \"site_settings\": {\n        \"brand_kit\": {\"palette_name\": \"Autumn\"},\n        \"date_time\": {\"hide_time_zone\": False},\n    },\n})\nsettings = response.map[\"site_settings\"]\nprint(settings[\"brand_kit\"][\"palette_name\"])\nprint(settings[\"date_time\"][\"hide_time_zone\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.siteSettings.patchSiteSettings({\n    site_settings: {brand_kit: {palette_name: 'Autumn'}, date_time: {hide_time_zone: false}},\n});\nconst settings = response.map.site_settings;\nconsole.log(settings.brand_kit.palette_name, settings.date_time.hide_time_zone);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = SiteSettings::patchSiteSettings($client, [\n    'site_settings' => [\n        'brand_kit' => ['palette_name' => 'Autumn'],\n        'date_time' => ['hide_time_zone' => false],\n    ],\n]);\n\n$settings = $response->map['site_settings'];\necho $settings['brand_kit']['palette_name'], PHP_EOL;\necho $settings['date_time']['hide_time_zone'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.siteSettings().patchSiteSettings(Map.of(\"site_settings\", Map.of(\n        \"brand_kit\", Map.of(\"palette_name\", \"Autumn\"),\n        \"date_time\", Map.of(\"hide_time_zone\", false))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"site_settings\");\nSystem.out.println(((Map<?, ?>) settings.get(\"brand_kit\")).get(\"palette_name\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"date_time\")).get(\"hide_time_zone\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SiteSettings.PatchSiteSettingsAsync(new Dictionary<string, object?>\n{\n    [\"site_settings\"] = new Dictionary<string, object?>\n    {\n        [\"brand_kit\"] = new Dictionary<string, object?> { [\"palette_name\"] = \"Autumn\" },\n        [\"date_time\"] = new Dictionary<string, object?> { [\"hide_time_zone\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar siteSettings = (IReadOnlyDictionary<string, object?>)body[\"site_settings\"]!;\nvar brandKit = (IReadOnlyDictionary<string, object?>)siteSettings[\"brand_kit\"]!;\nConsole.WriteLine(brandKit[\"palette_name\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.siteSettings.patchSiteSettings({\n  'site_settings': {\n    'brand_kit': {'palette_name': 'Autumn'},\n    'date_time': {'hide_time_zone': false},\n  },\n});\nfinal siteSettings = (response.map as Map)['site_settings'] as Map;\nprint((siteSettings['brand_kit'] as Map)['palette_name']);\nprint((siteSettings['date_time'] as Map)['hide_time_zone']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SiteSettings().PatchSiteSettings(ctx, map[string]any{\n\t\"site_settings\": map[string]any{\n\t\t\"brand_kit\": map[string]any{\"palette_name\": \"Autumn\"},\n\t\t\"date_time\": map[string]any{\"hide_time_zone\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"site_settings\"].(map[string]any)\nfmt.Println(settings[\"brand_kit\"].(map[string]any)[\"palette_name\"], settings[\"date_time\"].(map[string]any)[\"hide_time_zone\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Group the fields by section, inside `site_settings` or bare at the top level, as in `{\"brand_kit\": {\"palette_name\": \"Autumn\"}}`. Put each field under its section's name: a key whose value is not an object is ignored.",
+                "properties": {
+                  "site_settings": {
+                    "$ref": "#/components/schemas/SiteSettings",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Site settings"
+        ],
+        "summary": "Get site settings headers",
+        "operationId": "head_site_settings",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0`, and there is no `ETag` header. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0`. No `ETag` and no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/site_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.site_settings.head_site_settings()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.siteSettings.headSiteSettings();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = SiteSettings::headSiteSettings($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.siteSettings().headSiteSettings();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SiteSettings.HeadSiteSettingsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.siteSettings.headSiteSettings();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SiteSettings().HeadSiteSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/site_settings/{section}": {
+      "get": {
+        "tags": [
+          "Site settings"
+        ],
+        "summary": "Get a settings section",
+        "operationId": "get_site_settings_section",
+        "description": "Returns one section, wrapped in the section's own name rather than in `site_settings`, and without `group_meta`. The section is exactly what [Get site settings](/api-reference/site-settings/get-site-settings) returns for it. Add `field_metadata=true` to also get a description of each of the section's fields. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read: `administration`, `brand_kit`, `date_time`, `domain_settings`, `email_settings`, `favicon`, `store_details` or `store_logo`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "administration",
+                "brand_kit",
+                "date_time",
+                "domain_settings",
+                "email_settings",
+                "favicon",
+                "store_details",
+                "store_logo"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields under the section's own name. For `date_time` it also has an `enums` key that lists the `time_zone` values. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "administration": {
+                      "$ref": "#/components/schemas/SiteSettingsAdministration"
+                    },
+                    "brand_kit": {
+                      "$ref": "#/components/schemas/SiteSettingsBrandKit"
+                    },
+                    "date_time": {
+                      "$ref": "#/components/schemas/SiteSettingsDateTime"
+                    },
+                    "domain_settings": {
+                      "$ref": "#/components/schemas/SiteSettingsDomainSettings"
+                    },
+                    "email_settings": {
+                      "$ref": "#/components/schemas/SiteSettingsEmailSettings"
+                    },
+                    "favicon": {
+                      "$ref": "#/components/schemas/SiteSettingsFavicon"
+                    },
+                    "store_details": {
+                      "$ref": "#/components/schemas/SiteSettingsStoreDetails"
+                    },
+                    "store_logo": {
+                      "$ref": "#/components/schemas/SiteSettingsStoreLogo"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/SiteSettingsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Holds the section's own name, and an `enums` key for `date_time`."
+                    }
+                  }
+                },
+                "example": {
+                  "brand_kit": {
+                    "enabled": false,
+                    "palette_name": "My Palette",
+                    "colors": {
+                      "primary": "#1a1a1a",
+                      "secondary": "#4d4d4d",
+                      "accent": "#808080",
+                      "background": "#ffffff",
+                      "surface": "#f4f4f5",
+                      "text": "#111111"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The message is `Unknown site-settings section: <name>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown site-settings section: bogus",
+                    "details": [],
+                    "request_id": "dc77e68b-d88c-4a3f-b978-31db5ca7b0e8"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/site_settings/brand_kit\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.site_settings.get_site_settings_section(\"brand_kit\")\nbrand_kit = response.map[\"brand_kit\"]\nprint(brand_kit[\"enabled\"], brand_kit[\"palette_name\"])\nprint(brand_kit[\"colors\"][\"primary\"], brand_kit[\"colors\"][\"accent\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.siteSettings.getSiteSettingsSection('brand_kit');\nconst brandKit = response.map.brand_kit;\nconsole.log(brandKit.enabled, brandKit.palette_name);\nconsole.log(brandKit.colors.primary, brandKit.colors.secondary, brandKit.colors.accent);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = SiteSettings::getSiteSettingsSection($client, 'brand_kit');\n\n$brandKit = $response->map['brand_kit'];\necho 'palette: ', $brandKit['palette_name'], PHP_EOL;\nforeach ($brandKit['colors'] as $role => $color) {\n    echo $role, ' ', $color, PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.siteSettings().getSiteSettingsSection(\"brand_kit\");\nMap<?, ?> brandKit = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"brand_kit\");\nMap<?, ?> colors = (Map<?, ?>) brandKit.get(\"colors\");\nSystem.out.println(brandKit.get(\"enabled\") + \" \" + brandKit.get(\"palette_name\"));\nSystem.out.println(colors.get(\"primary\") + \" \" + colors.get(\"secondary\") + \" \" + colors.get(\"accent\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SiteSettings.GetSiteSettingsSectionAsync(\"brand_kit\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar brandKit = (IReadOnlyDictionary<string, object?>)body[\"brand_kit\"]!;\nvar colors = (IReadOnlyDictionary<string, object?>)brandKit[\"colors\"]!;\nConsole.WriteLine($\"{brandKit[\"palette_name\"]} {colors[\"primary\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.siteSettings.getSiteSettingsSection('brand_kit');\nfinal brandKit = (response.map as Map)['brand_kit'] as Map;\nprint(brandKit['palette_name']);\nprint(brandKit['colors']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SiteSettings().GetSiteSettingsSection(ctx, \"brand_kit\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbrandKit := resp.Map().(map[string]any)[\"brand_kit\"].(map[string]any)\ncolors := brandKit[\"colors\"].(map[string]any)\nfmt.Println(brandKit[\"enabled\"], brandKit[\"palette_name\"], colors[\"primary\"], colors[\"accent\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Site settings"
+        ],
+        "summary": "Update a settings section",
+        "operationId": "patch_site_settings_section",
+        "description": "Send the fields to change wrapped in the section's own name, such as `brand_kit`, or bare with no wrapper. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change, under its own key and without `group_meta`. A body wrapped in `site_settings` is rejected with `400`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to write: `administration`, `brand_kit`, `date_time`, `domain_settings`, `email_settings`, `favicon`, `store_details` or `store_logo`. `favicon` takes only an `image_base64` upload or `remove`, and `store_logo` only an `image_base64` upload.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "administration",
+                "brand_kit",
+                "date_time",
+                "domain_settings",
+                "email_settings",
+                "favicon",
+                "store_details",
+                "store_logo"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "administration": {
+                      "$ref": "#/components/schemas/SiteSettingsAdministration"
+                    },
+                    "brand_kit": {
+                      "$ref": "#/components/schemas/SiteSettingsBrandKit"
+                    },
+                    "date_time": {
+                      "$ref": "#/components/schemas/SiteSettingsDateTime"
+                    },
+                    "domain_settings": {
+                      "$ref": "#/components/schemas/SiteSettingsDomainSettings"
+                    },
+                    "email_settings": {
+                      "$ref": "#/components/schemas/SiteSettingsEmailSettings"
+                    },
+                    "favicon": {
+                      "$ref": "#/components/schemas/SiteSettingsFavicon"
+                    },
+                    "store_details": {
+                      "$ref": "#/components/schemas/SiteSettingsStoreDetails"
+                    },
+                    "store_logo": {
+                      "$ref": "#/components/schemas/SiteSettingsStoreLogo"
+                    }
+                  }
+                },
+                "example": {
+                  "brand_kit": {
+                    "enabled": false,
+                    "palette_name": "Autumn",
+                    "colors": {
+                      "primary": "#1a1a1a",
+                      "secondary": "#4d4d4d",
+                      "accent": "#808080",
+                      "background": "#ffffff",
+                      "surface": "#f4f4f5",
+                      "text": "#111111"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Every field the body names is unknown or read-only: the message is `no recognized fields for section '<section>': [<names>]` and `details[].code` is `unknown_field`. A body wrapped in `site_settings` gets the same message, naming `[site_settings]`. An unknown or read-only field sent beside fields the store recognises is ignored instead. Or a value is not accepted, with the reason in `details[].code`: `out_of_range` (`max_precision` outside `1` to `9`), `invalid_enum` (a value outside the field's `allowed_values`), `invalid_boolean`, `invalid_color` (a `brand_kit.colors` value that is not a colour), `invalid_page` (a `page_404` that is not the URL of an existing page), `invalid_abn` (an `abn` that is not 11 digits), `invalid_email` or `invalid_reference` (a state `id` in `default_state` that matches no state). On `store_logo`, `remove: true` is rejected with `details[0].code` `unsupported`: the logo can only be replaced with a new `image_base64`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "hide_time_zone: must be a boolean (true/false or 0/1)",
+                    "details": [
+                      {
+                        "field": "hide_time_zone",
+                        "code": "invalid_boolean",
+                        "message": "must be a boolean (true/false or 0/1)",
+                        "value": "nope"
+                      }
+                    ],
+                    "request_id": "2f0a11e6-2d79-410f-8aea-91b35c7ac12c"
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The `Content-Type` header is not `application/json`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "unsupported_media_type",
+                    "message": "Content-Type must be application/json",
+                    "details": [
+                      {
+                        "field": "Content-Type",
+                        "code": "unsupported_media_type",
+                        "message": null,
+                        "value": "text/plain"
+                      }
+                    ],
+                    "request_id": "4cfb4443-9f34-4e2c-8072-e2b275efbac4"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/site_settings/brand_kit\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"brand_kit\": {\n      \"palette_name\": \"Autumn\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.site_settings.patch_site_settings_section(\n    \"brand_kit\", {\"brand_kit\": {\"palette_name\": \"Autumn\"}}\n)\nprint(response.map[\"brand_kit\"][\"palette_name\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.siteSettings.patchSiteSettingsSection('brand_kit', {\n    brand_kit: {palette_name: 'Autumn'},\n});\nconsole.log(response.map.brand_kit.palette_name);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\SiteSettings\\SiteSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = SiteSettings::patchSiteSettingsSection($client, 'brand_kit', [\n    'brand_kit' => ['palette_name' => 'Autumn'],\n]);\n\necho $response->map['brand_kit']['palette_name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.siteSettings().patchSiteSettingsSection(\"brand_kit\",\n        Map.of(\"brand_kit\", Map.of(\"palette_name\", \"Autumn\")));\nMap<?, ?> brandKit = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"brand_kit\");\nSystem.out.println(brandKit.get(\"palette_name\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SiteSettings.PatchSiteSettingsSectionAsync(\"brand_kit\", new Dictionary<string, object?>\n{\n    [\"brand_kit\"] = new Dictionary<string, object?> { [\"palette_name\"] = \"Autumn\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar brandKit = (IReadOnlyDictionary<string, object?>)body[\"brand_kit\"]!;\nConsole.WriteLine(brandKit[\"palette_name\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.siteSettings.patchSiteSettingsSection('brand_kit', {\n  'brand_kit': {'palette_name': 'Autumn'},\n});\nfinal brandKit = (response.map as Map)['brand_kit'] as Map;\nprint(brandKit['palette_name']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SiteSettings().PatchSiteSettingsSection(ctx, \"brand_kit\", map[string]any{\n\t\"brand_kit\": map[string]any{\"palette_name\": \"Autumn\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"brand_kit\"].(map[string]any)[\"palette_name\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the section named in the path, or send them bare. Send only the fields that change.",
+                "properties": {
+                  "administration": {
+                    "$ref": "#/components/schemas/SiteSettingsAdministration"
+                  },
+                  "brand_kit": {
+                    "$ref": "#/components/schemas/SiteSettingsBrandKit"
+                  },
+                  "date_time": {
+                    "$ref": "#/components/schemas/SiteSettingsDateTime"
+                  },
+                  "domain_settings": {
+                    "$ref": "#/components/schemas/SiteSettingsDomainSettings"
+                  },
+                  "email_settings": {
+                    "$ref": "#/components/schemas/SiteSettingsEmailSettings"
+                  },
+                  "favicon": {
+                    "$ref": "#/components/schemas/SiteSettingsFavicon"
+                  },
+                  "store_details": {
+                    "$ref": "#/components/schemas/SiteSettingsStoreDetails"
+                  },
+                  "store_logo": {
+                    "$ref": "#/components/schemas/SiteSettingsStoreLogo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -26963,6 +28104,1048 @@
               "request_id": {
                 "type": "string",
                 "description": "The request's id."
+              }
+            }
+          }
+        }
+      },
+      "SiteSettings": {
+        "type": "object",
+        "description": "All eight sections, as [Get site settings](/api-reference/site-settings/get-site-settings) returns them. In a write, send only the sections and fields that change.",
+        "properties": {
+          "administration": {
+            "$ref": "#/components/schemas/SiteSettingsAdministration"
+          },
+          "brand_kit": {
+            "$ref": "#/components/schemas/SiteSettingsBrandKit"
+          },
+          "date_time": {
+            "$ref": "#/components/schemas/SiteSettingsDateTime"
+          },
+          "domain_settings": {
+            "$ref": "#/components/schemas/SiteSettingsDomainSettings"
+          },
+          "email_settings": {
+            "$ref": "#/components/schemas/SiteSettingsEmailSettings"
+          },
+          "favicon": {
+            "$ref": "#/components/schemas/SiteSettingsFavicon"
+          },
+          "store_details": {
+            "$ref": "#/components/schemas/SiteSettingsStoreDetails"
+          },
+          "store_logo": {
+            "$ref": "#/components/schemas/SiteSettingsStoreLogo"
+          }
+        }
+      },
+      "SiteSettingsRegion": {
+        "type": "object",
+        "description": "A country or a state. A read returns this record; a write can send the country's or state's `id`, `code` or `name` alone instead.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's or state's `id`."
+          },
+          "code": {
+            "type": "string",
+            "description": "The country's or state's code, such as `AU` or `NSW`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The country's or state's name, such as `Australia` or `New South Wales`."
+          }
+        }
+      },
+      "SiteSettingsAdministration": {
+        "type": "object",
+        "description": "Units of measure, price precision, the default country and state, error pages, CAPTCHA and address suggestions.",
+        "properties": {
+          "page_404": {
+            "type": "string",
+            "description": "The URL of the page shown when a page is not found. It must be the URL of an existing page, or empty for the system-defined page: anything else is rejected with `400 invalid_page`."
+          },
+          "page_403": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the page shown when access is forbidden, or `null`."
+          },
+          "default_country": {
+            "$ref": "#/components/schemas/SiteSettingsRegion",
+            "description": "The default country for new records. A write can send the country's `id`, `code` or `name` alone, or the whole record."
+          },
+          "default_state": {
+            "$ref": "#/components/schemas/SiteSettingsRegion",
+            "description": "The default state for new records. A write can send the state's `id`, `code` or `name` alone, or the whole record. A state `id` that matches no state is rejected with `400 invalid_reference`."
+          },
+          "max_precision": {
+            "type": "integer",
+            "description": "The number of decimal places for prices and amounts. `0` or `10` is rejected with `400 out_of_range`.",
+            "minimum": 1,
+            "maximum": 9
+          },
+          "unit_length": {
+            "type": "string",
+            "description": "The unit of length. A value outside this list is rejected with `400 invalid_enum`.",
+            "enum": [
+              "inches",
+              "centimeters",
+              "kilometers",
+              "miles",
+              "millimeters",
+              "feet",
+              "meters"
+            ]
+          },
+          "unit_weight": {
+            "type": "string",
+            "description": "The unit of weight.",
+            "enum": [
+              "pounds",
+              "ounces",
+              "grams",
+              "tonnes",
+              "kilograms"
+            ]
+          },
+          "ecommerce_enabled": {
+            "type": "boolean",
+            "description": "Turn the storefront's commerce features on or off."
+          },
+          "captcha": {
+            "$ref": "#/components/schemas/SiteSettingsCaptcha"
+          },
+          "auto_suggest": {
+            "$ref": "#/components/schemas/SiteSettingsAutoSuggest"
+          }
+        }
+      },
+      "SiteSettingsCaptcha": {
+        "type": "object",
+        "description": "CAPTCHA protection for the store's forms.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Protect forms with a CAPTCHA."
+          },
+          "version": {
+            "type": "string",
+            "description": "The reCAPTCHA version.",
+            "enum": [
+              "V2",
+              "V3"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "The CAPTCHA provider, such as `re_captcha`."
+          },
+          "use_own": {
+            "type": "boolean"
+          },
+          "public_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The CAPTCHA site key, or `null`."
+          },
+          "private_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The CAPTCHA secret key, or `null`. Reads back as `***` once set. Send a new value to change it, or leave it out to keep it."
+          },
+          "public_key_v3": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The reCAPTCHA v3 site key, or `null`."
+          },
+          "private_key_v3": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The reCAPTCHA v3 secret key, or `null`. Reads back as `***` once set. Send a new value to change it, or leave it out to keep it."
+          },
+          "public_key_turnstile": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Returned on reads, as text or `null`. `field_metadata` has no entry for it."
+          },
+          "private_key_turnstile": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Returned on reads, as text or `null`. `field_metadata` has no entry for it."
+          },
+          "minimum_score": {
+            "type": "number",
+            "description": "The reCAPTCHA v3 minimum passing score, such as `0.5`. A read returns a number, although `field_metadata` types it `string`."
+          }
+        }
+      },
+      "SiteSettingsAutoSuggest": {
+        "type": "object",
+        "description": "Address and suburb suggestions as the user types.",
+        "properties": {
+          "addresses": {
+            "$ref": "#/components/schemas/SiteSettingsAutoSuggestAddresses"
+          },
+          "suburbs_cities": {
+            "type": "boolean",
+            "description": "Suggest suburbs and cities as the user types."
+          }
+        }
+      },
+      "SiteSettingsAutoSuggestAddresses": {
+        "type": "object",
+        "description": "Address suggestions.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Suggest addresses as the user types."
+          },
+          "validate": {
+            "type": "boolean",
+            "description": "Validate the address the user chooses."
+          }
+        }
+      },
+      "SiteSettingsBrandKit": {
+        "type": "object",
+        "description": "The site-wide colour palette.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn the site-wide brand palette on or off."
+          },
+          "palette_name": {
+            "type": "string",
+            "description": "The name of the default colour palette."
+          },
+          "colors": {
+            "$ref": "#/components/schemas/SiteSettingsBrandColors"
+          }
+        }
+      },
+      "SiteSettingsBrandColors": {
+        "type": "object",
+        "description": "Six colour roles, each a hex colour such as `#1a1a1a`. A value that is not a colour is rejected with `400 invalid_color`.",
+        "properties": {
+          "primary": {
+            "type": "string",
+            "description": "The primary brand colour."
+          },
+          "secondary": {
+            "type": "string",
+            "description": "The secondary brand colour."
+          },
+          "accent": {
+            "type": "string",
+            "description": "The accent colour."
+          },
+          "background": {
+            "type": "string",
+            "description": "The background colour."
+          },
+          "surface": {
+            "type": "string",
+            "description": "The surface colour."
+          },
+          "text": {
+            "type": "string",
+            "description": "The text colour."
+          }
+        }
+      },
+      "SiteSettingsDateTime": {
+        "type": "object",
+        "description": "Date and time formats and time zones for the admin area, emails and the storefront.",
+        "properties": {
+          "admin": {
+            "$ref": "#/components/schemas/SiteSettingsAdminDateTime"
+          },
+          "email": {
+            "$ref": "#/components/schemas/SiteSettingsSeparableDateTime",
+            "description": "The date and time settings used in emails."
+          },
+          "user": {
+            "$ref": "#/components/schemas/SiteSettingsSeparableDateTime",
+            "description": "The date and time settings for the storefront."
+          },
+          "hide_time_zone": {
+            "type": "boolean",
+            "description": "Hide the time zone label on the storefront."
+          },
+          "separate_time_zone_for_email": {
+            "type": "boolean",
+            "description": "Use a separate time zone for emails. `field_metadata` lists it as writable, but a read does not return it.",
+            "writeOnly": true
+          },
+          "separate_time_zone_for_user": {
+            "type": "boolean",
+            "description": "Use a separate time zone for the storefront. `field_metadata` lists it as writable, but a read does not return it.",
+            "writeOnly": true
+          }
+        }
+      },
+      "SiteSettingsAdminDateTime": {
+        "type": "object",
+        "description": "The admin area's date and time settings.",
+        "properties": {
+          "date_format": {
+            "type": "string",
+            "description": "The date pattern, such as `M/d/yyyy`."
+          },
+          "time_format": {
+            "type": "string",
+            "description": "The time pattern, such as `HH:mm:ss`."
+          },
+          "time_zone": {
+            "type": "string",
+            "description": "The time zone, such as `Australia/Adelaide`. `field_metadata` lists the accepted values in `enums.time_zone.values`."
+          },
+          "first_day_of_week": {
+            "type": "string",
+            "description": "The first day shown in calendars.",
+            "enum": [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ]
+          }
+        }
+      },
+      "SiteSettingsSeparableDateTime": {
+        "type": "object",
+        "description": "The date and time settings for emails or for the storefront.",
+        "properties": {
+          "separate": {
+            "type": "boolean",
+            "description": "Returned on reads. `field_metadata` has no entry for it. To give emails or the storefront their own time zone, send `separate_time_zone_for_email` or `separate_time_zone_for_user` on `date_time`."
+          },
+          "date_format": {
+            "type": "string",
+            "description": "The date pattern, such as `M/d/yyyy`."
+          },
+          "time_format": {
+            "type": "string",
+            "description": "The time pattern, such as `HH:mm:ss`."
+          },
+          "time_zone": {
+            "type": "string",
+            "description": "The time zone, such as `Australia/Adelaide`. `field_metadata` lists the accepted values in `enums.time_zone.values`."
+          }
+        }
+      },
+      "SiteSettingsDomainSettings": {
+        "type": "object",
+        "description": "The store's web address, HTTPS, maintenance mode, site lock, domain aliases and SSL files.",
+        "properties": {
+          "website_address": {
+            "type": "string",
+            "description": "The public base URL of the store, such as `https://your-store.example.com/`."
+          },
+          "https_enabled": {
+            "type": "boolean",
+            "description": "Serve the storefront over HTTPS."
+          },
+          "maintenance": {
+            "$ref": "#/components/schemas/SiteSettingsMaintenance"
+          },
+          "security_code": {
+            "$ref": "#/components/schemas/SiteSettingsSecurityCode"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true,
+            "description": "The store's domain aliases. Read-only here: manage them through `/api/v4/admin/aliases`. A write that names only `aliases` is rejected with `400 unknown_field`."
+          },
+          "ssl": {
+            "$ref": "#/components/schemas/SiteSettingsSsl"
+          }
+        }
+      },
+      "SiteSettingsMaintenance": {
+        "type": "object",
+        "description": "Whether the storefront is closed for maintenance, and what it shows.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Put the storefront into maintenance mode."
+          },
+          "message": {
+            "type": "string",
+            "description": "The message shown during maintenance."
+          }
+        }
+      },
+      "SiteSettingsSecurityCode": {
+        "type": "object",
+        "description": "The site lock: a code visitors must enter to view the site.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Require a code to view the site."
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The code visitors must enter, or `null`. Reads back as `***` once set. Send a new value to change it, or leave it out to keep it."
+          },
+          "number_only": {
+            "type": "boolean",
+            "description": "Allow only digits in the code."
+          }
+        }
+      },
+      "SiteSettingsSsl": {
+        "type": "object",
+        "description": "The SSL private key and certificate. A read returns `key_file` and `certificate_file`; a write sends `key_file_base64` and `certificate_file_base64` instead.",
+        "properties": {
+          "key_file": {
+            "$ref": "#/components/schemas/SiteSettingsSslKeyFile",
+            "readOnly": true
+          },
+          "certificate_file": {
+            "$ref": "#/components/schemas/SiteSettingsSslCertificateFile",
+            "readOnly": true
+          },
+          "key_file_base64": {
+            "type": "string",
+            "description": "The private key as a base64 PEM. The store checks it and never returns it. Send it with `certificate_file_base64`.",
+            "writeOnly": true
+          },
+          "certificate_file_base64": {
+            "type": "string",
+            "description": "The certificate as a base64 PEM. The store checks it and never returns it. Send it with `key_file_base64`.",
+            "writeOnly": true
+          }
+        }
+      },
+      "SiteSettingsSslKeyFile": {
+        "type": "object",
+        "description": "What is stored for the private key. The key itself is never returned.",
+        "properties": {
+          "uploaded": {
+            "type": "boolean",
+            "description": "Whether a key file is stored."
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The stored key file's name."
+          }
+        }
+      },
+      "SiteSettingsSslCertificateFile": {
+        "type": "object",
+        "description": "What is stored for the certificate.",
+        "properties": {
+          "uploaded": {
+            "type": "boolean",
+            "description": "Whether a certificate file is stored."
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The stored certificate file's name."
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The certificate's subject, or `null`."
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "When the certificate expires, or `null`."
+          }
+        }
+      },
+      "SiteSettingsEmailSettings": {
+        "type": "object",
+        "description": "The provider the store sends email through, and each provider's settings.",
+        "properties": {
+          "service_provider": {
+            "type": "string",
+            "description": "The provider the store sends email through.",
+            "enum": [
+              "SMTP",
+              "DEFAULT",
+              "GMAIL",
+              "OFFICE365",
+              "SENDGRID"
+            ]
+          },
+          "available": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteSettingsEmailProvider"
+            },
+            "readOnly": true,
+            "description": "The providers you can choose. Read-only."
+          },
+          "smtp": {
+            "$ref": "#/components/schemas/SiteSettingsSmtp"
+          },
+          "sendgrid": {
+            "$ref": "#/components/schemas/SiteSettingsSendGrid"
+          },
+          "gmail": {
+            "$ref": "#/components/schemas/SiteSettingsOauthProvider",
+            "description": "Gmail. Connect it through its interactive flow, not through this API."
+          },
+          "office365": {
+            "$ref": "#/components/schemas/SiteSettingsOauthProvider",
+            "description": "Office 365. Connect it through its interactive flow, not through this API."
+          },
+          "default": {
+            "$ref": "#/components/schemas/SiteSettingsDefaultEmail"
+          }
+        }
+      },
+      "SiteSettingsEmailProvider": {
+        "type": "object",
+        "description": "A provider the store can send email through.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The provider's key: the value `service_provider` takes.",
+            "enum": [
+              "SMTP",
+              "DEFAULT",
+              "GMAIL",
+              "OFFICE365",
+              "SENDGRID"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "The provider's display name."
+          },
+          "type": {
+            "type": "string",
+            "description": "`direct`, or `oauth` for a provider you connect through `connect_url`.",
+            "enum": [
+              "direct",
+              "oauth"
+            ]
+          },
+          "connect_url": {
+            "type": "string",
+            "description": "The path that starts the provider's connect flow. Only on `oauth` providers."
+          }
+        }
+      },
+      "SiteSettingsOauthProvider": {
+        "type": "object",
+        "properties": {
+          "connect_url": {
+            "type": "string",
+            "description": "The path that starts the connect flow, such as `/setting/authorizeGmail`. Read-only.",
+            "readOnly": true
+          }
+        }
+      },
+      "SiteSettingsSmtp": {
+        "type": "object",
+        "description": "The SMTP server the store sends through, and the sender it uses.",
+        "properties": {
+          "sender_name": {
+            "type": "string",
+            "description": "The sender's display name."
+          },
+          "sender_email": {
+            "type": "string",
+            "description": "The from-address.",
+            "format": "email"
+          },
+          "host": {
+            "type": "string",
+            "description": "The SMTP server's host."
+          },
+          "port": {
+            "type": "integer",
+            "description": "The SMTP server's port.",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "encryption": {
+            "type": "string",
+            "description": "The connection encryption.",
+            "enum": [
+              "no",
+              "ssl",
+              "starttls"
+            ]
+          },
+          "authentication": {
+            "$ref": "#/components/schemas/SiteSettingsSmtpAuthentication"
+          }
+        }
+      },
+      "SiteSettingsSmtpAuthentication": {
+        "type": "object",
+        "description": "How the store signs in to the SMTP server.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Use SMTP authentication."
+          },
+          "username": {
+            "type": "string",
+            "description": "The SMTP user name."
+          },
+          "password": {
+            "type": "string",
+            "description": "The SMTP password. Reads back as `***` once set. Send a new value to change it, or leave it out to keep it."
+          }
+        }
+      },
+      "SiteSettingsSendGrid": {
+        "type": "object",
+        "description": "The SendGrid account the store sends through, and the sender it uses.",
+        "properties": {
+          "api_key": {
+            "type": "string",
+            "description": "The SendGrid API key. Reads back as `***` once set. Send a new value to change it, or leave it out to keep it."
+          },
+          "sender_name": {
+            "type": "string",
+            "description": "The sender's display name."
+          },
+          "sender_email": {
+            "type": "string",
+            "description": "The from-address.",
+            "format": "email"
+          },
+          "reply": {
+            "$ref": "#/components/schemas/SiteSettingsReplyTo"
+          }
+        }
+      },
+      "SiteSettingsReplyTo": {
+        "type": "object",
+        "description": "Where replies go.",
+        "properties": {
+          "different": {
+            "type": "boolean",
+            "description": "Send replies to a different address from the sender's."
+          },
+          "to_name": {
+            "type": "string",
+            "description": "The reply-to display name."
+          },
+          "to_email": {
+            "type": "string",
+            "description": "The reply-to address.",
+            "format": "email"
+          }
+        }
+      },
+      "SiteSettingsDefaultEmail": {
+        "type": "object",
+        "description": "The platform's own sending domains.",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteSettingsDefaultDomain"
+            }
+          }
+        }
+      },
+      "SiteSettingsDefaultDomain": {
+        "type": "object",
+        "description": "One of the platform's sending domains, and the sender used on it.",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "The sending domain. Read-only.",
+            "readOnly": true
+          },
+          "configure": {
+            "type": "boolean",
+            "description": "Use custom sender details for this domain."
+          },
+          "sender_name": {
+            "type": "string",
+            "description": "The sender's display name on this domain."
+          },
+          "email_prefix": {
+            "type": "string",
+            "description": "The part of the sender address before `@` and the domain."
+          },
+          "reply": {
+            "$ref": "#/components/schemas/SiteSettingsReplyTo"
+          }
+        }
+      },
+      "SiteSettingsFavicon": {
+        "type": "object",
+        "description": "The favicon. A read returns `enabled` and `image`; a write sends `image_base64` or `remove`.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "`true` when a favicon is set. Read-only: the store sets it from whether an image is stored.",
+            "readOnly": true
+          },
+          "image": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteSettingsMediaImage"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "readOnly": true,
+            "description": "The stored favicon, or `null` when none is set."
+          },
+          "image_base64": {
+            "type": "string",
+            "description": "A new favicon as a data URI, such as `data:image/png;base64,...`: a transparent PNG or JPEG of up to 10 KB and at most 256 x 256 pixels.",
+            "writeOnly": true
+          },
+          "remove": {
+            "type": "boolean",
+            "description": "Send `true` to remove the current favicon.",
+            "writeOnly": true
+          }
+        }
+      },
+      "SiteSettingsStoreLogo": {
+        "type": "object",
+        "description": "The store logo. A read returns `image`; a write sends `image_base64`.",
+        "properties": {
+          "image": {
+            "$ref": "#/components/schemas/SiteSettingsMediaImage",
+            "readOnly": true,
+            "description": "The stored logo."
+          },
+          "image_base64": {
+            "type": "string",
+            "description": "A new logo as a data URI, such as `data:image/png;base64,...`: a PNG or JPEG of up to 200 KB.",
+            "writeOnly": true
+          },
+          "remove": {
+            "type": "boolean",
+            "description": "Listed in `field_metadata`, but `remove: true` is rejected with `400`: the logo can only be replaced with a new `image_base64`.",
+            "writeOnly": true
+          }
+        }
+      },
+      "SiteSettingsMediaImage": {
+        "type": "object",
+        "description": "A stored image and where it is served from.",
+        "properties": {
+          "file_name": {
+            "type": "string",
+            "description": "The stored file's name."
+          },
+          "url": {
+            "type": "string",
+            "description": "The public URL of the image."
+          },
+          "content_type": {
+            "type": "string",
+            "description": "The image's media type, such as `image/png`."
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The file size in bytes, or `null`."
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The width in pixels, or `null`."
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The height in pixels, or `null`."
+          }
+        }
+      },
+      "SiteSettingsStoreDetails": {
+        "type": "object",
+        "description": "The business's name, contact email, address, phone numbers and ABN. `group_meta` marks it `kind: \"resource\"`, and every field is writable.",
+        "properties": {
+          "company_name": {
+            "type": "string",
+            "description": "The registered store or business name. Marked `required` in `field_metadata`; a write that leaves it out keeps the stored value."
+          },
+          "email": {
+            "type": "string",
+            "description": "The store's main contact email. A value that is not an email address is rejected with `400 invalid_email`. Marked `required` in `field_metadata`.",
+            "format": "email"
+          },
+          "address": {
+            "$ref": "#/components/schemas/SiteSettingsStoreAddress"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/SiteSettingsStoreContact"
+          },
+          "abn": {
+            "type": "string",
+            "description": "The Australian Business Number, or a local tax number. It must be 11 digits, with spaces allowed: anything else is rejected with `400 invalid_abn`."
+          }
+        }
+      },
+      "SiteSettingsStoreAddress": {
+        "type": "object",
+        "description": "Where the business is.",
+        "properties": {
+          "address_line_1": {
+            "type": "string",
+            "description": "Street address line 1. Marked `required` in `field_metadata`."
+          },
+          "address_line_2": {
+            "type": "string",
+            "description": "Street address line 2."
+          },
+          "city": {
+            "type": "string",
+            "description": "The city or suburb."
+          },
+          "post_code": {
+            "type": "string",
+            "description": "The postal or ZIP code."
+          },
+          "state": {
+            "$ref": "#/components/schemas/SiteSettingsRegion",
+            "description": "The state. A write can send the state's `id`, `code` or `name` alone, or the whole record."
+          },
+          "country": {
+            "$ref": "#/components/schemas/SiteSettingsRegion",
+            "description": "The country. A write can send the country's `id`, `code` or `name` alone, or the whole record."
+          }
+        }
+      },
+      "SiteSettingsStoreContact": {
+        "type": "object",
+        "description": "The store's published phone numbers.",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "description": "The landline number."
+          },
+          "mobile": {
+            "type": "string",
+            "description": "The mobile number."
+          },
+          "fax": {
+            "type": "string",
+            "description": "The fax number."
+          }
+        }
+      },
+      "SiteSettingsGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get site settings](/api-reference/site-settings/get-site-settings) and [Update site settings](/api-reference/site-settings/update-site-settings) return it.",
+        "properties": {
+          "administration": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "brand_kit": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "date_time": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "domain_settings": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "email_settings": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "favicon": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "store_details": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          },
+          "store_logo": {
+            "$ref": "#/components/schemas/SiteSettingsSectionMeta"
+          }
+        }
+      },
+      "SiteSettingsSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is: `media` for `favicon` and `store_logo`, `resource` for `store_details`, and `setting` for the other five.",
+            "enum": [
+              "setting",
+              "media",
+              "resource"
+            ]
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `true` for all eight."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/site_settings/brand_kit`."
+          }
+        }
+      },
+      "SiteSettingsFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Each section is nested like the settings, with a `SiteSettingsFieldMetadataEntry` for each field. A field entry always has `writable`; a block of entries does not. The match with a read is not exact: some entries name a field a read never returns, such as `favicon.image_base64`, and some fields a read returns have no entry, such as `date_time.email.separate`. On `/site_settings` it covers all eight sections, keyed by section, and an `enums` key beside them lists the `time_zone` and `locale` values. On `/site_settings/{section}` it holds the section's own name, and for `date_time` an `enums` key that lists the `time_zone` values. Each list under `enums` has `values`, the accepted values, and `labels`, a display name for each value."
+      },
+      "SiteSettingsFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field holds or does."
+          },
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes: `boolean`, `string`, `integer`, `enum`, `object` or `array`."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "`true` on `store_details.company_name`, `store_details.email` and `store_details.address.address_line_1`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether a write can set the field."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "`true` when a write cannot set the field."
+          },
+          "write_only": {
+            "type": "boolean",
+            "description": "`true` on a field that a read never returns, such as `domain_settings.ssl.key_file_base64`."
+          },
+          "secret": {
+            "type": "boolean",
+            "description": "`true` on a secret field. A read returns it as `***` once it is set, except `domain_settings.ssl.key_file_base64`, which a read never returns."
+          },
+          "note": {
+            "type": "string",
+            "description": "Extra guidance, such as how to keep a secret field's stored value."
+          },
+          "format": {
+            "type": "string",
+            "description": "The value's format: `hex-color`, `email` or `java-date-time-pattern`."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {},
+            "description": "The values the field accepts, for an `enum` field."
+          },
+          "enum_ref": {
+            "type": "string",
+            "description": "The key under `enums` that lists the field's accepted values, such as `time_zone`."
+          },
+          "min": {
+            "type": "integer",
+            "description": "The lowest value, for an `integer` field."
+          },
+          "max": {
+            "type": "integer",
+            "description": "The highest value, for an `integer` field."
+          },
+          "shape": {
+            "type": "string",
+            "description": "The record a read returns, such as `{id,code,name}`."
+          },
+          "accepts": {
+            "type": "string",
+            "description": "The forms a write accepts, such as `id | code | name | object`."
+          },
+          "accepts_human_value": {
+            "type": "boolean",
+            "description": "`true` on the country and state fields, whose `accepts` lists `code` and `name`."
+          },
+          "media": {
+            "type": "boolean",
+            "description": "`true` on an upload field, such as `image_base64`."
+          },
+          "key_path": {
+            "type": "string",
+            "description": "The field's full path, such as `site_settings.brand_kit.palette_name`."
+          }
+        }
+      },
+      "SiteSettingsError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `unsupported_media_type`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field`, `unknown_section` or `invalid_boolean`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
               }
             }
           }

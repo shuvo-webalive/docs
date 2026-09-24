@@ -1,0 +1,9 @@
+---
+title: "Get a settings section"
+description: "Returns one settings section under its own key, such as `brand_kit`."
+openapi: "GET /admin/settings/site_settings/{section}"
+---
+
+Returns one section, wrapped in the section's own name rather than in `site_settings`, and without `group_meta`. The section is exactly what [Get site settings](/api-reference/site-settings/get-site-settings) returns for it. Add `field_metadata=true` to also get a description of each of the section's fields. An unknown section returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

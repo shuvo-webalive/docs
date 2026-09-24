@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "site_settings",
+  "endpoints": {
+    "get_site_settings": {
+      "function": "getSiteSettings",
+      "code": "final response = await client.siteSettings.getSiteSettings();\nfinal siteSettings = (response.map as Map)['site_settings'] as Map;\nprint(siteSettings['store_details']);\nprint(siteSettings['brand_kit']);"
+    },
+    "patch_site_settings": {
+      "function": "patchSiteSettings",
+      "code": "final response = await client.siteSettings.patchSiteSettings({\n  'site_settings': {\n    'brand_kit': {'palette_name': 'Autumn'},\n    'date_time': {'hide_time_zone': false},\n  },\n});\nfinal siteSettings = (response.map as Map)['site_settings'] as Map;\nprint((siteSettings['brand_kit'] as Map)['palette_name']);\nprint((siteSettings['date_time'] as Map)['hide_time_zone']);"
+    },
+    "head_site_settings": {
+      "function": "headSiteSettings",
+      "code": "final response = await client.siteSettings.headSiteSettings();\nprint(response.statusCode);"
+    },
+    "get_site_settings_section": {
+      "function": "getSiteSettingsSection",
+      "code": "final response = await client.siteSettings.getSiteSettingsSection('brand_kit');\nfinal brandKit = (response.map as Map)['brand_kit'] as Map;\nprint(brandKit['palette_name']);\nprint(brandKit['colors']);"
+    },
+    "patch_site_settings_section": {
+      "function": "patchSiteSettingsSection",
+      "code": "final response =\n    await client.siteSettings.patchSiteSettingsSection('brand_kit', {\n  'brand_kit': {'palette_name': 'Autumn'},\n});\nfinal brandKit = (response.map as Map)['brand_kit'] as Map;\nprint(brandKit['palette_name']);"
+    }
+  }
+}

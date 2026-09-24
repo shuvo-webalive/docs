@@ -1,0 +1,9 @@
+---
+title: "Get site settings headers"
+description: "Returns the headers for the site settings, with no body."
+openapi: "HEAD /admin/settings/site_settings"
+---
+
+Returns `200` with headers only and no body. The headers include `Content-Length: 0`, and there is no `ETag` header. Use it to check that the settings are reachable without downloading them.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
