@@ -14,44 +14,48 @@ curl -X POST "$WC_BASE_URL/api/v4/oauth2/token" \
 ```python Python
 import os
 
-from webcommander import AuthConfig, build_client, register_instances
+from webcommander import AuthConfig, SdkConfig, register_instances
 
 register_instances([
-    AuthConfig(
-        client_name="default",
-        base_url=os.environ["WC_BASE_URL"],
-        client_id=os.environ["WC_CLIENT_ID"],
-        client_secret=os.environ["WC_CLIENT_SECRET"],
-        redirect_uri=os.environ["WC_REDIRECT_URI"],
-        auth_string=os.environ["WC_AUTH_STRING"],
+    SdkConfig(
+        AuthConfig(
+            client_name="default",
+            base_url=os.environ["WC_BASE_URL"],
+            client_id=os.environ["WC_CLIENT_ID"],
+            client_secret=os.environ["WC_CLIENT_SECRET"],
+            redirect_uri=os.environ["WC_REDIRECT_URI"],
+            auth_string=os.environ["WC_AUTH_STRING"],
+        ),
+        raise_on_error=True,
     ),
 ])
-
-client = build_client(raise_on_error=True)
 ```
 
 ```javascript JavaScript
-import {AuthConfig, buildClient, registerInstances} from 'webcommander-sdk';
+import {AuthConfig, SdkConfig, registerInstances} from 'webcommander-sdk';
 
 registerInstances([
-    new AuthConfig({
-        clientName: 'default',
-        grantType: 'client_credentials',
-        baseUrl: process.env.WC_BASE_URL,
-        clientId: process.env.WC_CLIENT_ID,
-        clientSecret: process.env.WC_CLIENT_SECRET,
-        redirectUri: process.env.WC_REDIRECT_URI,
-        authString: process.env.WC_AUTH_STRING,
-    }),
+    new SdkConfig(
+        new AuthConfig({
+            clientName: 'default',
+            grantType: 'client_credentials',
+            baseUrl: process.env.WC_BASE_URL,
+            clientId: process.env.WC_CLIENT_ID,
+            clientSecret: process.env.WC_CLIENT_SECRET,
+            redirectUri: process.env.WC_REDIRECT_URI,
+            authString: process.env.WC_AUTH_STRING,
+        }),
+        {raiseOnError: true},
+    ),
 ]);
-
-const client = await buildClient(0, {raiseOnError: true});
 ```
 
 ```php PHP
+<?php
+
 require __DIR__ . '/vendor/autoload.php';
 
-use WebCommander\Sdk\Client\WebCommanderClient;
+use WebCommander\Sdk\Client\ClientRegistry;
 use WebCommander\Sdk\Config\AuthConfig;
 use WebCommander\Sdk\Config\SdkConfig;
 
@@ -65,29 +69,29 @@ $auth = new AuthConfig(
     grantType: 'client_credentials',
 );
 
-$client = new WebCommanderClient(new SdkConfig($auth, raiseOnError: true));
+ClientRegistry::registerInstances([new SdkConfig($auth, raiseOnError: true)]);
 ```
 
 ```java Java
-import com.webcommander.sdk.client.ApiResponse;
-import com.webcommander.sdk.client.WebCommanderClient;
+import com.webcommander.sdk.client.ClientRegistry;
 import com.webcommander.sdk.config.AuthConfig;
 import com.webcommander.sdk.config.SdkConfig;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
-AuthConfig auth = AuthConfig.builder()
-        .baseUrl(System.getenv("WC_BASE_URL"))
-        .clientId(System.getenv("WC_CLIENT_ID"))
-        .clientSecret(System.getenv("WC_CLIENT_SECRET"))
-        .redirectUri(System.getenv("WC_REDIRECT_URI"))
-        .authString(System.getenv("WC_AUTH_STRING"))
-        .clientName("default")
-        .build();
-SdkConfig config = SdkConfig.builder(auth).raiseOnError(true).build();
-WebCommanderClient client = new WebCommanderClient(config);
+public class Main {
+    public static void main(String[] args) throws Exception {
+        AuthConfig auth = AuthConfig.builder()
+                .baseUrl(System.getenv("WC_BASE_URL"))
+                .clientId(System.getenv("WC_CLIENT_ID"))
+                .clientSecret(System.getenv("WC_CLIENT_SECRET"))
+                .redirectUri(System.getenv("WC_REDIRECT_URI"))
+                .authString(System.getenv("WC_AUTH_STRING"))
+                .clientName("default")
+                .build();
+        SdkConfig config = SdkConfig.builder(auth).raiseOnError(true).build();
+        ClientRegistry.registerInstances(List.of(config));
+    }
+}
 ```
 
 ```csharp .NET
@@ -102,53 +106,58 @@ var auth = new AuthConfig(
     authString: Environment.GetEnvironmentVariable("WC_AUTH_STRING")!,
     clientName: "default");
 
-await using var client = new WebCommanderClient(new SdkConfig(auth, raiseOnError: true));
+ClientRegistry.RegisterInstances([new SdkConfig(auth, raiseOnError: true)]);
 ```
 
 ```dart Dart
 import 'dart:io';
+
 import 'package:webcommander_sdk/webcommander_sdk.dart';
 
-final env = Platform.environment;
-final client = WebCommanderClient(SdkConfig(
-  AuthConfig(
-    clientName: 'default',
-    baseUrl: env['WC_BASE_URL']!,
-    clientId: env['WC_CLIENT_ID']!,
-    clientSecret: env['WC_CLIENT_SECRET']!,
-    redirectUri: env['WC_REDIRECT_URI']!,
-    authString: env['WC_AUTH_STRING']!,
-  ),
-  raiseOnError: true,
-));
+Future<void> main() async {
+  final env = Platform.environment;
+  ClientRegistry.registerInstances([
+    SdkConfig(
+      AuthConfig(
+        clientName: 'default',
+        baseUrl: env['WC_BASE_URL']!,
+        clientId: env['WC_CLIENT_ID']!,
+        clientSecret: env['WC_CLIENT_SECRET']!,
+        redirectUri: env['WC_REDIRECT_URI']!,
+        authString: env['WC_AUTH_STRING']!,
+      ),
+      raiseOnError: true,
+    ),
+  ]);
+}
 ```
 
 ```go Go
+package main
+
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
 
 	wc "bitbucket.org/webalive/webcommander-sdk-go/v3"
 )
 
-ctx := context.Background()
-client, err := wc.NewClient(wc.SdkConfig{
-	Auth: wc.AuthConfig{
-		ClientName:   "default",
-		BaseURL:      os.Getenv("WC_BASE_URL"),
-		ClientID:     os.Getenv("WC_CLIENT_ID"),
-		ClientSecret: os.Getenv("WC_CLIENT_SECRET"),
-		RedirectURI:  os.Getenv("WC_REDIRECT_URI"),
-		AuthString:   os.Getenv("WC_AUTH_STRING"),
-	},
-	RaiseOnError: true,
-})
-if err != nil {
-	log.Fatal(err)
+func main() {
+	err := wc.RegisterInstances(wc.SdkConfig{
+		Auth: wc.AuthConfig{
+			ClientName:   "default",
+			BaseURL:      os.Getenv("WC_BASE_URL"),
+			ClientID:     os.Getenv("WC_CLIENT_ID"),
+			ClientSecret: os.Getenv("WC_CLIENT_SECRET"),
+			RedirectURI:  os.Getenv("WC_REDIRECT_URI"),
+			AuthString:   os.Getenv("WC_AUTH_STRING"),
+		},
+		RaiseOnError: true,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
-defer client.Close()
 ```
 
 </CodeGroup>

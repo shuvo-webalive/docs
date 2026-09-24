@@ -1,5 +1,6 @@
 {
   "sdk": "dotnet",
   "language": "csharp",
-  "setup": "using WebCommander.Sdk.Client;\nusing WebCommander.Sdk.Config;\n\nvar auth = new AuthConfig(\n    baseUrl: Environment.GetEnvironmentVariable(\"WC_BASE_URL\")!,\n    clientId: Environment.GetEnvironmentVariable(\"WC_CLIENT_ID\")!,\n    clientSecret: Environment.GetEnvironmentVariable(\"WC_CLIENT_SECRET\")!,\n    redirectUri: Environment.GetEnvironmentVariable(\"WC_REDIRECT_URI\")!,\n    authString: Environment.GetEnvironmentVariable(\"WC_AUTH_STRING\")!,\n    clientName: \"default\");\n\nawait using var client = new WebCommanderClient(new SdkConfig(auth, raiseOnError: true));"
+  "register": "using WebCommander.Sdk.Client;\nusing WebCommander.Sdk.Config;\n\nvar auth = new AuthConfig(\n    baseUrl: Environment.GetEnvironmentVariable(\"WC_BASE_URL\")!,\n    clientId: Environment.GetEnvironmentVariable(\"WC_CLIENT_ID\")!,\n    clientSecret: Environment.GetEnvironmentVariable(\"WC_CLIENT_SECRET\")!,\n    redirectUri: Environment.GetEnvironmentVariable(\"WC_REDIRECT_URI\")!,\n    authString: Environment.GetEnvironmentVariable(\"WC_AUTH_STRING\")!,\n    clientName: \"default\");\n\nClientRegistry.RegisterInstances([new SdkConfig(auth, raiseOnError: true)]);\n",
+  "client": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n"
 }

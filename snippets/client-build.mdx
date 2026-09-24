@@ -1,0 +1,55 @@
+<CodeGroup>
+```python Python
+from webcommander import build_client
+
+client = build_client()
+```
+
+```javascript JavaScript
+import {buildClient} from 'webcommander-sdk';
+
+const client = await buildClient();
+```
+
+```php PHP
+use WebCommander\Sdk\Client\ClientRegistry;
+
+$client = ClientRegistry::buildClient();
+```
+
+```java Java
+import com.webcommander.sdk.client.ClientRegistry;
+import com.webcommander.sdk.client.WebCommanderClient;
+
+WebCommanderClient client = ClientRegistry.buildClient();
+```
+
+```csharp .NET
+using WebCommander.Sdk.Client;
+
+await using var client = WebCommanderClient.BuildClient();
+```
+
+```dart Dart
+import 'package:webcommander_sdk/webcommander_sdk.dart';
+
+final client = buildClient();
+```
+
+```go Go
+import (
+	"context"
+	"log"
+
+	wc "bitbucket.org/webalive/webcommander-sdk-go/v3"
+)
+
+ctx := context.Background()
+client, err := wc.BuildClient(nil)
+if err != nil {
+	log.Fatal(err)
+}
+defer client.Close()
+```
+
+</CodeGroup>

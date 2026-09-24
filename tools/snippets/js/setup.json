@@ -1,5 +1,6 @@
 {
   "sdk": "js",
   "language": "javascript",
-  "setup": "import {AuthConfig, buildClient, registerInstances} from 'webcommander-sdk';\n\nregisterInstances([\n    new AuthConfig({\n        clientName: 'default',\n        grantType: 'client_credentials',\n        baseUrl: process.env.WC_BASE_URL,\n        clientId: process.env.WC_CLIENT_ID,\n        clientSecret: process.env.WC_CLIENT_SECRET,\n        redirectUri: process.env.WC_REDIRECT_URI,\n        authString: process.env.WC_AUTH_STRING,\n    }),\n]);\n\nconst client = await buildClient(0, {raiseOnError: true});\n"
+  "register": "import {AuthConfig, SdkConfig, registerInstances} from 'webcommander-sdk';\n\nregisterInstances([\n    new SdkConfig(\n        new AuthConfig({\n            clientName: 'default',\n            grantType: 'client_credentials',\n            baseUrl: process.env.WC_BASE_URL,\n            clientId: process.env.WC_CLIENT_ID,\n            clientSecret: process.env.WC_CLIENT_SECRET,\n            redirectUri: process.env.WC_REDIRECT_URI,\n            authString: process.env.WC_AUTH_STRING,\n        }),\n        {raiseOnError: true},\n    ),\n]);\n",
+  "client": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n"
 }
