@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "getProductPage",
+      "code": "const response = await client.productPage.getProductPage();\nconst settings = response.map.product_page;\nconsole.log(settings.configuration.details.display_description);\nconsole.log(settings.quick_view.product_quick_view);\n"
+    },
+    "patch_product_page": {
+      "function": "patchProductPage",
+      "code": "const response = await client.productPage.patchProductPage({\n    product_page: {configuration: {details: {display_description: true}}, up_sell: {short_description: true}},\n});\nconst settings = response.map.product_page;\nconsole.log(settings.configuration.details.display_description, settings.up_sell.short_description);\n"
+    },
+    "head_product_page": {
+      "function": "headProductPage",
+      "code": "const response = await client.productPage.headProductPage();\nconsole.log(response.statusCode);\n"
+    },
+    "get_product_page_section": {
+      "function": "getProductPageSection",
+      "code": "const response = await client.productPage.getProductPageSection('quick_view');\nconst quickView = response.map.product_page.quick_view;\nconsole.log(quickView.product_quick_view, quickView.display_add_to_cart_button);\n"
+    },
+    "patch_product_page_section": {
+      "function": "patchProductPageSection",
+      "code": "const response = await client.productPage.patchProductPageSection('configuration', {\n    configuration: {details: {display_description: true}},\n});\nconsole.log(response.map.product_page.configuration.details.display_description);\n"
+    }
+  }
+}

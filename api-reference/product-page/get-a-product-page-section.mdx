@@ -1,0 +1,9 @@
+---
+title: "Get a product page section"
+description: "Returns one settings section, such as `quick_view`, inside the `product_page` key."
+openapi: "GET /admin/settings/page_settings/product_page/{section}"
+---
+
+Returns one section inside `product_page`, such as `{"product_page": {"quick_view": {...}}}`, without `group_meta`. This differs from [Category page](/category-page), where a section comes back under its own name. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

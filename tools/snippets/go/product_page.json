@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "GetProductPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductPageSettings().GetProductPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)\ndetails := settings[\"configuration\"].(map[string]any)[\"details\"].(map[string]any)\nupSell := settings[\"up_sell\"].(map[string]any)\nfmt.Println(details[\"display_description\"], upSell[\"number_of_products\"], upSell[\"short_description\"])"
+    },
+    "patch_product_page": {
+      "function": "PatchProductPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductPageSettings().PatchProductPage(ctx, map[string]any{\n\t\"product_page\": map[string]any{\n\t\t\"configuration\": map[string]any{\"details\": map[string]any{\"display_description\": true}},\n\t\t\"up_sell\":       map[string]any{\"short_description\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)\ndetails := settings[\"configuration\"].(map[string]any)[\"details\"].(map[string]any)\nfmt.Println(details[\"display_description\"], settings[\"up_sell\"].(map[string]any)[\"short_description\"])"
+    },
+    "head_product_page": {
+      "function": "HeadProductPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductPageSettings().HeadProductPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_product_page_section": {
+      "function": "GetProductPageSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductPageSettings().GetProductPageSection(ctx, \"quick_view\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nquickView := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)[\"quick_view\"].(map[string]any)\nfmt.Println(quickView[\"product_quick_view\"], quickView[\"display_sku\"], quickView[\"display_add_to_cart_button\"])"
+    },
+    "patch_product_page_section": {
+      "function": "PatchProductPageSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ProductPageSettings().PatchProductPageSection(ctx, \"configuration\", map[string]any{\n\t\"configuration\": map[string]any{\"details\": map[string]any{\"display_description\": true}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nconfiguration := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)[\"configuration\"].(map[string]any)\nfmt.Println(configuration[\"details\"].(map[string]any)[\"display_description\"])"
+    }
+  }
+}

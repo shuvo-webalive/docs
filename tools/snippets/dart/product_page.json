@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "getProductPage",
+      "code": "final response = await client.productPage.getProductPage();\nfinal productPage = (response.map as Map)['product_page'] as Map;\nprint(productPage['configuration']);\nprint(productPage['quick_view']);"
+    },
+    "patch_product_page": {
+      "function": "patchProductPage",
+      "code": "final response = await client.productPage.patchProductPage({\n  'product_page': {\n    'configuration': {\n      'details': {'display_description': true},\n    },\n    'up_sell': {'short_description': true},\n  },\n});\nfinal productPage = (response.map as Map)['product_page'] as Map;\nprint((productPage['configuration'] as Map)['details']);\nprint((productPage['up_sell'] as Map)['short_description']);"
+    },
+    "head_product_page": {
+      "function": "headProductPage",
+      "code": "final response = await client.productPage.headProductPage();\nprint(response.statusCode);"
+    },
+    "get_product_page_section": {
+      "function": "getProductPageSection",
+      "code": "final response = await client.productPage.getProductPageSection('quick_view');\nfinal productPage = (response.map as Map)['product_page'] as Map;\nfinal section = productPage['quick_view'] as Map;\nprint(section['product_quick_view']);\nprint(section['display_sku']);"
+    },
+    "patch_product_page_section": {
+      "function": "patchProductPageSection",
+      "code": "final response =\n    await client.productPage.patchProductPageSection('configuration', {\n  'configuration': {\n    'details': {'display_description': true},\n  },\n});\nfinal productPage = (response.map as Map)['product_page'] as Map;\nfinal section = productPage['configuration'] as Map;\nprint(section['details']);"
+    }
+  }
+}

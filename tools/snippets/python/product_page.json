@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "get_product_page",
+      "code": "response = client.product_page.get_product_page()\nsettings = response.map[\"product_page\"]\nprint(settings[\"configuration\"][\"details\"][\"display_description\"])\nprint(settings[\"variations\"][\"layout\"][\"select_variation_view_type\"])\nprint(settings[\"up_sell\"][\"number_of_products\"])\n"
+    },
+    "patch_product_page": {
+      "function": "patch_product_page",
+      "code": "response = client.product_page.patch_product_page({\n    \"product_page\": {\n        \"configuration\": {\"details\": {\"display_description\": True}},\n        \"up_sell\": {\"short_description\": True},\n    },\n})\nsettings = response.map[\"product_page\"]\nprint(settings[\"configuration\"][\"details\"][\"display_description\"])\nprint(settings[\"up_sell\"][\"short_description\"])\n"
+    },
+    "head_product_page": {
+      "function": "head_product_page",
+      "code": "response = client.product_page.head_product_page()\nprint(response.status_code)\n"
+    },
+    "get_product_page_section": {
+      "function": "get_product_page_section",
+      "code": "response = client.product_page.get_product_page_section(\"quick_view\")\nquick_view = response.map[\"product_page\"][\"quick_view\"]\nprint(quick_view[\"product_quick_view\"], quick_view[\"display_sku\"])\n"
+    },
+    "patch_product_page_section": {
+      "function": "patch_product_page_section",
+      "code": "response = client.product_page.patch_product_page_section(\n    \"configuration\", {\"configuration\": {\"details\": {\"display_description\": True}}}\n)\ndetails = response.map[\"product_page\"][\"configuration\"][\"details\"]\nprint(details[\"display_description\"], details[\"display_sale_percentage\"])\n"
+    }
+  }
+}

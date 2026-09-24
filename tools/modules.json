@@ -12,7 +12,8 @@
       "icon": "file-lines",
       "modules": [
         "category_page",
-        "checkout_page"
+        "checkout_page",
+        "product_page"
       ]
     },
     {

@@ -1,0 +1,58 @@
+---
+title: "Product page"
+sidebarTitle: "Overview"
+description: "Read and change what your store's product pages show, from action buttons and variations to images, up-sells, reviews and quick view."
+---
+
+The Product page API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/product_page`.
+
+<Warning>
+  **Sending a section back as you read it can be rejected.** Many fields depend on another field, as
+  `depends_on` in `field_metadata` shows. A write that sets such a field to `true` while the field it
+  depends on is off is rejected with `400 invalid_request` and the code `constraint_violation`, naming
+  both fields. That holds whether the field it depends on is already off or is set to `false` in the
+  same body. Setting a field to `false` does not change the fields that depend on it, so a stored
+  section can hold a pair of values that this rule rejects. Send only the fields you change.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get product page settings](/api-reference/product-page/get-product-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/product_page` | Returns all seven product page settings sections and a `group_meta` block describing each one. |
+| [Update product page settings](/api-reference/product-page/update-product-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/product_page` | Changes the fields you send in one or more sections and returns all the settings. |
+| [Check the product page settings](/api-reference/product-page/check-the-product-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/product_page` | Checks that the product page settings are reachable. Returns headers only, with no body. |
+| [Get a product page section](/api-reference/product-page/get-a-product-page-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/product_page/{section}` | Returns one settings section, such as `quick_view`, inside the `product_page` key. |
+| [Update a product page section](/api-reference/product-page/update-a-product-page-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/product_page/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into seven sections.** They are `configuration`, `variations`,
+  `image_and_video`, `up_sell`, `related_products`, `review_and_ratings` and `quick_view`. Read or
+  write them all through `/product_page`, or one through `/product_page/{section}`. An unknown section
+  returns `404 not_found` on both `GET` and `PATCH`.
+- **A section always comes back inside `product_page`.** Reading or writing `/product_page/quick_view`
+  returns `{"product_page": {"quick_view": {...}}}`, not `{"quick_view": {...}}`. This differs from
+  [Category page](/category-page). A section write accepts either wrapper: the section's own name, or
+  `product_page` and then the section name.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields you leave out
+  keep their stored values at every level, and one body to `/product_page` can change several sections.
+  `PUT`, `POST` and `DELETE` are rejected on every product page path with `405 method_not_allowed` and
+  an `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **Writes and reads have separate rate limits.** The eleventh write to a section in a short time is
+  rejected with `429 rate_limited` and a `Retry-After` header that counts down the seconds left. Until
+  then, writes to `/product_page` and to other sections are rejected too, while reads still return
+  `200`. After twenty reads in about one and a half seconds, the next read is rejected with `429` and
+  `Retry-After`, while writes are still accepted.
+- **Add `field_metadata=true` to a read to get a description of every field.** The settings are still
+  returned with it. Each entry gives the field's `ui_label`, `description`, `type`, `default` and
+  `read_only`, plus `depends_on` when the field depends on another, `allowed_values` for every `enum`
+  field, and `min` and `max` for an `integer` field. On `/product_page` it is keyed by section; on a
+  section it is keyed by the section's field names. The only read-only field is
+  `review_and_ratings.capabilities.available`.

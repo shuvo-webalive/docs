@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "GetProductPageAsync",
+      "code": "var response = await client.ProductPage.GetProductPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar configuration = (IReadOnlyDictionary<string, object?>)productPage[\"configuration\"]!;\nvar details = (IReadOnlyDictionary<string, object?>)configuration[\"details\"]!;\nConsole.WriteLine(details[\"display_description\"]);"
+    },
+    "patch_product_page": {
+      "function": "PatchProductPageAsync",
+      "code": "var response = await client.ProductPage.PatchProductPageAsync(new Dictionary<string, object?>\n{\n    [\"product_page\"] = new Dictionary<string, object?>\n    {\n        [\"configuration\"] = new Dictionary<string, object?>\n        {\n            [\"details\"] = new Dictionary<string, object?> { [\"display_description\"] = true },\n        },\n        [\"up_sell\"] = new Dictionary<string, object?> { [\"short_description\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar upSell = (IReadOnlyDictionary<string, object?>)productPage[\"up_sell\"]!;\nConsole.WriteLine(upSell[\"short_description\"]);"
+    },
+    "head_product_page": {
+      "function": "HeadProductPageAsync",
+      "code": "var response = await client.ProductPage.HeadProductPageAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_product_page_section": {
+      "function": "GetProductPageSectionAsync",
+      "code": "var response = await client.ProductPage.GetProductPageSectionAsync(\"quick_view\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar quickView = (IReadOnlyDictionary<string, object?>)productPage[\"quick_view\"]!;\nConsole.WriteLine(quickView[\"product_quick_view\"]);"
+    },
+    "patch_product_page_section": {
+      "function": "PatchProductPageSectionAsync",
+      "code": "var response = await client.ProductPage.PatchProductPageSectionAsync(\"configuration\", new Dictionary<string, object?>\n{\n    [\"configuration\"] = new Dictionary<string, object?>\n    {\n        [\"details\"] = new Dictionary<string, object?> { [\"display_description\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar configuration = (IReadOnlyDictionary<string, object?>)productPage[\"configuration\"]!;\nvar details = (IReadOnlyDictionary<string, object?>)configuration[\"details\"]!;\nConsole.WriteLine(details[\"display_description\"]);"
+    }
+  }
+}

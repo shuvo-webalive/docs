@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "getProductPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$response = ProductPage::getProductPage($client);\n\n$settings = $response->map['product_page'];\necho 'Description shown: ', $settings['configuration']['details']['display_description'] ? 'true' : 'false', PHP_EOL;\necho 'Quick view: ', $settings['quick_view']['product_quick_view'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "patch_product_page": {
+      "function": "patchProductPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$response = ProductPage::patchProductPage($client, [\n    'product_page' => [\n        'configuration' => ['details' => ['display_description' => true]],\n        'up_sell' => ['short_description' => true],\n    ],\n]);\n\n$settings = $response->map['product_page'];\necho $settings['configuration']['details']['display_description'] ? 'true' : 'false', PHP_EOL;\necho $settings['up_sell']['short_description'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_product_page": {
+      "function": "headProductPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$response = ProductPage::headProductPage($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_product_page_section": {
+      "function": "getProductPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$response = ProductPage::getProductPageSection($client, 'quick_view');\n\nforeach ($response->map['product_page']['quick_view'] as $field => $value) {\n    echo $field, ': ', $value ? 'true' : 'false', PHP_EOL;\n}"
+    },
+    "patch_product_page_section": {
+      "function": "patchProductPageSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$response = ProductPage::patchProductPageSection($client, 'configuration', [\n    'configuration' => ['details' => ['display_description' => true]],\n]);\n\necho $response->map['product_page']['configuration']['details']['display_description'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}
