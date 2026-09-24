@@ -1,0 +1,18 @@
+{
+  "sdk": "go",
+  "module": "shipping_settings",
+  "endpoints": {
+    "get_shipping_settings": {
+      "function": "GetShippingSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingSettings().GetShippingSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)\nfmt.Println(settings[\"enable_shipping_default_tax\"], settings[\"enable_shipping_class\"], settings[\"enable_flat_view_class\"])\nif profile, ok := settings[\"default_shipping_profile\"].(map[string]any); ok {\n\tfmt.Println(profile[\"id\"], profile[\"name\"])\n}"
+    },
+    "patch_shipping_settings": {
+      "function": "PatchShippingSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingSettings().PatchShippingSettings(ctx, map[string]any{\n\t\"shipping_settings\": map[string]any{\"enable_shipping_default_tax\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)[\"enable_shipping_default_tax\"])"
+    },
+    "head_shipping_settings": {
+      "function": "HeadShippingSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingSettings().HeadShippingSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

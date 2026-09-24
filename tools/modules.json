@@ -28,7 +28,8 @@
         "price_display_settings",
         "product_listing",
         "search_settings",
-        "seo_configuration"
+        "seo_configuration",
+        "shipping_settings"
       ]
     },
     {

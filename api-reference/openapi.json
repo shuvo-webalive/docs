@@ -64,6 +64,9 @@
       "name": "SEO configuration"
     },
     {
+      "name": "Shipping settings"
+    },
+    {
       "name": "Shipping methods"
     },
     {
@@ -14536,6 +14539,292 @@
         ]
       }
     },
+    "/admin/settings/shipping_settings": {
+      "get": {
+        "tags": [
+          "Shipping settings"
+        ],
+        "summary": "Get shipping settings",
+        "operationId": "get_shipping_settings",
+        "description": "Returns the seven shipping settings under `shipping_settings`, with `group_meta` beside them. The three profile fields each hold the profile's `{id, name}` record or `null`, and the other four are `true` or `false`. Send `field_metadata=true` to also get a description of each field, keyed by field name. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the seven fields, keyed by field name. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The seven settings under `shipping_settings`, and `group_meta`. With `field_metadata=true`, a `field_metadata` key is added beside them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_settings": {
+                      "$ref": "#/components/schemas/ShippingSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ShippingSettingsGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ShippingSettingsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_settings": {
+                    "default_shipping_profile": {
+                      "id": 4,
+                      "name": "Standard shipping"
+                    },
+                    "enable_shipping_default_tax": true,
+                    "default_delivery_profile": {
+                      "id": 4,
+                      "name": "Standard shipping"
+                    },
+                    "enable_delivery_default_tax": true,
+                    "shipping_tax_profile": null,
+                    "enable_shipping_class": true,
+                    "enable_flat_view_class": true
+                  },
+                  "group_meta": {
+                    "shipping_settings": {
+                      "kind": "setting",
+                      "writable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.get_shipping_settings()\nsettings = response.map[\"shipping_settings\"]\nprint(settings[\"default_shipping_profile\"], settings[\"shipping_tax_profile\"])\nprint(settings[\"enable_shipping_class\"], settings[\"enable_flat_view_class\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingSettings.getShippingSettings(client);\nconst settings = response.map.shipping_settings;\nconsole.log(settings.default_shipping_profile?.name, settings.default_delivery_profile?.name);\nconsole.log(settings.enable_shipping_default_tax, settings.enable_delivery_default_tax);\nconsole.log(settings.enable_shipping_class, settings.enable_flat_view_class);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingSettings::getShippingSettings($client);\n\n$settings = $response->map['shipping_settings'];\necho 'default shipping: ', $settings['default_shipping_profile']['name'] ?? 'No Shipping', PHP_EOL;\necho 'shipping tax: ', $settings['shipping_tax_profile']['name'] ?? 'No Tax', PHP_EOL;\necho 'shipping classes: ', $settings['enable_shipping_class'] ? 'on' : 'off', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().getShippingSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nMap<?, ?> shippingProfile = (Map<?, ?>) settings.get(\"default_shipping_profile\");\nSystem.out.println(shippingProfile == null ? \"No Shipping\" : shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\"));\nSystem.out.println(settings.get(\"enable_shipping_default_tax\") + \" \" + settings.get(\"enable_delivery_default_tax\"));\nSystem.out.println(settings.get(\"enable_shipping_class\") + \" \" + settings.get(\"enable_flat_view_class\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.GetShippingSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine($\"{shippingSettings[\"enable_shipping_default_tax\"]} {shippingSettings[\"enable_shipping_class\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingSettings.getShippingSettings();\nfinal shippingSettings = (response.map as Map)['shipping_settings'] as Map;\nprint(shippingSettings['default_shipping_profile']);\nprint(shippingSettings['enable_shipping_class']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().GetShippingSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)\nfmt.Println(settings[\"enable_shipping_default_tax\"], settings[\"enable_shipping_class\"], settings[\"enable_flat_view_class\"])\nif profile, ok := settings[\"default_shipping_profile\"].(map[string]any); ok {\n\tfmt.Println(profile[\"id\"], profile[\"name\"])\n}\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Shipping settings"
+        ],
+        "summary": "Update shipping settings",
+        "operationId": "patch_shipping_settings",
+        "description": "Send the fields to change, wrapped in `shipping_settings` or bare at the top level: both are accepted. Fields you leave out keep their stored values, except `enable_flat_view_class`, which turns off when you turn `enable_shipping_class` off. Set a profile field with the profile's `id`; a bare name string is rejected. Returns all seven settings after the change, with `group_meta`, as [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings) does.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All seven settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_settings": {
+                      "$ref": "#/components/schemas/ShippingSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ShippingSettingsGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_settings": {
+                    "default_shipping_profile": {
+                      "id": 4,
+                      "name": "Standard shipping"
+                    },
+                    "enable_shipping_default_tax": true,
+                    "default_delivery_profile": {
+                      "id": 4,
+                      "name": "Standard shipping"
+                    },
+                    "enable_delivery_default_tax": true,
+                    "shipping_tax_profile": null,
+                    "enable_shipping_class": true,
+                    "enable_flat_view_class": true
+                  },
+                  "group_meta": {
+                    "shipping_settings": {
+                      "kind": "setting",
+                      "writable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The write was rejected. A field outside the seven, or a second `shipping_settings` inside the wrapper, returns `invalid_request` with the message `<name>: not a recognized field`. An empty wrapper returns `invalid_request` with `shipping_settings body missing`. A string for a boolean field returns `must be a boolean (true/false or 0/1)`. A name string for a profile field returns `invalid_request` with `id must be an integer`. A profile `id` that none of the field's `options` has, or a `{\"code\": …}` record that matches no profile, returns `invalid_reference`, such as `no tax profile with id <n>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingSettingsError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_settings\": {\n      \"enable_shipping_default_tax\": true\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.patch_shipping_settings({\n    \"shipping_settings\": {\"enable_shipping_default_tax\": True},\n})\nprint(response.map[\"shipping_settings\"][\"enable_shipping_default_tax\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingSettings.patchShippingSettings(client, {\n    shipping_settings: {enable_shipping_default_tax: true},\n});\nconsole.log(response.map.shipping_settings.enable_shipping_default_tax);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingSettings::patchShippingSettings($client, [\n    'shipping_settings' => ['enable_shipping_default_tax' => true],\n]);\n\necho $response->map['shipping_settings']['enable_shipping_default_tax'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().patchShippingSettings(\n        Map.of(\"shipping_settings\", Map.of(\"enable_shipping_default_tax\", true)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nSystem.out.println(settings.get(\"enable_shipping_default_tax\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.PatchShippingSettingsAsync(new Dictionary<string, object?>\n{\n    [\"shipping_settings\"] = new Dictionary<string, object?> { [\"enable_shipping_default_tax\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine(shippingSettings[\"enable_shipping_default_tax\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingSettings.patchShippingSettings({\n  'shipping_settings': {'enable_shipping_default_tax': true},\n});\nfinal shippingSettings = (response.map as Map)['shipping_settings'] as Map;\nprint(shippingSettings['enable_shipping_default_tax']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().PatchShippingSettings(ctx, map[string]any{\n\t\"shipping_settings\": map[string]any{\"enable_shipping_default_tax\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)[\"enable_shipping_default_tax\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in `shipping_settings`, or send them bare at the top level. Send only the fields that change.",
+                "properties": {
+                  "shipping_settings": {
+                    "$ref": "#/components/schemas/ShippingSettingsInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Shipping settings"
+        ],
+        "summary": "Check the shipping settings",
+        "operationId": "head_shipping_settings",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0`, and there is no `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0`. No body and no `ETag`."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.head_shipping_settings()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, shippingSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingSettings.headShippingSettings(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingSettings::headShippingSettings($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().headShippingSettings();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.HeadShippingSettingsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingSettings.headShippingSettings();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().HeadShippingSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -26366,6 +26655,314 @@
               "request_id": {
                 "type": "string",
                 "description": "A value that identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "ShippingSettings": {
+        "type": "object",
+        "description": "The seven shipping settings. None of them has a path of its own.",
+        "properties": {
+          "default_shipping_profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShippingSettingsProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The default shipping profile, as the profile's `{id, name}` record, or `null` for `No Shipping`."
+          },
+          "enable_shipping_default_tax": {
+            "type": "boolean",
+            "description": "`true` turns on the default tax for shipping. Changing it changes no other field."
+          },
+          "default_delivery_profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShippingSettingsProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The default delivery profile, as the profile's `{id, name}` record, or `null` for `No Shipping`."
+          },
+          "enable_delivery_default_tax": {
+            "type": "boolean",
+            "description": "`true` turns on the default tax for delivery."
+          },
+          "shipping_tax_profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShippingSettingsProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The shipping tax profile, as the profile's `{id, name}` record, or `null` for `No Tax`."
+          },
+          "enable_shipping_class": {
+            "type": "boolean",
+            "description": "`true` turns on shipping classes. Turning it off also turns `enable_flat_view_class` off."
+          },
+          "enable_flat_view_class": {
+            "type": "boolean",
+            "description": "Depends on `enable_shipping_class`: it stays `false` while `enable_shipping_class` is `false`, even when you write `true`."
+          }
+        }
+      },
+      "ShippingSettingsProfile": {
+        "type": "object",
+        "description": "The profile a profile field points at.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The profile's `id`. Send it in a write to choose this profile."
+          },
+          "name": {
+            "type": "string",
+            "description": "The profile's name."
+          }
+        }
+      },
+      "ShippingSettingsInput": {
+        "type": "object",
+        "description": "The fields to change. Every field is optional; send only the ones that change.",
+        "properties": {
+          "default_shipping_profile": {
+            "$ref": "#/components/schemas/ShippingSettingsProfileInput",
+            "description": "The profile to choose as the default shipping profile."
+          },
+          "enable_shipping_default_tax": {
+            "type": "boolean",
+            "description": "`true` turns on the default tax for shipping. Changing it changes no other field. A string is rejected with `400`."
+          },
+          "default_delivery_profile": {
+            "$ref": "#/components/schemas/ShippingSettingsProfileInput",
+            "description": "The profile to choose as the default delivery profile."
+          },
+          "enable_delivery_default_tax": {
+            "type": "boolean",
+            "description": "`true` turns on the default tax for delivery. A string is rejected with `400`."
+          },
+          "shipping_tax_profile": {
+            "$ref": "#/components/schemas/ShippingSettingsProfileInput",
+            "description": "The profile to choose as the shipping tax profile."
+          },
+          "enable_shipping_class": {
+            "type": "boolean",
+            "description": "`true` turns on shipping classes. Turning it off also turns `enable_flat_view_class` off. When you turn it back on, write `enable_flat_view_class` as well. A string is rejected with `400`."
+          },
+          "enable_flat_view_class": {
+            "type": "boolean",
+            "description": "Depends on `enable_shipping_class`: it stays `false` while `enable_shipping_class` is `false`, even when you write `true`. A string is rejected with `400`."
+          }
+        }
+      },
+      "ShippingSettingsProfileInput": {
+        "description": "The profile to choose, by its `id`. The profile `id`s you can send are in the field's `options` under `field_metadata`. A profile `id` that none of the `options` has is rejected with `400 invalid_reference`, and a bare name string with `400` and `id must be an integer`. A `{\"code\": …}` record is looked up by code, and is rejected with `400 invalid_reference` when no profile matches.",
+        "anyOf": [
+          {
+            "type": "integer",
+            "description": "The profile's `id`, such as `4`."
+          },
+          {
+            "type": "string",
+            "description": "The profile's `id` as a numeric string, such as `\"1\"`. A name is rejected."
+          },
+          {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "description": "A record with the profile's `id`. The `{id, name}` record a read returns is accepted as it is.",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "The profile's `id`."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "description": "A record with the profile's name.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The profile's name."
+              }
+            }
+          },
+          {
+            "type": "null",
+            "description": "The `No Shipping` or `No Tax` option."
+          }
+        ]
+      },
+      "ShippingSettingsGroupMeta": {
+        "type": "object",
+        "description": "A single entry, `shipping_settings`.",
+        "properties": {
+          "shipping_settings": {
+            "$ref": "#/components/schemas/ShippingSettingsAreaMeta"
+          }
+        }
+      },
+      "ShippingSettingsAreaMeta": {
+        "type": "object",
+        "description": "What the settings group is and whether you can write it. There is no `href`.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "The kind of group: `setting`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write these settings: `true`."
+          }
+        }
+      },
+      "ShippingSettingsFieldMetadata": {
+        "type": "object",
+        "description": "Describes each of the seven fields, keyed by field name. Returned only when you send `field_metadata=true`.",
+        "properties": {
+          "default_shipping_profile": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          },
+          "enable_shipping_default_tax": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          },
+          "default_delivery_profile": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          },
+          "enable_delivery_default_tax": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          },
+          "shipping_tax_profile": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          },
+          "enable_shipping_class": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          },
+          "enable_flat_view_class": {
+            "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
+          }
+        }
+      },
+      "ShippingSettingsFieldOption": {
+        "type": "object",
+        "description": "One profile you can choose for a profile field.",
+        "properties": {
+          "id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The profile's `id`. Send it in a write to choose this profile. `null` on the `No Shipping` or `No Tax` option: send `null` to choose it."
+          },
+          "name": {
+            "type": "string",
+            "description": "The profile's name, or `No Shipping` or `No Tax`."
+          }
+        }
+      },
+      "ShippingSettingsFieldDescription": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes: `reference` for the three profile fields, `boolean` for the other four."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field does."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the field is required."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether a write can set the field."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "Whether the field is read-only."
+          },
+          "key_path": {
+            "type": "string",
+            "description": "Where the field sits in the body, such as `shipping_settings.enable_shipping_class`."
+          },
+          "default": {
+            "description": "The field's default value. Only on the four boolean fields."
+          },
+          "depends_on": {
+            "type": "string",
+            "description": "Only on `enable_flat_view_class`: `enable_shipping_class`, the field it depends on."
+          },
+          "nullable": {
+            "type": "boolean",
+            "description": "Whether the field can be `null`. Only on the three profile fields, where it is `true`."
+          },
+          "references": {
+            "type": "string",
+            "description": "Only on the three profile fields: the kind of profile the field points at. `shipping_profile` on `default_shipping_profile` and `default_delivery_profile`, `custom_tax_profile` on `shipping_tax_profile`."
+          },
+          "accepts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Only on the three profile fields: `id` and `name`, and also `code` on `shipping_tax_profile`. A bare name string is still rejected with `400`: send `{\"name\": …}` or the profile's `id` instead."
+          },
+          "write_key": {
+            "type": "string",
+            "description": "Only on the three profile fields: `id`."
+          },
+          "options": {
+            "type": "array",
+            "description": "Only on the three profile fields: the profiles you can choose, starting with the `No Shipping` or `No Tax` option, whose `id` is `null`. Send an option's `id` to choose that profile.",
+            "items": {
+              "$ref": "#/components/schemas/ShippingSettingsFieldOption"
+            }
+          }
+        }
+      },
+      "ShippingSettingsError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `invalid_reference`, `not_found` or `method_not_allowed`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What was wrong, such as `shipping_settings body missing`."
+              },
+              "details": {
+                "type": "array",
+                "description": "Extra detail about the error, or an empty list.",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "The request's id."
               }
             }
           }

@@ -1,0 +1,9 @@
+---
+title: "Update shipping settings"
+description: "Changes the shipping settings you send and returns all seven after the change."
+openapi: "PATCH /admin/settings/shipping_settings"
+---
+
+Send the fields to change, wrapped in `shipping_settings` or bare at the top level: both are accepted. Fields you leave out keep their stored values, except `enable_flat_view_class`, which turns off when you turn `enable_shipping_class` off. Set a profile field with the profile's `id`; a bare name string is rejected. Returns all seven settings after the change, with `group_meta`, as [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings) does.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

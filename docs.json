@@ -235,6 +235,16 @@
                   "api-reference/seo-configuration/update-a-redirect",
                   "api-reference/seo-configuration/delete-a-redirect"
                 ]
+              },
+              {
+                "group": "Shipping settings",
+                "expanded": false,
+                "pages": [
+                  "shipping-settings",
+                  "api-reference/shipping-settings/get-shipping-settings",
+                  "api-reference/shipping-settings/update-shipping-settings",
+                  "api-reference/shipping-settings/check-the-shipping-settings"
+                ]
               }
             ]
           },

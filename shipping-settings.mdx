@@ -1,0 +1,60 @@
+---
+title: "Shipping settings"
+sidebarTitle: "Overview"
+description: "Read and change your store's default shipping, delivery and shipping tax profiles, its default tax switches for shipping and delivery, and its shipping class switches."
+---
+
+The Shipping settings API has three endpoints, and you can call every one from all seven SDKs. All three use one path, `/api/v4/admin/settings/shipping_settings`.
+
+<Warning>
+  **Turning `enable_shipping_class` off also turns `enable_flat_view_class` off.** While
+  `enable_shipping_class` is `false`, a write of `"enable_flat_view_class": true` returns `200`,
+  but the value stays `false`, so check the value in the response. Turning `enable_shipping_class`
+  back on does not turn `enable_flat_view_class` back on: write `enable_flat_view_class` as well,
+  or it stays `false`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_settings` | Returns all seven shipping settings, and `group_meta` saying whether you can write them. |
+| [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shipping_settings` | Changes the shipping settings you send and returns all seven after the change. |
+| [Check the shipping settings](/api-reference/shipping-settings/check-the-shipping-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_settings` | Checks that the shipping settings are reachable. Returns headers only, with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The seven settings have no paths of their own.** Read and write all seven at
+  `/admin/settings/shipping_settings`. A path such as
+  `/admin/settings/shipping_settings/enable_shipping_class` returns `404 not_found` with the message
+  `Unknown settings path: shipping_settings/enable_shipping_class`, whatever the method. `group_meta`
+  has a single entry, `shipping_settings`, with `kind` and `writable` and no `href`.
+- **`PATCH` is the only way to write, and it changes only the fields you send, with one exception.**
+  Wrap the fields in `shipping_settings` or send them bare at the top level: both are accepted.
+  Fields you leave out keep their stored values, except `enable_flat_view_class`, which turns off
+  when you turn `enable_shipping_class` off. You can send the settings from a read straight back as a
+  write, profile records included. `PUT`, `POST` and `DELETE` are rejected with
+  `405 method_not_allowed` and an `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **A profile field takes the profile's `id`, not a bare name.** `default_shipping_profile`,
+  `default_delivery_profile` and `shipping_tax_profile` each read back as `{"id": …, "name": …}` or as
+  `null`. To change one, send the profile's `id` as a number or as a numeric string such as `"1"`, an
+  `{"id": …}` or `{"name": …}` record, or `null` for the `No Shipping` or `No Tax` option. A bare name
+  string is rejected with `400` and `id must be an integer`, even though `field_metadata` lists `name`
+  under `accepts`. Each profile field's `options` in `field_metadata` lists the profiles you can
+  choose, with their `id`s.
+- **Add `field_metadata=true` to a read to get a description of each field.** The settings and
+  `group_meta` are still returned. `field_metadata` is keyed by field name and covers exactly the
+  seven fields. Every entry has `type`, `ui_label`, `description`, `required`, `writable`, `read_only`
+  and a `key_path` such as `shipping_settings.enable_shipping_class`. A boolean field's entry adds
+  `default`, and the `enable_flat_view_class` entry also adds `depends_on`, which names
+  `enable_shipping_class`. A profile field's entry adds `nullable`, `references`, `accepts`, `write_key`
+  and `options`, a list of `{id, name}` records for the profiles you can choose. The first option is
+  `No Shipping`, or `No Tax` on `shipping_tax_profile`, and its `id` is `null`.
+- **`400`, `404` and `405` responses share one shape:** an `error` object with `code`, `message`,
+  `details` and `request_id`.
