@@ -52,6 +52,9 @@
       "name": "Ecommerce settings"
     },
     {
+      "name": "Price display settings"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -9791,6 +9794,1094 @@
         }
       }
     },
+    "/admin/settings/price_display_settings": {
+      "get": {
+        "tags": [
+          "Price display settings"
+        ],
+        "summary": "Get price display settings",
+        "operationId": "get_price_display_settings",
+        "description": "Returns every price display setting under `price_display_settings`, with both sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field in both sections, keyed by section. The settings and `group_meta` are still returned. The value must be `true`/`false` or `1`/`0`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Both sections and `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "price_display_settings": {
+                      "$ref": "#/components/schemas/PriceDisplaySettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/PriceDisplayGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/PriceDisplayFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section."
+                    }
+                  }
+                },
+                "example": {
+                  "price_display_settings": {
+                    "order_item": {
+                      "price_including_tax": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "price_including_discount": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "tax_in_line": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "order_success": false
+                        }
+                      },
+                      "discount_in_line_item": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "item_total_including_tax": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "order_success": false
+                        }
+                      }
+                    },
+                    "order_summary": {
+                      "order_total_excluding_tax": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "order_total_including_discount": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "subtotal": {
+                        "show": {
+                          "shopping_cart": true,
+                          "checkout": true,
+                          "order_success": true
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "include_discount": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "discount": {
+                        "show": {
+                          "shopping_cart": true,
+                          "checkout": true,
+                          "order_success": true
+                        },
+                        "hide_if_zero": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "subtotal_tax": {
+                        "enabled": false
+                      },
+                      "total_tax": {
+                        "enabled": false
+                      },
+                      "order_total": {
+                        "enabled": true
+                      },
+                      "shipping_cost": {
+                        "show": {
+                          "checkout": true,
+                          "order_success": true
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "include_discount": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "shipping_discount": {
+                        "show": {
+                          "checkout": false,
+                          "order_success": false
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "shipping_tax": {
+                          "enabled": true
+                        }
+                      },
+                      "handling": {
+                        "show_separately": {
+                          "checkout": false,
+                          "order_success": false
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "handling_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "payment_surcharge": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "pricing_info": {
+                        "enabled": false,
+                        "text": "",
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        },
+                        "do_not_show_due_amount": false
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "order_item": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/price_display_settings/order_item"
+                    },
+                    "order_summary": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/price_display_settings/order_summary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a query parameter the call does not accept: the message is `unknown query parameter(s): <name>` and `details[0].code` is `unknown_parameter`. Or `field_metadata` is not `true`/`false` or `1`/`0`: the message is `field_metadata must be true/false or 0/1` and `details[0].code` is `invalid_boolean`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceDisplaySettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "unknown query parameter(s): bogus",
+                    "details": [
+                      {
+                        "field": "bogus",
+                        "code": "unknown_parameter",
+                        "message": null
+                      }
+                    ],
+                    "request_id": "5b2e8c41-7d3a-4f6b-9e10-3a8c2d7f4b65"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/price_display_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.price_display_settings.get_price_display_settings()\nsettings = response.map[\"price_display_settings\"]\nprint(settings[\"order_item\"][\"price_including_tax\"][\"enabled\"])\nprint(settings[\"order_summary\"][\"order_total\"][\"enabled\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.priceDisplaySettings.getPriceDisplaySettings();\nconst settings = response.map.price_display_settings;\nconsole.log(settings.order_item.price_including_tax.enabled);\nconsole.log(settings.order_summary.payment_surcharge.enabled);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = PriceDisplaySettings::getPriceDisplaySettings($client);\n\n$settings = $response->map['price_display_settings'];\necho 'price including tax: ', $settings['order_item']['price_including_tax']['enabled'] ? 'on' : 'off', PHP_EOL;\necho 'order total: ', $settings['order_summary']['order_total']['enabled'] ? 'on' : 'off', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.priceDisplaySettings().getPriceDisplaySettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"price_display_settings\");\nMap<?, ?> orderItem = (Map<?, ?>) settings.get(\"order_item\");\nMap<?, ?> orderSummary = (Map<?, ?>) settings.get(\"order_summary\");\nSystem.out.println(((Map<?, ?>) orderItem.get(\"price_including_tax\")).get(\"enabled\"));\nSystem.out.println(((Map<?, ?>) orderSummary.get(\"order_total\")).get(\"enabled\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.PriceDisplaySettings.GetPriceDisplaySettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar priceDisplaySettings = (IReadOnlyDictionary<string, object?>)body[\"price_display_settings\"]!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)priceDisplaySettings[\"order_item\"]!;\nvar priceIncludingTax = (IReadOnlyDictionary<string, object?>)orderItem[\"price_including_tax\"]!;\nConsole.WriteLine($\"{priceIncludingTax[\"enabled\"]} {priceIncludingTax[\"customize\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.priceDisplaySettings.getPriceDisplaySettings();\nfinal settings = (response.map as Map)['price_display_settings'] as Map;\nprint(settings['order_item']);\nprint(settings['order_summary']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.PriceDisplaySettings().GetPriceDisplaySettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"price_display_settings\"].(map[string]any)\ntax := settings[\"order_item\"].(map[string]any)[\"price_including_tax\"].(map[string]any)\ntotal := settings[\"order_summary\"].(map[string]any)[\"order_total\"].(map[string]any)\nfmt.Println(tax[\"enabled\"], tax[\"scopes\"], total[\"enabled\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Price display settings"
+        ],
+        "summary": "Update price display settings",
+        "operationId": "patch_price_display_settings",
+        "description": "Send the fields to change inside `price_display_settings`, grouped by section name; one body can change both sections. Only the fields you send change, and everything you leave out keeps its stored value. Returns all the settings after the change, with `group_meta`, as [Get price display settings](/api-reference/price-display-settings/get-price-display-settings) does. A body not wrapped in `price_display_settings` is rejected with `400 invalid_request`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`. While a block's `customize` is `false`, its `scopes` follow its `enabled` value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "price_display_settings": {
+                      "$ref": "#/components/schemas/PriceDisplaySettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/PriceDisplayGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "price_display_settings": {
+                    "order_item": {
+                      "price_including_tax": {
+                        "enabled": true,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": true,
+                          "checkout": true,
+                          "order_success": true
+                        }
+                      },
+                      "price_including_discount": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "tax_in_line": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "order_success": false
+                        }
+                      },
+                      "discount_in_line_item": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "item_total_including_tax": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "order_success": false
+                        }
+                      }
+                    },
+                    "order_summary": {
+                      "order_total_excluding_tax": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "order_total_including_discount": {
+                        "enabled": false,
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        }
+                      },
+                      "subtotal": {
+                        "show": {
+                          "shopping_cart": true,
+                          "checkout": true,
+                          "order_success": true
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "include_discount": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "discount": {
+                        "show": {
+                          "shopping_cart": true,
+                          "checkout": true,
+                          "order_success": true
+                        },
+                        "hide_if_zero": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "shopping_cart": false,
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "subtotal_tax": {
+                        "enabled": false
+                      },
+                      "total_tax": {
+                        "enabled": false
+                      },
+                      "order_total": {
+                        "enabled": true
+                      },
+                      "shipping_cost": {
+                        "show": {
+                          "checkout": true,
+                          "order_success": true
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "include_discount": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "shipping_discount": {
+                        "show": {
+                          "checkout": false,
+                          "order_success": false
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "shipping_tax": {
+                          "enabled": true
+                        }
+                      },
+                      "handling": {
+                        "show_separately": {
+                          "checkout": false,
+                          "order_success": false
+                        },
+                        "include_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        },
+                        "handling_tax": {
+                          "enabled": false,
+                          "customize": false,
+                          "scopes": {
+                            "checkout": false,
+                            "order_success": false
+                          }
+                        }
+                      },
+                      "payment_surcharge": {
+                        "enabled": true,
+                        "customize": false,
+                        "scopes": {
+                          "checkout": true,
+                          "order_success": true
+                        }
+                      },
+                      "pricing_info": {
+                        "enabled": false,
+                        "text": "",
+                        "customize": false,
+                        "scopes": {
+                          "shopping_cart": false,
+                          "checkout": false,
+                          "order_success": false
+                        },
+                        "do_not_show_due_amount": false
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "order_item": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/price_display_settings/order_item"
+                    },
+                    "order_summary": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/price_display_settings/order_summary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `price_display_settings` (`required`), names a section or field that does not exist (`unknown_field`), sends a value other than `true`/`false` or `1`/`0` for a `true`/`false` field (`invalid_boolean`), sends a surface the block does not accept (`invalid_enum`), or sends a `pricing_info.text` longer than 2000 characters (`too_long`). `details` has one entry per rejected field, and each entry's `code` gives the reason. An empty section, such as `\"order_item\": {}`, is rejected too, with the message `no recognized price_display_settings fields in body` and an empty `details`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceDisplaySettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "request body must be wrapped in a 'price_display_settings' object",
+                    "details": [
+                      {
+                        "field": "price_display_settings",
+                        "code": "required",
+                        "message": "the request body must be wrapped in a 'price_display_settings' object"
+                      }
+                    ],
+                    "request_id": "c47a1e93-2b6d-4f08-8a5c-9d3e7b1f6a20"
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The `Content-Type` header is not `application/json`. The message is `Content-Type must be application/json` and `details[0].code` is `unsupported_media_type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceDisplaySettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "unsupported_media_type",
+                    "message": "Content-Type must be application/json",
+                    "details": [
+                      {
+                        "field": "Content-Type",
+                        "code": "unsupported_media_type",
+                        "message": null,
+                        "value": "text/plain"
+                      }
+                    ],
+                    "request_id": "3a9f6c12-8e4b-4d27-b5a0-6c1e9d2f7b48"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/price_display_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"price_display_settings\": {\n      \"order_item\": {\n        \"price_including_tax\": {\n          \"enabled\": true,\n          \"customize\": false\n        }\n      },\n      \"order_summary\": {\n        \"payment_surcharge\": {\n          \"enabled\": true,\n          \"customize\": false\n        }\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.price_display_settings.patch_price_display_settings({\n    \"price_display_settings\": {\n        \"order_item\": {\"price_including_tax\": {\"enabled\": True, \"customize\": False}},\n        \"order_summary\": {\"payment_surcharge\": {\"enabled\": True, \"customize\": False}},\n    },\n})\nsettings = response.map[\"price_display_settings\"]\nprint(settings[\"order_item\"][\"price_including_tax\"][\"scopes\"])\nprint(settings[\"order_summary\"][\"payment_surcharge\"][\"enabled\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.priceDisplaySettings.patchPriceDisplaySettings({\n    price_display_settings: {\n        order_item: {price_including_tax: {enabled: true, customize: false}},\n        order_summary: {payment_surcharge: {enabled: true, customize: false}},\n    },\n});\nconst settings = response.map.price_display_settings;\nconsole.log(settings.order_item.price_including_tax.enabled);\nconsole.log(settings.order_summary.payment_surcharge.enabled);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = PriceDisplaySettings::patchPriceDisplaySettings($client, [\n    'price_display_settings' => [\n        'order_item' => ['price_including_tax' => ['enabled' => true, 'customize' => false]],\n        'order_summary' => ['payment_surcharge' => ['enabled' => true, 'customize' => false]],\n    ],\n]);\n\n$settings = $response->map['price_display_settings'];\necho $settings['order_item']['price_including_tax']['enabled'] ? 'true' : 'false', PHP_EOL;\necho $settings['order_summary']['payment_surcharge']['enabled'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.priceDisplaySettings().patchPriceDisplaySettings(Map.of(\"price_display_settings\", Map.of(\n        \"order_item\", Map.of(\"price_including_tax\", Map.of(\"enabled\", true, \"customize\", false)),\n        \"order_summary\", Map.of(\"payment_surcharge\", Map.of(\"enabled\", true, \"customize\", false)))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"price_display_settings\");\nMap<?, ?> priceIncludingTax = (Map<?, ?>) ((Map<?, ?>) settings.get(\"order_item\")).get(\"price_including_tax\");\nMap<?, ?> paymentSurcharge = (Map<?, ?>) ((Map<?, ?>) settings.get(\"order_summary\")).get(\"payment_surcharge\");\nSystem.out.println(priceIncludingTax.get(\"enabled\") + \" \" + priceIncludingTax.get(\"scopes\"));\nSystem.out.println(paymentSurcharge.get(\"enabled\") + \" \" + paymentSurcharge.get(\"scopes\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.PriceDisplaySettings.PatchPriceDisplaySettingsAsync(new Dictionary<string, object?>\n{\n    [\"price_display_settings\"] = new Dictionary<string, object?>\n    {\n        [\"order_item\"] = new Dictionary<string, object?> { [\"price_including_tax\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"customize\"] = false } },\n        [\"order_summary\"] = new Dictionary<string, object?> { [\"payment_surcharge\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"customize\"] = false } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar priceDisplaySettings = (IReadOnlyDictionary<string, object?>)body[\"price_display_settings\"]!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)priceDisplaySettings[\"order_item\"]!;\nConsole.WriteLine(((IReadOnlyDictionary<string, object?>)orderItem[\"price_including_tax\"]!)[\"enabled\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.priceDisplaySettings.patchPriceDisplaySettings({\n  'price_display_settings': {\n    'order_item': {\n      'price_including_tax': {'enabled': true, 'customize': false},\n    },\n    'order_summary': {\n      'payment_surcharge': {'enabled': true, 'customize': false},\n    },\n  },\n});\nfinal settings = (response.map as Map)['price_display_settings'] as Map;\nprint('${settings['order_item']} ${settings['order_summary']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.PriceDisplaySettings().PatchPriceDisplaySettings(ctx, map[string]any{\n\t\"price_display_settings\": map[string]any{\n\t\t\"order_item\":    map[string]any{\"price_including_tax\": map[string]any{\"enabled\": true, \"customize\": false}},\n\t\t\"order_summary\": map[string]any{\"payment_surcharge\": map[string]any{\"enabled\": true, \"customize\": false}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"price_display_settings\"].(map[string]any)\ntax := settings[\"order_item\"].(map[string]any)[\"price_including_tax\"].(map[string]any)\nfmt.Println(tax[\"enabled\"], tax[\"scopes\"], settings[\"order_summary\"].(map[string]any)[\"payment_surcharge\"].(map[string]any)[\"enabled\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "price_display_settings"
+                ],
+                "properties": {
+                  "price_display_settings": {
+                    "$ref": "#/components/schemas/PriceDisplaySettings",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Price display settings"
+        ],
+        "summary": "Get price display settings headers",
+        "operationId": "head_price_display_settings",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/price_display_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.price_display_settings.head_price_display_settings()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.priceDisplaySettings.headPriceDisplaySettings();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = PriceDisplaySettings::headPriceDisplaySettings($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.priceDisplaySettings().headPriceDisplaySettings();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.PriceDisplaySettings.HeadPriceDisplaySettingsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.priceDisplaySettings.headPriceDisplaySettings();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.PriceDisplaySettings().HeadPriceDisplaySettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/price_display_settings/{section}": {
+      "get": {
+        "tags": [
+          "Price display settings"
+        ],
+        "summary": "Get a settings section",
+        "operationId": "get_price_display_settings_section",
+        "description": "Returns one section, wrapped in the section's own name rather than in `price_display_settings`, and without `group_meta`. Its values are the same as that section's part of [Get price display settings](/api-reference/price-display-settings/get-price-display-settings). Add `field_metadata=true` to also get a description of the section's fields, under the section's own name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `order_item` or `order_summary`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "order_item",
+                "order_summary"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields under the section's own name. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "order_item": {
+                      "$ref": "#/components/schemas/PriceDisplayOrderItem"
+                    },
+                    "order_summary": {
+                      "$ref": "#/components/schemas/PriceDisplayOrderSummary"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/PriceDisplayFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Holds one key, the section's own name."
+                    }
+                  }
+                },
+                "example": {
+                  "order_item": {
+                    "price_including_tax": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "checkout": false,
+                        "order_success": false
+                      }
+                    },
+                    "price_including_discount": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "checkout": false,
+                        "order_success": false
+                      }
+                    },
+                    "tax_in_line": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "order_success": false
+                      }
+                    },
+                    "discount_in_line_item": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "checkout": false,
+                        "order_success": false
+                      }
+                    },
+                    "item_total_including_tax": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "order_success": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The message is `Unknown price_display_settings section: <section>`. Right after another settings area rejects a call on its section path with `400`, the next call on the same client can also return this `404` once, naming the last part of that earlier path as the section.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceDisplaySettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown price_display_settings section: bogus_section",
+                    "details": [],
+                    "request_id": "8d3f5a27-6c1e-4b94-a0d8-2e7b9c4f1a36"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/price_display_settings/order_item\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.price_display_settings.get_price_display_settings_section(\"order_item\")\norder_item = response.map[\"order_item\"]\nprint(order_item[\"price_including_tax\"][\"enabled\"], order_item[\"tax_in_line\"][\"enabled\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.priceDisplaySettings.getPriceDisplaySettingsSection('order_item');\nconst orderItem = response.map.order_item;\nconsole.log(orderItem.price_including_tax.enabled, orderItem.price_including_discount.enabled);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = PriceDisplaySettings::getPriceDisplaySettingsSection($client, 'order_item');\n\nforeach ($response->map['order_item'] as $name => $block) {\n    echo $name, $block['enabled'] ? ' on' : ' off', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.priceDisplaySettings().getPriceDisplaySettingsSection(\"order_item\");\nMap<?, ?> orderItem = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_item\");\nMap<?, ?> priceIncludingDiscount = (Map<?, ?>) orderItem.get(\"price_including_discount\");\nSystem.out.println(priceIncludingDiscount.get(\"enabled\") + \" \" + priceIncludingDiscount.get(\"customize\"));\nSystem.out.println(priceIncludingDiscount.get(\"scopes\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.PriceDisplaySettings.GetPriceDisplaySettingsSectionAsync(\"order_item\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)body[\"order_item\"]!;\nvar priceIncludingDiscount = (IReadOnlyDictionary<string, object?>)orderItem[\"price_including_discount\"]!;\nConsole.WriteLine($\"{priceIncludingDiscount[\"enabled\"]} {priceIncludingDiscount[\"customize\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.priceDisplaySettings\n    .getPriceDisplaySettingsSection('order_item');\nfinal orderItem = (response.map as Map)['order_item'] as Map;\nprint(orderItem['price_including_tax']);\nprint(orderItem['price_including_discount']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.PriceDisplaySettings().GetPriceDisplaySettingsSection(ctx, \"order_item\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntax := resp.Map().(map[string]any)[\"order_item\"].(map[string]any)[\"price_including_tax\"].(map[string]any)\nfmt.Println(tax[\"enabled\"], tax[\"customize\"], tax[\"scopes\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Price display settings"
+        ],
+        "summary": "Update a settings section",
+        "operationId": "patch_price_display_settings_section",
+        "description": "Send the fields to change wrapped in the section's own name, such as `order_item`, or send them with no wrapper at all. A body wrapped in `price_display_settings` is rejected with `400 invalid_request`, and the error names `<section>.price_display_settings` as an unknown field. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change, under its own key and without `group_meta`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `order_item` or `order_summary`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "order_item",
+                "order_summary"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key. While a block's `customize` is `false`, its `scopes` follow its `enabled` value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section in the path.",
+                  "properties": {
+                    "order_item": {
+                      "$ref": "#/components/schemas/PriceDisplayOrderItem"
+                    },
+                    "order_summary": {
+                      "$ref": "#/components/schemas/PriceDisplayOrderSummary"
+                    }
+                  }
+                },
+                "example": {
+                  "order_item": {
+                    "price_including_tax": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "checkout": false,
+                        "order_success": false
+                      }
+                    },
+                    "price_including_discount": {
+                      "enabled": true,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": true,
+                        "checkout": true,
+                        "order_success": true
+                      }
+                    },
+                    "tax_in_line": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "order_success": false
+                      }
+                    },
+                    "discount_in_line_item": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "checkout": false,
+                        "order_success": false
+                      }
+                    },
+                    "item_total_including_tax": {
+                      "enabled": false,
+                      "customize": false,
+                      "scopes": {
+                        "shopping_cart": false,
+                        "order_success": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `price_display_settings` or names a field the section does not have, sends a surface the block does not accept (`invalid_enum`), or sends a `pricing_info.text` longer than 2000 characters (`too_long`). `details` has one entry per rejected field, and each entry's `code` gives the reason.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceDisplaySettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "order_summary.pricing_info.text: must be at most 2000 characters",
+                    "details": [
+                      {
+                        "field": "order_summary.pricing_info.text",
+                        "code": "too_long",
+                        "message": "must be at most 2000 characters"
+                      }
+                    ],
+                    "request_id": "1e6b9d42-3f7a-4c85-b2e0-7a4d8c1f5e93"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/price_display_settings/order_item\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"order_item\": {\n      \"price_including_discount\": {\n        \"enabled\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.price_display_settings.patch_price_display_settings_section(\n    \"order_item\", {\"order_item\": {\"price_including_discount\": {\"enabled\": True}}}\n)\ndiscount = response.map[\"order_item\"][\"price_including_discount\"]\nprint(discount[\"enabled\"], discount[\"scopes\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.priceDisplaySettings.patchPriceDisplaySettingsSection('order_item', {\n    order_item: {price_including_discount: {enabled: true}},\n});\nconsole.log(response.map.order_item.price_including_discount.enabled);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = PriceDisplaySettings::patchPriceDisplaySettingsSection($client, 'order_item', [\n    'order_item' => ['price_including_discount' => ['enabled' => true]],\n]);\n\n$block = $response->map['order_item']['price_including_discount'];\necho 'enabled: ', $block['enabled'] ? 'true' : 'false', PHP_EOL;\necho 'checkout: ', $block['scopes']['checkout'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.priceDisplaySettings().patchPriceDisplaySettingsSection(\"order_item\",\n        Map.of(\"order_item\", Map.of(\"price_including_discount\", Map.of(\"enabled\", true))));\nMap<?, ?> orderItem = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_item\");\nMap<?, ?> priceIncludingDiscount = (Map<?, ?>) orderItem.get(\"price_including_discount\");\nSystem.out.println(priceIncludingDiscount.get(\"enabled\") + \" \" + priceIncludingDiscount.get(\"scopes\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.PriceDisplaySettings.PatchPriceDisplaySettingsSectionAsync(\"order_item\", new Dictionary<string, object?>\n{\n    [\"order_item\"] = new Dictionary<string, object?> { [\"price_including_discount\"] = new Dictionary<string, object?> { [\"enabled\"] = true } },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)body[\"order_item\"]!;\nvar priceIncludingDiscount = (IReadOnlyDictionary<string, object?>)orderItem[\"price_including_discount\"]!;\nConsole.WriteLine(priceIncludingDiscount[\"enabled\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.priceDisplaySettings\n    .patchPriceDisplaySettingsSection('order_item', {\n  'order_item': {\n    'price_including_discount': {'enabled': true},\n  },\n});\nfinal orderItem = (response.map as Map)['order_item'] as Map;\nprint(orderItem['price_including_discount']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.PriceDisplaySettings().PatchPriceDisplaySettingsSection(ctx, \"order_item\", map[string]any{\n\t\"order_item\": map[string]any{\"price_including_discount\": map[string]any{\"enabled\": true}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndiscount := resp.Map().(map[string]any)[\"order_item\"].(map[string]any)[\"price_including_discount\"].(map[string]any)\nfmt.Println(discount[\"enabled\"], discount[\"scopes\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the name of the section in the path, or send them with no wrapper. Do not wrap them in `price_display_settings`.",
+                "properties": {
+                  "order_item": {
+                    "$ref": "#/components/schemas/PriceDisplayOrderItem"
+                  },
+                  "order_summary": {
+                    "$ref": "#/components/schemas/PriceDisplayOrderSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -15574,6 +16665,375 @@
               "request_id": {
                 "type": "string",
                 "description": "The identifier of this request."
+              }
+            }
+          }
+        }
+      },
+      "PriceDisplaySettings": {
+        "type": "object",
+        "properties": {
+          "order_item": {
+            "$ref": "#/components/schemas/PriceDisplayOrderItem"
+          },
+          "order_summary": {
+            "$ref": "#/components/schemas/PriceDisplayOrderSummary"
+          }
+        }
+      },
+      "PriceDisplayOrderItem": {
+        "type": "object",
+        "description": "The `order_item` section: how each line item's own price shows.",
+        "properties": {
+          "price_including_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show each line item's price with tax included."
+          },
+          "price_including_discount": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show each line item's price with the discount included."
+          },
+          "tax_in_line": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the tax on each line item. Accepts the `shopping_cart` and `order_success` surfaces only."
+          },
+          "discount_in_line_item": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the discount on each line item."
+          },
+          "item_total_including_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show each line item's total with tax included. Accepts the `shopping_cart` and `order_success` surfaces only."
+          }
+        }
+      },
+      "PriceDisplayOrderSummary": {
+        "type": "object",
+        "description": "The `order_summary` section: the lines of the order summary and what each one includes.",
+        "properties": {
+          "order_total_excluding_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the order total with tax excluded."
+          },
+          "order_total_including_discount": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the order total with the discount included."
+          },
+          "subtotal": {
+            "$ref": "#/components/schemas/PriceDisplaySubtotal"
+          },
+          "discount": {
+            "$ref": "#/components/schemas/PriceDisplayDiscount"
+          },
+          "subtotal_tax": {
+            "$ref": "#/components/schemas/PriceDisplayPlainToggle",
+            "description": "Show the subtotal tax line. One `enabled` value covers the shopping cart, checkout and the order success page."
+          },
+          "total_tax": {
+            "$ref": "#/components/schemas/PriceDisplayPlainToggle",
+            "description": "Show the total tax line. One `enabled` value covers checkout and the order success page."
+          },
+          "order_total": {
+            "$ref": "#/components/schemas/PriceDisplayPlainToggle",
+            "description": "Show the order total line. One `enabled` value covers the shopping cart, checkout and the order success page."
+          },
+          "shipping_cost": {
+            "$ref": "#/components/schemas/PriceDisplayShippingCost"
+          },
+          "shipping_discount": {
+            "$ref": "#/components/schemas/PriceDisplayShippingDiscount"
+          },
+          "handling": {
+            "$ref": "#/components/schemas/PriceDisplayHandling"
+          },
+          "payment_surcharge": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the payment surcharge in the order summary. Accepts the `checkout` and `order_success` surfaces only."
+          },
+          "pricing_info": {
+            "$ref": "#/components/schemas/PriceDisplayPricingInfo"
+          }
+        }
+      },
+      "PriceDisplayScopes": {
+        "type": "object",
+        "description": "The surfaces a setting applies to. A block accepts only the surfaces its `field_metadata` entry lists in `allowed_scopes`. A write that sends any other key is rejected with `400 invalid_request` and the reason `invalid_enum`.",
+        "properties": {
+          "shopping_cart": {
+            "type": "boolean",
+            "description": "The shopping cart."
+          },
+          "checkout": {
+            "type": "boolean",
+            "description": "The checkout page."
+          },
+          "order_success": {
+            "type": "boolean",
+            "description": "The order success page."
+          }
+        }
+      },
+      "PriceDisplayScopedToggle": {
+        "type": "object",
+        "description": "A setting with a master switch and optional control per surface.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "The master switch. While `customize` is `false`, every surface in `scopes` follows it."
+          },
+          "customize": {
+            "type": "boolean",
+            "description": "Set each surface in `scopes` yourself instead of following `enabled`."
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "The surfaces this setting applies to when `customize` is `true`."
+          }
+        }
+      },
+      "PriceDisplayPlainToggle": {
+        "type": "object",
+        "description": "A setting with only a master switch and no control per surface.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn the setting on or off."
+          }
+        }
+      },
+      "PriceDisplaySubtotal": {
+        "type": "object",
+        "description": "The subtotal line: where it shows, and whether it includes tax and discount.",
+        "properties": {
+          "show": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "Show the subtotal line on each surface."
+          },
+          "include_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the subtotal with tax included."
+          },
+          "include_discount": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the subtotal with the discount included."
+          }
+        }
+      },
+      "PriceDisplayDiscount": {
+        "type": "object",
+        "description": "The discount line: where it shows, whether it hides when zero, and whether it includes tax.",
+        "properties": {
+          "show": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "Show the discount line on each surface."
+          },
+          "hide_if_zero": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Hide the discount line when the discount is zero."
+          },
+          "include_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the discount with tax included."
+          }
+        }
+      },
+      "PriceDisplayShippingCost": {
+        "type": "object",
+        "description": "The shipping cost line: where it shows, and whether it includes tax and discount. Accepts the `checkout` and `order_success` surfaces only.",
+        "properties": {
+          "show": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "Show the shipping cost line on each surface."
+          },
+          "include_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the shipping cost with tax included."
+          },
+          "include_discount": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the shipping cost with the discount included."
+          }
+        }
+      },
+      "PriceDisplayShippingDiscount": {
+        "type": "object",
+        "description": "The shipping discount line and the shipping tax line. Accepts the `checkout` and `order_success` surfaces only.",
+        "properties": {
+          "show": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "Show the shipping discount line on each surface."
+          },
+          "include_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the shipping discount with tax included."
+          },
+          "shipping_tax": {
+            "$ref": "#/components/schemas/PriceDisplayPlainToggle",
+            "description": "Show the shipping tax line. One `enabled` value covers checkout and the order success page."
+          }
+        }
+      },
+      "PriceDisplayHandling": {
+        "type": "object",
+        "description": "The handling cost, shown apart from shipping, and its tax settings. Accepts the `checkout` and `order_success` surfaces only.",
+        "properties": {
+          "show_separately": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "Show the handling cost separately from shipping, on each surface."
+          },
+          "include_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the handling cost with tax included."
+          },
+          "handling_tax": {
+            "$ref": "#/components/schemas/PriceDisplayScopedToggle",
+            "description": "Show the handling tax in the order summary."
+          }
+        }
+      },
+      "PriceDisplayPricingInfo": {
+        "type": "object",
+        "description": "A pricing information note shown after the total, and whether the order success page hides the due amount.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show a custom pricing information note after the total."
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "The note's text. At most 2000 characters: a longer value is rejected with `400 invalid_request` and the reason `too_long`."
+          },
+          "customize": {
+            "type": "boolean",
+            "description": "Set the surfaces in `scopes` yourself instead of following `enabled`."
+          },
+          "scopes": {
+            "$ref": "#/components/schemas/PriceDisplayScopes",
+            "description": "The surfaces the note shows on."
+          },
+          "do_not_show_due_amount": {
+            "type": "boolean",
+            "description": "Hide the due amount on the order success page."
+          }
+        }
+      },
+      "PriceDisplayGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get price display settings](/api-reference/price-display-settings/get-price-display-settings) and [Update price display settings](/api-reference/price-display-settings/update-price-display-settings) return it.",
+        "properties": {
+          "order_item": {
+            "$ref": "#/components/schemas/PriceDisplaySectionMeta"
+          },
+          "order_summary": {
+            "$ref": "#/components/schemas/PriceDisplaySectionMeta"
+          }
+        }
+      },
+      "PriceDisplaySectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is. `setting` for both sections."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `true` for both sections."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/price_display_settings/order_item`."
+          }
+        }
+      },
+      "PriceDisplayFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Has the same nesting as the settings, with a `PriceDisplayFieldMetadataEntry` in place of each setting. A `scopes`, `show` or `show_separately` object gets one `scope_flags` entry. On `/price_display_settings` it is keyed by section; on a section path it holds that section under its own name."
+      },
+      "PriceDisplayFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "boolean",
+              "string",
+              "scope_flags"
+            ],
+            "description": "The kind of value the field takes: `boolean`, `string` or `scope_flags`."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field does."
+          },
+          "default": {
+            "description": "The field's default value, for a `boolean` or `string` field."
+          },
+          "allowed_scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The surfaces the block accepts, for a `scope_flags` field."
+          },
+          "scope_labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "A label for each surface in `allowed_scopes`."
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "The longest value accepted, for a `string` field. Only `order_summary.pricing_info.text` has it, set to `2000`."
+          }
+        }
+      },
+      "PriceDisplaySettingsError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field` or `invalid_enum`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "An id for this request."
               }
             }
           }

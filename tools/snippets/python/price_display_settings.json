@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "get_price_display_settings",
+      "code": "response = client.price_display_settings.get_price_display_settings()\nsettings = response.map[\"price_display_settings\"]\nprint(settings[\"order_item\"][\"price_including_tax\"][\"enabled\"])\nprint(settings[\"order_summary\"][\"order_total\"][\"enabled\"])\n"
+    },
+    "patch_price_display_settings": {
+      "function": "patch_price_display_settings",
+      "code": "response = client.price_display_settings.patch_price_display_settings({\n    \"price_display_settings\": {\n        \"order_item\": {\"price_including_tax\": {\"enabled\": True, \"customize\": False}},\n        \"order_summary\": {\"payment_surcharge\": {\"enabled\": True, \"customize\": False}},\n    },\n})\nsettings = response.map[\"price_display_settings\"]\nprint(settings[\"order_item\"][\"price_including_tax\"][\"scopes\"])\nprint(settings[\"order_summary\"][\"payment_surcharge\"][\"enabled\"])\n"
+    },
+    "head_price_display_settings": {
+      "function": "head_price_display_settings",
+      "code": "response = client.price_display_settings.head_price_display_settings()\nprint(response.status_code)\n"
+    },
+    "get_price_display_settings_section": {
+      "function": "get_price_display_settings_section",
+      "code": "response = client.price_display_settings.get_price_display_settings_section(\"order_item\")\norder_item = response.map[\"order_item\"]\nprint(order_item[\"price_including_tax\"][\"enabled\"], order_item[\"tax_in_line\"][\"enabled\"])\n"
+    },
+    "patch_price_display_settings_section": {
+      "function": "patch_price_display_settings_section",
+      "code": "response = client.price_display_settings.patch_price_display_settings_section(\n    \"order_item\", {\"order_item\": {\"price_including_discount\": {\"enabled\": True}}}\n)\ndiscount = response.map[\"order_item\"][\"price_including_discount\"]\nprint(discount[\"enabled\"], discount[\"scopes\"])\n"
+    }
+  }
+}

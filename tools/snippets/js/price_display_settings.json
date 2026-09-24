@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "getPriceDisplaySettings",
+      "code": "const response = await client.priceDisplaySettings.getPriceDisplaySettings();\nconst settings = response.map.price_display_settings;\nconsole.log(settings.order_item.price_including_tax.enabled);\nconsole.log(settings.order_summary.payment_surcharge.enabled);\n"
+    },
+    "patch_price_display_settings": {
+      "function": "patchPriceDisplaySettings",
+      "code": "const response = await client.priceDisplaySettings.patchPriceDisplaySettings({\n    price_display_settings: {\n        order_item: {price_including_tax: {enabled: true, customize: false}},\n        order_summary: {payment_surcharge: {enabled: true, customize: false}},\n    },\n});\nconst settings = response.map.price_display_settings;\nconsole.log(settings.order_item.price_including_tax.enabled);\nconsole.log(settings.order_summary.payment_surcharge.enabled);\n"
+    },
+    "head_price_display_settings": {
+      "function": "headPriceDisplaySettings",
+      "code": "const response = await client.priceDisplaySettings.headPriceDisplaySettings();\nconsole.log(response.statusCode);\n"
+    },
+    "get_price_display_settings_section": {
+      "function": "getPriceDisplaySettingsSection",
+      "code": "const response = await client.priceDisplaySettings.getPriceDisplaySettingsSection('order_item');\nconst orderItem = response.map.order_item;\nconsole.log(orderItem.price_including_tax.enabled, orderItem.price_including_discount.enabled);\n"
+    },
+    "patch_price_display_settings_section": {
+      "function": "patchPriceDisplaySettingsSection",
+      "code": "const response = await client.priceDisplaySettings.patchPriceDisplaySettingsSection('order_item', {\n    order_item: {price_including_discount: {enabled: true}},\n});\nconsole.log(response.map.order_item.price_including_discount.enabled);\n"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Update price display settings"
+description: "Changes the fields you send in one or both sections and returns all settings."
+openapi: "PATCH /admin/settings/price_display_settings"
+---
+
+Send the fields to change inside `price_display_settings`, grouped by section name; one body can change both sections. Only the fields you send change, and everything you leave out keeps its stored value. Returns all the settings after the change, with `group_meta`, as [Get price display settings](/api-reference/price-display-settings/get-price-display-settings) does. A body not wrapped in `price_display_settings` is rejected with `400 invalid_request`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

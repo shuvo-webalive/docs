@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "GetPriceDisplaySettingsAsync",
+      "code": "var response = await client.PriceDisplaySettings.GetPriceDisplaySettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar priceDisplaySettings = (IReadOnlyDictionary<string, object?>)body[\"price_display_settings\"]!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)priceDisplaySettings[\"order_item\"]!;\nvar priceIncludingTax = (IReadOnlyDictionary<string, object?>)orderItem[\"price_including_tax\"]!;\nConsole.WriteLine($\"{priceIncludingTax[\"enabled\"]} {priceIncludingTax[\"customize\"]}\");"
+    },
+    "patch_price_display_settings": {
+      "function": "PatchPriceDisplaySettingsAsync",
+      "code": "var response = await client.PriceDisplaySettings.PatchPriceDisplaySettingsAsync(new Dictionary<string, object?>\n{\n    [\"price_display_settings\"] = new Dictionary<string, object?>\n    {\n        [\"order_item\"] = new Dictionary<string, object?> { [\"price_including_tax\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"customize\"] = false } },\n        [\"order_summary\"] = new Dictionary<string, object?> { [\"payment_surcharge\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"customize\"] = false } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar priceDisplaySettings = (IReadOnlyDictionary<string, object?>)body[\"price_display_settings\"]!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)priceDisplaySettings[\"order_item\"]!;\nConsole.WriteLine(((IReadOnlyDictionary<string, object?>)orderItem[\"price_including_tax\"]!)[\"enabled\"]);"
+    },
+    "head_price_display_settings": {
+      "function": "HeadPriceDisplaySettingsAsync",
+      "code": "var response = await client.PriceDisplaySettings.HeadPriceDisplaySettingsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_price_display_settings_section": {
+      "function": "GetPriceDisplaySettingsSectionAsync",
+      "code": "var response = await client.PriceDisplaySettings.GetPriceDisplaySettingsSectionAsync(\"order_item\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)body[\"order_item\"]!;\nvar priceIncludingDiscount = (IReadOnlyDictionary<string, object?>)orderItem[\"price_including_discount\"]!;\nConsole.WriteLine($\"{priceIncludingDiscount[\"enabled\"]} {priceIncludingDiscount[\"customize\"]}\");"
+    },
+    "patch_price_display_settings_section": {
+      "function": "PatchPriceDisplaySettingsSectionAsync",
+      "code": "var response = await client.PriceDisplaySettings.PatchPriceDisplaySettingsSectionAsync(\"order_item\", new Dictionary<string, object?>\n{\n    [\"order_item\"] = new Dictionary<string, object?> { [\"price_including_discount\"] = new Dictionary<string, object?> { [\"enabled\"] = true } },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderItem = (IReadOnlyDictionary<string, object?>)body[\"order_item\"]!;\nvar priceIncludingDiscount = (IReadOnlyDictionary<string, object?>)orderItem[\"price_including_discount\"]!;\nConsole.WriteLine(priceIncludingDiscount[\"enabled\"]);"
+    }
+  }
+}

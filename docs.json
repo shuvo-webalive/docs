@@ -176,6 +176,18 @@
                   "api-reference/ecommerce-settings/get-a-settings-section",
                   "api-reference/ecommerce-settings/update-a-settings-section"
                 ]
+              },
+              {
+                "group": "Price display settings",
+                "expanded": false,
+                "pages": [
+                  "price-display-settings",
+                  "api-reference/price-display-settings/get-price-display-settings",
+                  "api-reference/price-display-settings/update-price-display-settings",
+                  "api-reference/price-display-settings/get-price-display-settings-headers",
+                  "api-reference/price-display-settings/get-a-settings-section",
+                  "api-reference/price-display-settings/update-a-settings-section"
+                ]
               }
             ]
           },

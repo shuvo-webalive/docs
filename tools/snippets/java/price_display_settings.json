@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "getPriceDisplaySettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.priceDisplaySettings().getPriceDisplaySettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"price_display_settings\");\nMap<?, ?> orderItem = (Map<?, ?>) settings.get(\"order_item\");\nMap<?, ?> orderSummary = (Map<?, ?>) settings.get(\"order_summary\");\nSystem.out.println(((Map<?, ?>) orderItem.get(\"price_including_tax\")).get(\"enabled\"));\nSystem.out.println(((Map<?, ?>) orderSummary.get(\"order_total\")).get(\"enabled\"));"
+    },
+    "patch_price_display_settings": {
+      "function": "patchPriceDisplaySettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.priceDisplaySettings().patchPriceDisplaySettings(Map.of(\"price_display_settings\", Map.of(\n        \"order_item\", Map.of(\"price_including_tax\", Map.of(\"enabled\", true, \"customize\", false)),\n        \"order_summary\", Map.of(\"payment_surcharge\", Map.of(\"enabled\", true, \"customize\", false)))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"price_display_settings\");\nMap<?, ?> priceIncludingTax = (Map<?, ?>) ((Map<?, ?>) settings.get(\"order_item\")).get(\"price_including_tax\");\nMap<?, ?> paymentSurcharge = (Map<?, ?>) ((Map<?, ?>) settings.get(\"order_summary\")).get(\"payment_surcharge\");\nSystem.out.println(priceIncludingTax.get(\"enabled\") + \" \" + priceIncludingTax.get(\"scopes\"));\nSystem.out.println(paymentSurcharge.get(\"enabled\") + \" \" + paymentSurcharge.get(\"scopes\"));"
+    },
+    "head_price_display_settings": {
+      "function": "headPriceDisplaySettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.priceDisplaySettings().headPriceDisplaySettings();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_price_display_settings_section": {
+      "function": "getPriceDisplaySettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.priceDisplaySettings().getPriceDisplaySettingsSection(\"order_item\");\nMap<?, ?> orderItem = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_item\");\nMap<?, ?> priceIncludingDiscount = (Map<?, ?>) orderItem.get(\"price_including_discount\");\nSystem.out.println(priceIncludingDiscount.get(\"enabled\") + \" \" + priceIncludingDiscount.get(\"customize\"));\nSystem.out.println(priceIncludingDiscount.get(\"scopes\"));"
+    },
+    "patch_price_display_settings_section": {
+      "function": "patchPriceDisplaySettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.priceDisplaySettings().patchPriceDisplaySettingsSection(\"order_item\",\n        Map.of(\"order_item\", Map.of(\"price_including_discount\", Map.of(\"enabled\", true))));\nMap<?, ?> orderItem = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_item\");\nMap<?, ?> priceIncludingDiscount = (Map<?, ?>) orderItem.get(\"price_including_discount\");\nSystem.out.println(priceIncludingDiscount.get(\"enabled\") + \" \" + priceIncludingDiscount.get(\"scopes\"));"
+    }
+  }
+}

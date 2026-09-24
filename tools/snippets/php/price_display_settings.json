@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "price_display_settings",
+  "endpoints": {
+    "get_price_display_settings": {
+      "function": "getPriceDisplaySettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$response = PriceDisplaySettings::getPriceDisplaySettings($client);\n\n$settings = $response->map['price_display_settings'];\necho 'price including tax: ', $settings['order_item']['price_including_tax']['enabled'] ? 'on' : 'off', PHP_EOL;\necho 'order total: ', $settings['order_summary']['order_total']['enabled'] ? 'on' : 'off', PHP_EOL;"
+    },
+    "patch_price_display_settings": {
+      "function": "patchPriceDisplaySettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$response = PriceDisplaySettings::patchPriceDisplaySettings($client, [\n    'price_display_settings' => [\n        'order_item' => ['price_including_tax' => ['enabled' => true, 'customize' => false]],\n        'order_summary' => ['payment_surcharge' => ['enabled' => true, 'customize' => false]],\n    ],\n]);\n\n$settings = $response->map['price_display_settings'];\necho $settings['order_item']['price_including_tax']['enabled'] ? 'true' : 'false', PHP_EOL;\necho $settings['order_summary']['payment_surcharge']['enabled'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "head_price_display_settings": {
+      "function": "headPriceDisplaySettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$response = PriceDisplaySettings::headPriceDisplaySettings($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_price_display_settings_section": {
+      "function": "getPriceDisplaySettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$response = PriceDisplaySettings::getPriceDisplaySettingsSection($client, 'order_item');\n\nforeach ($response->map['order_item'] as $name => $block) {\n    echo $name, $block['enabled'] ? ' on' : ' off', PHP_EOL;\n}"
+    },
+    "patch_price_display_settings_section": {
+      "function": "patchPriceDisplaySettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PriceDisplaySettings\\PriceDisplaySettings;\n\n$response = PriceDisplaySettings::patchPriceDisplaySettingsSection($client, 'order_item', [\n    'order_item' => ['price_including_discount' => ['enabled' => true]],\n]);\n\n$block = $response->map['order_item']['price_including_discount'];\necho 'enabled: ', $block['enabled'] ? 'true' : 'false', PHP_EOL;\necho 'checkout: ', $block['scopes']['checkout'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}
