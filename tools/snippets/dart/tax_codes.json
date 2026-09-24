@@ -1,0 +1,34 @@
+{
+  "sdk": "dart",
+  "module": "tax_codes",
+  "endpoints": {
+    "list_tax_codes": {
+      "function": "listTaxCodes",
+      "code": "final response = await client.taxCodes.listTaxCodes(queryParams: {'limit': 20});\nfinal taxCodes = (response.map as Map)['tax_codes'] as List;\nfor (final taxCode in taxCodes) {\n  print('${(taxCode as Map)['id']} ${taxCode['name']} ${taxCode['rate']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
+    },
+    "head_tax_codes": {
+      "function": "headTaxCodes",
+      "code": "final response = await client.taxCodes.headTaxCodes();\nprint(response.statusCode);"
+    },
+    "create_tax_code": {
+      "function": "createTaxCode",
+      "code": "final response = await client.taxCodes.createTaxCode({\n  'tax_code': {\n    'name': 'LUXURY',\n    'label': 'Luxury goods',\n    'description': 'Higher rate for luxury goods',\n    'rate': 15.0,\n    'resolver_type': 'flat',\n    'priority': 1,\n  },\n});\nfinal taxCode = (response.map as Map)['tax_code'] as Map;\nprint(taxCode['id']);"
+    },
+    "get_tax_code": {
+      "function": "getTaxCode",
+      "code": "final response = await client.taxCodes.getTaxCode(2);\nfinal taxCode = (response.map as Map)['tax_code'] as Map;\nprint('${taxCode['name']} ${taxCode['rate']} ${taxCode['resolver_type']}');"
+    },
+    "head_tax_code": {
+      "function": "headTaxCode",
+      "code": "final response = await client.taxCodes.headTaxCode(2);\nprint(response.statusCode);"
+    },
+    "update_tax_code": {
+      "function": "updateTaxCode",
+      "code": "final response = await client.taxCodes.updateTaxCode(105, {\n  'tax_code': {\n    'label': 'Luxury items',\n    'priority': 1,\n    'resolver_type': 'flat',\n  },\n});\nfinal taxCode = (response.map as Map)['tax_code'] as Map;\nprint('${taxCode['label']} ${taxCode['priority']} ${taxCode['resolver_type']}');"
+    },
+    "delete_tax_code": {
+      "function": "deleteTaxCode",
+      "code": "final response = await client.taxCodes.deleteTaxCode(105);\nprint(response.statusCode);"
+    }
+  }
+}

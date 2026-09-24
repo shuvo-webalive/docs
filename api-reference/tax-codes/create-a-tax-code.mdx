@@ -1,0 +1,9 @@
+---
+title: "Create a tax code"
+description: "Creates a tax code and returns it with its `id`, which other calls take as `tax_code_id`."
+openapi: "POST /admin/tax_codes"
+---
+
+Creates a tax code and returns it with the `id` the store assigned. Pass that `id` as `tax_code_id` to retrieve, update or delete the tax code. Wrap the fields in `tax_code`; `name` is the only required field. The store ignores a tax code `id`, a `default` or an unknown field inside `tax_code`, and stores `resolver_type` exactly as you send it, without checking the value.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

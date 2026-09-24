@@ -1,0 +1,9 @@
+---
+title: "Check a tax code"
+description: "Returns headers only, with `200` even when no tax code has the `tax_code_id` you send."
+openapi: "HEAD /admin/tax_codes/{tax_code_id}"
+---
+
+Returns `200` with headers only and no body. It returns `200` even when no tax code has the `tax_code_id` you send, or when `tax_code_id` is not a number, so it does not tell you whether the tax code exists. To check that, use [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code), which returns `404` when no tax code has that `tax_code_id`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

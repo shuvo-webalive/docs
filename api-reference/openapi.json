@@ -59,6 +59,9 @@
     },
     {
       "name": "Shipping methods"
+    },
+    {
+      "name": "Tax codes"
     }
   ],
   "paths": {
@@ -12244,6 +12247,720 @@
           }
         ]
       }
+    },
+    "/admin/tax_codes": {
+      "get": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "List tax codes",
+        "operationId": "list_tax_codes",
+        "description": "Returns the store's tax codes under `tax_codes`, up to 20 per call, with a `pagination` block. Each tax code has the same eight fields that [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code) returns. A larger `limit` still returns 20, so to get every tax code, raise `offset` by the number of tax codes each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Rows per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. A value below `1`, or one that is not a number, is rejected with `400` `invalid_pagination`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of rows to skip. A value that is not a number is rejected with `400` `invalid_pagination`.",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit` against the `limit` you send with it.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Accepted and ignored: the listing is not filtered.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Accepted and ignored: the rows are the same with or without it, and no field descriptions are returned.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of tax codes and the `pagination` block. The response has no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_codes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxCode"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TaxCodePagination"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_codes": [
+                    {
+                      "id": 1,
+                      "name": "STANDARD",
+                      "label": "Standard rate",
+                      "description": "Standard rate for most goods",
+                      "rate": 10.0,
+                      "resolver_type": "flat",
+                      "priority": 0,
+                      "default": true
+                    },
+                    {
+                      "id": 2,
+                      "name": "REDUCED",
+                      "label": "Reduced rate",
+                      "description": "Reduced rate for essential goods",
+                      "rate": 5.0,
+                      "resolver_type": "flat",
+                      "priority": 0,
+                      "default": true
+                    },
+                    {
+                      "id": 3,
+                      "name": "ZERO",
+                      "label": "Zero rate",
+                      "description": "Goods with no tax",
+                      "rate": 0.0,
+                      "resolver_type": "flat",
+                      "priority": 0,
+                      "default": true
+                    }
+                  ],
+                  "pagination": {
+                    "total": 3,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 3,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`limit` is below `1`, or `limit` or `offset` is not a number. The error is `invalid_pagination`, and its `errors` list names the parameter. After this rejection, the next listing you send on the same connection returns the same `400`, even from another tax collection; the request after that is handled normally.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCodeError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax_codes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.list_tax_codes({\"limit\": 20})\nfor tax_code in response.map[\"tax_codes\"]:\n    print(tax_code[\"id\"], tax_code[\"name\"], tax_code[\"rate\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.listTaxCodes(client, {limit: 20});\nfor (const taxCode of response.map.tax_codes) {\n    console.log(taxCode.id, taxCode.name, taxCode.rate);\n}\nconsole.log(response.map.pagination.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::listTaxCodes($client, ['limit' => 20]);\n\nforeach ($response->map['tax_codes'] as $taxCode) {\n    echo $taxCode['id'], ' ', $taxCode['name'], ' ', $taxCode['rate'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' tax codes in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().listTaxCodes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"tax_codes\")) {\n    Map<?, ?> taxCode = (Map<?, ?>) row;\n    System.out.println(taxCode.get(\"id\") + \" \" + taxCode.get(\"name\") + \" \" + taxCode.get(\"rate\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.ListTaxCodesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var taxCode in ((IReadOnlyList<object?>)body[\"tax_codes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{taxCode[\"id\"]} {taxCode[\"name\"]} {taxCode[\"rate\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.listTaxCodes(queryParams: {'limit': 20});\nfinal taxCodes = (response.map as Map)['tax_codes'] as List;\nfor (final taxCode in taxCodes) {\n  print('${(taxCode as Map)['id']} ${taxCode['name']} ${taxCode['rate']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().ListTaxCodes(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_codes\"].([]any) {\n\ttaxCode := row.(map[string]any)\n\tfmt.Println(taxCode[\"id\"], taxCode[\"name\"], taxCode[\"rate\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "Check the tax codes list",
+        "operationId": "head_tax_codes",
+        "description": "Returns `200` with headers only and no body. A `200` tells you only that the path is reachable. Neither this response nor the listing has an `ETag` or `Last-Modified` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/tax_codes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.head_tax_codes()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.headTaxCodes(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::headTaxCodes($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().headTaxCodes();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.HeadTaxCodesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.headTaxCodes();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().HeadTaxCodes(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "Create a tax code",
+        "operationId": "create_tax_code",
+        "description": "Creates a tax code and returns it with the `id` the store assigned. Pass that `id` as `tax_code_id` to retrieve, update or delete the tax code. Wrap the fields in `tax_code`; `name` is the only required field. The store ignores a tax code `id`, a `default` or an unknown field inside `tax_code`, and stores `resolver_type` exactly as you send it, without checking the value.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new tax code, under `tax_code`. The response has no `Location` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_code": {
+                      "$ref": "#/components/schemas/TaxCode"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_code": {
+                    "id": 105,
+                    "name": "LUXURY",
+                    "label": "Luxury goods",
+                    "description": "Higher rate for luxury goods",
+                    "rate": 15.0,
+                    "resolver_type": "flat",
+                    "priority": 1,
+                    "default": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `tax_code`. A bare record, or one wrapped in the plural `tax_codes`, is rejected with the message `tax_code missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCodeError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has no `name`. The store rejects a create without a `name` with `500`, not `400`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCodeError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax_codes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_code\": {\n      \"name\": \"LUXURY\",\n      \"label\": \"Luxury goods\",\n      \"description\": \"Higher rate for luxury goods\",\n      \"rate\": 15.0,\n      \"resolver_type\": \"flat\",\n      \"priority\": 1\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.create_tax_code({\n    \"tax_code\": {\n        \"name\": \"LUXURY\",\n        \"label\": \"Luxury goods\",\n        \"description\": \"Higher rate for luxury goods\",\n        \"rate\": 15.0,\n        \"resolver_type\": \"flat\",\n        \"priority\": 1,\n    },\n})\nprint(response.map[\"tax_code\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst taxCode = {\n    name: 'LUXURY',\n    label: 'Luxury goods',\n    description: 'Higher rate for luxury goods',\n    rate: 15.0,\n    resolver_type: 'flat',\n    priority: 1,\n};\nconst response = await taxCodes.createTaxCode(client, {tax_code: taxCode});\nconsole.log(response.map.tax_code.id);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::createTaxCode($client, [\n    'tax_code' => [\n        'name' => 'LUXURY', 'label' => 'Luxury goods', 'description' => 'Higher rate for luxury goods',\n        'rate' => 15.0, 'resolver_type' => 'flat', 'priority' => 1,\n    ],\n]);\n\necho $response->map['tax_code']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().createTaxCode(Map.of(\"tax_code\", Map.of(\n        \"name\", \"LUXURY\", \"label\", \"Luxury goods\", \"description\", \"Higher rate for luxury goods\",\n        \"rate\", 15.0, \"resolver_type\", \"flat\", \"priority\", 1)));\nMap<?, ?> taxCode = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_code\");\nSystem.out.println(taxCode.get(\"id\") + \" \" + taxCode.get(\"name\") + \" \" + taxCode.get(\"rate\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.CreateTaxCodeAsync(new Dictionary<string, object?>\n{\n    [\"tax_code\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"LUXURY\", [\"label\"] = \"Luxury goods\", [\"description\"] = \"Higher rate for luxury goods\",\n        [\"rate\"] = 15.0, [\"resolver_type\"] = \"flat\", [\"priority\"] = 1,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxCode = (IReadOnlyDictionary<string, object?>)body[\"tax_code\"]!;\nConsole.WriteLine(taxCode[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.createTaxCode({\n  'tax_code': {\n    'name': 'LUXURY',\n    'label': 'Luxury goods',\n    'description': 'Higher rate for luxury goods',\n    'rate': 15.0,\n    'resolver_type': 'flat',\n    'priority': 1,\n  },\n});\nfinal taxCode = (response.map as Map)['tax_code'] as Map;\nprint(taxCode['id']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().CreateTaxCode(ctx, map[string]any{\n\t\"tax_code\": map[string]any{\n\t\t\"name\": \"LUXURY\", \"label\": \"Luxury goods\", \"description\": \"Higher rate for luxury goods\",\n\t\t\"rate\": 15.0, \"resolver_type\": \"flat\", \"priority\": 1,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxCode := resp.Map().(map[string]any)[\"tax_code\"].(map[string]any)\nfmt.Println(taxCode[\"id\"], taxCode[\"name\"], taxCode[\"rate\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_code"
+                ],
+                "properties": {
+                  "tax_code": {
+                    "$ref": "#/components/schemas/TaxCodeInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/tax_codes/{tax_code_id}": {
+      "get": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "Retrieve a tax code",
+        "operationId": "get_tax_code",
+        "description": "Returns one tax code under the `tax_code` key, with the same eight fields a listing row has: `id`, `name`, `label`, `description`, `rate`, `resolver_type`, `priority` and `default`. The response has no `ETag` or `Last-Modified` header.",
+        "parameters": [
+          {
+            "name": "tax_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax code's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The tax code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_code": {
+                      "$ref": "#/components/schemas/TaxCode"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_code": {
+                    "id": 2,
+                    "name": "REDUCED",
+                    "label": "Reduced rate",
+                    "description": "Reduced rate for essential goods",
+                    "rate": 5.0,
+                    "resolver_type": "flat",
+                    "priority": 0,
+                    "default": true
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No tax code has that `tax_code_id`. The message is `Tax code not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCodeError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax_codes/2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.get_tax_code(2)\ntax_code = response.map[\"tax_code\"]\nprint(tax_code[\"name\"], tax_code[\"rate\"], tax_code[\"resolver_type\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.getTaxCode(client, 2);\nconsole.log(response.map.tax_code.name, response.map.tax_code.rate);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::getTaxCode($client, 2);\n\n$taxCode = $response->map['tax_code'];\necho $taxCode['name'], ' ', $taxCode['rate'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().getTaxCode(2);\nMap<?, ?> taxCode = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_code\");\nSystem.out.println(taxCode.get(\"name\") + \" \" + taxCode.get(\"rate\") + \" \" + taxCode.get(\"resolver_type\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.GetTaxCodeAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxCode = (IReadOnlyDictionary<string, object?>)body[\"tax_code\"]!;\nConsole.WriteLine($\"{taxCode[\"name\"]} {taxCode[\"rate\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.getTaxCode(2);\nfinal taxCode = (response.map as Map)['tax_code'] as Map;\nprint('${taxCode['name']} ${taxCode['rate']} ${taxCode['resolver_type']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().GetTaxCode(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxCode := resp.Map().(map[string]any)[\"tax_code\"].(map[string]any)\nfmt.Println(taxCode[\"name\"], taxCode[\"rate\"], taxCode[\"default\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "Check a tax code",
+        "operationId": "head_tax_code",
+        "description": "Returns `200` with headers only and no body. It returns `200` even when no tax code has the `tax_code_id` you send, or when `tax_code_id` is not a number, so it does not tell you whether the tax code exists. To check that, use [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code), which returns `404` when no tax code has that `tax_code_id`.",
+        "parameters": [
+          {
+            "name": "tax_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax code's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body, and no `ETag` or `Last-Modified` header. Returned even when no tax code has the `tax_code_id` you send."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/tax_codes/2\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.head_tax_code(2)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.headTaxCode(client, 2);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::headTaxCode($client, 2);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().headTaxCode(2);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.HeadTaxCodeAsync(2);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.headTaxCode(2);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().HeadTaxCode(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "Update a tax code",
+        "operationId": "update_tax_code",
+        "description": "Changes the fields you send and returns the tax code. Wrap the fields in `tax_code`; you can leave out `name`. `name`, `label`, `description` and `rate` keep their stored values when you leave them out, but `priority` is set to `0` and `resolver_type` to `flat`, so send both in every update. A `default: true` in the body is stored as `false`.",
+        "parameters": [
+          {
+            "name": "tax_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax code's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated tax code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_code": {
+                      "$ref": "#/components/schemas/TaxCode"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_code": {
+                    "id": 105,
+                    "name": "LUXURY",
+                    "label": "Luxury items",
+                    "description": "Higher rate for luxury goods",
+                    "rate": 15.0,
+                    "resolver_type": "flat",
+                    "priority": 1,
+                    "default": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `tax_code`. A bare record, or one wrapped in the plural `tax_codes`, is rejected with the message `tax_code missing`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCodeError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax_codes/105\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_code\": {\n      \"label\": \"Luxury items\",\n      \"priority\": 1,\n      \"resolver_type\": \"flat\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.update_tax_code(105, {\n    \"tax_code\": {\"label\": \"Luxury items\", \"priority\": 1, \"resolver_type\": \"flat\"},\n})\ntax_code = response.map[\"tax_code\"]\nprint(tax_code[\"label\"], tax_code[\"priority\"], tax_code[\"resolver_type\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.updateTaxCode(client, 105, {\n    tax_code: {label: 'Luxury items', priority: 1, resolver_type: 'flat'},\n});\nconsole.log(response.map.tax_code.label, response.map.tax_code.priority);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::updateTaxCode($client, 105, [\n    'tax_code' => ['label' => 'Luxury items', 'priority' => 1, 'resolver_type' => 'flat'],\n]);\n\n$taxCode = $response->map['tax_code'];\necho $taxCode['label'], ' ', $taxCode['priority'], ' ', $taxCode['resolver_type'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().updateTaxCode(105,\n        Map.of(\"tax_code\", Map.of(\"label\", \"Luxury items\", \"priority\", 1, \"resolver_type\", \"flat\")));\nMap<?, ?> taxCode = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_code\");\nSystem.out.println(taxCode.get(\"label\") + \" \" + taxCode.get(\"priority\") + \" \" + taxCode.get(\"resolver_type\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.UpdateTaxCodeAsync(105, new Dictionary<string, object?>\n{\n    [\"tax_code\"] = new Dictionary<string, object?> { [\"label\"] = \"Luxury items\", [\"priority\"] = 1, [\"resolver_type\"] = \"flat\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxCode = (IReadOnlyDictionary<string, object?>)body[\"tax_code\"]!;\nConsole.WriteLine($\"{taxCode[\"label\"]} {taxCode[\"priority\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.updateTaxCode(105, {\n  'tax_code': {\n    'label': 'Luxury items',\n    'priority': 1,\n    'resolver_type': 'flat',\n  },\n});\nfinal taxCode = (response.map as Map)['tax_code'] as Map;\nprint('${taxCode['label']} ${taxCode['priority']} ${taxCode['resolver_type']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().UpdateTaxCode(ctx, 105, map[string]any{\n\t\"tax_code\": map[string]any{\"label\": \"Luxury items\", \"priority\": 1, \"resolver_type\": \"flat\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxCode := resp.Map().(map[string]any)[\"tax_code\"].(map[string]any)\nfmt.Println(taxCode[\"label\"], taxCode[\"priority\"], taxCode[\"resolver_type\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_code"
+                ],
+                "properties": {
+                  "tax_code": {
+                    "$ref": "#/components/schemas/TaxCodeInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tax codes"
+        ],
+        "summary": "Delete a tax code",
+        "operationId": "delete_tax_code",
+        "description": "Deletes the tax code permanently and returns `204` with no body. The tax code leaves the listing, and retrieving it returns `404`. If the request just before the delete was rejected, the delete returns that same rejection and deletes nothing, so retrieve the tax code afterwards to confirm it is gone.",
+        "parameters": [
+          {
+            "name": "tax_code_id",
+            "in": "path",
+            "required": true,
+            "description": "The tax code's `id`, from a listing or from the response to creating it.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No tax code has that `tax_code_id`. The message is `Code not found`. You also get a `404` when the request just before the delete returned one: the delete returns that earlier `404` and deletes nothing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCodeError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax_codes/105\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_codes.delete_tax_code(105)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.deleteTaxCode(client, 105);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCodes\\TaxCodes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCodes::deleteTaxCode($client, 105);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCodes().deleteTaxCode(105);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCodes.DeleteTaxCodeAsync(105);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCodes.deleteTaxCode(105);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCodes().DeleteTaxCode(ctx, 105, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -17913,6 +18630,137 @@
               "request_id": {
                 "type": "string"
               }
+            }
+          }
+        }
+      },
+      "TaxCode": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The tax code's `id`, assigned by the store. Pass it as `tax_code_id` in a path. A create ignores any tax code `id` you send inside `tax_code`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The tax code's name. Required when you create a tax code. An update that leaves it out keeps the stored name."
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The tax code's label, or `null` when the tax code has none. An update that leaves it out keeps the stored label."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The tax code's description, or `null` when the tax code has none. An update that leaves it out keeps the stored description."
+          },
+          "rate": {
+            "type": "number",
+            "description": "The tax code's rate. An update that leaves it out keeps the stored rate."
+          },
+          "resolver_type": {
+            "type": "string",
+            "description": "The tax code's resolver type, such as `flat`. The store keeps any value you send without checking it. An update that leaves it out sets it to `flat`."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "The tax code's priority. An update that leaves it out sets it to `0`."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "`true` marks a tax code the store built. More than one tax code can have it. Read-only: a create or an update that sends `default: true` stores `false`."
+          }
+        }
+      },
+      "TaxCodeInput": {
+        "type": "object",
+        "description": "The fields you can write. A create needs `name`; an update can leave it out.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required when you create a tax code."
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "resolver_type": {
+            "type": "string",
+            "description": "Stored exactly as you send it. An update that leaves it out sets it to `flat`."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "An update that leaves it out sets it to `0`."
+          }
+        }
+      },
+      "TaxCodePagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of tax codes in the store."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied. At most `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of tax codes skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of tax codes on this page."
+          },
+          "current_page": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          },
+          "has_next": {
+            "type": "boolean"
+          },
+          "has_previous": {
+            "type": "boolean"
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the previous page, or `null` on the first page."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The URL of the next page, or `null` on the last page."
+          }
+        }
+      },
+      "TaxCodeError": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "What the store returns when it rejects a request.",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "On a `400` `invalid_pagination`, names the rejected parameter: `limit` or `offset`.",
+            "items": {
+              "type": "object"
             }
           }
         }

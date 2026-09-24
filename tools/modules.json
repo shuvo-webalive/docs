@@ -35,6 +35,13 @@
       "modules": [
         "shipping_methods"
       ]
+    },
+    {
+      "name": "Tax",
+      "icon": "percent",
+      "modules": [
+        "tax_codes"
+      ]
     }
   ]
 }

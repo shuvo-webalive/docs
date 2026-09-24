@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "tax_codes",
+  "endpoints": {
+    "list_tax_codes": {
+      "function": "listTaxCodes",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst response = await taxCodes.listTaxCodes(client, {limit: 20});\nfor (const taxCode of response.map.tax_codes) {\n    console.log(taxCode.id, taxCode.name, taxCode.rate);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "head_tax_codes": {
+      "function": "headTaxCodes",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst response = await taxCodes.headTaxCodes(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_tax_code": {
+      "function": "createTaxCode",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst taxCode = {\n    name: 'LUXURY',\n    label: 'Luxury goods',\n    description: 'Higher rate for luxury goods',\n    rate: 15.0,\n    resolver_type: 'flat',\n    priority: 1,\n};\nconst response = await taxCodes.createTaxCode(client, {tax_code: taxCode});\nconsole.log(response.map.tax_code.id);\n"
+    },
+    "get_tax_code": {
+      "function": "getTaxCode",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst response = await taxCodes.getTaxCode(client, 2);\nconsole.log(response.map.tax_code.name, response.map.tax_code.rate);\n"
+    },
+    "head_tax_code": {
+      "function": "headTaxCode",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst response = await taxCodes.headTaxCode(client, 2);\nconsole.log(response.statusCode);\n"
+    },
+    "update_tax_code": {
+      "function": "updateTaxCode",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst response = await taxCodes.updateTaxCode(client, 105, {\n    tax_code: {label: 'Luxury items', priority: 1, resolver_type: 'flat'},\n});\nconsole.log(response.map.tax_code.label, response.map.tax_code.priority);\n"
+    },
+    "delete_tax_code": {
+      "function": "deleteTaxCode",
+      "code": "import {taxCodes} from 'webcommander-sdk';\n\nconst response = await taxCodes.deleteTaxCode(client, 105);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

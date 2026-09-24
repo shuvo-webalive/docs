@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "tax_codes",
+  "endpoints": {
+    "list_tax_codes": {
+      "function": "list_tax_codes",
+      "code": "response = client.tax_codes.list_tax_codes({\"limit\": 20})\nfor tax_code in response.map[\"tax_codes\"]:\n    print(tax_code[\"id\"], tax_code[\"name\"], tax_code[\"rate\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+    },
+    "head_tax_codes": {
+      "function": "head_tax_codes",
+      "code": "response = client.tax_codes.head_tax_codes()\nprint(response.status_code)\n"
+    },
+    "create_tax_code": {
+      "function": "create_tax_code",
+      "code": "response = client.tax_codes.create_tax_code({\n    \"tax_code\": {\n        \"name\": \"LUXURY\",\n        \"label\": \"Luxury goods\",\n        \"description\": \"Higher rate for luxury goods\",\n        \"rate\": 15.0,\n        \"resolver_type\": \"flat\",\n        \"priority\": 1,\n    },\n})\nprint(response.map[\"tax_code\"][\"id\"])\n"
+    },
+    "get_tax_code": {
+      "function": "get_tax_code",
+      "code": "response = client.tax_codes.get_tax_code(2)\ntax_code = response.map[\"tax_code\"]\nprint(tax_code[\"name\"], tax_code[\"rate\"], tax_code[\"resolver_type\"])\n"
+    },
+    "head_tax_code": {
+      "function": "head_tax_code",
+      "code": "response = client.tax_codes.head_tax_code(2)\nprint(response.status_code)\n"
+    },
+    "update_tax_code": {
+      "function": "update_tax_code",
+      "code": "response = client.tax_codes.update_tax_code(105, {\n    \"tax_code\": {\"label\": \"Luxury items\", \"priority\": 1, \"resolver_type\": \"flat\"},\n})\ntax_code = response.map[\"tax_code\"]\nprint(tax_code[\"label\"], tax_code[\"priority\"], tax_code[\"resolver_type\"])\n"
+    },
+    "delete_tax_code": {
+      "function": "delete_tax_code",
+      "code": "response = client.tax_codes.delete_tax_code(105)\nprint(response.status_code)\n"
+    }
+  }
+}

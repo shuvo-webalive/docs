@@ -223,6 +223,27 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Tax",
+            "icon": "percent",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Tax codes",
+                "expanded": false,
+                "pages": [
+                  "tax-codes",
+                  "api-reference/tax-codes/list-tax-codes",
+                  "api-reference/tax-codes/check-the-tax-codes-list",
+                  "api-reference/tax-codes/create-a-tax-code",
+                  "api-reference/tax-codes/retrieve-a-tax-code",
+                  "api-reference/tax-codes/check-a-tax-code",
+                  "api-reference/tax-codes/update-a-tax-code",
+                  "api-reference/tax-codes/delete-a-tax-code"
+                ]
+              }
+            ]
           }
         ]
       }

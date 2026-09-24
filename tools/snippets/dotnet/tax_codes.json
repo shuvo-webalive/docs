@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "tax_codes",
+  "endpoints": {
+    "list_tax_codes": {
+      "function": "ListTaxCodesAsync",
+      "code": "var response = await client.TaxCodes.ListTaxCodesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var taxCode in ((IReadOnlyList<object?>)body[\"tax_codes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{taxCode[\"id\"]} {taxCode[\"name\"]} {taxCode[\"rate\"]}\");"
+    },
+    "head_tax_codes": {
+      "function": "HeadTaxCodesAsync",
+      "code": "var response = await client.TaxCodes.HeadTaxCodesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_tax_code": {
+      "function": "CreateTaxCodeAsync",
+      "code": "var response = await client.TaxCodes.CreateTaxCodeAsync(new Dictionary<string, object?>\n{\n    [\"tax_code\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"LUXURY\", [\"label\"] = \"Luxury goods\", [\"description\"] = \"Higher rate for luxury goods\",\n        [\"rate\"] = 15.0, [\"resolver_type\"] = \"flat\", [\"priority\"] = 1,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxCode = (IReadOnlyDictionary<string, object?>)body[\"tax_code\"]!;\nConsole.WriteLine(taxCode[\"id\"]);"
+    },
+    "get_tax_code": {
+      "function": "GetTaxCodeAsync",
+      "code": "var response = await client.TaxCodes.GetTaxCodeAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxCode = (IReadOnlyDictionary<string, object?>)body[\"tax_code\"]!;\nConsole.WriteLine($\"{taxCode[\"name\"]} {taxCode[\"rate\"]}\");"
+    },
+    "head_tax_code": {
+      "function": "HeadTaxCodeAsync",
+      "code": "var response = await client.TaxCodes.HeadTaxCodeAsync(2);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_tax_code": {
+      "function": "UpdateTaxCodeAsync",
+      "code": "var response = await client.TaxCodes.UpdateTaxCodeAsync(105, new Dictionary<string, object?>\n{\n    [\"tax_code\"] = new Dictionary<string, object?> { [\"label\"] = \"Luxury items\", [\"priority\"] = 1, [\"resolver_type\"] = \"flat\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxCode = (IReadOnlyDictionary<string, object?>)body[\"tax_code\"]!;\nConsole.WriteLine($\"{taxCode[\"label\"]} {taxCode[\"priority\"]}\");"
+    },
+    "delete_tax_code": {
+      "function": "DeleteTaxCodeAsync",
+      "code": "var response = await client.TaxCodes.DeleteTaxCodeAsync(105);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

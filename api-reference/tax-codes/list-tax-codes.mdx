@@ -1,0 +1,9 @@
+---
+title: "List tax codes"
+description: "Returns up to 20 tax codes per call, and how many the store has in `pagination.total`."
+openapi: "GET /admin/tax_codes"
+---
+
+Returns the store's tax codes under `tax_codes`, up to 20 per call, with a `pagination` block. Each tax code has the same eight fields that [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code) returns. A larger `limit` still returns 20, so to get every tax code, raise `offset` by the number of tax codes each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
