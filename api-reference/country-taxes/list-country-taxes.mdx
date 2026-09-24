@@ -1,0 +1,9 @@
+---
+title: "List country taxes"
+description: "Returns up to 20 country taxes under `country_taxes`, and how many exist in `pagination.total`."
+openapi: "GET /admin/tax/country_taxes"
+---
+
+Returns your store's country taxes under `country_taxes`, up to 20 per call, and a `pagination` object with the total and this page's `offset`. Each country tax has thirteen fields, including `state_rules_count`, the number of its state rules; only [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves. To read every country tax, add `pagination.count` to `offset` after each page until `offset` reaches `pagination.total`. `q` and `field_metadata` are accepted and ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

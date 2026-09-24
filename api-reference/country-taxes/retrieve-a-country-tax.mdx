@@ -1,0 +1,9 @@
+---
+title: "Retrieve a country tax"
+description: "Returns the country tax whose `id` you pass as `country_tax_id`, including its state rules."
+openapi: "GET /admin/tax/country_taxes/{country_tax_id}"
+---
+
+Returns one country tax under the `country_tax` key. It has the thirteen fields the listing returns plus `state_rules`, the list of the country tax's state rules, which no other call returns. A country tax with no state rules has an empty `state_rules` list.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

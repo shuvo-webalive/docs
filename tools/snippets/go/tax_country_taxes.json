@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "tax_country_taxes",
+  "endpoints": {
+    "list_tax_country_taxes": {
+      "function": "ListTaxCountryTaxes",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCountryTaxes().ListTaxCountryTaxes(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"country_taxes\"].([]any) {\n\tcountryTax := row.(map[string]any)\n\tfmt.Println(countryTax[\"id\"], countryTax[\"name\"], countryTax[\"rate_display\"])\n}"
+    },
+    "create_tax_country_tax": {
+      "function": "CreateTaxCountryTax",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCountryTaxes().CreateTaxCountryTax(ctx, map[string]any{\n\t\"country_tax\": map[string]any{\"country_code\": \"NZ\", \"name\": \"New Zealand\", \"tax_rate\": 4.5, \"tax_method\": \"FIXED_RATE\", \"is_default\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"id\"], countryTax[\"name\"], countryTax[\"rate_display\"])"
+    },
+    "get_tax_country_tax": {
+      "function": "GetTaxCountryTax",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCountryTaxes().GetTaxCountryTax(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"name\"], countryTax[\"rate_display\"], len(countryTax[\"state_rules\"].([]any)))"
+    },
+    "update_tax_country_tax": {
+      "function": "UpdateTaxCountryTax",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCountryTaxes().UpdateTaxCountryTax(ctx, 42, map[string]any{\n\t\"country_tax\": map[string]any{\"tax_rate\": 6.25},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"tax_rate\"], countryTax[\"rate_display\"])"
+    },
+    "delete_tax_country_tax": {
+      "function": "DeleteTaxCountryTax",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCountryTaxes().DeleteTaxCountryTax(ctx, 42, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

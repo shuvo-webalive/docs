@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "tax_country_taxes",
+  "endpoints": {
+    "list_tax_country_taxes": {
+      "function": "listTaxCountryTaxes",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$response = TaxCountryTaxes::listTaxCountryTaxes($client, ['limit' => 20]);\n\nforeach ($response->map['country_taxes'] as $countryTax) {\n    echo $countryTax['id'], ' ', $countryTax['name'], ' ', $countryTax['rate_display'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' country taxes in total', PHP_EOL;"
+    },
+    "create_tax_country_tax": {
+      "function": "createTaxCountryTax",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$response = TaxCountryTaxes::createTaxCountryTax($client, [\n    'country_tax' => [\n        'country_code' => 'NZ', 'name' => 'New Zealand',\n        'tax_rate' => 4.5, 'tax_method' => 'FIXED_RATE', 'is_default' => false,\n    ],\n]);\n\necho $response->map['country_tax']['id'], PHP_EOL;"
+    },
+    "get_tax_country_tax": {
+      "function": "getTaxCountryTax",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$response = TaxCountryTaxes::getTaxCountryTax($client, 4);\n\n$countryTax = $response->map['country_tax'];\necho $countryTax['name'], ' ', $countryTax['rate_display'], PHP_EOL;\nforeach ($countryTax['state_rules'] as $rule) {\n    echo 'state rule ', $rule['id'], ' ', $rule['tax_rule'], ' ', $rule['effective_tax_rate'], PHP_EOL;\n}"
+    },
+    "update_tax_country_tax": {
+      "function": "updateTaxCountryTax",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$response = TaxCountryTaxes::updateTaxCountryTax($client, 42, [\n    'country_tax' => ['tax_rate' => 6.25],\n]);\n\necho $response->map['country_tax']['rate_display'], PHP_EOL;"
+    },
+    "delete_tax_country_tax": {
+      "function": "deleteTaxCountryTax",
+      "code": "use WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$response = TaxCountryTaxes::deleteTaxCountryTax($client, 42);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

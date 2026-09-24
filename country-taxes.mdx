@@ -1,0 +1,58 @@
+---
+title: "Country taxes"
+sidebarTitle: "Overview"
+description: "List, create, update and delete your store's country taxes, and read the state rules of each one."
+---
+
+The Country taxes API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax/country_taxes`.
+
+<Warning>
+  **After a request is rejected, the store handles your next request on the same client with the rejected value.**
+  This applies to the id in the path, such as a `country_tax_id`, and to a query parameter such as `limit`, and
+  it lasts for one request. After `GET /admin/tax/country_taxes/99999999` returns `404`, your next request for
+  one record, such as `GET /admin/tax/country_taxes/4` or `GET /admin/tax/custom_profiles/1`, also returns `404`,
+  even though that record exists. After `limit=0` is rejected, your next listing call is rejected with the same
+  message, even with `limit=1`. A request that takes neither value runs normally, and a request from a new client
+  is not affected. A delete sent straight after a rejected `country_tax_id` is handled with that id, so it returns
+  `404` and removes nothing. Confirm a delete by reading the country tax back with
+  [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax).
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List country taxes](/api-reference/country-taxes/list-country-taxes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/country_taxes` | Returns up to 20 country taxes under `country_taxes`, and how many exist in `pagination.total`. |
+| [Create a country tax](/api-reference/country-taxes/create-a-country-tax) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/country_taxes` | Creates a country tax and returns it with its `id`, which other calls take as `country_tax_id`. |
+| [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/country_taxes/{country_tax_id}` | Returns the country tax whose `id` you pass as `country_tax_id`, including its state rules. |
+| [Update a country tax](/api-reference/country-taxes/update-a-country-tax) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/country_taxes/{country_tax_id}` | Changes only the fields you send and returns the updated country tax. |
+| [Delete a country tax](/api-reference/country-taxes/delete-a-country-tax) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/country_taxes/{country_tax_id}` | Deletes a country tax permanently and returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap every create and update in `country_tax`, and send `country_code` when you create.** A bare
+  record, or the plural `country_taxes` key, is rejected with `400` and the message `country_tax missing`.
+  A create without `country_code` is rejected with `400 invalid_request` and the message
+  `Invalid country_code`. The store fills `country` and `code` from `country_code` and works out
+  `rate_display` from `tax_rate`, but no response includes `country_code` itself.
+- **An update changes only the fields you send.** Fields you leave out keep their values, so you do not
+  send `country_code` again. When you change `tax_rate`, `rate_display` changes with it.
+- **A listing returns at most 20 country taxes per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To read every country tax, add `pagination.count` to `offset` after each
+  page until `offset` reaches `pagination.total`. `q` and `field_metadata` are accepted and ignored.
+- **Read `country.code` to find the country a country tax covers.** On older country taxes, `code` is free
+  text such as `GST`, `NO_TAX`, `Tax` or `VAT` rather than the country's code. The store's rest-of-the-world
+  country tax has `country` set to `null`, and `special_key` names it instead. Several country taxes can
+  have `is_default` set to `true` at the same time.
+- **There is no `HEAD` call for country taxes, and a `200` does not prove a write was stored.** A `HEAD` or
+  `OPTIONS` request on the listing is rejected with `404`. A `HEAD` on one country tax returns `200` whether
+  or not a country tax has that `country_tax_id`, so it cannot tell you the country tax exists. A method the
+  store has no handler for returns `200` with `{"isSuccess": false, "message": "Invalid API Request"}`
+  and stores nothing, so read the country tax back after a write. Neither path sends an `ETag` or
+  `Last-Modified` header.
