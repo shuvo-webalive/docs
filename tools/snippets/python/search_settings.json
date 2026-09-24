@@ -1,0 +1,38 @@
+{
+  "sdk": "python",
+  "module": "search_settings",
+  "endpoints": {
+    "get_search_settings": {
+      "function": "get_search_settings",
+      "code": "response = client.search_settings.get_search_settings()\nsettings = response.map[\"search_settings\"]\nprint(settings[\"searchable_content\"][\"placeholder_text\"])\nprint(settings[\"search_fields\"][\"match_keywords_exactly\"])\n"
+    },
+    "patch_search_settings": {
+      "function": "patch_search_settings",
+      "code": "response = client.search_settings.patch_search_settings({\n    \"search_settings\": {\n        \"searchable_content\": {\"placeholder_text\": \"Search products\"},\n        \"search_fields\": {\"match_keywords_exactly\": True},\n    },\n})\nsettings = response.map[\"search_settings\"]\nprint(settings[\"searchable_content\"][\"placeholder_text\"])\nprint(settings[\"search_fields\"][\"match_keywords_exactly\"])\n"
+    },
+    "put_search_settings": {
+      "function": "put_search_settings",
+      "code": "response = client.search_settings.put_search_settings({\"search_settings\": {\n    \"searchable_content\": {\"placeholder_text\": \"Search products\",\n        \"product\": {\"enabled\": True, \"display_heading\": \"Product\", \"excluded\": [{\"id\": 4, \"name\": \"Gift Card\"}]},\n        \"product_categories\": {\"enabled\": True, \"hide_parent_category\": True,\n                               \"display_heading\": \"Product Categories\", \"excluded\": [{\"id\": 16, \"name\": \"Clearance\"}]},\n        \"blog\": {\"enabled\": True, \"display_heading\": \"Blog Posts\", \"excluded\": [{\"id\": 13, \"name\": \"Store News\"}]},\n        \"other_pages\": {\"enabled\": True, \"display_heading\": \"Other Pages\", \"excluded\": [{\"id\": 4, \"name\": \"Home - Copy\"}]}},\n    \"search_fields\": {\"match_keywords_exactly\": False, \"match_full_sentences\": False, \"fields\": [\n        {\"field\": \"title\", \"priority\": 1}, {\"field\": \"tags\", \"priority\": 2}, {\"field\": \"category\", \"priority\": 3},\n        {\"field\": \"description\", \"priority\": 4}, {\"field\": \"sku\", \"priority\": 5}, {\"field\": \"brand\", \"priority\": 6}]},\n    \"synonyms\": {\"groups\": [{\"keywords\": [\"mobile\", \"phone\", \"telephone\"]}, {\"keywords\": [\"shoe\", \"footwear\", \"sneaker\"]}]}}})\nprint(response.map[\"search_settings\"][\"searchable_content\"][\"placeholder_text\"])\n"
+    },
+    "head_search_settings": {
+      "function": "head_search_settings",
+      "code": "response = client.search_settings.head_search_settings()\nprint(response.status_code)\n"
+    },
+    "get_search_settings_section": {
+      "function": "get_search_settings_section",
+      "code": "response = client.search_settings.get_search_settings_section(\"search_fields\")\nsearch_fields = response.map[\"search_fields\"]\nprint(search_fields[\"match_keywords_exactly\"], search_fields[\"match_full_sentences\"])\nfor row in search_fields[\"fields\"]:\n    print(row[\"priority\"], row[\"field\"])\n"
+    },
+    "patch_search_settings_section": {
+      "function": "patch_search_settings_section",
+      "code": "response = client.search_settings.patch_search_settings_section(\n    \"search_fields\", {\"search_fields\": {\"match_keywords_exactly\": True}}\n)\nprint(response.map[\"search_fields\"][\"match_keywords_exactly\"])\n"
+    },
+    "put_search_settings_section": {
+      "function": "put_search_settings_section",
+      "code": "response = client.search_settings.put_search_settings_section(\"search_fields\", {\"search_fields\": {\n    \"match_keywords_exactly\": True,\n    \"match_full_sentences\": False,\n    \"fields\": [\n        {\"field\": \"title\", \"priority\": 1}, {\"field\": \"tags\", \"priority\": 2},\n        {\"field\": \"category\", \"priority\": 3}, {\"field\": \"description\", \"priority\": 4},\n        {\"field\": \"sku\", \"priority\": 5}, {\"field\": \"brand\", \"priority\": 6},\n    ],\n}})\nsearch_fields = response.map[\"search_fields\"]\nprint(search_fields[\"match_keywords_exactly\"], search_fields[\"match_full_sentences\"])\nprint([row[\"field\"] for row in search_fields[\"fields\"]])\n"
+    },
+    "get_search_settings_reindex_status": {
+      "function": "get_search_settings_reindex_status",
+      "code": "response = client.search_settings.get_search_settings_reindex_status()\nstatus = response.map\nprint(status[\"state\"], status[\"started_at\"], status[\"finished_at\"])\nprint(status[\"error\"])\n"
+    }
+  }
+}

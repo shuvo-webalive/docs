@@ -1,0 +1,9 @@
+---
+title: "Replace a search settings section"
+description: "Replaces one section with the body you send. Fields you leave out are reset."
+openapi: "PUT /admin/settings/search_settings/{section}"
+---
+
+Replaces the section named in the path with the body you send, wrapped in the section's own name. Any field the body leaves out is reset to its default, so send the whole section: read it with [Get a search settings section](/api-reference/search-settings/get-a-search-settings-section), change what you need, and send it all back. A body not wrapped in the section's own name is rejected with `400`. Returns the whole section after the change, under its own key and without `group_meta`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

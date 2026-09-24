@@ -1,0 +1,65 @@
+---
+title: "Search settings"
+sidebarTitle: "Overview"
+description: "Read and change the content your store's search covers, the product fields it matches and its synonym groups, and check the reindex status."
+---
+
+The Search settings API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/search_settings`.
+
+<Warning>
+  **`PUT` replaces, so every field you leave out is reset to its default.** A `PUT`
+  of `search_fields` that sends only `match_keywords_exactly` returns `match_full_sentences` set to
+  `false` and `fields` cut to the single row `{"field": "title", "priority": 1}`. To change a few
+  fields, use `PATCH`. A `PUT` on `/search_settings` also resets or writes `synonyms`, and a change to
+  `synonyms` triggers an Elasticsearch reindex that cannot be undone.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get search settings](/api-reference/search-settings/get-search-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_settings` | Returns all three search settings sections and a `group_meta` block describing each one. |
+| [Update search settings](/api-reference/search-settings/update-search-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_settings` | Changes the fields you send in one or more sections and returns all settings. |
+| [Replace search settings](/api-reference/search-settings/replace-search-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/search_settings` | Replaces all three sections with the body you send. Fields you leave out are reset. |
+| [Check search settings](/api-reference/search-settings/check-search-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/search_settings` | Returns the headers for the search settings, with no body. |
+| [Get a search settings section](/api-reference/search-settings/get-a-search-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_settings/{section}` | Returns one search settings section under its own key, such as `search_fields`. |
+| [Update a search settings section](/api-reference/search-settings/update-a-search-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_settings/{section}` | Changes the fields you send in one section and returns that whole section. |
+| [Replace a search settings section](/api-reference/search-settings/replace-a-search-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/search_settings/{section}` | Replaces one section with the body you send. Fields you leave out are reset. |
+| [Get the reindex status](/api-reference/search-settings/get-the-reindex-status) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_settings/reindex_status` | Returns where the search reindex stands: its `state`, start and finish times, and any `error`. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into three sections.** `searchable_content` sets the search box's
+  placeholder text and which content types the search covers: `product`, `product_categories`,
+  `blog` and `other_pages`, each with a list of items hidden from its results. `search_fields` sets
+  how a query is matched and which product fields it is matched against, by priority. `synonyms`
+  holds groups of words that a search treats as synonyms of each other. Read or write all three
+  through `/search_settings`, or one through `/search_settings/{section}`. Reading an unknown section
+  returns `404 not_found`.
+- **`PATCH` changes only the fields you send, and `PUT` replaces.** `/search_settings` and each
+  section accept `GET`, `HEAD`, `PATCH` and `PUT`. A `PATCH` keeps the stored value of every field
+  you do not send, including other fields in the same nested block. `POST` and `DELETE` on
+  `/search_settings` are rejected with `405 method_not_allowed`, the message
+  `HTTP method not allowed for this endpoint.` and an `Allow: GET, HEAD, PATCH, PUT, OPTIONS` header.
+- **Every write body is wrapped, and the key depends on the path.** On `/search_settings`, wrap the
+  fields in `search_settings` and then in the section name: a body with the section name at the top
+  level is rejected. On `/search_settings/{section}`, wrap them in the section's own name only, such as
+  `search_fields`: a body with no wrapper, or one wrapped in `search_settings`, is rejected. Both
+  return `400 invalid_request` and the message `request body must be wrapped in a '<name>' object`,
+  where `<name>` is the key the path expects.
+- **An `excluded` list takes ids or records.** A read returns each excluded item as a record such as
+  `{"id": 4, "name": "Gift Card"}`. Its `id` is the product's `id` under `product`, the product
+  category's `id` under `product_categories`, the blog's `id` under `blog`, and the page's `id` under
+  `other_pages`. A write accepts a list of those ids or the same records, and both read back as
+  records. So you can `PUT` a `searchable_content` section exactly as you read it.
+- **`search_fields.fields` has three rules.** Each `field` may appear once, each `priority` may appear
+  once, and `title` must be in the list at priority `1`. `field` is one of `title`, `category`,
+  `description`, `tags`, `sku` or `brand`, and `priority` is from `1` to `10`. A list that breaks a
+  rule is rejected with `400`. Add `field_metadata=true` to a read to get these rules and every other
+  field's limits, such as the 50-character `display_heading`.
