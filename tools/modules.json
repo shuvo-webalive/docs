@@ -1,0 +1,5 @@
+{
+  "areas": [
+    {"name": "Customers", "icon": "users", "modules": ["customers"]}
+  ]
+}

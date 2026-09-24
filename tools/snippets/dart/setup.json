@@ -1,0 +1,5 @@
+{
+  "sdk": "dart",
+  "language": "dart",
+  "setup": "import 'dart:io';\nimport 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal env = Platform.environment;\nfinal client = WebCommanderClient(SdkConfig(\n  AuthConfig(\n    clientName: 'default',\n    baseUrl: env['WC_BASE_URL']!,\n    clientId: env['WC_CLIENT_ID']!,\n    clientSecret: env['WC_CLIENT_SECRET']!,\n    redirectUri: env['WC_REDIRECT_URI']!,\n    authString: env['WC_AUTH_STRING']!,\n  ),\n  raiseOnError: true,\n));"
+}

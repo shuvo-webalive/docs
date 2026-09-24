@@ -370,3 +370,41 @@ def _apply_copy():
 
 
 _apply_copy()
+
+
+SLUG = "customers"
+ICON = "users"
+OVERVIEW_DESCRIPTION = "Read, create, update and remove customers, and manage their addresses, passwords and store credit."
+INTRO = "The Customers API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/customers`."
+WARNING = (
+    "Paths take the customer's `customer_id`. Each customer also has an `internal_id`, a separate\n"
+    "  number that no path takes. If you send an `internal_id` by mistake and it matches another\n"
+    "  customer's `customer_id`, you get **that other customer with a `200`** instead of a `404`.\n"
+    "  Check that the customer you get back is the one you asked for."
+)
+NOTES = [
+    "**A listing returns at most 20 records per call.** A larger `limit` is not rejected, but you\n"
+    "  still get at most 20, and `pagination.limit` shows `20`. To get more, send the next `page`\n"
+    "  number or a higher `offset` for as long as `pagination.has_next` is `true`.",
+    "**A new customer cannot sign in until it is active.** If you create a customer without\n"
+    "  `status: \"active\"`, it is created as `awaiting_verification` with no usable login, even if you\n"
+    "  send a `password`, and changing its password fails with `401`. Send `status: \"active\"` with a\n"
+    "  `password` to create a customer who can sign in.",
+    "**An export always contains every customer.** Its parameters choose columns, not customers: a\n"
+    "  column is removed when its parameter is anything other than `1`, `true`, `on` or `yes`, so\n"
+    "  `status=active` exports everyone and removes the `Status` column. Importing an export rewrites\n"
+    "  every customer in the store, so build import files from only the customers you want to change.",
+    "**Every error response has the same fields:** `status`, `code` and `message`, plus `error` (a\n"
+    "  machine-readable reason) and `errors` (one entry per rejected field) when the API provides them.",
+]
+
+_EXAMPLE_CALLS = {
+    "list_customers": {"query": "limit=20&status=active"},
+    "count_customers": {"query": "status=active"},
+    "check_email": {"query": "email=jane@example.com"},
+    "list_store_credit_adjustments": {"query": "limit=20"},
+    "export_customers": {"output": "customers.xlsx"},
+    "import_customers": {"file": "customers.csv"},
+}
+for _endpoint in ENDPOINTS:
+    _endpoint["example_call"] = dict({"path": {"customer_id": 123}}, **_EXAMPLE_CALLS.get(_endpoint["key"], {}))

@@ -1,0 +1,5 @@
+{
+  "sdk": "python",
+  "language": "python",
+  "setup": "import os\n\nfrom webcommander import AuthConfig, build_client, register_instances\n\nregister_instances([\n    AuthConfig(\n        client_name=\"default\",\n        base_url=os.environ[\"WC_BASE_URL\"],\n        client_id=os.environ[\"WC_CLIENT_ID\"],\n        client_secret=os.environ[\"WC_CLIENT_SECRET\"],\n        redirect_uri=os.environ[\"WC_REDIRECT_URI\"],\n        auth_string=os.environ[\"WC_AUTH_STRING\"],\n    ),\n])\n\nclient = build_client(raise_on_error=True)\n"
+}

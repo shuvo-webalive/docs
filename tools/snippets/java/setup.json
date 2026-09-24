@@ -1,0 +1,5 @@
+{
+  "sdk": "java",
+  "language": "java",
+  "setup": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport com.webcommander.sdk.config.AuthConfig;\nimport com.webcommander.sdk.config.SdkConfig;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\nimport java.util.List;\nimport java.util.Map;\n\nAuthConfig auth = AuthConfig.builder()\n        .baseUrl(System.getenv(\"WC_BASE_URL\"))\n        .clientId(System.getenv(\"WC_CLIENT_ID\"))\n        .clientSecret(System.getenv(\"WC_CLIENT_SECRET\"))\n        .redirectUri(System.getenv(\"WC_REDIRECT_URI\"))\n        .authString(System.getenv(\"WC_AUTH_STRING\"))\n        .clientName(\"default\")\n        .build();\nSdkConfig config = SdkConfig.builder(auth).raiseOnError(true).build();\nWebCommanderClient client = new WebCommanderClient(config);"
+}
