@@ -1,0 +1,9 @@
+---
+title: "Get a settings section"
+description: "Returns one settings section under its own key, such as `pricing`."
+openapi: "GET /admin/settings/ecommerce_settings/{section}"
+---
+
+Returns one section, wrapped in the section's own name rather than in `ecommerce_settings`, and without `group_meta`. The values are the same ones [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) returns for that section, and the response has an `ETag` header. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section, and `order_flags`, return `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

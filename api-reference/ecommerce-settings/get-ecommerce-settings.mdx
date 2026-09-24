@@ -1,0 +1,9 @@
+---
+title: "Get ecommerce settings"
+description: "Returns all six settings sections and the store's order flags, with a `group_meta` entry for each."
+openapi: "GET /admin/settings/ecommerce_settings"
+---
+
+Returns every ecommerce setting under `ecommerce_settings`, with the six sections in full and the store's order flags as a list under `order_flags`. Beside it, `group_meta` gives each key's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has an `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

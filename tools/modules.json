@@ -23,7 +23,8 @@
       "icon": "sliders",
       "modules": [
         "animation_effects",
-        "customer_portal"
+        "customer_portal",
+        "ecommerce_settings"
       ]
     },
     {

@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "GetEcommerceSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.EcommerceSettings().GetEcommerceSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"ecommerce_settings\"].(map[string]any)\npricing := settings[\"pricing\"].(map[string]any)\nfmt.Println(settings[\"product_inventory\"].(map[string]any)[\"update_stock\"], pricing[\"minimum_purchase_amount\"], pricing[\"payment_terms\"])\nfor _, row := range settings[\"order_flags\"].([]any) {\n\torderFlag := row.(map[string]any)\n\tfmt.Println(orderFlag[\"id\"], orderFlag[\"name\"])\n}"
+    },
+    "patch_ecommerce_settings": {
+      "function": "PatchEcommerceSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.EcommerceSettings().PatchEcommerceSettings(ctx, map[string]any{\n\t\"ecommerce_settings\": map[string]any{\n\t\t\"continue_shopping\": map[string]any{\"continue_shopping_target\": \"previous\"},\n\t\t\"order_filters\":     map[string]any{\"default_payment_status\": \"unpaid\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"ecommerce_settings\"].(map[string]any)\nfmt.Println(settings[\"continue_shopping\"].(map[string]any)[\"continue_shopping_target\"], settings[\"order_filters\"].(map[string]any)[\"default_payment_status\"])"
+    },
+    "head_ecommerce_settings": {
+      "function": "HeadEcommerceSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.EcommerceSettings().HeadEcommerceSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "GetEcommerceSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.EcommerceSettings().GetEcommerceSettingsSection(ctx, \"order_filters\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfilters := resp.Map().(map[string]any)[\"order_filters\"].(map[string]any)\nfmt.Println(filters[\"default_order_status\"], filters[\"default_payment_status\"], filters[\"default_shipment_status\"])"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "PatchEcommerceSettingsSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.EcommerceSettings().PatchEcommerceSettingsSection(ctx, \"order_filters\", map[string]any{\n\t\"order_filters\": map[string]any{\"default_shipment_status\": \"unshipped\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"order_filters\"].(map[string]any)[\"default_shipment_status\"])"
+    }
+  }
+}

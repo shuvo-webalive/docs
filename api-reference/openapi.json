@@ -49,6 +49,9 @@
       "name": "Customer portal"
     },
     {
+      "name": "Ecommerce settings"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -8981,6 +8984,813 @@
         }
       }
     },
+    "/admin/settings/ecommerce_settings": {
+      "get": {
+        "tags": [
+          "Ecommerce settings"
+        ],
+        "summary": "Get ecommerce settings",
+        "operationId": "get_ecommerce_settings",
+        "description": "Returns every ecommerce setting under `ecommerce_settings`, with the six sections in full and the store's order flags as a list under `order_flags`. Beside it, `group_meta` gives each key's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has an `ETag` header.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field of the six sections, keyed by section. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All six sections, the order flags and `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ecommerce_settings": {
+                      "$ref": "#/components/schemas/EcommerceSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/EcommerceSettingsGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/EcommerceSettingsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section, with no entry for `order_flags`."
+                    }
+                  }
+                },
+                "example": {
+                  "ecommerce_settings": {
+                    "continue_shopping": {
+                      "enable_continue_shopping": true,
+                      "continue_shopping_target": "specified",
+                      "continue_shopping_specified_target": "home"
+                    },
+                    "product_inventory": {
+                      "show_out_of_stock_products": false,
+                      "low_stock_notification": false,
+                      "out_of_stock_notification": false,
+                      "hide_on_sale_tag_for_out_of_stock_product": false,
+                      "order_quantity_over_stock": "do_not_sell",
+                      "update_stock": "after_shipment"
+                    },
+                    "pricing": {
+                      "update_price_range": false,
+                      "enable_minimum_purchase_amount": true,
+                      "minimum_purchase_amount": 1,
+                      "enable_minimum_purchase_amount_in_cart": true,
+                      "minimum_purchase_amount_in_cart": 2,
+                      "enable_on_account_purchase": false,
+                      "assign_credit_limit_per_order": false,
+                      "credit_limit_per_order": null,
+                      "enable_payment_terms": true,
+                      "payment_terms": "NET_30",
+                      "enable_customer_price_restriction": true
+                    },
+                    "product_restriction": {
+                      "enable_product_restriction_based_on_parent_category": false
+                    },
+                    "order_filters": {
+                      "default_order_status": null,
+                      "default_payment_status": null,
+                      "default_shipment_status": "shipped"
+                    },
+                    "location_settings": {
+                      "enable_multi_location": false,
+                      "locations": [
+                        {
+                          "id": 1,
+                          "name": "Main Warehouse",
+                          "address": "1 Example Street, Sydney NSW 2000",
+                          "is_active": true,
+                          "is_default": true,
+                          "created": "2026-07-16T06:24:24",
+                          "updated": "2026-08-25T05:00:56"
+                        },
+                        {
+                          "id": 4,
+                          "name": "Second Warehouse",
+                          "address": "2 Example Street, Sydney NSW 2000",
+                          "is_active": true,
+                          "is_default": false,
+                          "created": "2026-07-16T06:58:32",
+                          "updated": "2026-08-16T14:19:49"
+                        }
+                      ]
+                    },
+                    "order_flags": [
+                      {
+                        "id": 2,
+                        "name": "Partial Shipment",
+                        "color": "#4FD9FC",
+                        "description": null,
+                        "type": "order"
+                      },
+                      {
+                        "id": 1,
+                        "name": "Payment Failed",
+                        "color": "#FF6868",
+                        "description": null,
+                        "type": "order"
+                      },
+                      {
+                        "id": 3,
+                        "name": "Payment Pending",
+                        "color": "#FFA959",
+                        "description": null,
+                        "type": "order"
+                      }
+                    ]
+                  },
+                  "group_meta": {
+                    "continue_shopping": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/continue_shopping"
+                    },
+                    "product_inventory": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/product_inventory"
+                    },
+                    "pricing": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/pricing"
+                    },
+                    "product_restriction": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/product_restriction"
+                    },
+                    "order_filters": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/order_filters"
+                    },
+                    "location_settings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/location_settings",
+                      "locations_href": "/api/v4/admin/inventory_locations"
+                    },
+                    "order_flags": {
+                      "kind": "collection",
+                      "writable": false,
+                      "href": "/api/v4/admin/order_flags"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/ecommerce_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.ecommerce_settings.get_ecommerce_settings()\nsettings = response.map[\"ecommerce_settings\"]\nprint(settings[\"continue_shopping\"][\"continue_shopping_target\"])\nprint(settings[\"order_filters\"][\"default_shipment_status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.getEcommerceSettings(client);\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status, settings.order_filters.default_shipment_status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = EcommerceSettings::getEcommerceSettings($client);\n\n$settings = $response->map['ecommerce_settings'];\necho 'continue shopping: ', $settings['continue_shopping']['continue_shopping_target'], PHP_EOL;\necho 'update stock: ', $settings['product_inventory']['update_stock'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.ecommerceSettings().getEcommerceSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"ecommerce_settings\");\nMap<?, ?> continueShopping = (Map<?, ?>) settings.get(\"continue_shopping\");\nMap<?, ?> orderFilters = (Map<?, ?>) settings.get(\"order_filters\");\nSystem.out.println(continueShopping.get(\"continue_shopping_target\"));\nSystem.out.println(orderFilters.get(\"default_shipment_status\"));\nfor (Object row : (List<?>) settings.get(\"order_flags\")) {\n    Map<?, ?> orderFlag = (Map<?, ?>) row;\n    System.out.println(orderFlag.get(\"id\") + \" \" + orderFlag.get(\"name\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.EcommerceSettings.GetEcommerceSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar ecommerceSettings = (IReadOnlyDictionary<string, object?>)body[\"ecommerce_settings\"]!;\nvar continueShopping = (IReadOnlyDictionary<string, object?>)ecommerceSettings[\"continue_shopping\"]!;\nConsole.WriteLine($\"{continueShopping[\"enable_continue_shopping\"]} {continueShopping[\"continue_shopping_target\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.ecommerceSettings.getEcommerceSettings();\nfinal ecommerceSettings = (response.map as Map)['ecommerce_settings'] as Map;\nprint(ecommerceSettings['continue_shopping']);\nprint(ecommerceSettings['order_flags']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.EcommerceSettings().GetEcommerceSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"ecommerce_settings\"].(map[string]any)\npricing := settings[\"pricing\"].(map[string]any)\nfmt.Println(settings[\"product_inventory\"].(map[string]any)[\"update_stock\"], pricing[\"minimum_purchase_amount\"], pricing[\"payment_terms\"])\nfor _, row := range settings[\"order_flags\"].([]any) {\n\torderFlag := row.(map[string]any)\n\tfmt.Println(orderFlag[\"id\"], orderFlag[\"name\"])\n}\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Ecommerce settings"
+        ],
+        "summary": "Update ecommerce settings",
+        "operationId": "patch_ecommerce_settings",
+        "description": "Send the fields to change inside `ecommerce_settings`, grouped by section name; one body can change several sections. Only the fields you send change: other fields, and sections you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) does. A body not wrapped in `ecommerce_settings` is rejected with `400`, and so is a section name the store does not have.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ecommerce_settings": {
+                      "$ref": "#/components/schemas/EcommerceSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/EcommerceSettingsGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "ecommerce_settings": {
+                    "continue_shopping": {
+                      "enable_continue_shopping": true,
+                      "continue_shopping_target": "previous",
+                      "continue_shopping_specified_target": "home"
+                    },
+                    "product_inventory": {
+                      "show_out_of_stock_products": false,
+                      "low_stock_notification": false,
+                      "out_of_stock_notification": false,
+                      "hide_on_sale_tag_for_out_of_stock_product": false,
+                      "order_quantity_over_stock": "do_not_sell",
+                      "update_stock": "after_shipment"
+                    },
+                    "pricing": {
+                      "update_price_range": false,
+                      "enable_minimum_purchase_amount": true,
+                      "minimum_purchase_amount": 1,
+                      "enable_minimum_purchase_amount_in_cart": true,
+                      "minimum_purchase_amount_in_cart": 2,
+                      "enable_on_account_purchase": false,
+                      "assign_credit_limit_per_order": false,
+                      "credit_limit_per_order": null,
+                      "enable_payment_terms": true,
+                      "payment_terms": "NET_30",
+                      "enable_customer_price_restriction": true
+                    },
+                    "product_restriction": {
+                      "enable_product_restriction_based_on_parent_category": false
+                    },
+                    "order_filters": {
+                      "default_order_status": null,
+                      "default_payment_status": "unpaid",
+                      "default_shipment_status": "shipped"
+                    },
+                    "location_settings": {
+                      "enable_multi_location": false,
+                      "locations": [
+                        {
+                          "id": 1,
+                          "name": "Main Warehouse",
+                          "address": "1 Example Street, Sydney NSW 2000",
+                          "is_active": true,
+                          "is_default": true,
+                          "created": "2026-07-16T06:24:24",
+                          "updated": "2026-08-25T05:00:56"
+                        },
+                        {
+                          "id": 4,
+                          "name": "Second Warehouse",
+                          "address": "2 Example Street, Sydney NSW 2000",
+                          "is_active": true,
+                          "is_default": false,
+                          "created": "2026-07-16T06:58:32",
+                          "updated": "2026-08-16T14:19:49"
+                        }
+                      ]
+                    },
+                    "order_flags": [
+                      {
+                        "id": 2,
+                        "name": "Partial Shipment",
+                        "color": "#4FD9FC",
+                        "description": null,
+                        "type": "order"
+                      },
+                      {
+                        "id": 1,
+                        "name": "Payment Failed",
+                        "color": "#FF6868",
+                        "description": null,
+                        "type": "order"
+                      },
+                      {
+                        "id": 3,
+                        "name": "Payment Pending",
+                        "color": "#FFA959",
+                        "description": null,
+                        "type": "order"
+                      }
+                    ]
+                  },
+                  "group_meta": {
+                    "continue_shopping": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/continue_shopping"
+                    },
+                    "product_inventory": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/product_inventory"
+                    },
+                    "pricing": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/pricing"
+                    },
+                    "product_restriction": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/product_restriction"
+                    },
+                    "order_filters": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/order_filters"
+                    },
+                    "location_settings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/ecommerce_settings/location_settings",
+                      "locations_href": "/api/v4/admin/inventory_locations"
+                    },
+                    "order_flags": {
+                      "kind": "collection",
+                      "writable": false,
+                      "href": "/api/v4/admin/order_flags"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `ecommerce_settings` (`request body must be wrapped in a 'ecommerce_settings' object`), or names a section the store does not have (`<name>: not a recognized section`, with `details[0].code` set to `unknown_field`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EcommerceSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "not_a_section: not a recognized section",
+                    "details": [
+                      {
+                        "field": "not_a_section",
+                        "code": "unknown_field",
+                        "message": "not a recognized section"
+                      }
+                    ],
+                    "request_id": "43172b74-5301-49b0-bd09-b766034162f3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/ecommerce_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"ecommerce_settings\": {\n      \"continue_shopping\": {\n        \"continue_shopping_target\": \"previous\"\n      },\n      \"order_filters\": {\n        \"default_payment_status\": \"unpaid\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.ecommerce_settings.patch_ecommerce_settings({\n    \"ecommerce_settings\": {\n        \"continue_shopping\": {\"continue_shopping_target\": \"previous\"},\n        \"order_filters\": {\"default_payment_status\": \"unpaid\"},\n    },\n})\nsettings = response.map[\"ecommerce_settings\"]\nprint(settings[\"continue_shopping\"][\"continue_shopping_target\"])\nprint(settings[\"order_filters\"][\"default_payment_status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.patchEcommerceSettings(client, {\n    ecommerce_settings: {\n        continue_shopping: {continue_shopping_target: 'previous'},\n        order_filters: {default_payment_status: 'unpaid'},\n    },\n});\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = EcommerceSettings::patchEcommerceSettings($client, [\n    'ecommerce_settings' => [\n        'continue_shopping' => ['continue_shopping_target' => 'previous'],\n        'order_filters' => ['default_payment_status' => 'unpaid'],\n    ],\n]);\n\n$settings = $response->map['ecommerce_settings'];\necho $settings['continue_shopping']['continue_shopping_target'], PHP_EOL;\necho $settings['order_filters']['default_payment_status'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.ecommerceSettings().patchEcommerceSettings(Map.of(\"ecommerce_settings\", Map.of(\n        \"continue_shopping\", Map.of(\"continue_shopping_target\", \"previous\"),\n        \"order_filters\", Map.of(\"default_payment_status\", \"unpaid\"))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"ecommerce_settings\");\nSystem.out.println(((Map<?, ?>) settings.get(\"continue_shopping\")).get(\"continue_shopping_target\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"order_filters\")).get(\"default_payment_status\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.EcommerceSettings.PatchEcommerceSettingsAsync(new Dictionary<string, object?>\n{\n    [\"ecommerce_settings\"] = new Dictionary<string, object?>\n    {\n        [\"continue_shopping\"] = new Dictionary<string, object?> { [\"continue_shopping_target\"] = \"previous\" },\n        [\"order_filters\"] = new Dictionary<string, object?> { [\"default_payment_status\"] = \"unpaid\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar ecommerceSettings = (IReadOnlyDictionary<string, object?>)body[\"ecommerce_settings\"]!;\nvar continueShopping = (IReadOnlyDictionary<string, object?>)ecommerceSettings[\"continue_shopping\"]!;\nConsole.WriteLine(continueShopping[\"continue_shopping_target\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.ecommerceSettings.patchEcommerceSettings({\n  'ecommerce_settings': {\n    'continue_shopping': {'continue_shopping_target': 'previous'},\n    'order_filters': {'default_payment_status': 'unpaid'},\n  },\n});\nfinal ecommerceSettings = (response.map as Map)['ecommerce_settings'] as Map;\nprint(ecommerceSettings['continue_shopping']);\nprint(ecommerceSettings['order_filters']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.EcommerceSettings().PatchEcommerceSettings(ctx, map[string]any{\n\t\"ecommerce_settings\": map[string]any{\n\t\t\"continue_shopping\": map[string]any{\"continue_shopping_target\": \"previous\"},\n\t\t\"order_filters\":     map[string]any{\"default_payment_status\": \"unpaid\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"ecommerce_settings\"].(map[string]any)\nfmt.Println(settings[\"continue_shopping\"].(map[string]any)[\"continue_shopping_target\"], settings[\"order_filters\"].(map[string]any)[\"default_payment_status\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ecommerce_settings"
+                ],
+                "properties": {
+                  "ecommerce_settings": {
+                    "$ref": "#/components/schemas/EcommerceSettingsInput",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Ecommerce settings"
+        ],
+        "summary": "Get ecommerce settings headers",
+        "operationId": "head_ecommerce_settings",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and the same `ETag` that [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) returns. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/ecommerce_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.ecommerce_settings.head_ecommerce_settings()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.headEcommerceSettings(client);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = EcommerceSettings::headEcommerceSettings($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.ecommerceSettings().headEcommerceSettings();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.EcommerceSettings.HeadEcommerceSettingsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.ecommerceSettings.headEcommerceSettings();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.EcommerceSettings().HeadEcommerceSettings(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/ecommerce_settings/{section}": {
+      "get": {
+        "tags": [
+          "Ecommerce settings"
+        ],
+        "summary": "Get a settings section",
+        "operationId": "get_ecommerce_settings_section",
+        "description": "Returns one section, wrapped in the section's own name rather than in `ecommerce_settings`, and without `group_meta`. The values are the same ones [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) returns for that section, and the response has an `ETag` header. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section, and `order_flags`, return `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `continue_shopping`, `product_inventory`, `pricing`, `product_restriction`, `order_filters` or `location_settings`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "continue_shopping",
+                "product_inventory",
+                "pricing",
+                "product_restriction",
+                "order_filters",
+                "location_settings"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields, keyed by field name. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "continue_shopping": {
+                      "$ref": "#/components/schemas/ContinueShoppingSettings"
+                    },
+                    "product_inventory": {
+                      "$ref": "#/components/schemas/ProductInventorySettings"
+                    },
+                    "pricing": {
+                      "$ref": "#/components/schemas/PricingSettings"
+                    },
+                    "product_restriction": {
+                      "$ref": "#/components/schemas/ProductRestrictionSettings"
+                    },
+                    "order_filters": {
+                      "$ref": "#/components/schemas/OrderFilterSettings"
+                    },
+                    "location_settings": {
+                      "$ref": "#/components/schemas/LocationSettings"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/EcommerceSettingsFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "order_filters": {
+                    "default_order_status": null,
+                    "default_payment_status": null,
+                    "default_shipment_status": "shipped"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. `order_flags` returns this too, because it is not a section.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EcommerceSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown settings path: ecommerce_settings/order_flags",
+                    "details": [],
+                    "request_id": "085b1f0c-82ee-4ffc-a5da-c31269ddf632"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/ecommerce_settings/order_filters\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.ecommerce_settings.get_ecommerce_settings_section(\"order_filters\")\nfilters = response.map[\"order_filters\"]\nprint(filters[\"default_payment_status\"], filters[\"default_shipment_status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.getEcommerceSettingsSection(client, 'order_filters');\nconst filters = response.map.order_filters;\nconsole.log(filters.default_order_status, filters.default_payment_status, filters.default_shipment_status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = EcommerceSettings::getEcommerceSettingsSection($client, 'order_filters');\n\necho 'default shipment status: ', $response->map['order_filters']['default_shipment_status'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.ecommerceSettings().getEcommerceSettingsSection(\"order_filters\");\nMap<?, ?> orderFilters = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_filters\");\nSystem.out.println(orderFilters.get(\"default_order_status\"));\nSystem.out.println(orderFilters.get(\"default_payment_status\"));\nSystem.out.println(orderFilters.get(\"default_shipment_status\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.EcommerceSettings.GetEcommerceSettingsSectionAsync(\"order_filters\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFilters = (IReadOnlyDictionary<string, object?>)body[\"order_filters\"]!;\nConsole.WriteLine(orderFilters[\"default_shipment_status\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.ecommerceSettings.getEcommerceSettingsSection('order_filters');\nfinal orderFilters = (response.map as Map)['order_filters'] as Map;\nprint(orderFilters['default_order_status']);\nprint(orderFilters['default_payment_status']);\nprint(orderFilters['default_shipment_status']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.EcommerceSettings().GetEcommerceSettingsSection(ctx, \"order_filters\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfilters := resp.Map().(map[string]any)[\"order_filters\"].(map[string]any)\nfmt.Println(filters[\"default_order_status\"], filters[\"default_payment_status\"], filters[\"default_shipment_status\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Ecommerce settings"
+        ],
+        "summary": "Update a settings section",
+        "operationId": "patch_ecommerce_settings_section",
+        "description": "Send the fields to change wrapped in the section's own name, such as `order_filters`, or send them unwrapped. A body wrapped in `ecommerce_settings` is rejected with `400`, and so is a field the section does not have, even beside fields it does have. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change, under its own key and without `group_meta`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `continue_shopping`, `product_inventory`, `pricing`, `product_restriction`, `order_filters` or `location_settings`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "continue_shopping",
+                "product_inventory",
+                "pricing",
+                "product_restriction",
+                "order_filters",
+                "location_settings"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "continue_shopping": {
+                      "$ref": "#/components/schemas/ContinueShoppingSettings"
+                    },
+                    "product_inventory": {
+                      "$ref": "#/components/schemas/ProductInventorySettings"
+                    },
+                    "pricing": {
+                      "$ref": "#/components/schemas/PricingSettings"
+                    },
+                    "product_restriction": {
+                      "$ref": "#/components/schemas/ProductRestrictionSettings"
+                    },
+                    "order_filters": {
+                      "$ref": "#/components/schemas/OrderFilterSettings"
+                    },
+                    "location_settings": {
+                      "$ref": "#/components/schemas/LocationSettings"
+                    }
+                  }
+                },
+                "example": {
+                  "order_filters": {
+                    "default_order_status": null,
+                    "default_payment_status": null,
+                    "default_shipment_status": "unshipped"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `ecommerce_settings` (`<section>.ecommerce_settings: not a recognized field`), or names a field the section does not have (`<section>.<field>: not a recognized field`). A value is also rejected when it is not one of an `enum` field's `allowed_values` (`invalid_enum`), is not a boolean for a boolean field (`invalid_boolean`, `must be a boolean (true/false or 0/1)`), or is a `continue_shopping_specified_target` that names no page (`invalid_reference`, `not a known page slug`). While `enable_minimum_purchase_amount` is on, a `minimum_purchase_amount` of `0` is rejected with `must be a number greater than 0 when enable_minimum_purchase_amount is on`. After this `400`, the next read on the same client returns the wrong section, so create a new client first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EcommerceSettingsError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "default_order_status: must be one of [all, paused, in_progress, completed, reopened] (or empty to clear)",
+                    "details": [
+                      {
+                        "field": "default_order_status",
+                        "code": "invalid_enum",
+                        "message": "must be one of [all, paused, in_progress, completed, reopened] (or empty to clear)",
+                        "value": " completed"
+                      }
+                    ],
+                    "request_id": "182b77d5-aa71-447b-9e18-c2da1ea8d936"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/ecommerce_settings/order_filters\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"order_filters\": {\n      \"default_shipment_status\": \"unshipped\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.ecommerce_settings.patch_ecommerce_settings_section(\n    \"order_filters\", {\"order_filters\": {\"default_shipment_status\": \"unshipped\"}}\n)\nprint(response.map[\"order_filters\"][\"default_shipment_status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.patchEcommerceSettingsSection(client, 'order_filters', {\n    order_filters: {default_shipment_status: 'unshipped'},\n});\nconsole.log(response.map.order_filters.default_shipment_status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = EcommerceSettings::patchEcommerceSettingsSection($client, 'order_filters', [\n    'order_filters' => ['default_shipment_status' => 'unshipped'],\n]);\n\necho $response->map['order_filters']['default_shipment_status'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.ecommerceSettings().patchEcommerceSettingsSection(\"order_filters\",\n        Map.of(\"order_filters\", Map.of(\"default_shipment_status\", \"unshipped\")));\nMap<?, ?> orderFilters = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_filters\");\nSystem.out.println(orderFilters.get(\"default_shipment_status\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.EcommerceSettings.PatchEcommerceSettingsSectionAsync(\"order_filters\", new Dictionary<string, object?>\n{\n    [\"order_filters\"] = new Dictionary<string, object?> { [\"default_shipment_status\"] = \"unshipped\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFilters = (IReadOnlyDictionary<string, object?>)body[\"order_filters\"]!;\nConsole.WriteLine(orderFilters[\"default_shipment_status\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.ecommerceSettings\n    .patchEcommerceSettingsSection('order_filters', {\n  'order_filters': {'default_shipment_status': 'unshipped'},\n});\nfinal orderFilters = (response.map as Map)['order_filters'] as Map;\nprint(orderFilters['default_shipment_status']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.EcommerceSettings().PatchEcommerceSettingsSection(ctx, \"order_filters\", map[string]any{\n\t\"order_filters\": map[string]any{\"default_shipment_status\": \"unshipped\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"order_filters\"].(map[string]any)[\"default_shipment_status\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the name of the section in the path, or send the fields unwrapped. The `ecommerce_settings` wrapper is not accepted here.",
+                "properties": {
+                  "continue_shopping": {
+                    "$ref": "#/components/schemas/ContinueShoppingSettings"
+                  },
+                  "product_inventory": {
+                    "$ref": "#/components/schemas/ProductInventorySettings"
+                  },
+                  "pricing": {
+                    "$ref": "#/components/schemas/PricingSettings"
+                  },
+                  "product_restriction": {
+                    "$ref": "#/components/schemas/ProductRestrictionSettings"
+                  },
+                  "order_filters": {
+                    "$ref": "#/components/schemas/OrderFilterSettings"
+                  },
+                  "location_settings": {
+                    "$ref": "#/components/schemas/LocationSettingsInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -14286,6 +15096,484 @@
               "request_id": {
                 "type": "string",
                 "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "EcommerceSettings": {
+        "type": "object",
+        "properties": {
+          "continue_shopping": {
+            "$ref": "#/components/schemas/ContinueShoppingSettings"
+          },
+          "product_inventory": {
+            "$ref": "#/components/schemas/ProductInventorySettings"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingSettings"
+          },
+          "product_restriction": {
+            "$ref": "#/components/schemas/ProductRestrictionSettings"
+          },
+          "order_filters": {
+            "$ref": "#/components/schemas/OrderFilterSettings"
+          },
+          "location_settings": {
+            "$ref": "#/components/schemas/LocationSettings"
+          },
+          "order_flags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EcommerceSettingsOrderFlag"
+            },
+            "description": "The store's order flags. Read-only here: manage them through `/api/v4/admin/order_flags`."
+          }
+        }
+      },
+      "EcommerceSettingsInput": {
+        "type": "object",
+        "description": "The fields to change, grouped by section. `order_flags` cannot be written here.",
+        "properties": {
+          "continue_shopping": {
+            "$ref": "#/components/schemas/ContinueShoppingSettings"
+          },
+          "product_inventory": {
+            "$ref": "#/components/schemas/ProductInventorySettings"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/PricingSettings"
+          },
+          "product_restriction": {
+            "$ref": "#/components/schemas/ProductRestrictionSettings"
+          },
+          "order_filters": {
+            "$ref": "#/components/schemas/OrderFilterSettings"
+          },
+          "location_settings": {
+            "$ref": "#/components/schemas/LocationSettingsInput"
+          }
+        }
+      },
+      "ContinueShoppingSettings": {
+        "type": "object",
+        "description": "The `continue_shopping` section: where the continue shopping link leads.",
+        "properties": {
+          "enable_continue_shopping": {
+            "type": "boolean",
+            "description": "Turn continue shopping on or off."
+          },
+          "continue_shopping_target": {
+            "type": "string",
+            "enum": [
+              "home",
+              "previous",
+              "specified"
+            ],
+            "description": "Where continue shopping leads: `home`, `previous` or `specified`. With `specified`, `continue_shopping_specified_target` names the page."
+          },
+          "continue_shopping_specified_target": {
+            "type": "string",
+            "description": "The slug of the page to link to. Required when `continue_shopping_target` is `specified`. `field_metadata` lists every page slug in your store under `options`, and a slug that names no page is rejected with `400 invalid_reference` and the message `not a known page slug`."
+          }
+        }
+      },
+      "ProductInventorySettings": {
+        "type": "object",
+        "description": "The `product_inventory` section: out-of-stock handling and when a sale reduces stock.",
+        "properties": {
+          "show_out_of_stock_products": {
+            "type": "boolean",
+            "description": "Display out of stock products."
+          },
+          "low_stock_notification": {
+            "type": "boolean",
+            "description": "Get a low stock notification by email."
+          },
+          "out_of_stock_notification": {
+            "type": "boolean",
+            "description": "Get an out of stock notification by email."
+          },
+          "hide_on_sale_tag_for_out_of_stock_product": {
+            "type": "boolean",
+            "description": "Do not display the \"On Sale\" tag on a sold out product."
+          },
+          "order_quantity_over_stock": {
+            "type": "string",
+            "enum": [
+              "add_available",
+              "sell_away",
+              "allow_admin_only_to_add_out_of_stock_products",
+              "do_not_sell"
+            ],
+            "description": "The stock rule when an order quantity is more than the stock: `add_available`, `sell_away`, `allow_admin_only_to_add_out_of_stock_products` or `do_not_sell`."
+          },
+          "update_stock": {
+            "type": "string",
+            "enum": [
+              "after_order",
+              "after_payment",
+              "after_shipment"
+            ],
+            "description": "When stock is updated: `after_order`, `after_payment` or `after_shipment`."
+          }
+        }
+      },
+      "PricingSettings": {
+        "type": "object",
+        "description": "The `pricing` section: minimum purchase amounts, on account purchase, credit limit and payment terms.",
+        "properties": {
+          "update_price_range": {
+            "type": "boolean",
+            "description": "Adjust the price range for the product."
+          },
+          "enable_minimum_purchase_amount": {
+            "type": "boolean",
+            "description": "Turn on the minimum purchase amount."
+          },
+          "minimum_purchase_amount": {
+            "type": "number",
+            "description": "The minimum purchase amount. Depends on `enable_minimum_purchase_amount`, and is required and greater than `0` while it is on."
+          },
+          "enable_minimum_purchase_amount_in_cart": {
+            "type": "boolean",
+            "description": "Turn on the minimum purchase amount in cart details."
+          },
+          "minimum_purchase_amount_in_cart": {
+            "type": "number",
+            "description": "The minimum purchase amount in cart details. Depends on `enable_minimum_purchase_amount_in_cart`, and is required and greater than `0` while it is on."
+          },
+          "enable_on_account_purchase": {
+            "type": "boolean",
+            "description": "Turn on on account purchase."
+          },
+          "assign_credit_limit_per_order": {
+            "type": "boolean",
+            "description": "Set a credit limit for the account. Depends on `enable_on_account_purchase`."
+          },
+          "credit_limit_per_order": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The credit limit. Depends on `assign_credit_limit_per_order`, and is required while it is on. `0` is allowed and grants no credit. Can be `null`."
+          },
+          "enable_payment_terms": {
+            "type": "boolean",
+            "description": "Turn on payment terms."
+          },
+          "payment_terms": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "NET_30",
+              "NET_60",
+              "NET_90",
+              null
+            ],
+            "description": "The net payment term: `NET_30`, `NET_60` or `NET_90`, written and returned as that string. Depends on `enable_payment_terms`. Can be `null`."
+          },
+          "enable_customer_price_restriction": {
+            "type": "boolean",
+            "description": "Allow customer-specific price restriction."
+          }
+        }
+      },
+      "ProductRestrictionSettings": {
+        "type": "object",
+        "description": "The `product_restriction` section: one switch for product restriction based on the parent category.",
+        "properties": {
+          "enable_product_restriction_based_on_parent_category": {
+            "type": "boolean",
+            "description": "Allow product restriction based on the parent category."
+          }
+        }
+      },
+      "OrderFilterSettings": {
+        "type": "object",
+        "description": "The `order_filters` section: the status each admin order list opens on. A field is `null` when no default is set.",
+        "properties": {
+          "default_order_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "all",
+              "paused",
+              "in_progress",
+              "completed",
+              "reopened",
+              null
+            ],
+            "description": "The default order status: `all`, `paused`, `in_progress`, `completed` or `reopened`, or `null` when unset."
+          },
+          "default_payment_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "all",
+              "paid",
+              "unpaid",
+              "partially_paid",
+              null
+            ],
+            "description": "The default payment status: `all`, `paid`, `unpaid` or `partially_paid`, or `null` when unset."
+          },
+          "default_shipment_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "all",
+              "unshipped",
+              "shipped",
+              "returned",
+              "partial",
+              null
+            ],
+            "description": "The default shipment status: `all`, `unshipped`, `shipped`, `returned` or `partial`, or `null` when unset."
+          }
+        }
+      },
+      "LocationSettings": {
+        "type": "object",
+        "description": "The `location_settings` section. Only `enable_multi_location` can be written.",
+        "properties": {
+          "enable_multi_location": {
+            "type": "boolean",
+            "description": "Turn on multiple stock locations."
+          },
+          "locations": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/EcommerceSettingsLocation"
+            },
+            "description": "A read-only list of your stock locations. Manage them through `/api/v4/admin/inventory_locations`. A body that sends `locations` is rejected with `400 invalid_request` and the message `no recognized ecommerce_settings fields in body`."
+          }
+        }
+      },
+      "LocationSettingsInput": {
+        "type": "object",
+        "description": "The `location_settings` fields you can write. `locations` is read-only.",
+        "properties": {
+          "enable_multi_location": {
+            "type": "boolean",
+            "description": "Turn on multiple stock locations."
+          }
+        }
+      },
+      "EcommerceSettingsLocation": {
+        "type": "object",
+        "description": "One stock location, as `location_settings.locations` lists it.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The stock location's `id`, which `/api/v4/admin/inventory_locations/{inventory_location_id}` takes as `inventory_location_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The location's name."
+          },
+          "address": {
+            "type": "string",
+            "description": "The location's address."
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Whether the location is active."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "`true` on the store's default location."
+          },
+          "created": {
+            "type": "string",
+            "description": "When the location was created, such as `2026-07-16T06:24:24`."
+          },
+          "updated": {
+            "type": "string",
+            "description": "When the location was last changed."
+          }
+        }
+      },
+      "EcommerceSettingsOrderFlag": {
+        "type": "object",
+        "description": "One order flag, as `order_flags` lists it.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The order flag's `id`, which `/api/v4/admin/order_flags/{order_flag_id}` takes as `order_flag_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The flag's name."
+          },
+          "color": {
+            "type": "string",
+            "description": "The flag's colour as a hex code, such as `#FF6868`."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The flag's description, or `null`."
+          },
+          "type": {
+            "type": "string",
+            "description": "The flag's type, such as `order`."
+          }
+        }
+      },
+      "EcommerceSettingsGroupMeta": {
+        "type": "object",
+        "description": "One entry per key under `ecommerce_settings`. Only [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) and [Update ecommerce settings](/api-reference/ecommerce-settings/update-ecommerce-settings) return it.",
+        "properties": {
+          "continue_shopping": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          },
+          "product_inventory": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          },
+          "product_restriction": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          },
+          "order_filters": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          },
+          "location_settings": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          },
+          "order_flags": {
+            "$ref": "#/components/schemas/EcommerceSettingsSectionMeta"
+          }
+        }
+      },
+      "EcommerceSettingsSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`setting` for the six sections, `collection` for `order_flags`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "`true` for the six sections, `false` for `order_flags`."
+          },
+          "href": {
+            "type": "string",
+            "description": "The key's own path, such as `/api/v4/admin/settings/ecommerce_settings/pricing`. For `order_flags` it is `/api/v4/admin/order_flags`."
+          },
+          "locations_href": {
+            "type": "string",
+            "description": "Only on `location_settings`: `/api/v4/admin/inventory_locations`, where you manage the stock locations."
+          }
+        }
+      },
+      "EcommerceSettingsFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Describes each field with an `EcommerceSettingsFieldMetadataEntry`. On `/ecommerce_settings` it is keyed by section and then by field name; on a section it is keyed by field name."
+      },
+      "EcommerceSettingsFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes: `boolean`, `enum`, `decimal`, `reference` or `collection`."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "default": {
+            "description": "The field's default value, when it has one."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The values an `enum` field accepts."
+          },
+          "nullable": {
+            "type": "boolean",
+            "description": "`true` when the field can be empty."
+          },
+          "depends_on": {
+            "type": "string",
+            "description": "The field this one depends on, such as `enable_minimum_purchase_amount`."
+          },
+          "description": {
+            "type": "string",
+            "description": "A note about the field's values, on some fields, such as `Empty = unset.`"
+          },
+          "references": {
+            "type": "string",
+            "description": "What a `reference` field points to: `page` for `continue_shopping_specified_target`."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For `continue_shopping_specified_target`, every page slug in your store."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "`false` on `locations`, which you cannot write."
+          }
+        }
+      },
+      "EcommerceSettingsError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field` or `invalid_enum`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "The identifier of this request."
               }
             }
           }

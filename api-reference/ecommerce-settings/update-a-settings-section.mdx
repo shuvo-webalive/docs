@@ -1,0 +1,9 @@
+---
+title: "Update a settings section"
+description: "Changes the fields you send in one section and returns that section."
+openapi: "PATCH /admin/settings/ecommerce_settings/{section}"
+---
+
+Send the fields to change wrapped in the section's own name, such as `order_filters`, or send them unwrapped. A body wrapped in `ecommerce_settings` is rejected with `400`, and so is a field the section does not have, even beside fields it does have. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change, under its own key and without `group_meta`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

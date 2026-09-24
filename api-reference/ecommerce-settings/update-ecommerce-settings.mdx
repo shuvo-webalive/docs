@@ -1,0 +1,9 @@
+---
+title: "Update ecommerce settings"
+description: "Changes the fields you send in one or more sections and returns all settings."
+openapi: "PATCH /admin/settings/ecommerce_settings"
+---
+
+Send the fields to change inside `ecommerce_settings`, grouped by section name; one body can change several sections. Only the fields you send change: other fields, and sections you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) does. A body not wrapped in `ecommerce_settings` is rejected with `400`, and so is a section name the store does not have.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

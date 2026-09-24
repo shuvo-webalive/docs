@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "GetEcommerceSettingsAsync",
+      "code": "var response = await client.EcommerceSettings.GetEcommerceSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar ecommerceSettings = (IReadOnlyDictionary<string, object?>)body[\"ecommerce_settings\"]!;\nvar continueShopping = (IReadOnlyDictionary<string, object?>)ecommerceSettings[\"continue_shopping\"]!;\nConsole.WriteLine($\"{continueShopping[\"enable_continue_shopping\"]} {continueShopping[\"continue_shopping_target\"]}\");"
+    },
+    "patch_ecommerce_settings": {
+      "function": "PatchEcommerceSettingsAsync",
+      "code": "var response = await client.EcommerceSettings.PatchEcommerceSettingsAsync(new Dictionary<string, object?>\n{\n    [\"ecommerce_settings\"] = new Dictionary<string, object?>\n    {\n        [\"continue_shopping\"] = new Dictionary<string, object?> { [\"continue_shopping_target\"] = \"previous\" },\n        [\"order_filters\"] = new Dictionary<string, object?> { [\"default_payment_status\"] = \"unpaid\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar ecommerceSettings = (IReadOnlyDictionary<string, object?>)body[\"ecommerce_settings\"]!;\nvar continueShopping = (IReadOnlyDictionary<string, object?>)ecommerceSettings[\"continue_shopping\"]!;\nConsole.WriteLine(continueShopping[\"continue_shopping_target\"]);"
+    },
+    "head_ecommerce_settings": {
+      "function": "HeadEcommerceSettingsAsync",
+      "code": "var response = await client.EcommerceSettings.HeadEcommerceSettingsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "GetEcommerceSettingsSectionAsync",
+      "code": "var response = await client.EcommerceSettings.GetEcommerceSettingsSectionAsync(\"order_filters\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFilters = (IReadOnlyDictionary<string, object?>)body[\"order_filters\"]!;\nConsole.WriteLine(orderFilters[\"default_shipment_status\"]);"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "PatchEcommerceSettingsSectionAsync",
+      "code": "var response = await client.EcommerceSettings.PatchEcommerceSettingsSectionAsync(\"order_filters\", new Dictionary<string, object?>\n{\n    [\"order_filters\"] = new Dictionary<string, object?> { [\"default_shipment_status\"] = \"unshipped\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderFilters = (IReadOnlyDictionary<string, object?>)body[\"order_filters\"]!;\nConsole.WriteLine(orderFilters[\"default_shipment_status\"]);"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "getEcommerceSettings",
+      "code": "final response = await client.ecommerceSettings.getEcommerceSettings();\nfinal ecommerceSettings = (response.map as Map)['ecommerce_settings'] as Map;\nprint(ecommerceSettings['continue_shopping']);\nprint(ecommerceSettings['order_flags']);"
+    },
+    "patch_ecommerce_settings": {
+      "function": "patchEcommerceSettings",
+      "code": "final response = await client.ecommerceSettings.patchEcommerceSettings({\n  'ecommerce_settings': {\n    'continue_shopping': {'continue_shopping_target': 'previous'},\n    'order_filters': {'default_payment_status': 'unpaid'},\n  },\n});\nfinal ecommerceSettings = (response.map as Map)['ecommerce_settings'] as Map;\nprint(ecommerceSettings['continue_shopping']);\nprint(ecommerceSettings['order_filters']);"
+    },
+    "head_ecommerce_settings": {
+      "function": "headEcommerceSettings",
+      "code": "final response = await client.ecommerceSettings.headEcommerceSettings();\nprint(response.statusCode);"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "getEcommerceSettingsSection",
+      "code": "final response =\n    await client.ecommerceSettings.getEcommerceSettingsSection('order_filters');\nfinal orderFilters = (response.map as Map)['order_filters'] as Map;\nprint(orderFilters['default_order_status']);\nprint(orderFilters['default_payment_status']);\nprint(orderFilters['default_shipment_status']);"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "patchEcommerceSettingsSection",
+      "code": "final response = await client.ecommerceSettings\n    .patchEcommerceSettingsSection('order_filters', {\n  'order_filters': {'default_shipment_status': 'unshipped'},\n});\nfinal orderFilters = (response.map as Map)['order_filters'] as Map;\nprint(orderFilters['default_shipment_status']);"
+    }
+  }
+}

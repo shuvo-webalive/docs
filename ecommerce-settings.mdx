@@ -1,0 +1,65 @@
+---
+title: "Ecommerce settings"
+sidebarTitle: "Overview"
+description: "Read and change your store's continue shopping, stock, pricing, product restriction, order list and stock location settings."
+---
+
+The Ecommerce settings API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/ecommerce_settings`.
+
+<Warning>
+  **After a section write is rejected with `400`, the next request on the same client returns the wrong section.**
+  For example, after `PATCH /ecommerce_settings/pricing` returns `400`, a
+  `GET /ecommerce_settings/continue_shopping` on the same client returns `200` with the `pricing`
+  section in its body. Create a new client after such a `400` before you make another call. A
+  successful write does not cause this.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/ecommerce_settings` | Returns all six settings sections and the store's order flags, with a `group_meta` entry for each. |
+| [Update ecommerce settings](/api-reference/ecommerce-settings/update-ecommerce-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/ecommerce_settings` | Changes the fields you send in one or more sections and returns all settings. |
+| [Get ecommerce settings headers](/api-reference/ecommerce-settings/get-ecommerce-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/ecommerce_settings` | Returns the headers for the ecommerce settings, with no body. |
+| [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/ecommerce_settings/{section}` | Returns one settings section under its own key, such as `pricing`. |
+| [Update a settings section](/api-reference/ecommerce-settings/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/ecommerce_settings/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Six sections hold the settings, and `order_flags` is not one of them.** The sections are
+  `continue_shopping`, `product_inventory`, `pricing`, `product_restriction`, `order_filters` and
+  `location_settings`. [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) also lists the store's order flags
+  under `order_flags`, but you cannot read them as a section (`404`) or write them here: manage them
+  through `/api/v4/admin/order_flags`. In the same way, `location_settings.locations` is a read-only
+  list of your stock locations, managed through `/api/v4/admin/inventory_locations`.
+- **The wrapper a write needs depends on the path.** On `/ecommerce_settings`, wrap the fields in
+  `ecommerce_settings` and then in the section name: a bare section or a loose field is rejected
+  with `400` and the message `request body must be wrapped in a 'ecommerce_settings' object`. On
+  `/ecommerce_settings/{section}`, wrap the fields in the section's own name or send them
+  unwrapped: the `ecommerce_settings` wrapper is rejected there with `400`.
+- **`PATCH` changes only the fields you send, and checks the values you send.** A value outside an
+  `enum` field's `allowed_values`, a non-boolean for a boolean field, and a
+  `continue_shopping_specified_target` that is not a page slug in your store are each rejected with
+  `400`. On `/ecommerce_settings/{section}`, a field the section does not have is rejected too, even
+  beside fields it does have. `PUT`, `POST` and `DELETE` are rejected on both paths with
+  `405 method_not_allowed`.
+- **Five `pricing` fields depend on a switch.** `minimum_purchase_amount` depends on
+  `enable_minimum_purchase_amount`, `minimum_purchase_amount_in_cart` on
+  `enable_minimum_purchase_amount_in_cart`, `assign_credit_limit_per_order` on
+  `enable_on_account_purchase`, `credit_limit_per_order` on `assign_credit_limit_per_order`, and
+  `payment_terms` on `enable_payment_terms`. While `enable_minimum_purchase_amount` is on,
+  `minimum_purchase_amount: 0` is rejected with `400` and the message
+  `must be a number greater than 0 when enable_minimum_purchase_amount is on`. Turning
+  `enable_minimum_purchase_amount` off does not clear `minimum_purchase_amount`, and you can still
+  write `minimum_purchase_amount` while the switch is off.
+- **Add `field_metadata=true` to a read to get a description of every field.** Each entry gives the
+  field's `type` and `ui_label`, and where they apply its `default`, `allowed_values`, `nullable`,
+  `depends_on` and `description`. For `continue_shopping_specified_target`, `options` lists every
+  page slug in your store. On `/ecommerce_settings` the block is keyed by section; on a section it is
+  keyed by field name.
