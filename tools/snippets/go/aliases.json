@@ -1,0 +1,22 @@
+{
+  "sdk": "go",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "ListAliases",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Aliases().ListAliases(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"aliases\"].([]any) {\n\talias := row.(map[string]any)\n\tfmt.Println(alias[\"id\"], alias[\"alias\"])\n}"
+    },
+    "head_aliases": {
+      "function": "HeadAliases",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Aliases().HeadAliases(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_alias": {
+      "function": "CreateAlias",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Aliases().CreateAlias(ctx, map[string]any{\"alias\": \"shop.example.com\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nalias := resp.Map().(map[string]any)[\"alias\"].(map[string]any)\nfmt.Println(alias[\"id\"], alias[\"alias\"])"
+    },
+    "delete_alias": {
+      "function": "DeleteAlias",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Aliases().DeleteAlias(ctx, 115, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

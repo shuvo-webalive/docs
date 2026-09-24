@@ -1,0 +1,22 @@
+{
+  "sdk": "dotnet",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "ListAliasesAsync",
+      "code": "var response = await client.Aliases.ListAliasesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var domainAlias in ((IReadOnlyList<object?>)body[\"aliases\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{domainAlias[\"id\"]} {domainAlias[\"alias\"]}\");"
+    },
+    "head_aliases": {
+      "function": "HeadAliasesAsync",
+      "code": "var response = await client.Aliases.HeadAliasesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_alias": {
+      "function": "CreateAliasAsync",
+      "code": "var response = await client.Aliases.CreateAliasAsync(new Dictionary<string, object?>\n{\n    [\"alias\"] = \"shop.example.com\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar domainAlias = (IReadOnlyDictionary<string, object?>)body[\"alias\"]!;\nConsole.WriteLine($\"{domainAlias[\"id\"]} {domainAlias[\"alias\"]}\");"
+    },
+    "delete_alias": {
+      "function": "DeleteAliasAsync",
+      "code": "var response = await client.Aliases.DeleteAliasAsync(115);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

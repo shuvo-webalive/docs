@@ -1,0 +1,22 @@
+{
+  "sdk": "java",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "listAliases",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.aliases().listAliases(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"aliases\")) {\n    Map<?, ?> alias = (Map<?, ?>) row;\n    System.out.println(alias.get(\"id\") + \" \" + alias.get(\"alias\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));"
+    },
+    "head_aliases": {
+      "function": "headAliases",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.aliases().headAliases();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_alias": {
+      "function": "createAlias",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.aliases().createAlias(Map.of(\"alias\", \"shop.example.com\"));\nMap<?, ?> alias = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"alias\");\nSystem.out.println(alias.get(\"id\") + \" \" + alias.get(\"alias\") + \" \" + alias.get(\"created_at\"));"
+    },
+    "delete_alias": {
+      "function": "deleteAlias",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.aliases().deleteAlias(115);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

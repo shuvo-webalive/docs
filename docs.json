@@ -310,6 +310,18 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Domain aliases",
+            "icon": "globe",
+            "expanded": false,
+            "pages": [
+              "domain-aliases",
+              "api-reference/domain-aliases/list-domain-aliases",
+              "api-reference/domain-aliases/check-the-domain-aliases-list",
+              "api-reference/domain-aliases/create-a-domain-alias",
+              "api-reference/domain-aliases/delete-a-domain-alias"
+            ]
           }
         ]
       }

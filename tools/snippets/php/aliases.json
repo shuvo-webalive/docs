@@ -1,0 +1,22 @@
+{
+  "sdk": "php",
+  "module": "aliases",
+  "endpoints": {
+    "list_aliases": {
+      "function": "listAliases",
+      "code": "use WebCommander\\Sdk\\Resources\\Aliases\\Aliases;\n\n$response = Aliases::listAliases($client, ['limit' => 20]);\n\nforeach ($response->map['aliases'] as $alias) {\n    echo $alias['id'], ' ', $alias['alias'], PHP_EOL;\n}"
+    },
+    "head_aliases": {
+      "function": "headAliases",
+      "code": "use WebCommander\\Sdk\\Resources\\Aliases\\Aliases;\n\n$response = Aliases::headAliases($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_alias": {
+      "function": "createAlias",
+      "code": "use WebCommander\\Sdk\\Resources\\Aliases\\Aliases;\n\n$response = Aliases::createAlias($client, ['alias' => 'shop.example.com']);\n\necho $response->map['alias']['id'], PHP_EOL;"
+    },
+    "delete_alias": {
+      "function": "deleteAlias",
+      "code": "use WebCommander\\Sdk\\Resources\\Aliases\\Aliases;\n\n$response = Aliases::deleteAlias($client, 115);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}
