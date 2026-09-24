@@ -1,0 +1,9 @@
+---
+title: "Set the default shipping method"
+description: "Makes a shipping method the default and removes the flag from the previous one."
+openapi: "PUT /admin/shipping_methods/{shipping_method_id}/default"
+---
+
+Makes this method the default and returns it with `is_default` set to `true`. The method that was the default loses the flag. The call reads no body, so anything you send is ignored. No call clears the flag without giving it to another method.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

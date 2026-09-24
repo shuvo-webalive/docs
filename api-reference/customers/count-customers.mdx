@@ -6,16 +6,4 @@ openapi: "GET /admin/customers/count"
 
 Returns one field, `total`: the number of customers that match the filters you send, or all customers when you send none. These parameters narrow the count: `search` (also `searchText`), `email`, `status`, `companyName`, `phone`, `city`, `state` and `customerGroup`. These are accepted but ignored, so they do not change the count: `country`, `limit`, `offset`, `page`, `sort`, `createdFrom`, `createdTo`, `updatedFrom` and `updatedTo`. An unknown parameter name, such as `max`, is rejected with `400 unknown_parameter`.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.get_customer_count()` |
-| JavaScript | `client.adminCustomers.getCustomerCount()` |
-| PHP | `AdminCustomers::getCustomerCount()` |
-| Java | `client.adminCustomers().getCustomerCount()` |
-| .NET | `client.AdminCustomers.GetCustomerCountAsync()` |
-| Dart | `client.adminCustomers.getCustomerCount()` |
-| Go | `client.AdminCustomers().GetCustomerCount()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

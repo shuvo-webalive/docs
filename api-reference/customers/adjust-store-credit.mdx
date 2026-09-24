@@ -6,16 +6,4 @@ openapi: "POST /admin/customers/{customer_id}/store-credit/adjustments"
 
 Adds credit to a customer or deducts it, and records the change in their store credit history. Send `action`, `amount` and an optional `note` at the top level of the JSON body, not inside a `customer` object. `action` is `add` or `deduct` and sets the direction, so `amount` is always a positive number. Save `balance_before` and `balance_after` from the response if you need them, because [List store credit adjustments](/api-reference/customers/list-store-credit-adjustments) does not return them.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.create_customer_store_credit_adjustment()` |
-| JavaScript | `client.adminCustomers.createCustomerStoreCreditAdjustment()` |
-| PHP | `AdminCustomers::createCustomerStoreCreditAdjustment()` |
-| Java | `client.adminCustomers().createCustomerStoreCreditAdjustment()` |
-| .NET | `client.AdminCustomers.CreateCustomerStoreCreditAdjustmentAsync()` |
-| Dart | `client.adminCustomers.createCustomerStoreCreditAdjustment()` |
-| Go | `client.AdminCustomers().CreateCustomerStoreCreditAdjustment()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

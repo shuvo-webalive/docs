@@ -4,63 +4,63 @@
   "endpoints": {
     "list_customers": {
       "function": "GetCustomers",
-      "code": "resp, err := client.AdminCustomers().GetCustomers(ctx, map[string]any{\"limit\": 20, \"status\": \"active\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"customer_id\"], customer[\"email\"])\n}"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().GetCustomers(ctx, map[string]any{\"limit\": 20, \"status\": \"active\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"customer_id\"], customer[\"email\"])\n}"
     },
     "get_customer": {
       "function": "GetCustomer",
-      "code": "resp, err := client.AdminCustomers().GetCustomer(ctx, 123, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncustomer := resp.Map().(map[string]any)[\"customer\"].(map[string]any)\nfmt.Println(customer[\"email\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().GetCustomer(ctx, 123, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncustomer := resp.Map().(map[string]any)[\"customer\"].(map[string]any)\nfmt.Println(customer[\"email\"])"
     },
     "count_customers": {
       "function": "GetCustomerCount",
-      "code": "resp, err := client.AdminCustomers().GetCustomerCount(ctx, map[string]any{\"status\": \"active\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().GetCustomerCount(ctx, map[string]any{\"status\": \"active\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])"
     },
     "check_email": {
       "function": "GetCustomerEmailExists",
-      "code": "resp, err := client.AdminCustomers().GetCustomerEmailExists(ctx, \"jane@example.com\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"exists\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().GetCustomerEmailExists(ctx, \"jane@example.com\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"exists\"])"
     },
     "export_customers": {
       "function": "GetCustomerExport",
-      "code": "resp, err := client.AdminCustomers().GetCustomerExport(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndata := resp.Map().([]byte)\nif err := os.WriteFile(\"customers.xlsx\", data, 0o644); err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(\"wrote\", len(data), \"bytes to customers.xlsx\")"
+      "code": "import (\n\t\"fmt\"\n\t\"os\"\n)\n\nresp, err := client.AdminCustomers().GetCustomerExport(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndata := resp.Map().([]byte)\nif err := os.WriteFile(\"customers.xlsx\", data, 0o644); err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(\"wrote\", len(data), \"bytes to customers.xlsx\")"
     },
     "create_customer": {
       "function": "CreateCustomer",
-      "code": "resp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])"
     },
     "update_customer": {
       "function": "UpdateCustomer",
-      "code": "resp, err := client.AdminCustomers().UpdateCustomer(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\"last_name\": \"Smith\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"last_name\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().UpdateCustomer(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\"last_name\": \"Smith\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"last_name\"])"
     },
     "delete_customer": {
       "function": "DeleteCustomer",
-      "code": "resp, err := client.AdminCustomers().DeleteCustomer(ctx, 123, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().DeleteCustomer(ctx, 123, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "add_addresses": {
       "function": "CreateCustomerAddresses",
-      "code": "resp, err := client.AdminCustomers().CreateCustomerAddresses(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"addresses\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"type\":           \"shipping\",\n\t\t\t\t\"first_name\":     \"Jane\",\n\t\t\t\t\"last_name\":      \"Doe\",\n\t\t\t\t\"address_line_1\": \"1 Example Street\",\n\t\t\t\t\"city\":           \"Sydney\",\n\t\t\t\t\"post_code\":      \"2000\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"addresses\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().CreateCustomerAddresses(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"addresses\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"type\":           \"shipping\",\n\t\t\t\t\"first_name\":     \"Jane\",\n\t\t\t\t\"last_name\":      \"Doe\",\n\t\t\t\t\"address_line_1\": \"1 Example Street\",\n\t\t\t\t\"city\":           \"Sydney\",\n\t\t\t\t\"post_code\":      \"2000\",\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"addresses\"])"
     },
     "reset_password": {
       "function": "ResetCustomerPassword",
-      "code": "resp, err := client.AdminCustomers().ResetCustomerPassword(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\"password\": \"NewPassw0rd!\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"status\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().ResetCustomerPassword(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\"password\": \"NewPassw0rd!\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"status\"])"
     },
     "change_password": {
       "function": "ChangeCustomerPassword",
-      "code": "resp, err := client.AdminCustomers().ChangeCustomerPassword(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"email\":        \"jane@example.com\",\n\t\t\"old_password\": \"OldPassw0rd!\",\n\t\t\"password\":     \"NewPassw0rd!\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"status\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().ChangeCustomerPassword(ctx, 123, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"email\":        \"jane@example.com\",\n\t\t\"old_password\": \"OldPassw0rd!\",\n\t\t\"password\":     \"NewPassw0rd!\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"status\"])"
     },
     "bulk_reset_passwords": {
       "function": "BulkResetCustomerPasswords",
-      "code": "resp, err := client.AdminCustomers().BulkResetCustomerPasswords(ctx, map[string]any{\n\t\"customer_ids\": []any{123, 124},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nqueued := resp.Map().(map[string]any)[\"queued\"].([]any)\nfmt.Println(len(queued), \"queued\")"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().BulkResetCustomerPasswords(ctx, map[string]any{\n\t\"customer_ids\": []any{123, 124},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nqueued := resp.Map().(map[string]any)[\"queued\"].([]any)\nfmt.Println(len(queued), \"queued\")"
     },
     "import_customers": {
       "function": "ImportCustomers",
-      "code": "contents, err := os.ReadFile(\"customers.csv\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresp, err := client.AdminCustomers().ImportCustomers(ctx, map[string]any{\n\t\"file\": []any{\"customers.csv\", contents, \"text/csv\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nreport := resp.Map().(map[string]any)\nfmt.Println(report[\"created\"], report[\"updated\"], report[\"failed\"])"
+      "code": "import (\n\t\"fmt\"\n\t\"os\"\n)\n\ncontents, err := os.ReadFile(\"customers.csv\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresp, err := client.AdminCustomers().ImportCustomers(ctx, map[string]any{\n\t\"file\": []any{\"customers.csv\", contents, \"text/csv\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nreport := resp.Map().(map[string]any)\nfmt.Println(report[\"created\"], report[\"updated\"], report[\"failed\"])"
     },
     "list_store_credit_adjustments": {
       "function": "GetCustomerStoreCreditAdjustments",
-      "code": "resp, err := client.AdminCustomers().GetCustomerStoreCreditAdjustments(ctx, 123, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"store_credit_adjustments\"].([]any) {\n\tadjustment := row.(map[string]any)\n\tfmt.Println(adjustment[\"action\"], adjustment[\"amount\"])\n}"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().GetCustomerStoreCreditAdjustments(ctx, 123, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"store_credit_adjustments\"].([]any) {\n\tadjustment := row.(map[string]any)\n\tfmt.Println(adjustment[\"action\"], adjustment[\"amount\"])\n}"
     },
     "adjust_store_credit": {
       "function": "CreateCustomerStoreCreditAdjustment",
-      "code": "resp, err := client.AdminCustomers().CreateCustomerStoreCreditAdjustment(ctx, 123, map[string]any{\n\t\"action\": \"add\",\n\t\"amount\": 20,\n\t\"note\":   \"Refund\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"store_credit\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().CreateCustomerStoreCreditAdjustment(ctx, 123, map[string]any{\n\t\"action\": \"add\",\n\t\"amount\": 20,\n\t\"note\":   \"Refund\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"store_credit\"])"
     }
   }
 }

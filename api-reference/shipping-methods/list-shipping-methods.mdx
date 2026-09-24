@@ -1,0 +1,9 @@
+---
+title: "List shipping methods"
+description: "Returns up to 20 shipping methods per call, in `id` order, with paging details."
+openapi: "GET /admin/shipping_methods"
+---
+
+Returns the shipping methods in ascending `id` order, up to 20 per call, with a `pagination` block. The default method is not moved to the top. Only `limit`, `offset`, `page` and `field_metadata` are accepted; any other parameter, such as `sort` or `q`, is rejected with `400`. After a rejected `limit=0`, the next request on the same client returns that rejection's body instead of its own.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

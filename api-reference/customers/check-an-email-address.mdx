@@ -6,16 +6,4 @@ openapi: "GET /admin/customers/check-email"
 
 Returns `exists`: `true` if a customer already has this email address, `false` if not. When the address is taken, the response also includes that customer's `customer_id` and `internal_id`. When it is free, `exists` is the only field, so read `exists` before you look for an id. Use the `customer_id` with the other customer endpoints. Deleted customers still count: a deleted customer's address returns `exists: true`, and creating a new customer with that address is rejected with `409`.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.get_customer_email_exists()` |
-| JavaScript | `client.adminCustomers.getCustomerEmailExists()` |
-| PHP | `AdminCustomers::getCustomerEmailExists()` |
-| Java | `client.adminCustomers().getCustomerEmailExists()` |
-| .NET | `client.AdminCustomers.GetCustomerEmailExistsAsync()` |
-| Dart | `client.adminCustomers.getCustomerEmailExists()` |
-| Go | `client.AdminCustomers().GetCustomerEmailExists()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

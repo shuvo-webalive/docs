@@ -1,0 +1,42 @@
+{
+  "sdk": "python",
+  "module": "shipping_methods",
+  "endpoints": {
+    "list_shipping_methods": {
+      "function": "list_shipping_methods",
+      "code": "response = client.shipping_methods.list_shipping_methods({\"limit\": 20})\nfor shipping_method in response.map[\"shipping_methods\"]:\n    print(shipping_method[\"id\"], shipping_method[\"name\"], shipping_method[\"is_default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_shipping_methods": {
+      "function": "head_shipping_methods",
+      "code": "response = client.shipping_methods.head_shipping_methods()\nprint(response.status_code)\n"
+    },
+    "count_shipping_methods": {
+      "function": "count_shipping_methods",
+      "code": "response = client.shipping_methods.count_shipping_methods()\nprint(response.map[\"shipping_methods\"][\"count\"])\n"
+    },
+    "create_shipping_method": {
+      "function": "create_shipping_method",
+      "code": "response = client.shipping_methods.create_shipping_method({\n    \"shipping_method\": {\"name\": \"Express Post\"},\n})\nprint(response.map[\"shipping_method\"][\"id\"])\n"
+    },
+    "get_shipping_method": {
+      "function": "get_shipping_method",
+      "code": "response = client.shipping_methods.get_shipping_method(2)\nshipping_method = response.map[\"shipping_method\"]\nprint(shipping_method[\"name\"], shipping_method[\"is_default\"])\n"
+    },
+    "head_shipping_method": {
+      "function": "head_shipping_method",
+      "code": "response = client.shipping_methods.head_shipping_method(2)\nprint(response.status_code)\n"
+    },
+    "update_shipping_method": {
+      "function": "update_shipping_method",
+      "code": "response = client.shipping_methods.update_shipping_method(4, {\n    \"shipping_method\": {\"name\": \"Express Post Next Day\"},\n})\nprint(response.map[\"shipping_method\"][\"name\"])\n"
+    },
+    "delete_shipping_method": {
+      "function": "delete_shipping_method",
+      "code": "response = client.shipping_methods.delete_shipping_method(4)\nprint(response.status_code)\n"
+    },
+    "set_shipping_method_default": {
+      "function": "set_shipping_method_default",
+      "code": "response = client.shipping_methods.set_shipping_method_default(2)\nshipping_method = response.map[\"shipping_method\"]\nprint(shipping_method[\"name\"], shipping_method[\"is_default\"])\n"
+    }
+  }
+}

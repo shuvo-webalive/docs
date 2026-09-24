@@ -1,0 +1,54 @@
+---
+title: "Shipping methods"
+sidebarTitle: "Overview"
+description: "List, count, create, rename and delete shipping methods, and choose which one is the default."
+---
+
+The Shipping methods API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_methods`.
+
+<Warning>
+  **A `HEAD` request for one shipping method returns `200` even when no method has the `shipping_method_id` you send**,
+  so it does not tell you whether the method exists. To check that, call
+  [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method) instead: it returns `404` when no method
+  has that `shipping_method_id`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping methods](/api-reference/shipping-methods/list-shipping-methods) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_methods` | Returns up to 20 shipping methods per call, in `id` order, with paging details. |
+| [Check the shipping methods list](/api-reference/shipping-methods/check-the-shipping-methods-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_methods` | Checks that the shipping methods list is reachable. Returns headers only, with no body. |
+| [Count shipping methods](/api-reference/shipping-methods/count-shipping-methods) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_methods/count` | Returns the number of shipping methods in the store. |
+| [Create a shipping method](/api-reference/shipping-methods/create-a-shipping-method) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_methods` | Creates a shipping method from a `name` and returns it with its `id`, which the other calls take as `shipping_method_id`. |
+| [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_methods/{shipping_method_id}` | Returns the shipping method whose `id` you pass as `shipping_method_id`. |
+| [Check a shipping method](/api-reference/shipping-methods/check-a-shipping-method) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_methods/{shipping_method_id}` | Returns headers only, and `200` even when no method has that `shipping_method_id`. |
+| [Rename a shipping method](/api-reference/shipping-methods/rename-a-shipping-method) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_methods/{shipping_method_id}` | Changes a shipping method's `name` and returns the updated method. |
+| [Delete a shipping method](/api-reference/shipping-methods/delete-a-shipping-method) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_methods/{shipping_method_id}` | Deletes a shipping method permanently. You cannot delete the default method. |
+| [Set the default shipping method](/api-reference/shipping-methods/set-the-default-shipping-method) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_methods/{shipping_method_id}/default` | Makes a shipping method the default and removes the flag from the previous one. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create and rename wrap the method in `shipping_method`.** Send `{"shipping_method": {"name": "Express Post"}}`
+  to create or rename a method. A bare record, or the plural `shipping_methods` key, is rejected
+  with `400` and the message `shipping_method missing`.
+- **`name` is the only field you can write.** It is required, at most 100 characters, and must be
+  unique: a name another method already has is rejected with `409`. The store ignores `id` and
+  `is_default` if you send them inside `shipping_method`.
+- **Only one method is the default, and only one call changes it.**
+  [Set the default shipping method](/api-reference/shipping-methods/set-the-default-shipping-method) gives the flag to the method you name and
+  takes it from the method that had it. You cannot delete the default method: make another method
+  the default first, or the delete is rejected with `409`.
+- **A listing returns at most 20 methods per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get more, send the next `page` or a higher `offset` while
+  `pagination.has_next` is `true`. The listing accepts only `limit`, `offset`, `page` and
+  `field_metadata`, and rejects any other parameter with `400`.
+- **`PATCH` does not change a method.** A `PATCH` on a method returns `200` with
+  `{"isSuccess": false, "message": "Invalid API Request"}` and changes nothing. Use `PUT` to
+  rename a method.

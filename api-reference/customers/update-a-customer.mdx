@@ -4,18 +4,6 @@ description: "Changes only the fields you send and returns the updated customer.
 openapi: "PUT /admin/customers/{customer_id}"
 ---
 
-Updates a customer and returns `200` with the updated customer. Inside the `customer` object, send only the fields you want to change. Fields you leave out keep their current values. Sending `custom_properties` replaces the customer's whole list, so include every entry you want to keep. Leave `custom_properties` out to keep the list unchanged. Send each entry as `{label, description}`. The API also accepts `{name, value}`, but the response always uses `label` and `description`. An entry keeps its `id` while its `label` and `description` stay the same; new text gets a new `id`. You can set `store_credit` directly, but the API does not record the change in the customer's store credit history. The balance can then differ from the total of the recorded adjustments. To record a change, use [Adjust store credit](/api-reference/customers/adjust-store-credit).
+Updates a customer and returns `200` with the updated customer. Inside the `customer` object, send only the fields you want to change. Fields you leave out keep their current values. Sending `custom_properties` replaces the customer's whole list, so include every entry you want to keep. Leave `custom_properties` out to keep the list unchanged. Send each entry as `{label, description}`. The API also accepts `{name, value}`, but the response always uses `label` and `description`. An entry keeps its own `id` (the entry's, not the customer's) while its `label` and `description` stay the same; new text gets a new entry `id`. You can set `store_credit` directly, but the API does not record the change in the customer's store credit history. The balance can then differ from the total of the recorded adjustments. To record a change, use [Adjust store credit](/api-reference/customers/adjust-store-credit).
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.update_customer()` |
-| JavaScript | `client.adminCustomers.updateCustomer()` |
-| PHP | `AdminCustomers::updateCustomer()` |
-| Java | `client.adminCustomers().updateCustomer()` |
-| .NET | `client.AdminCustomers.UpdateCustomerAsync()` |
-| Dart | `client.adminCustomers.updateCustomer()` |
-| Go | `client.AdminCustomers().UpdateCustomer()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

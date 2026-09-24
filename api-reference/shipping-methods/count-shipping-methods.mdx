@@ -1,0 +1,9 @@
+---
+title: "Count shipping methods"
+description: "Returns the number of shipping methods in the store."
+openapi: "GET /admin/shipping_methods/count"
+---
+
+Returns the number of shipping methods as `count`, inside a `shipping_methods` object. The number matches `pagination.total` from the listing. Query parameters are accepted and ignored, so nothing narrows the count.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

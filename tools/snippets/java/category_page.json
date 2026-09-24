@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "category_page",
+  "endpoints": {
+    "get_category_page": {
+      "function": "getCategoryPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categoryPage().getCategoryPage();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category_page\");\nMap<?, ?> categoryInformation = (Map<?, ?>) settings.get(\"category_information\");\nMap<?, ?> productInformation = (Map<?, ?>) settings.get(\"product_information\");\nSystem.out.println(categoryInformation.get(\"show_description\"));\nSystem.out.println(((Map<?, ?>) productInformation.get(\"load\")).get(\"per_page\"));"
+    },
+    "patch_category_page": {
+      "function": "patchCategoryPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categoryPage().patchCategoryPage(Map.of(\"category_page\", Map.of(\n        \"category_information\", Map.of(\"show_description\", true, \"subcategory\", Map.of(\"per_page\", 24)))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category_page\");\nMap<?, ?> categoryInformation = (Map<?, ?>) settings.get(\"category_information\");\nSystem.out.println(categoryInformation.get(\"show_description\"));\nSystem.out.println(((Map<?, ?>) categoryInformation.get(\"subcategory\")).get(\"per_page\"));"
+    },
+    "head_category_page": {
+      "function": "headCategoryPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.categoryPage().headCategoryPage();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_category_page_section": {
+      "function": "getCategoryPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categoryPage().getCategoryPageSection(\"category_information\");\nMap<?, ?> categoryInformation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category_information\");\nSystem.out.println(categoryInformation.get(\"show_description\"));\nSystem.out.println(((Map<?, ?>) categoryInformation.get(\"subcategory\")).get(\"per_page\"));"
+    },
+    "patch_category_page_section": {
+      "function": "patchCategoryPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categoryPage().patchCategoryPageSection(\"category_information\",\n        Map.of(\"category_information\", Map.of(\"show_description\", true)));\nMap<?, ?> categoryInformation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category_information\");\nSystem.out.println(categoryInformation.get(\"show_description\"));"
+    }
+  }
+}

@@ -4,6 +4,7 @@ description: "Give the client your store's credentials once; it gets, caches and
 ---
 
 import ClientSetup from '/snippets/client-setup.mdx';
+import ClientBuild from '/snippets/client-build.mdx';
 
 Every call to the API must include an access token. The SDKs get that token for you from your store's
 credentials, cache it and renew it before it expires. With cURL, or any HTTP client, you request the
@@ -26,16 +27,21 @@ token yourself and send it with each call.
 
 ## Set up a client
 
-Build the client once and reuse it for every call. You pass the credentials in; these samples read
-them from environment variables named `WC_BASE_URL`, `WC_CLIENT_ID`, `WC_CLIENT_SECRET`,
-`WC_REDIRECT_URI` and `WC_AUTH_STRING`.
+Register your store's credentials once, when your app starts. These samples read them from
+environment variables named `WC_BASE_URL`, `WC_CLIENT_ID`, `WC_CLIENT_SECRET`, `WC_REDIRECT_URI` and
+`WC_AUTH_STRING`.
 
 <ClientSetup />
 
-Each setup also turns on the raise-on-error option (`raise_on_error=True` in Python), so a failed
-call raises an exception or throws an error instead of going unnoticed. A `200` whose body contains
-`"isSuccess": false` also counts as a failure: the API returns that for a URL it cannot route, such
-as `/api/v4/admin/customerz`.
+Then get a client wherever you make calls. Every SDK sample in the API reference starts this
+way:
+
+<ClientBuild />
+
+The registration turns on the raise-on-error option (`raise_on_error=True` in Python) for every
+client you build, so a failed call raises an exception or throws an error instead of going
+unnoticed. A `200` whose body contains `"isSuccess": false` also counts as a failure: the API
+returns that for a URL it cannot route, such as `/api/v4/admin/customerz`.
 
 ## What the SDKs handle
 

@@ -1,0 +1,42 @@
+{
+  "sdk": "dotnet",
+  "module": "shipping_methods",
+  "endpoints": {
+    "list_shipping_methods": {
+      "function": "ListShippingMethodsAsync",
+      "code": "var response = await client.ShippingMethods.ListShippingMethodsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var shippingMethod in ((IReadOnlyList<object?>)body[\"shipping_methods\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{shippingMethod[\"id\"]} {shippingMethod[\"name\"]} {shippingMethod[\"is_default\"]}\");"
+    },
+    "head_shipping_methods": {
+      "function": "HeadShippingMethodsAsync",
+      "code": "var response = await client.ShippingMethods.HeadShippingMethodsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_shipping_methods": {
+      "function": "CountShippingMethodsAsync",
+      "code": "var response = await client.ShippingMethods.CountShippingMethodsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingMethods = (IReadOnlyDictionary<string, object?>)body[\"shipping_methods\"]!;\nConsole.WriteLine(shippingMethods[\"count\"]);"
+    },
+    "create_shipping_method": {
+      "function": "CreateShippingMethodAsync",
+      "code": "var response = await client.ShippingMethods.CreateShippingMethodAsync(new Dictionary<string, object?>\n{\n    [\"shipping_method\"] = new Dictionary<string, object?> { [\"name\"] = \"Express Post\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingMethod = (IReadOnlyDictionary<string, object?>)body[\"shipping_method\"]!;\nConsole.WriteLine(shippingMethod[\"id\"]);"
+    },
+    "get_shipping_method": {
+      "function": "GetShippingMethodAsync",
+      "code": "var response = await client.ShippingMethods.GetShippingMethodAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingMethod = (IReadOnlyDictionary<string, object?>)body[\"shipping_method\"]!;\nConsole.WriteLine($\"{shippingMethod[\"name\"]} {shippingMethod[\"is_default\"]}\");"
+    },
+    "head_shipping_method": {
+      "function": "HeadShippingMethodAsync",
+      "code": "var response = await client.ShippingMethods.HeadShippingMethodAsync(2);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_shipping_method": {
+      "function": "UpdateShippingMethodAsync",
+      "code": "var response = await client.ShippingMethods.UpdateShippingMethodAsync(4, new Dictionary<string, object?>\n{\n    [\"shipping_method\"] = new Dictionary<string, object?> { [\"name\"] = \"Express Post Next Day\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingMethod = (IReadOnlyDictionary<string, object?>)body[\"shipping_method\"]!;\nConsole.WriteLine(shippingMethod[\"name\"]);"
+    },
+    "delete_shipping_method": {
+      "function": "DeleteShippingMethodAsync",
+      "code": "var response = await client.ShippingMethods.DeleteShippingMethodAsync(4);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "set_shipping_method_default": {
+      "function": "SetShippingMethodDefaultAsync",
+      "code": "var response = await client.ShippingMethods.SetShippingMethodDefaultAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingMethod = (IReadOnlyDictionary<string, object?>)body[\"shipping_method\"]!;\nConsole.WriteLine($\"{shippingMethod[\"name\"]} {shippingMethod[\"is_default\"]}\");"
+    }
+  }
+}

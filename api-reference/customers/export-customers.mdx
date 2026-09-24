@@ -6,16 +6,4 @@ openapi: "GET /admin/customers/export"
 
 Returns an XLSX spreadsheet of your customers. The file always contains every customer except deleted ones, whatever parameters you send. The parameters choose which columns appear, not which customers. To keep a column, leave its parameter out or send `1`, `true`, `on` or `yes`. Any other value removes the column. For example, `status=active` removes the status column and still exports every customer. With no parameters, the file has 21 columns. `Customer Id`, `Gender` and `Email` are always included. The API ignores unknown parameters instead of rejecting them. To get only the customers that match a filter, use [List customers](/api-reference/customers/list-customers). Do not upload an export file to [Import customers](/api-reference/customers/import-customers) unchanged. Every row has a `Customer Id`, so the import updates every customer in the file, which is every customer in your store. Build import files that contain only the customers you want to create or change.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.get_customer_export()` |
-| JavaScript | `client.adminCustomers.getCustomerExport()` |
-| PHP | `AdminCustomers::getCustomerExport()` |
-| Java | `client.adminCustomers().getCustomerExport()` |
-| .NET | `client.AdminCustomers.GetCustomerExportAsync()` |
-| Dart | `client.adminCustomers.getCustomerExport()` |
-| Go | `client.AdminCustomers().GetCustomerExport()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,55 @@
+---
+title: "Category page"
+sidebarTitle: "Overview"
+description: "Read and change how your store's category pages show the category, its subcategories and its products."
+---
+
+The Category page API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/category_page`.
+
+<Warning>
+  Every write body must be wrapped in a key, and the key depends on the path. On `/category_page`,
+  wrap the fields in `category_page` and then in the section name. On `/category_page/{section}`,
+  wrap them in the section's own name only, such as `category_information`: a body wrapped in
+  `category_page`, or not wrapped at all, is rejected with `400 invalid_request`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get category page settings](/api-reference/category-page/get-category-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/category_page` | Returns both settings sections and a `group_meta` block describing each one. |
+| [Update category page settings](/api-reference/category-page/update-category-page-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/category_page` | Changes the fields you send in one or both sections and returns all settings. |
+| [Get category page settings headers](/api-reference/category-page/get-category-page-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/category_page` | Returns the headers for the category page settings, with no body. |
+| [Get a settings section](/api-reference/category-page/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/category_page/{section}` | Returns one settings section under its own key, such as `category_information`. |
+| [Update a settings section](/api-reference/category-page/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/category_page/{section}` | Changes the fields you send in one section and returns that section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The settings are split into two sections.** `category_information` controls the category itself
+  and its subcategory list. `product_information` controls each product card and how the product
+  listing displays, pages and sorts. Read or write both through `/category_page`, or one through
+  `/category_page/{section}`. An unknown section returns `404 not_found`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields you leave out
+  keep their stored values, including other fields in the same nested block and a section you did
+  not name. `PUT`, `POST` and `DELETE` are rejected on both paths with `405 method_not_allowed`
+  and an `Allow: GET, HEAD, PATCH, OPTIONS` header.
+- **Add `field_metadata=true` to a read to get a description of every field.** The settings are
+  still returned with it. Each entry gives the field's `ui_label`, `description`, `type` and
+  `default`, and every `enum` field also lists its `allowed_values`, with a label for each in
+  `labels`. For `variation_combination.types`, `allowed_values` lists the variation types your store
+  defines, with the ids you can send. On `/category_page` the block is keyed by section; on a
+  section it is keyed by field name.
+- **All category page writes share one rate limit.** If you send eleven writes within about 2.3
+  seconds, the eleventh is rejected with `429` and a `Retry-After` header that counts down the time
+  left before writes are accepted again. Until then, writes to either section and to
+  `/category_page` are all rejected, while reads still return `200`. A retry before then counts as
+  another write, so wait until `Retry-After` has passed before you write again.
+- **`400`, `404` and `405` responses share one shape:** an `error` object with `code`, `message`,
+  `details` (one entry per rejected field, each with its own `field`, `code` and `message`) and
+  `request_id`.

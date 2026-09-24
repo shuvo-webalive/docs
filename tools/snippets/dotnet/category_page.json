@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "category_page",
+  "endpoints": {
+    "get_category_page": {
+      "function": "GetCategoryPageAsync",
+      "code": "var response = await client.CategoryPage.GetCategoryPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar categoryPage = (IReadOnlyDictionary<string, object?>)body[\"category_page\"]!;\nvar categoryInformation = (IReadOnlyDictionary<string, object?>)categoryPage[\"category_information\"]!;\nConsole.WriteLine(categoryInformation[\"show_description\"]);"
+    },
+    "patch_category_page": {
+      "function": "PatchCategoryPageAsync",
+      "code": "var response = await client.CategoryPage.PatchCategoryPageAsync(new Dictionary<string, object?>\n{\n    [\"category_page\"] = new Dictionary<string, object?>\n    {\n        [\"category_information\"] = new Dictionary<string, object?>\n        {\n            [\"show_description\"] = true, [\"subcategory\"] = new Dictionary<string, object?> { [\"per_page\"] = 24 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar categoryPage = (IReadOnlyDictionary<string, object?>)body[\"category_page\"]!;\nvar categoryInformation = (IReadOnlyDictionary<string, object?>)categoryPage[\"category_information\"]!;\nConsole.WriteLine(categoryInformation[\"show_description\"]);"
+    },
+    "head_category_page": {
+      "function": "HeadCategoryPageAsync",
+      "code": "var response = await client.CategoryPage.HeadCategoryPageAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_category_page_section": {
+      "function": "GetCategoryPageSectionAsync",
+      "code": "var response = await client.CategoryPage.GetCategoryPageSectionAsync(\"category_information\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar categoryInformation = (IReadOnlyDictionary<string, object?>)body[\"category_information\"]!;\nConsole.WriteLine(categoryInformation[\"show_description\"]);"
+    },
+    "patch_category_page_section": {
+      "function": "PatchCategoryPageSectionAsync",
+      "code": "var response = await client.CategoryPage.PatchCategoryPageSectionAsync(\"category_information\", new Dictionary<string, object?>\n{\n    [\"category_information\"] = new Dictionary<string, object?> { [\"show_description\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar categoryInformation = (IReadOnlyDictionary<string, object?>)body[\"category_information\"]!;\nConsole.WriteLine(categoryInformation[\"show_description\"]);"
+    }
+  }
+}

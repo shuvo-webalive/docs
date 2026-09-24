@@ -1,0 +1,9 @@
+---
+title: "Delete a shipping method"
+description: "Deletes a shipping method permanently. You cannot delete the default method."
+openapi: "DELETE /admin/shipping_methods/{shipping_method_id}"
+---
+
+Deletes the shipping method permanently and returns `204` with no body. The method leaves the listing and the count goes down by one. You cannot delete the default method: make another method the default first, or the call is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

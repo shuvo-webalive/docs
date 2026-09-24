@@ -20,7 +20,7 @@
           {
             "group": "Get started",
             "icon": "rocket",
-            "expanded": true,
+            "expanded": false,
             "pages": [
               "introduction",
               "installation",
@@ -35,7 +35,7 @@
           {
             "group": "Authentication",
             "icon": "key",
-            "expanded": true,
+            "expanded": false,
             "pages": [
               "api-reference/authentication/get-an-access-token"
             ]
@@ -43,7 +43,7 @@
           {
             "group": "Customers",
             "icon": "users",
-            "expanded": true,
+            "expanded": false,
             "pages": [
               "customers",
               "api-reference/customers/list-customers",
@@ -61,6 +61,48 @@
               "api-reference/customers/import-customers",
               "api-reference/customers/list-store-credit-adjustments",
               "api-reference/customers/adjust-store-credit"
+            ]
+          },
+          {
+            "group": "Page settings",
+            "icon": "file-lines",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Category page",
+                "expanded": false,
+                "pages": [
+                  "category-page",
+                  "api-reference/category-page/get-category-page-settings",
+                  "api-reference/category-page/update-category-page-settings",
+                  "api-reference/category-page/get-category-page-settings-headers",
+                  "api-reference/category-page/get-a-settings-section",
+                  "api-reference/category-page/update-a-settings-section"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Shipping",
+            "icon": "truck",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Shipping methods",
+                "expanded": false,
+                "pages": [
+                  "shipping-methods",
+                  "api-reference/shipping-methods/list-shipping-methods",
+                  "api-reference/shipping-methods/check-the-shipping-methods-list",
+                  "api-reference/shipping-methods/count-shipping-methods",
+                  "api-reference/shipping-methods/create-a-shipping-method",
+                  "api-reference/shipping-methods/retrieve-a-shipping-method",
+                  "api-reference/shipping-methods/check-a-shipping-method",
+                  "api-reference/shipping-methods/rename-a-shipping-method",
+                  "api-reference/shipping-methods/delete-a-shipping-method",
+                  "api-reference/shipping-methods/set-the-default-shipping-method"
+                ]
+              }
             ]
           }
         ]

@@ -82,10 +82,120 @@ def without_path_example(parameter):
     return dict({k: v for k, v in parameter.items() if k != "example"}, schema=schema)
 
 
-def operation(module, endpoint, snippets):
+IMPORT_LINE = {
+    "python": re.compile(r"(import|from) \S"),
+    "js": re.compile(r"import \S"),
+    "php": re.compile(r"(use|require) \S"),
+    "java": re.compile(r"import \S"),
+    "dotnet": re.compile(r"using [\w.]+;$"),
+    "dart": re.compile(r"import \S"),
+}
+PROGRAM_FILES = {"python": "main.py", "js": "main.mjs", "php": "main.php", "java": "Main.java",
+                 "dotnet": "Program.cs", "dart": "main.dart", "go": "main.go"}
+
+
+def split_imports(sdk, code):
+    """Splits the import lines at the top of a sample or setup from the code below them."""
+    if sdk == "go":
+        block = re.match(r"\s*import \((.*?)\n\)\n", code, re.S)
+        if not block:
+            return [], code.strip("\n")
+        return [line.strip() for line in block.group(1).splitlines() if line.strip()], code[block.end():].strip("\n")
+    lines = code.strip("\n").splitlines()
+    imports = []
+    while lines and (not lines[0].strip() or IMPORT_LINE[sdk].match(lines[0])):
+        line = lines.pop(0)
+        if line.strip():
+            imports.append(line)
+    return imports, "\n".join(lines).strip("\n")
+
+
+def indent(code, prefix):
+    return "\n".join(prefix + line if line.strip() else "" for line in code.splitlines())
+
+
+def used(name, code):
+    return re.search(r"(?<![\w.])%s\b" % re.escape(name), code) is not None
+
+
+def python_program(imports, code, complete):
+    standard = sorted({line for line in imports if "webcommander" not in line})
+    sdk = sorted({line for line in imports if "webcommander" in line})
+    return "\n\n".join(part for part in ["\n".join(standard), "\n".join(sdk), code] if part)
+
+
+def js_program(imports, code, complete):
+    names = {}
+    for line in imports:
+        found = re.match(r"import \{(.*)\} from '(.*)';$", line)
+        if not found:
+            raise SystemExit("cannot merge the JavaScript import: " + line)
+        listed = names.setdefault(found.group(2), [])
+        listed += [name.strip() for name in found.group(1).split(",") if name.strip() not in listed]
+    order = sorted(names, key=lambda source: (not source.startswith("node:"), source))
+    return "\n".join("import {%s} from '%s';" % (", ".join(names[source]), source) for source in order) + "\n\n" + code
+
+
+def php_program(imports, code, complete):
+    requires = "\n".join(line for line in imports if line.startswith("require"))
+    uses = "\n".join(sorted({line for line in imports if line.startswith("use ")}))
+    return "\n\n".join(part for part in ["<?php" if complete else "", requires, uses, code] if part)
+
+
+def java_program(imports, code, complete):
+    kept = "\n".join(sorted({line for line in imports if used(line.rstrip(";").rsplit(".", 1)[1], code)}))
+    if not complete:
+        return kept + "\n\n" + code
+    return (kept + "\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n"
+            + indent(code, " " * 8) + "\n    }\n}")
+
+
+def dotnet_program(imports, code, complete):
+    return "\n".join(dict.fromkeys(imports)) + "\n\n" + code
+
+
+def dart_program(imports, code, complete):
+    groups = [sorted({line for line in imports if "'dart:" in line}), sorted({line for line in imports if "'dart:" not in line})]
+    head = "\n\n".join("\n".join(group) for group in groups if group)
+    if not complete:
+        return head + "\n\n" + code
+    return head + "\n\nFuture<void> main() async {\n" + indent(code, "  ") + "\n}"
+
+
+def go_program(imports, code, complete):
+    def name(spec):
+        parts = spec.split()
+        return parts[0] if len(parts) == 2 else parts[-1].strip('"').rsplit("/", 1)[-1]
+    kept = [spec for spec in dict.fromkeys(imports) if used(name(spec), code)]
+    standard = sorted(spec for spec in kept if "." not in spec.split()[-1].split("/")[0])
+    other = sorted(spec for spec in kept if spec not in standard)
+    block = "\n".join("\t" + spec if spec else "" for spec in standard + ([""] if standard and other else []) + other)
+    head = "import (\n" + block + "\n)"
+    if not complete:
+        return head + "\n\n" + code
+    return "package main\n\n" + head + "\n\nfunc main() {\n" + indent(code, "\t") + "\n}"
+
+
+PROGRAMS = {"python": python_program, "js": js_program, "php": php_program, "java": java_program,
+            "dotnet": dotnet_program, "dart": dart_program, "go": go_program}
+
+
+def program(sdk, parts, complete=False):
+    """Joins code parts in order with their imports merged at the top. A complete program also gets
+    what its language needs to compile on its own, such as a main function."""
+    imports, codes = [], []
+    for part in parts:
+        part_imports, part_code = split_imports(sdk, part)
+        imports += part_imports
+        codes.append(part_code)
+    return PROGRAMS[sdk](imports, "\n\n".join(code for code in codes if code), complete) + "\n"
+
+
+def operation(module, endpoint, snippets, setups):
     samples = [{"lang": "bash", "label": "cURL", "source": curl(endpoint)}]
     for sdk, lang, label in SDKS:
-        samples.append({"lang": lang, "label": label, "source": snippets[sdk]["endpoints"][endpoint["key"]]["code"]})
+        code = program(sdk, [setups[sdk]["client"], snippets[sdk]["endpoints"][endpoint["key"]]["code"]])
+        samples.append({"lang": lang, "label": label, "source": code})
     op = {
         "tags": [module.TAG],
         "summary": endpoint["title"],
@@ -214,14 +324,15 @@ def rename_refs(text, mapping):
     return text
 
 
-def spec(areas, snippets, schemas, renames):
+def spec(areas, snippets, setups, schemas, renames):
     paths = {"/oauth2/token": {"post": token_operation()}}
     tags = [{"name": "Authentication"}]
     for area in areas:
         for module in area["modules"]:
             tags.append({"name": module.TAG})
             for endpoint in module.ENDPOINTS:
-                op = json.loads(rename_refs(json.dumps(operation(module, endpoint, snippets[module.NAME])), renames[module.NAME]))
+                op = operation(module, endpoint, snippets[module.NAME], setups)
+                op = json.loads(rename_refs(json.dumps(op), renames[module.NAME]))
                 paths.setdefault(endpoint["path"], {})[endpoint["method"].lower()] = op
     return {
         "openapi": "3.1.0",
@@ -240,21 +351,9 @@ def spec(areas, snippets, schemas, renames):
     }
 
 
-def sdk_call(snippet):
-    found = re.search(
-        r"([A-Za-z_$][\w$]*(?:\(\))?(?:\s*(?:\.|::|->)\s*[A-Za-z_$][\w$]*(?:\(\))?)*)\s*(\.|::|->)\s*"
-        + re.escape(snippet["function"]) + r"\s*\(", snippet["code"])
-    if not found:
-        raise SystemExit("cannot find the %s call in its sample" % snippet["function"])
-    return re.sub(r"\s+", "", found.group(1)) + found.group(2) + snippet["function"] + "()"
-
-
-def page(endpoint, snippets):
-    rows = ["| %s | `%s` |" % (label, sdk_call(snippets[sdk]["endpoints"][endpoint["key"]]))
-            for sdk, _, label in SDKS]
-    note = ("Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, "
-            "as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` "
-            "to your store's host name and paste an access token from "
+def page(endpoint):
+    note = ("The SDK samples get their client from credentials your app registers once when it starts, as shown in "
+            "[Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from "
             "[Get an access token](/api-reference/authentication/get-an-access-token).")
     if endpoint.get("body") and not endpoint.get("multipart"):
         note += " To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload."
@@ -267,12 +366,6 @@ def page(endpoint, snippets):
         "",
         endpoint["description"],
         "",
-        "## SDK method",
-        "",
-        "| SDK | Call |",
-        "| --- | --- |",
-    ] + rows + [
-        "",
         "<Note>%s</Note>" % note,
         "",
     ])
@@ -283,10 +376,12 @@ def badge(method):
             'letterSpacing: "0.02em", color: "%s"}}>%s</span>' % (METHOD_COLOURS[method], method))
 
 
-def client_setup(setups):
-    tabs = ["<CodeGroup>", "```bash cURL", CURL_SETUP, "```", ""]
+def code_group(setups, field, curl_tab=None, complete=False):
+    tabs = ["<CodeGroup>"]
+    if curl_tab:
+        tabs += ["```bash cURL", curl_tab, "```", ""]
     for sdk, lang, label in SDKS:
-        tabs += ["```%s %s" % (lang, label), setups[sdk]["setup"].rstrip(), "```", ""]
+        tabs += ["```%s %s" % (lang, label), program(sdk, [setups[sdk][field]], complete).rstrip(), "```", ""]
     tabs.append("</CodeGroup>")
     return "\n".join(tabs) + "\n"
 
@@ -321,9 +416,9 @@ def overview(module):
         "",
         "## Before you call",
         "",
-        "Set up a client once with your store's credentials, as shown in [Authentication](/authentication).",
-        "The SDK samples on these pages use that client. With cURL, send the access token in an",
-        "`Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.",
+        "Register your store's credentials once when your app starts, as shown in",
+        "[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.",
+        "With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.",
         "",
     ]
     if getattr(module, "NOTES", None):
@@ -336,16 +431,39 @@ def module_pages(module):
 
 
 def navigation(areas):
-    groups = [{"group": "Authentication", "icon": "key", "expanded": True,
+    groups = [{"group": "Authentication", "icon": "key", "expanded": False,
                "pages": ["api-reference/authentication/get-an-access-token"]}]
     for area in areas:
         modules = area["modules"]
         if len(modules) == 1 and modules[0].TAG == area["name"]:
-            groups.append({"group": area["name"], "icon": area["icon"], "expanded": True, "pages": module_pages(modules[0])})
+            groups.append({"group": area["name"], "icon": area["icon"], "expanded": False, "pages": module_pages(modules[0])})
         else:
             groups.append({"group": area["name"], "icon": area["icon"], "expanded": False, "pages": [
                 {"group": module.TAG, "expanded": False, "pages": module_pages(module)} for module in modules]})
     return groups
+
+
+def write_programs(target, areas, snippets, setups):
+    """Writes the registration and every sample, exactly as the pages show them, as programs that compile on their
+    own, one folder each. Samples leave out the registration, so an import it provides cannot hide a missing one."""
+    count = 0
+    for sdk, _, _ in SDKS:
+        folder = target / sdk / "authentication" / "register"
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / PROGRAM_FILES[sdk]).write_bytes(program(sdk, [setups[sdk]["register"]], complete=True).encode("utf-8"))
+        count += 1
+    for area in areas:
+        for module in area["modules"]:
+            for endpoint in module.ENDPOINTS:
+                for sdk, _, _ in SDKS:
+                    folder = target / sdk / module.NAME / endpoint["key"]
+                    folder.mkdir(parents=True, exist_ok=True)
+                    sample = snippets[module.NAME][sdk]["endpoints"][endpoint["key"]]["code"]
+                    code = program(sdk, [setups[sdk]["client"], sample], complete=True)
+                    (folder / PROGRAM_FILES[sdk]).write_bytes(code.encode("utf-8"))
+                    count += 1
+    print("Wrote %d programs to %s" % (count, target))
+    return 0
 
 
 def main():
@@ -375,8 +493,10 @@ def main():
     if duplicates:
         print("Build failed: endpoint keys are not unique across modules: %s" % ", ".join(duplicates))
         return 1
+    if len(sys.argv) == 3 and sys.argv[1] == "--programs":
+        return write_programs(pathlib.Path(sys.argv[2]), areas, snippets, setups)
     schemas, renames = prefixed_schemas(areas)
-    document = json.dumps(spec(areas, snippets, schemas, renames), indent=2, ensure_ascii=False)
+    document = json.dumps(spec(areas, snippets, setups, schemas, renames), indent=2, ensure_ascii=False)
     if STORE_ADDRESS.search(document):
         print("Build failed: the spec contains a store address")
         return 1
@@ -387,13 +507,14 @@ def main():
         for module in area["modules"]:
             (OUT / module.SLUG).mkdir(parents=True, exist_ok=True)
             for endpoint in module.ENDPOINTS:
-                (OUT / module.SLUG / (endpoint["slug"] + ".mdx")).write_text(page(endpoint, snippets[module.NAME]), encoding="utf-8")
+                (OUT / module.SLUG / (endpoint["slug"] + ".mdx")).write_text(page(endpoint), encoding="utf-8")
                 count += 1
             (DOCS / (module.SLUG + ".mdx")).write_text(overview(module), encoding="utf-8")
     (OUT / "authentication").mkdir(exist_ok=True)
     (OUT / "authentication" / "get-an-access-token.mdx").write_text(TOKEN_PAGE, encoding="utf-8")
     (DOCS / "snippets").mkdir(exist_ok=True)
-    (DOCS / "snippets" / "client-setup.mdx").write_text(client_setup(setups), encoding="utf-8")
+    (DOCS / "snippets" / "client-setup.mdx").write_text(code_group(setups, "register", CURL_SETUP, complete=True), encoding="utf-8")
+    (DOCS / "snippets" / "client-build.mdx").write_text(code_group(setups, "client"), encoding="utf-8")
 
     docs_json = json.loads((DOCS / "docs.json").read_text(encoding="utf-8"))
     for group in docs_json["navigation"]["groups"]:
