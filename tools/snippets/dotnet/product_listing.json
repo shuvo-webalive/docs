@@ -1,0 +1,18 @@
+{
+  "sdk": "dotnet",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "GetProductListingAsync",
+      "code": "var response = await client.ProductListing.GetProductListingAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productListing = (IReadOnlyDictionary<string, object?>)body[\"product_listing\"]!;\nvar load = (IReadOnlyDictionary<string, object?>)productListing[\"load\"]!;\nvar pagination = (IReadOnlyDictionary<string, object?>)load[\"pagination\"]!;\nConsole.WriteLine($\"{load[\"type\"]} {pagination[\"per_page\"]}\");"
+    },
+    "patch_product_listing": {
+      "function": "PatchProductListingAsync",
+      "code": "var response = await client.ProductListing.PatchProductListingAsync(new Dictionary<string, object?>\n{\n    [\"product_listing\"] = new Dictionary<string, object?>\n    {\n        [\"sorting\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"sort_by\"] = \"price_asc\" },\n        [\"load\"] = new Dictionary<string, object?> { [\"pagination\"] = new Dictionary<string, object?> { [\"per_page\"] = 24 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productListing = (IReadOnlyDictionary<string, object?>)body[\"product_listing\"]!;\nvar sorting = (IReadOnlyDictionary<string, object?>)productListing[\"sorting\"]!;\nConsole.WriteLine($\"{sorting[\"enabled\"]} {sorting[\"sort_by\"]}\");"
+    },
+    "head_product_listing": {
+      "function": "HeadProductListingAsync",
+      "code": "var response = await client.ProductListing.HeadProductListingAsync();\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

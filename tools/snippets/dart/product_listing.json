@@ -1,0 +1,18 @@
+{
+  "sdk": "dart",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "getProductListing",
+      "code": "final response = await client.productListing.getProductListing();\nfinal productListing = (response.map as Map)['product_listing'] as Map;\nprint(productListing['load']);\nprint(productListing['sorting']);"
+    },
+    "patch_product_listing": {
+      "function": "patchProductListing",
+      "code": "final response = await client.productListing.patchProductListing({\n  'product_listing': {\n    'sorting': {'enabled': true, 'sort_by': 'price_asc'},\n    'load': {\n      'pagination': {'per_page': 24},\n    },\n  },\n});\nfinal productListing = (response.map as Map)['product_listing'] as Map;\nprint(productListing['sorting']);\nprint(productListing['load']);"
+    },
+    "head_product_listing": {
+      "function": "headProductListing",
+      "code": "final response = await client.productListing.headProductListing();\nprint(response.statusCode);"
+    }
+  }
+}

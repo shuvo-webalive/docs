@@ -1,0 +1,59 @@
+---
+title: "Product listing"
+sidebarTitle: "Overview"
+description: "Read and change what your store's product listings show for each product, and how they page and sort."
+---
+
+The Product listing API has three endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/product_listing`.
+
+<Warning>
+  **Product listing has no section paths.** Other settings areas with sections, such as Category page,
+  let you read or write one section at its own path. `/api/v4/admin/settings/product_listing/{section}`
+  returns `404` for every method, even for the four real section names, with the message
+  `Unknown settings path: product_listing/<name>`. To change one section, name it inside the
+  `product_listing` wrapper of [Update product listing settings](/api-reference/product-listing/update-product-listing-settings).
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get product listing settings](/api-reference/product-listing/get-product-listing-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/product_listing` | Returns all four product listing sections and a `group_meta` block describing each one. |
+| [Update product listing settings](/api-reference/product-listing/update-product-listing-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/product_listing` | Changes the fields you send in one or more sections and returns all settings. |
+| [Check the product listing settings](/api-reference/product-listing/check-the-product-listing-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/product_listing` | Checks that the product listing settings are reachable. Returns headers only, with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every write is wrapped in `product_listing`, then in the section name.** Send
+  `{"product_listing": {"sorting": {"enabled": true}}}`. A bare section such as `{"sorting": {...}}`,
+  or a field at the top level, is rejected with `400 missing_wrapper` and the message
+  `request body must be wrapped in a 'product_listing' object`. A field placed directly inside
+  `product_listing` is rejected with `400 validation_failed` and `<field>: not a recognized section`.
+- **`PATCH` is the only way to write, and it changes only the fields you send.** Fields you leave out
+  keep their stored values, including other fields in the same nested block and any section you did
+  not name. One body can change all four sections. `PUT`, `POST` and `DELETE` are rejected with
+  `405 method_not_allowed` and an `Allow: GET, HEAD, PATCH, OPTIONS` header. There is nothing to
+  create or delete: the four sections already exist.
+- **Values must match the field's type and allowed values.** Booleans take `true`, `false`, `0` or `1`;
+  a string is rejected with `must be a boolean (true/false or 0/1)`. `load.type` takes `pagination` or
+  `load_more`. `load.pagination.position` takes `top`, `bottom`, `top_and_bottom` or `null`.
+  `sorting.sort_by` takes `alpha_asc`, `alpha_desc`, `price_desc`, `price_asc`, `created_asc`,
+  `created_desc` or `null`. Any other value is rejected with `400`, and an unknown field is rejected
+  with `400` and `not a recognized field`.
+- **A write to a dependent field is accepted even when the field it depends on does not switch it on.**
+  `load.load_more.per_load` at `0` is accepted while `load.type` is `pagination`, and you can set
+  `load.type` while `load.enabled` is `false`. `load.pagination.per_page` is still checked: `0` is
+  rejected with `400` and `must be a positive integer for the selected load type`, and `1000000`
+  with `400` and `must be between 1 and 999999`.
+- **Add `field_metadata=true` to a read to get a description of every field.** The settings and
+  `group_meta` are still returned. `field_metadata` is keyed by section, then nested the same way as
+  that section, with one entry for every field. For `product_information.variation_combination.types`,
+  the entry's `allowed_values` lists your store's variation type names; any other name is rejected
+  with `400` and `unknown variation type`. `load` has a field named `type`, so use the settings body,
+  not the presence of a `type` key, to tell a nested block from a field's entry.

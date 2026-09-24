@@ -55,6 +55,9 @@
       "name": "Price display settings"
     },
     {
+      "name": "Product listing"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -10882,6 +10885,407 @@
         }
       }
     },
+    "/admin/settings/product_listing": {
+      "get": {
+        "tags": [
+          "Product listing"
+        ],
+        "summary": "Get product listing settings",
+        "operationId": "get_product_listing",
+        "description": "Returns every product listing setting under `product_listing`, with all four sections in full: `product_information`, `load`, `sorting` and `sortable_items`. Beside it, `group_meta` gives each section's `kind` and whether it is `writable`; it has no `href`, because no section has a path of its own. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field in all four sections. It is keyed by section, then nested the same way as that section. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All four sections and `group_meta`. With `field_metadata=true`, a `field_metadata` key is added beside them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_listing": {
+                      "$ref": "#/components/schemas/ProductListingSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ProductListingGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ProductListingFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section."
+                    }
+                  }
+                },
+                "example": {
+                  "product_listing": {
+                    "product_information": {
+                      "interaction_buttons": {
+                        "enabled": true,
+                        "add_to_cart": true,
+                        "show_details": true,
+                        "show_on_hover": false
+                      },
+                      "show_summary": true,
+                      "show_sale_percentage": true,
+                      "show_stock_availability": false,
+                      "show_parent_category": false,
+                      "show_loyalty_point": false,
+                      "price": {
+                        "enabled": true,
+                        "expect_to_pay": false,
+                        "expect_to_pay_with_tax": false
+                      },
+                      "reviews": {
+                        "rating_active": true,
+                        "show_review_count": true
+                      },
+                      "variation_combination": {
+                        "enabled": true,
+                        "types": [
+                          "Size",
+                          "Color"
+                        ]
+                      },
+                      "show_variations_as_products": false
+                    },
+                    "load": {
+                      "enabled": true,
+                      "type": "pagination",
+                      "pagination": {
+                        "position": "bottom",
+                        "per_page": 12,
+                        "allow_user_per_page": false
+                      },
+                      "load_more": {
+                        "per_load": 10
+                      }
+                    },
+                    "sorting": {
+                      "enabled": false,
+                      "sort_by": null
+                    },
+                    "sortable_items": {
+                      "enabled": true,
+                      "options": {
+                        "alphabetic": true,
+                        "featured": false,
+                        "new": true,
+                        "top_selling": false,
+                        "price": true,
+                        "date": false
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "product_information": {
+                      "kind": "setting",
+                      "writable": true
+                    },
+                    "load": {
+                      "kind": "setting",
+                      "writable": true
+                    },
+                    "sorting": {
+                      "kind": "setting",
+                      "writable": true
+                    },
+                    "sortable_items": {
+                      "kind": "setting",
+                      "writable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/product_listing\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_listing.get_product_listing()\nsettings = response.map[\"product_listing\"]\nprint(settings[\"load\"][\"type\"], settings[\"load\"][\"pagination\"][\"per_page\"])\nprint(settings[\"sorting\"][\"enabled\"], settings[\"sorting\"][\"sort_by\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productListing.getProductListing();\nconst settings = response.map.product_listing;\nconsole.log(settings.sorting.enabled, settings.sorting.sort_by);\nconsole.log(settings.load.type, settings.load.pagination.per_page);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\ProductListing\\ProductListing;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductListing::getProductListing($client);\n\n$settings = $response->map['product_listing'];\necho $settings['load']['pagination']['per_page'], ' products per page', PHP_EOL;\necho 'sorting: ', $settings['sorting']['enabled'] ? 'on' : 'off', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productListing().getProductListing();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_listing\");\nMap<?, ?> load = (Map<?, ?>) settings.get(\"load\");\nMap<?, ?> sorting = (Map<?, ?>) settings.get(\"sorting\");\nSystem.out.println(load.get(\"type\") + \" \" + ((Map<?, ?>) load.get(\"pagination\")).get(\"per_page\"));\nSystem.out.println(sorting.get(\"enabled\") + \" \" + sorting.get(\"sort_by\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductListing.GetProductListingAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productListing = (IReadOnlyDictionary<string, object?>)body[\"product_listing\"]!;\nvar load = (IReadOnlyDictionary<string, object?>)productListing[\"load\"]!;\nvar pagination = (IReadOnlyDictionary<string, object?>)load[\"pagination\"]!;\nConsole.WriteLine($\"{load[\"type\"]} {pagination[\"per_page\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productListing.getProductListing();\nfinal productListing = (response.map as Map)['product_listing'] as Map;\nprint(productListing['load']);\nprint(productListing['sorting']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductListingSettings().GetProductListing(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_listing\"].(map[string]any)\nload := settings[\"load\"].(map[string]any)\nsorting := settings[\"sorting\"].(map[string]any)\nfmt.Println(load[\"type\"], load[\"pagination\"].(map[string]any)[\"per_page\"], sorting[\"enabled\"], sorting[\"sort_by\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Product listing"
+        ],
+        "summary": "Update product listing settings",
+        "operationId": "patch_product_listing",
+        "description": "Send the fields to change inside `product_listing`, grouped by section name. Only the fields you send change: other fields in the same block, and sections you leave out, keep their stored values. One body can change all four sections. Returns all the settings after the change, with `group_meta`, as [Get product listing settings](/api-reference/product-listing/get-product-listing-settings) does.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_listing": {
+                      "$ref": "#/components/schemas/ProductListingSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ProductListingGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "product_listing": {
+                    "product_information": {
+                      "interaction_buttons": {
+                        "enabled": true,
+                        "add_to_cart": true,
+                        "show_details": true,
+                        "show_on_hover": false
+                      },
+                      "show_summary": true,
+                      "show_sale_percentage": true,
+                      "show_stock_availability": false,
+                      "show_parent_category": false,
+                      "show_loyalty_point": false,
+                      "price": {
+                        "enabled": true,
+                        "expect_to_pay": false,
+                        "expect_to_pay_with_tax": false
+                      },
+                      "reviews": {
+                        "rating_active": true,
+                        "show_review_count": true
+                      },
+                      "variation_combination": {
+                        "enabled": true,
+                        "types": [
+                          "Size",
+                          "Color"
+                        ]
+                      },
+                      "show_variations_as_products": false
+                    },
+                    "load": {
+                      "enabled": true,
+                      "type": "pagination",
+                      "pagination": {
+                        "position": "bottom",
+                        "per_page": 24,
+                        "allow_user_per_page": false
+                      },
+                      "load_more": {
+                        "per_load": 10
+                      }
+                    },
+                    "sorting": {
+                      "enabled": true,
+                      "sort_by": "price_asc"
+                    },
+                    "sortable_items": {
+                      "enabled": true,
+                      "options": {
+                        "alphabetic": true,
+                        "featured": false,
+                        "new": true,
+                        "top_selling": false,
+                        "price": true,
+                        "date": false
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "product_information": {
+                      "kind": "setting",
+                      "writable": true
+                    },
+                    "load": {
+                      "kind": "setting",
+                      "writable": true
+                    },
+                    "sorting": {
+                      "kind": "setting",
+                      "writable": true
+                    },
+                    "sortable_items": {
+                      "kind": "setting",
+                      "writable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `product_listing` (`400 missing_wrapper`: `request body must be wrapped in a 'product_listing' object`), names something other than the four sections directly inside it (`400 validation_failed`: `<name>: not a recognized section`), or sends a field or value the section does not accept. The messages for those include `not a recognized field`, `must be a boolean (true/false or 0/1)`, `must be a positive integer for the selected load type`, `must be between 1 and 999999` and `unknown variation type`. A value outside the allowed list of `load.type`, `load.pagination.position` or `sorting.sort_by` is rejected with `400` too.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListingError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/product_listing\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_listing\": {\n      \"sorting\": {\n        \"enabled\": true,\n        \"sort_by\": \"price_asc\"\n      },\n      \"load\": {\n        \"pagination\": {\n          \"per_page\": 24\n        }\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_listing.patch_product_listing({\n    \"product_listing\": {\n        \"sorting\": {\"enabled\": True, \"sort_by\": \"price_asc\"},\n        \"load\": {\"pagination\": {\"per_page\": 24}},\n    },\n})\nsettings = response.map[\"product_listing\"]\nprint(settings[\"sorting\"][\"enabled\"], settings[\"sorting\"][\"sort_by\"])\nprint(settings[\"load\"][\"pagination\"][\"per_page\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productListing.patchProductListing({\n    product_listing: {sorting: {enabled: true, sort_by: 'price_asc'}, load: {pagination: {per_page: 24}}},\n});\nconst settings = response.map.product_listing;\nconsole.log(settings.sorting.sort_by, settings.load.pagination.per_page);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\ProductListing\\ProductListing;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductListing::patchProductListing($client, [\n    'product_listing' => [\n        'sorting' => ['enabled' => true, 'sort_by' => 'price_asc'],\n        'load' => ['pagination' => ['per_page' => 24]],\n    ],\n]);\n\n$settings = $response->map['product_listing'];\necho $settings['sorting']['sort_by'], PHP_EOL;\necho $settings['load']['pagination']['per_page'], ' products per page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productListing().patchProductListing(Map.of(\"product_listing\", Map.of(\n        \"sorting\", Map.of(\"enabled\", true, \"sort_by\", \"price_asc\"),\n        \"load\", Map.of(\"pagination\", Map.of(\"per_page\", 24)))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_listing\");\nMap<?, ?> sorting = (Map<?, ?>) settings.get(\"sorting\");\nMap<?, ?> load = (Map<?, ?>) settings.get(\"load\");\nSystem.out.println(sorting.get(\"enabled\") + \" \" + sorting.get(\"sort_by\"));\nSystem.out.println(((Map<?, ?>) load.get(\"pagination\")).get(\"per_page\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductListing.PatchProductListingAsync(new Dictionary<string, object?>\n{\n    [\"product_listing\"] = new Dictionary<string, object?>\n    {\n        [\"sorting\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"sort_by\"] = \"price_asc\" },\n        [\"load\"] = new Dictionary<string, object?> { [\"pagination\"] = new Dictionary<string, object?> { [\"per_page\"] = 24 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productListing = (IReadOnlyDictionary<string, object?>)body[\"product_listing\"]!;\nvar sorting = (IReadOnlyDictionary<string, object?>)productListing[\"sorting\"]!;\nConsole.WriteLine($\"{sorting[\"enabled\"]} {sorting[\"sort_by\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productListing.patchProductListing({\n  'product_listing': {\n    'sorting': {'enabled': true, 'sort_by': 'price_asc'},\n    'load': {\n      'pagination': {'per_page': 24},\n    },\n  },\n});\nfinal productListing = (response.map as Map)['product_listing'] as Map;\nprint(productListing['sorting']);\nprint(productListing['load']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductListingSettings().PatchProductListing(ctx, map[string]any{\n\t\"product_listing\": map[string]any{\n\t\t\"sorting\": map[string]any{\"enabled\": true, \"sort_by\": \"price_asc\"},\n\t\t\"load\":    map[string]any{\"pagination\": map[string]any{\"per_page\": 24}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_listing\"].(map[string]any)\nsorting := settings[\"sorting\"].(map[string]any)\nfmt.Println(sorting[\"enabled\"], sorting[\"sort_by\"], settings[\"load\"].(map[string]any)[\"pagination\"].(map[string]any)[\"per_page\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_listing"
+                ],
+                "properties": {
+                  "product_listing": {
+                    "$ref": "#/components/schemas/ProductListingSettings",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Product listing"
+        ],
+        "summary": "Check the product listing settings",
+        "operationId": "head_product_listing",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0`. Neither this response nor [Get product listing settings](/api-reference/product-listing/get-product-listing-settings) has an `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The settings are reachable. Headers only, with `Content-Length: 0` and no `ETag` header. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/product_listing\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_listing.head_product_listing()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productListing.headProductListing();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\ProductListing\\ProductListing;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductListing::headProductListing($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productListing().headProductListing();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductListing.HeadProductListingAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productListing.headProductListing();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductListingSettings().HeadProductListing(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -17038,6 +17442,331 @@
             }
           }
         }
+      },
+      "ProductListingSettings": {
+        "type": "object",
+        "description": "The product listing settings, in four sections.",
+        "properties": {
+          "product_information": {
+            "$ref": "#/components/schemas/ProductListingProductInformation"
+          },
+          "load": {
+            "$ref": "#/components/schemas/ProductListingLoad"
+          },
+          "sorting": {
+            "$ref": "#/components/schemas/ProductListingSorting"
+          },
+          "sortable_items": {
+            "$ref": "#/components/schemas/ProductListingSortableItems"
+          }
+        }
+      },
+      "ProductListingProductInformation": {
+        "type": "object",
+        "description": "What each product shows on a listing tile.",
+        "properties": {
+          "interaction_buttons": {
+            "$ref": "#/components/schemas/ProductListingInteractionButtons"
+          },
+          "show_summary": {
+            "type": "boolean",
+            "description": "Show the product summary on each tile."
+          },
+          "show_sale_percentage": {
+            "type": "boolean",
+            "description": "Show the sale percentage on each tile."
+          },
+          "show_stock_availability": {
+            "type": "boolean",
+            "description": "Show the stock availability on each tile."
+          },
+          "show_parent_category": {
+            "type": "boolean",
+            "description": "Show the product's parent category on each tile."
+          },
+          "show_loyalty_point": {
+            "type": "boolean",
+            "description": "Show loyalty points on each tile."
+          },
+          "price": {
+            "$ref": "#/components/schemas/ProductListingPrice"
+          },
+          "reviews": {
+            "$ref": "#/components/schemas/ProductListingReviews"
+          },
+          "variation_combination": {
+            "$ref": "#/components/schemas/ProductListingVariationCombination"
+          },
+          "show_variations_as_products": {
+            "type": "boolean",
+            "description": "Show variations as separate products in the listing."
+          }
+        }
+      },
+      "ProductListingInteractionButtons": {
+        "type": "object",
+        "description": "The add to cart and view details buttons on each listing tile.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show the buttons on each tile."
+          },
+          "add_to_cart": {
+            "type": "boolean",
+            "description": "Show the add to cart button."
+          },
+          "show_details": {
+            "type": "boolean",
+            "description": "Show the view details button."
+          },
+          "show_on_hover": {
+            "type": "boolean",
+            "description": "Show the buttons on hover."
+          }
+        }
+      },
+      "ProductListingPrice": {
+        "type": "object",
+        "description": "Which prices each listing tile shows.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show the price."
+          },
+          "expect_to_pay": {
+            "type": "boolean",
+            "description": "Show the expect to pay price."
+          },
+          "expect_to_pay_with_tax": {
+            "type": "boolean",
+            "description": "Show the expect to pay price with tax."
+          }
+        }
+      },
+      "ProductListingReviews": {
+        "type": "object",
+        "description": "The rating stars on each listing tile and the review count beside them.",
+        "properties": {
+          "rating_active": {
+            "type": "boolean",
+            "description": "Show the rating stars."
+          },
+          "show_review_count": {
+            "type": "boolean",
+            "description": "Show the review count beside the stars."
+          }
+        }
+      },
+      "ProductListingVariationCombination": {
+        "type": "object",
+        "description": "Which variation types each listing tile combines.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show variation combinations on each tile."
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Names of your store's variation types, such as `Color`. The entry for this field in `field_metadata` lists the names you can send under `allowed_values`. Any other name is rejected with `400` and `unknown variation type`."
+          }
+        }
+      },
+      "ProductListingLoad": {
+        "type": "object",
+        "description": "Whether a listing pages or loads more. `type` selects which block applies.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn the load settings on."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "pagination",
+              "load_more"
+            ],
+            "description": "How the listing loads products: `pagination` uses the `pagination` block and `load_more` uses the `load_more` block. Any other value is rejected with `400`."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ProductListingLoadPagination"
+          },
+          "load_more": {
+            "$ref": "#/components/schemas/ProductListingLoadMore"
+          }
+        }
+      },
+      "ProductListingLoadPagination": {
+        "type": "object",
+        "description": "Where the pager shows and how many products a page holds.",
+        "properties": {
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "top",
+              "bottom",
+              "top_and_bottom",
+              null
+            ],
+            "description": "Where the pager shows: `top`, `bottom` or `top_and_bottom`, or `null`. Any other value is rejected with `400`."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999999,
+            "description": "Products per page, from `1` to `999999`. `0` is rejected with `must be a positive integer for the selected load type`, and `1000000` with `must be between 1 and 999999`."
+          },
+          "allow_user_per_page": {
+            "type": "boolean",
+            "description": "Let shoppers change the number of products per page."
+          }
+        }
+      },
+      "ProductListingLoadMore": {
+        "type": "object",
+        "description": "How many products each press of load more adds.",
+        "properties": {
+          "per_load": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999999,
+            "description": "Products added each time a shopper presses load more, from `1` to `999999`. While `load.type` is `pagination`, `0` is accepted."
+          }
+        }
+      },
+      "ProductListingSorting": {
+        "type": "object",
+        "description": "The order a listing is shown in.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Turn sorting on."
+          },
+          "sort_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "alpha_asc",
+              "alpha_desc",
+              "price_desc",
+              "price_asc",
+              "created_asc",
+              "created_desc",
+              null
+            ],
+            "description": "The sort order: `alpha_asc`, `alpha_desc`, `price_desc`, `price_asc`, `created_asc` or `created_desc`, or `null`. Any other value is rejected with `400`."
+          }
+        }
+      },
+      "ProductListingSortableItems": {
+        "type": "object",
+        "description": "Whether a shopper can re-sort a listing, and by what.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Let shoppers re-sort the listing."
+          },
+          "options": {
+            "$ref": "#/components/schemas/ProductListingSortableOptions"
+          }
+        }
+      },
+      "ProductListingSortableOptions": {
+        "type": "object",
+        "description": "The sort orders a shopper can pick from.",
+        "properties": {
+          "alphabetic": {
+            "type": "boolean",
+            "description": "Offer alphabetical sorting."
+          },
+          "featured": {
+            "type": "boolean",
+            "description": "Offer sorting by featured products."
+          },
+          "new": {
+            "type": "boolean",
+            "description": "Offer sorting by newest."
+          },
+          "top_selling": {
+            "type": "boolean",
+            "description": "Offer sorting by top selling."
+          },
+          "price": {
+            "type": "boolean",
+            "description": "Offer sorting by price."
+          },
+          "date": {
+            "type": "boolean",
+            "description": "Offer sorting by date."
+          }
+        }
+      },
+      "ProductListingGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. No entry has an `href`, because no section has a path of its own.",
+        "properties": {
+          "product_information": {
+            "$ref": "#/components/schemas/ProductListingSectionMeta"
+          },
+          "load": {
+            "$ref": "#/components/schemas/ProductListingSectionMeta"
+          },
+          "sorting": {
+            "$ref": "#/components/schemas/ProductListingSectionMeta"
+          },
+          "sortable_items": {
+            "$ref": "#/components/schemas/ProductListingSectionMeta"
+          }
+        }
+      },
+      "ProductListingSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is. `setting` for all four sections."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `true` for all four sections."
+          }
+        }
+      },
+      "ProductListingFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Keyed by section, then nested the same way as that section's settings, with a `ProductListingFieldMetadataEntry` in place of each field's value. Every field has an entry, and there are no other entries."
+      },
+      "ProductListingFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes, such as `enum_list` for `product_information.variation_combination.types`."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {},
+            "description": "The values the field accepts. For `product_information.variation_combination.types`, the names of your store's variation types."
+          },
+          "depends_on": {
+            "description": "Present on a field that depends on another field's value, such as `load.load_more.per_load`. A write to the field is still accepted when that other value does not switch it on."
+          },
+          "nullable": {
+            "description": "Whether the field accepts `null`."
+          }
+        }
+      },
+      "ProductListingError": {
+        "type": "object",
+        "description": "Describes why the request was rejected. The message gives the reason, such as `request body must be wrapped in a 'product_listing' object`."
       },
       "ShippingMethod": {
         "type": "object",

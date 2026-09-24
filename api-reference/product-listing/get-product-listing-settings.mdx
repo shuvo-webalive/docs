@@ -1,0 +1,9 @@
+---
+title: "Get product listing settings"
+description: "Returns all four product listing sections and a `group_meta` block describing each one."
+openapi: "GET /admin/settings/product_listing"
+---
+
+Returns every product listing setting under `product_listing`, with all four sections in full: `product_information`, `load`, `sorting` and `sortable_items`. Beside it, `group_meta` gives each section's `kind` and whether it is `writable`; it has no `href`, because no section has a path of its own. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

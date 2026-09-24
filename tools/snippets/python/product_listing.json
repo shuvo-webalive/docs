@@ -1,0 +1,18 @@
+{
+  "sdk": "python",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "get_product_listing",
+      "code": "response = client.product_listing.get_product_listing()\nsettings = response.map[\"product_listing\"]\nprint(settings[\"load\"][\"type\"], settings[\"load\"][\"pagination\"][\"per_page\"])\nprint(settings[\"sorting\"][\"enabled\"], settings[\"sorting\"][\"sort_by\"])\n"
+    },
+    "patch_product_listing": {
+      "function": "patch_product_listing",
+      "code": "response = client.product_listing.patch_product_listing({\n    \"product_listing\": {\n        \"sorting\": {\"enabled\": True, \"sort_by\": \"price_asc\"},\n        \"load\": {\"pagination\": {\"per_page\": 24}},\n    },\n})\nsettings = response.map[\"product_listing\"]\nprint(settings[\"sorting\"][\"enabled\"], settings[\"sorting\"][\"sort_by\"])\nprint(settings[\"load\"][\"pagination\"][\"per_page\"])\n"
+    },
+    "head_product_listing": {
+      "function": "head_product_listing",
+      "code": "response = client.product_listing.head_product_listing()\nprint(response.status_code)\n"
+    }
+  }
+}

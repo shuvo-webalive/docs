@@ -1,0 +1,9 @@
+---
+title: "Update product listing settings"
+description: "Changes the fields you send in one or more sections and returns all settings."
+openapi: "PATCH /admin/settings/product_listing"
+---
+
+Send the fields to change inside `product_listing`, grouped by section name. Only the fields you send change: other fields in the same block, and sections you leave out, keep their stored values. One body can change all four sections. Returns all the settings after the change, with `group_meta`, as [Get product listing settings](/api-reference/product-listing/get-product-listing-settings) does.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,18 @@
+{
+  "sdk": "php",
+  "module": "product_listing",
+  "endpoints": {
+    "get_product_listing": {
+      "function": "getProductListing",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\ProductListing\\ProductListing;\n\n$response = ProductListing::getProductListing($client);\n\n$settings = $response->map['product_listing'];\necho $settings['load']['pagination']['per_page'], ' products per page', PHP_EOL;\necho 'sorting: ', $settings['sorting']['enabled'] ? 'on' : 'off', PHP_EOL;"
+    },
+    "patch_product_listing": {
+      "function": "patchProductListing",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\ProductListing\\ProductListing;\n\n$response = ProductListing::patchProductListing($client, [\n    'product_listing' => [\n        'sorting' => ['enabled' => true, 'sort_by' => 'price_asc'],\n        'load' => ['pagination' => ['per_page' => 24]],\n    ],\n]);\n\n$settings = $response->map['product_listing'];\necho $settings['sorting']['sort_by'], PHP_EOL;\necho $settings['load']['pagination']['per_page'], ' products per page', PHP_EOL;"
+    },
+    "head_product_listing": {
+      "function": "headProductListing",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\ProductListing\\ProductListing;\n\n$response = ProductListing::headProductListing($client);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}
