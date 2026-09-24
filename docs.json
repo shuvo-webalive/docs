@@ -1,82 +1,27 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "luma",
-  "name": "SDK Knowledge Base",
+  "name": "WebCommander API & SDK",
   "colors": {
     "primary": "#ef7025",
     "light": "#eec9bc",
     "dark": "#4fa1ab"
   },
-  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/webcommander-light.svg",
+    "dark": "/logo/webcommander-dark.svg"
+  },
+  "favicon": "/webcommander-favicon.svg",
   "navigation": {
     "tabs": [
       {
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Get started",
             "pages": [
               "introduction",
-              "quickstart",
-              "installation",
-              "authentication"
-            ]
-          },
-          {
-            "group": "Core Concepts",
-            "pages": [
-              "concepts/overview",
-              "concepts/data-model",
-              "concepts/error-handling",
-              "concepts/pagination"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/first-integration",
-              "guides/configuration",
-              "guides/webhooks",
-              "guides/testing"
-            ]
-          },
-          {
-            "group": "Support",
-            "pages": [
-              "support/faq",
-              "support/troubleshooting",
-              "support/changelog"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "SDK Reference",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "sdk/overview",
-              "sdk/initialization",
-              "sdk/configuration"
-            ]
-          },
-          {
-            "group": "Core Methods",
-            "pages": [
-              "sdk/client",
-              "sdk/resources",
-              "sdk/requests",
-              "sdk/responses"
-            ]
-          },
-          {
-            "group": "Advanced",
-            "pages": [
-              "sdk/middleware",
-              "sdk/retries",
-              "sdk/logging",
-              "sdk/typescript"
+              "installation"
             ]
           }
         ]
@@ -84,15 +29,9 @@
     ]
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:support@example.com"
-      }
-    ],
     "primary": {
       "type": "button",
-      "label": "Get Started",
+      "label": "Get started",
       "href": "/introduction"
     }
   },
