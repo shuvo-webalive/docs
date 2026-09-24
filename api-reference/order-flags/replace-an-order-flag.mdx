@@ -1,0 +1,9 @@
+---
+title: "Replace an order flag"
+description: "Replaces an order flag's `name`, `color` and `description` and returns the updated flag."
+openapi: "PUT /admin/order_flags/{order_flag_id}"
+---
+
+Replaces the order flag whose `id` you pass as `order_flag_id` with the fields you send, and returns it. This is a replace, not a merge: `name` and `color` are required, and if you leave out `description` it is set to `null`. Wrap the fields in `order_flag`. `PATCH` is rejected with `405 method_not_allowed` and the message `HTTP method not allowed for this endpoint.`
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "listOrderFlags",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.listOrderFlags(client, {limit: 20});\nfor (const orderFlag of response.map.order_flags) {\n    console.log(orderFlag.id, orderFlag.name, orderFlag.color);\n}\n"
+    },
+    "head_order_flags": {
+      "function": "headOrderFlags",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.headOrderFlags(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_order_flag": {
+      "function": "createOrderFlag",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.createOrderFlag(client, {\n    order_flag: {name: 'Awaiting Stock', color: '#5A7BD4', description: 'Waiting for stock to arrive.'},\n});\nconsole.log(response.map.order_flag.id);\n"
+    },
+    "get_order_flag": {
+      "function": "getOrderFlag",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.getOrderFlag(client, 2);\nconsole.log(response.map.order_flag.name, response.map.order_flag.color);\n"
+    },
+    "head_order_flag": {
+      "function": "headOrderFlag",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.headOrderFlag(client, 2);\nconsole.log(response.statusCode);\n"
+    },
+    "update_order_flag": {
+      "function": "updateOrderFlag",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.updateOrderFlag(client, 4, {\n    order_flag: {name: 'Awaiting Stock', color: '#B02E2E', description: 'Waiting for stock from the supplier.'},\n});\nconsole.log(response.map.order_flag.color, response.map.order_flag.description);\n"
+    },
+    "delete_order_flag": {
+      "function": "deleteOrderFlag",
+      "code": "import {orderFlags} from 'webcommander-sdk';\n\nconst response = await orderFlags.deleteOrderFlag(client, 4);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

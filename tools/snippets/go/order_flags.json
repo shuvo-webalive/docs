@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "order_flags",
+  "endpoints": {
+    "list_order_flags": {
+      "function": "ListOrderFlags",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().ListOrderFlags(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"order_flags\"].([]any) {\n\tflag := row.(map[string]any)\n\tfmt.Println(flag[\"id\"], flag[\"name\"], flag[\"color\"])\n}"
+    },
+    "head_order_flags": {
+      "function": "HeadOrderFlags",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().HeadOrderFlags(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_order_flag": {
+      "function": "CreateOrderFlag",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().CreateOrderFlag(ctx, map[string]any{\n\t\"order_flag\": map[string]any{\n\t\t\"name\":        \"Awaiting Stock\",\n\t\t\"color\":       \"#5A7BD4\",\n\t\t\"description\": \"Waiting for stock to arrive.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nflag := resp.Map().(map[string]any)[\"order_flag\"].(map[string]any)\nfmt.Println(flag[\"id\"], flag[\"name\"], flag[\"color\"])"
+    },
+    "get_order_flag": {
+      "function": "GetOrderFlag",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().GetOrderFlag(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nflag := resp.Map().(map[string]any)[\"order_flag\"].(map[string]any)\nfmt.Println(flag[\"name\"], flag[\"color\"], flag[\"type\"])"
+    },
+    "head_order_flag": {
+      "function": "HeadOrderFlag",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().HeadOrderFlag(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_order_flag": {
+      "function": "UpdateOrderFlag",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().UpdateOrderFlag(ctx, 4, map[string]any{\n\t\"order_flag\": map[string]any{\n\t\t\"name\":        \"Awaiting Stock\",\n\t\t\"color\":       \"#B02E2E\",\n\t\t\"description\": \"Waiting for stock from the supplier.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nflag := resp.Map().(map[string]any)[\"order_flag\"].(map[string]any)\nfmt.Println(flag[\"color\"], flag[\"description\"])"
+    },
+    "delete_order_flag": {
+      "function": "DeleteOrderFlag",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderFlags().DeleteOrderFlag(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}
