@@ -91,6 +91,18 @@
                   "api-reference/checkout-page/get-a-settings-section",
                   "api-reference/checkout-page/update-a-settings-section"
                 ]
+              },
+              {
+                "group": "Product page",
+                "expanded": false,
+                "pages": [
+                  "product-page",
+                  "api-reference/product-page/get-product-page-settings",
+                  "api-reference/product-page/update-product-page-settings",
+                  "api-reference/product-page/check-the-product-page-settings",
+                  "api-reference/product-page/get-a-product-page-section",
+                  "api-reference/product-page/update-a-product-page-section"
+                ]
               }
             ]
           },

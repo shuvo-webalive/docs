@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "product_page",
+  "endpoints": {
+    "get_product_page": {
+      "function": "getProductPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.productPage().getProductPage();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"product_page\");\nMap<?, ?> upSell = (Map<?, ?>) settings.get(\"up_sell\");\nSystem.out.println(upSell.get(\"number_of_products\") + \" \" + upSell.get(\"select_display_type\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"quick_view\")).get(\"product_quick_view\"));\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"up_sell\")).get(\"ui_label\"));"
+    },
+    "patch_product_page": {
+      "function": "patchProductPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.productPage().patchProductPage(Map.of(\"product_page\", Map.of(\n        \"configuration\", Map.of(\"details\", Map.of(\"display_description\", true)),\n        \"up_sell\", Map.of(\"short_description\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_page\");\nMap<?, ?> configuration = (Map<?, ?>) settings.get(\"configuration\");\nSystem.out.println(((Map<?, ?>) configuration.get(\"details\")).get(\"display_description\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"up_sell\")).get(\"short_description\"));"
+    },
+    "head_product_page": {
+      "function": "headProductPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.productPage().headProductPage();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_product_page_section": {
+      "function": "getProductPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.productPage().getProductPageSection(\"quick_view\");\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_page\");\nMap<?, ?> quickView = (Map<?, ?>) settings.get(\"quick_view\");\nSystem.out.println(quickView.get(\"product_quick_view\") + \" \" + quickView.get(\"display_sku\"));\nSystem.out.println(quickView.get(\"display_add_to_cart_button\"));"
+    },
+    "patch_product_page_section": {
+      "function": "patchProductPageSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.productPage().patchProductPageSection(\"configuration\",\n        Map.of(\"configuration\", Map.of(\"details\", Map.of(\"display_description\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_page\");\nMap<?, ?> configuration = (Map<?, ?>) settings.get(\"configuration\");\nSystem.out.println(((Map<?, ?>) configuration.get(\"details\")).get(\"display_description\"));"
+    }
+  }
+}

@@ -34,6 +34,9 @@
       "name": "Checkout page"
     },
     {
+      "name": "Product page"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -3768,6 +3771,1049 @@
         }
       }
     },
+    "/admin/settings/page_settings/product_page": {
+      "get": {
+        "tags": [
+          "Product page"
+        ],
+        "summary": "Get product page settings",
+        "operationId": "get_product_page",
+        "description": "Returns every product page setting under `product_page`, with all seven sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, its `ui_label` and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field in all seven sections, keyed by section. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All seven sections and `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_page": {
+                      "$ref": "#/components/schemas/ProductPageSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ProductPageGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ProductPageFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section."
+                    }
+                  }
+                },
+                "example": {
+                  "product_page": {
+                    "configuration": {
+                      "actions_buttons": {
+                        "show_product_action_buttons": true,
+                        "display_add_to_cart_button": true,
+                        "display_buy_now_button": true,
+                        "display_on_hover": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true
+                      },
+                      "details": {
+                        "display_description": true,
+                        "display_sale_percentage": true,
+                        "use_strike_through_on_previous_price": true,
+                        "display_tax_with_expect_to_pay_price": true
+                      },
+                      "social_sharing": {
+                        "enable_share_on_social_media": true,
+                        "facebook": true,
+                        "twitter": true,
+                        "pinterest": true,
+                        "messenger": true,
+                        "linkedin": true,
+                        "email": true,
+                        "snapchat": true,
+                        "telegram": true,
+                        "reddit": true,
+                        "instagram": true,
+                        "youtube": true,
+                        "tiktok": true,
+                        "threads": false,
+                        "whatsapp": true,
+                        "bluesky": false,
+                        "mastodon": false,
+                        "copy_link": false,
+                        "display_title": false,
+                        "title": ""
+                      },
+                      "set_product_properties": {
+                        "display_height": true,
+                        "display_width": true,
+                        "display_length": true,
+                        "display_weight": true,
+                        "display_add_to_gift_registry": true
+                      }
+                    },
+                    "variations": {
+                      "labels_and_display": {
+                        "disable_variation_label_for_price": true,
+                        "display_product_image_as_variation_icons": true,
+                        "display_selected_variation_value": true,
+                        "enable_colour_type_variation_image_display": true,
+                        "use_strike_through_for_out_of_stock_variations": true,
+                        "enable_single_click_variation_loading": true
+                      },
+                      "layout": {
+                        "select_variation_view": true,
+                        "select_variation_view_type": "matrix_view",
+                        "display_variation_combinations": true,
+                        "variation_combinations": [
+                          {
+                            "id": 4,
+                            "name": "Colour"
+                          },
+                          {
+                            "id": 46,
+                            "name": "Size"
+                          }
+                        ],
+                        "variation_price_display_mode": true,
+                        "variation_price_display_type": "lowest"
+                      }
+                    },
+                    "image_and_video": {
+                      "allow_single_file_upload_per_product": true,
+                      "image_display": {
+                        "enable_image_slider": true,
+                        "product_thumbnail_vertical_view": true,
+                        "product_image_view": true,
+                        "product_image_view_type": "enable_grid_view",
+                        "image_zoom_type": true,
+                        "zoom_type": "fade_in_out"
+                      },
+                      "video": {
+                        "enable_video_preview": true,
+                        "display_video_thumbnail_in_first_order": true
+                      }
+                    },
+                    "up_sell": {
+                      "number_of_products": 10,
+                      "allow_viewers_to_change_display_mode": false,
+                      "grid_view": true,
+                      "list_view": true,
+                      "tabular_view": true,
+                      "select_display_type": "image",
+                      "maximum_number_of_columns_per_row": 6,
+                      "maximum_number_of_columns_per_row_list": 2,
+                      "short_description": true,
+                      "display_on_hover": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true,
+                      "price": true,
+                      "show_expect_to_pay_price": true,
+                      "display_rating": true,
+                      "display_review_count": true
+                    },
+                    "related_products": {
+                      "number_of_products": 20,
+                      "allow_viewers_to_change_display_mode": false,
+                      "grid_view": true,
+                      "list_view": true,
+                      "tabular_view": true,
+                      "select_display_type": "image",
+                      "maximum_number_of_columns_per_row": 4,
+                      "maximum_number_of_columns_per_row_list": 2,
+                      "short_description": true,
+                      "display_on_hover": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true,
+                      "price": true,
+                      "show_expect_to_pay_price": true,
+                      "display_rating": true,
+                      "display_review_count": true
+                    },
+                    "review_and_ratings": {
+                      "capabilities": {
+                        "available": true
+                      },
+                      "enable_review_in_tab": true,
+                      "enable_new_version": true
+                    },
+                    "quick_view": {
+                      "product_quick_view": true,
+                      "display_product_name": true,
+                      "display_sku": true,
+                      "display_product_rating": true,
+                      "display_product_stock": true,
+                      "display_product_variation": true,
+                      "display_product_image": true,
+                      "display_variation_image": true,
+                      "display_product_summary": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true
+                    }
+                  },
+                  "group_meta": {
+                    "configuration": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Configuration",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/configuration"
+                    },
+                    "variations": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Variations",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/variations"
+                    },
+                    "image_and_video": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Image and Video",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/image_and_video"
+                    },
+                    "up_sell": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Up-sell",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/up_sell"
+                    },
+                    "related_products": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Related Products",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/related_products"
+                    },
+                    "review_and_ratings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "plugin": "product-review",
+                      "available": true,
+                      "ui_label": "Review and Ratings",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/review_and_ratings"
+                    },
+                    "quick_view": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Quick View",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/quick_view"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many reads in a short time. After twenty reads in about one and a half seconds, the next read is rejected, and the `Retry-After` header says how long to wait. Writes are still accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/product_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_page.get_product_page()\nsettings = response.map[\"product_page\"]\nprint(settings[\"configuration\"][\"details\"][\"display_description\"])\nprint(settings[\"variations\"][\"layout\"][\"select_variation_view_type\"])\nprint(settings[\"up_sell\"][\"number_of_products\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productPage.getProductPage();\nconst settings = response.map.product_page;\nconsole.log(settings.configuration.details.display_description);\nconsole.log(settings.quick_view.product_quick_view);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductPage::getProductPage($client);\n\n$settings = $response->map['product_page'];\necho 'Description shown: ', $settings['configuration']['details']['display_description'] ? 'true' : 'false', PHP_EOL;\necho 'Quick view: ', $settings['quick_view']['product_quick_view'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productPage().getProductPage();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> settings = (Map<?, ?>) body.get(\"product_page\");\nMap<?, ?> upSell = (Map<?, ?>) settings.get(\"up_sell\");\nSystem.out.println(upSell.get(\"number_of_products\") + \" \" + upSell.get(\"select_display_type\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"quick_view\")).get(\"product_quick_view\"));\nMap<?, ?> groupMeta = (Map<?, ?>) body.get(\"group_meta\");\nSystem.out.println(((Map<?, ?>) groupMeta.get(\"up_sell\")).get(\"ui_label\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductPage.GetProductPageAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar configuration = (IReadOnlyDictionary<string, object?>)productPage[\"configuration\"]!;\nvar details = (IReadOnlyDictionary<string, object?>)configuration[\"details\"]!;\nConsole.WriteLine(details[\"display_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productPage.getProductPage();\nfinal productPage = (response.map as Map)['product_page'] as Map;\nprint(productPage['configuration']);\nprint(productPage['quick_view']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductPageSettings().GetProductPage(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)\ndetails := settings[\"configuration\"].(map[string]any)[\"details\"].(map[string]any)\nupSell := settings[\"up_sell\"].(map[string]any)\nfmt.Println(details[\"display_description\"], upSell[\"number_of_products\"], upSell[\"short_description\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Product page"
+        ],
+        "summary": "Update product page settings",
+        "operationId": "patch_product_page",
+        "description": "Send the fields to change, grouped by section name, inside `product_page` or with no wrapper at all. Only the fields you send change: other fields in the same block, and every section you leave out, keep their stored values. One body can change several sections at once. Returns all the settings after the change, with `group_meta`, as [Get product page settings](/api-reference/product-page/get-product-page-settings) does.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_page": {
+                      "$ref": "#/components/schemas/ProductPageSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ProductPageGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "product_page": {
+                    "configuration": {
+                      "actions_buttons": {
+                        "show_product_action_buttons": true,
+                        "display_add_to_cart_button": true,
+                        "display_buy_now_button": true,
+                        "display_on_hover": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true
+                      },
+                      "details": {
+                        "display_description": true,
+                        "display_sale_percentage": true,
+                        "use_strike_through_on_previous_price": true,
+                        "display_tax_with_expect_to_pay_price": true
+                      },
+                      "social_sharing": {
+                        "enable_share_on_social_media": true,
+                        "facebook": true,
+                        "twitter": true,
+                        "pinterest": true,
+                        "messenger": true,
+                        "linkedin": true,
+                        "email": true,
+                        "snapchat": true,
+                        "telegram": true,
+                        "reddit": true,
+                        "instagram": true,
+                        "youtube": true,
+                        "tiktok": true,
+                        "threads": false,
+                        "whatsapp": true,
+                        "bluesky": false,
+                        "mastodon": false,
+                        "copy_link": false,
+                        "display_title": false,
+                        "title": ""
+                      },
+                      "set_product_properties": {
+                        "display_height": true,
+                        "display_width": true,
+                        "display_length": true,
+                        "display_weight": true,
+                        "display_add_to_gift_registry": true
+                      }
+                    },
+                    "variations": {
+                      "labels_and_display": {
+                        "disable_variation_label_for_price": true,
+                        "display_product_image_as_variation_icons": true,
+                        "display_selected_variation_value": true,
+                        "enable_colour_type_variation_image_display": true,
+                        "use_strike_through_for_out_of_stock_variations": true,
+                        "enable_single_click_variation_loading": true
+                      },
+                      "layout": {
+                        "select_variation_view": true,
+                        "select_variation_view_type": "matrix_view",
+                        "display_variation_combinations": true,
+                        "variation_combinations": [
+                          {
+                            "id": 4,
+                            "name": "Colour"
+                          },
+                          {
+                            "id": 46,
+                            "name": "Size"
+                          }
+                        ],
+                        "variation_price_display_mode": true,
+                        "variation_price_display_type": "lowest"
+                      }
+                    },
+                    "image_and_video": {
+                      "allow_single_file_upload_per_product": true,
+                      "image_display": {
+                        "enable_image_slider": true,
+                        "product_thumbnail_vertical_view": true,
+                        "product_image_view": true,
+                        "product_image_view_type": "enable_grid_view",
+                        "image_zoom_type": true,
+                        "zoom_type": "fade_in_out"
+                      },
+                      "video": {
+                        "enable_video_preview": true,
+                        "display_video_thumbnail_in_first_order": true
+                      }
+                    },
+                    "up_sell": {
+                      "number_of_products": 10,
+                      "allow_viewers_to_change_display_mode": false,
+                      "grid_view": true,
+                      "list_view": true,
+                      "tabular_view": true,
+                      "select_display_type": "image",
+                      "maximum_number_of_columns_per_row": 6,
+                      "maximum_number_of_columns_per_row_list": 2,
+                      "short_description": true,
+                      "display_on_hover": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true,
+                      "price": true,
+                      "show_expect_to_pay_price": true,
+                      "display_rating": true,
+                      "display_review_count": true
+                    },
+                    "related_products": {
+                      "number_of_products": 20,
+                      "allow_viewers_to_change_display_mode": false,
+                      "grid_view": true,
+                      "list_view": true,
+                      "tabular_view": true,
+                      "select_display_type": "image",
+                      "maximum_number_of_columns_per_row": 4,
+                      "maximum_number_of_columns_per_row_list": 2,
+                      "short_description": true,
+                      "display_on_hover": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true,
+                      "price": true,
+                      "show_expect_to_pay_price": true,
+                      "display_rating": true,
+                      "display_review_count": true
+                    },
+                    "review_and_ratings": {
+                      "capabilities": {
+                        "available": true
+                      },
+                      "enable_review_in_tab": true,
+                      "enable_new_version": true
+                    },
+                    "quick_view": {
+                      "product_quick_view": true,
+                      "display_product_name": true,
+                      "display_sku": true,
+                      "display_product_rating": true,
+                      "display_product_stock": true,
+                      "display_product_variation": true,
+                      "display_product_image": true,
+                      "display_variation_image": true,
+                      "display_product_summary": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true
+                    }
+                  },
+                  "group_meta": {
+                    "configuration": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Configuration",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/configuration"
+                    },
+                    "variations": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Variations",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/variations"
+                    },
+                    "image_and_video": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Image and Video",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/image_and_video"
+                    },
+                    "up_sell": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Up-sell",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/up_sell"
+                    },
+                    "related_products": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Related Products",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/related_products"
+                    },
+                    "review_and_ratings": {
+                      "kind": "setting",
+                      "writable": true,
+                      "plugin": "product-review",
+                      "available": true,
+                      "ui_label": "Review and Ratings",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/review_and_ratings"
+                    },
+                    "quick_view": {
+                      "kind": "setting",
+                      "writable": true,
+                      "ui_label": "Product Quick View",
+                      "href": "/api/v4/admin/settings/page_settings/product_page/quick_view"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A key at the top level of the body is not a section name, such as a field sent without its section (`unknown_field`), or the body sets a field to `true` while the field in its `depends_on` is off (`constraint_violation`, naming both fields). `details[].code` gives the reason.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "display_sku: not a recognized field",
+                    "details": [
+                      {
+                        "field": "display_sku",
+                        "code": "unknown_field",
+                        "message": "not a recognized field"
+                      }
+                    ],
+                    "request_id": "3b8e1f2a-6c4d-4e7f-9a15-0d2c8b6e4f71"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. After ten writes, the next one is rejected with the error `code` `rate_limited` and the message `Too many writes to this resource`. The `Retry-After` header counts down the seconds left before writes are accepted again. Reads still return `200`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/product_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_page\": {\n      \"configuration\": {\n        \"details\": {\n          \"display_description\": true\n        }\n      },\n      \"up_sell\": {\n        \"short_description\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_page.patch_product_page({\n    \"product_page\": {\n        \"configuration\": {\"details\": {\"display_description\": True}},\n        \"up_sell\": {\"short_description\": True},\n    },\n})\nsettings = response.map[\"product_page\"]\nprint(settings[\"configuration\"][\"details\"][\"display_description\"])\nprint(settings[\"up_sell\"][\"short_description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productPage.patchProductPage({\n    product_page: {configuration: {details: {display_description: true}}, up_sell: {short_description: true}},\n});\nconst settings = response.map.product_page;\nconsole.log(settings.configuration.details.display_description, settings.up_sell.short_description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductPage::patchProductPage($client, [\n    'product_page' => [\n        'configuration' => ['details' => ['display_description' => true]],\n        'up_sell' => ['short_description' => true],\n    ],\n]);\n\n$settings = $response->map['product_page'];\necho $settings['configuration']['details']['display_description'] ? 'true' : 'false', PHP_EOL;\necho $settings['up_sell']['short_description'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productPage().patchProductPage(Map.of(\"product_page\", Map.of(\n        \"configuration\", Map.of(\"details\", Map.of(\"display_description\", true)),\n        \"up_sell\", Map.of(\"short_description\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_page\");\nMap<?, ?> configuration = (Map<?, ?>) settings.get(\"configuration\");\nSystem.out.println(((Map<?, ?>) configuration.get(\"details\")).get(\"display_description\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"up_sell\")).get(\"short_description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductPage.PatchProductPageAsync(new Dictionary<string, object?>\n{\n    [\"product_page\"] = new Dictionary<string, object?>\n    {\n        [\"configuration\"] = new Dictionary<string, object?>\n        {\n            [\"details\"] = new Dictionary<string, object?> { [\"display_description\"] = true },\n        },\n        [\"up_sell\"] = new Dictionary<string, object?> { [\"short_description\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar upSell = (IReadOnlyDictionary<string, object?>)productPage[\"up_sell\"]!;\nConsole.WriteLine(upSell[\"short_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productPage.patchProductPage({\n  'product_page': {\n    'configuration': {\n      'details': {'display_description': true},\n    },\n    'up_sell': {'short_description': true},\n  },\n});\nfinal productPage = (response.map as Map)['product_page'] as Map;\nprint((productPage['configuration'] as Map)['details']);\nprint((productPage['up_sell'] as Map)['short_description']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductPageSettings().PatchProductPage(ctx, map[string]any{\n\t\"product_page\": map[string]any{\n\t\t\"configuration\": map[string]any{\"details\": map[string]any{\"display_description\": true}},\n\t\t\"up_sell\":       map[string]any{\"short_description\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)\ndetails := settings[\"configuration\"].(map[string]any)[\"details\"].(map[string]any)\nfmt.Println(details[\"display_description\"], settings[\"up_sell\"].(map[string]any)[\"short_description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the sections in `product_page`, or send the section names at the top level with no wrapper. Send only the fields that change.",
+                "properties": {
+                  "product_page": {
+                    "$ref": "#/components/schemas/ProductPageSettings",
+                    "description": "The fields to change, grouped by section."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Product page"
+        ],
+        "summary": "Check the product page settings",
+        "operationId": "head_product_page",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/page_settings/product_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_page.head_product_page()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productPage.headProductPage();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductPage::headProductPage($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productPage().headProductPage();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductPage.HeadProductPageAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productPage.headProductPage();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductPageSettings().HeadProductPage(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/page_settings/product_page/{section}": {
+      "get": {
+        "tags": [
+          "Product page"
+        ],
+        "summary": "Get a product page section",
+        "operationId": "get_product_page_section",
+        "description": "Returns one section inside `product_page`, such as `{\"product_page\": {\"quick_view\": {...}}}`, without `group_meta`. This differs from [Category page](/category-page), where a section comes back under its own name. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `configuration`, `variations`, `image_and_video`, `up_sell`, `related_products`, `review_and_ratings` or `quick_view`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "configuration",
+                "variations",
+                "image_and_video",
+                "up_sell",
+                "related_products",
+                "review_and_ratings",
+                "quick_view"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields, keyed by field name and nested the way the section is. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section inside `product_page`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_page": {
+                      "$ref": "#/components/schemas/ProductPageSettings",
+                      "description": "Holds only the section named in the path."
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ProductPageFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name. It matches the section's part of the `field_metadata` that Get product page settings returns."
+                    }
+                  }
+                },
+                "example": {
+                  "product_page": {
+                    "quick_view": {
+                      "product_quick_view": true,
+                      "display_product_name": true,
+                      "display_sku": true,
+                      "display_product_rating": true,
+                      "display_product_stock": true,
+                      "display_product_variation": true,
+                      "display_product_image": true,
+                      "display_variation_image": true,
+                      "display_product_summary": true,
+                      "display_add_to_cart_button": true,
+                      "display_add_to_compare_button": true,
+                      "display_add_to_wishlist_button": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown page-settings section: product_page/bogus",
+                    "details": [],
+                    "request_id": "3b8e1f2a-6c4d-4e7f-9a15-0d2c8b6e4f71"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many reads in a short time. After twenty reads in about one and a half seconds, the next read is rejected, and the `Retry-After` header says how long to wait. Writes are still accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/product_page/quick_view\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_page.get_product_page_section(\"quick_view\")\nquick_view = response.map[\"product_page\"][\"quick_view\"]\nprint(quick_view[\"product_quick_view\"], quick_view[\"display_sku\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productPage.getProductPageSection('quick_view');\nconst quickView = response.map.product_page.quick_view;\nconsole.log(quickView.product_quick_view, quickView.display_add_to_cart_button);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductPage::getProductPageSection($client, 'quick_view');\n\nforeach ($response->map['product_page']['quick_view'] as $field => $value) {\n    echo $field, ': ', $value ? 'true' : 'false', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productPage().getProductPageSection(\"quick_view\");\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_page\");\nMap<?, ?> quickView = (Map<?, ?>) settings.get(\"quick_view\");\nSystem.out.println(quickView.get(\"product_quick_view\") + \" \" + quickView.get(\"display_sku\"));\nSystem.out.println(quickView.get(\"display_add_to_cart_button\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductPage.GetProductPageSectionAsync(\"quick_view\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar quickView = (IReadOnlyDictionary<string, object?>)productPage[\"quick_view\"]!;\nConsole.WriteLine(quickView[\"product_quick_view\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.productPage.getProductPageSection('quick_view');\nfinal productPage = (response.map as Map)['product_page'] as Map;\nfinal section = productPage['quick_view'] as Map;\nprint(section['product_quick_view']);\nprint(section['display_sku']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductPageSettings().GetProductPageSection(ctx, \"quick_view\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nquickView := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)[\"quick_view\"].(map[string]any)\nfmt.Println(quickView[\"product_quick_view\"], quickView[\"display_sku\"], quickView[\"display_add_to_cart_button\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Product page"
+        ],
+        "summary": "Update a product page section",
+        "operationId": "patch_product_page_section",
+        "description": "Send the fields to change wrapped in the section's own name, such as `{\"configuration\": {...}}`, or in `product_page` and then the section name. A body wrapped in anything else is rejected with `400 invalid_request`, and `details[0].field` names the section. Only the fields you send change; the rest keep their stored values. Returns the whole section after the change inside `product_page`, without `group_meta`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `configuration`, `variations`, `image_and_video`, `up_sell`, `related_products`, `review_and_ratings` or `quick_view`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "configuration",
+                "variations",
+                "image_and_video",
+                "up_sell",
+                "related_products",
+                "review_and_ratings",
+                "quick_view"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, inside `product_page`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product_page": {
+                      "$ref": "#/components/schemas/ProductPageSettings",
+                      "description": "Holds only the section named in the path."
+                    }
+                  }
+                },
+                "example": {
+                  "product_page": {
+                    "configuration": {
+                      "actions_buttons": {
+                        "show_product_action_buttons": true,
+                        "display_add_to_cart_button": true,
+                        "display_buy_now_button": true,
+                        "display_on_hover": true,
+                        "display_add_to_compare_button": true,
+                        "display_add_to_wishlist_button": true
+                      },
+                      "details": {
+                        "display_description": true,
+                        "display_sale_percentage": true,
+                        "use_strike_through_on_previous_price": true,
+                        "display_tax_with_expect_to_pay_price": true
+                      },
+                      "social_sharing": {
+                        "enable_share_on_social_media": true,
+                        "facebook": true,
+                        "twitter": true,
+                        "pinterest": true,
+                        "messenger": true,
+                        "linkedin": true,
+                        "email": true,
+                        "snapchat": true,
+                        "telegram": true,
+                        "reddit": true,
+                        "instagram": true,
+                        "youtube": true,
+                        "tiktok": true,
+                        "threads": false,
+                        "whatsapp": true,
+                        "bluesky": false,
+                        "mastodon": false,
+                        "copy_link": false,
+                        "display_title": false,
+                        "title": ""
+                      },
+                      "set_product_properties": {
+                        "display_height": true,
+                        "display_width": true,
+                        "display_length": true,
+                        "display_weight": true,
+                        "display_add_to_gift_registry": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in the section's name or in `product_page` (`required`), names a field the section does not have (`unknown_field`), sets a field to `true` while the field in its `depends_on` is off (`constraint_violation`, naming both fields), tries to change the read-only `review_and_ratings.capabilities.available` (`read_only`), or sends a value the field does not accept: the wrong type (`invalid_type`), a value outside `allowed_values` (`invalid_enum`) or a number outside `min` and `max` (`out_of_range`). `details[].code` gives the reason. A body that is not valid JSON, or that repeats a key, is rejected with the error `code` `malformed_json`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "request body must be wrapped in a 'configuration' object",
+                    "details": [
+                      {
+                        "field": "configuration",
+                        "code": "required",
+                        "message": "the request body must be wrapped in a 'configuration' object"
+                      }
+                    ],
+                    "request_id": "3b8e1f2a-6c4d-4e7f-9a15-0d2c8b6e4f71"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown page-settings section: product_page/bogus",
+                    "details": [],
+                    "request_id": "3b8e1f2a-6c4d-4e7f-9a15-0d2c8b6e4f71"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. After ten writes, the next one is rejected with the error `code` `rate_limited` and the message `Too many writes to this resource`. The `Retry-After` header counts down the seconds left before writes are accepted again. Reads still return `200`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPageError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/product_page/configuration\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"configuration\": {\n      \"details\": {\n        \"display_description\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.product_page.patch_product_page_section(\n    \"configuration\", {\"configuration\": {\"details\": {\"display_description\": True}}}\n)\ndetails = response.map[\"product_page\"][\"configuration\"][\"details\"]\nprint(details[\"display_description\"], details[\"display_sale_percentage\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.productPage.patchProductPageSection('configuration', {\n    configuration: {details: {display_description: true}},\n});\nconsole.log(response.map.product_page.configuration.details.display_description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ProductPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = ProductPage::patchProductPageSection($client, 'configuration', [\n    'configuration' => ['details' => ['display_description' => true]],\n]);\n\necho $response->map['product_page']['configuration']['details']['display_description'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.productPage().patchProductPageSection(\"configuration\",\n        Map.of(\"configuration\", Map.of(\"details\", Map.of(\"display_description\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_page\");\nMap<?, ?> configuration = (Map<?, ?>) settings.get(\"configuration\");\nSystem.out.println(((Map<?, ?>) configuration.get(\"details\")).get(\"display_description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ProductPage.PatchProductPageSectionAsync(\"configuration\", new Dictionary<string, object?>\n{\n    [\"configuration\"] = new Dictionary<string, object?>\n    {\n        [\"details\"] = new Dictionary<string, object?> { [\"display_description\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar productPage = (IReadOnlyDictionary<string, object?>)body[\"product_page\"]!;\nvar configuration = (IReadOnlyDictionary<string, object?>)productPage[\"configuration\"]!;\nvar details = (IReadOnlyDictionary<string, object?>)configuration[\"details\"]!;\nConsole.WriteLine(details[\"display_description\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.productPage.patchProductPageSection('configuration', {\n  'configuration': {\n    'details': {'display_description': true},\n  },\n});\nfinal productPage = (response.map as Map)['product_page'] as Map;\nfinal section = productPage['configuration'] as Map;\nprint(section['details']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ProductPageSettings().PatchProductPageSection(ctx, \"configuration\", map[string]any{\n\t\"configuration\": map[string]any{\"details\": map[string]any{\"display_description\": true}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nconfiguration := resp.Map().(map[string]any)[\"product_page\"].(map[string]any)[\"configuration\"].(map[string]any)\nfmt.Println(configuration[\"details\"].(map[string]any)[\"display_description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Wrap the fields in the name of the section in the path, or in `product_page` and then that section name.",
+                "properties": {
+                  "configuration": {
+                    "$ref": "#/components/schemas/ProductPageConfiguration"
+                  },
+                  "variations": {
+                    "$ref": "#/components/schemas/ProductPageVariations"
+                  },
+                  "image_and_video": {
+                    "$ref": "#/components/schemas/ProductPageImageAndVideo"
+                  },
+                  "up_sell": {
+                    "$ref": "#/components/schemas/ProductPageListing"
+                  },
+                  "related_products": {
+                    "$ref": "#/components/schemas/ProductPageListing"
+                  },
+                  "review_and_ratings": {
+                    "$ref": "#/components/schemas/ProductPageReviewAndRatings"
+                  },
+                  "quick_view": {
+                    "$ref": "#/components/schemas/ProductPageQuickView"
+                  },
+                  "product_page": {
+                    "$ref": "#/components/schemas/ProductPageSettings",
+                    "description": "The other accepted wrapper: `product_page`, then the section name."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -6157,6 +7203,728 @@
               "request_id": {
                 "type": "string",
                 "description": "The id the store gave this request."
+              }
+            }
+          }
+        }
+      },
+      "ProductPageSettings": {
+        "type": "object",
+        "description": "The product page settings, one key per section.",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ProductPageConfiguration"
+          },
+          "variations": {
+            "$ref": "#/components/schemas/ProductPageVariations"
+          },
+          "image_and_video": {
+            "$ref": "#/components/schemas/ProductPageImageAndVideo"
+          },
+          "up_sell": {
+            "$ref": "#/components/schemas/ProductPageListing",
+            "description": "The up-sell product listing."
+          },
+          "related_products": {
+            "$ref": "#/components/schemas/ProductPageListing",
+            "description": "The related products listing."
+          },
+          "review_and_ratings": {
+            "$ref": "#/components/schemas/ProductPageReviewAndRatings"
+          },
+          "quick_view": {
+            "$ref": "#/components/schemas/ProductPageQuickView"
+          }
+        }
+      },
+      "ProductPageConfiguration": {
+        "type": "object",
+        "description": "What the product page itself shows, in four blocks.",
+        "properties": {
+          "actions_buttons": {
+            "$ref": "#/components/schemas/ProductPageActionButtons"
+          },
+          "details": {
+            "$ref": "#/components/schemas/ProductPageDetails"
+          },
+          "social_sharing": {
+            "$ref": "#/components/schemas/ProductPageSocialSharing"
+          },
+          "set_product_properties": {
+            "$ref": "#/components/schemas/ProductPageProductProperties"
+          }
+        }
+      },
+      "ProductPageActionButtons": {
+        "type": "object",
+        "description": "Which buttons the product page shows.",
+        "properties": {
+          "show_product_action_buttons": {
+            "type": "boolean",
+            "description": "Show the product action buttons."
+          },
+          "display_add_to_cart_button": {
+            "type": "boolean",
+            "description": "Show the Add to Cart button. Depends on `configuration.actions_buttons.show_product_action_buttons`."
+          },
+          "display_buy_now_button": {
+            "type": "boolean",
+            "description": "Show the Buy Now button. Depends on `configuration.actions_buttons.show_product_action_buttons`."
+          },
+          "display_on_hover": {
+            "type": "boolean",
+            "description": "Show the buttons on hover. Depends on `configuration.actions_buttons.show_product_action_buttons`."
+          },
+          "display_add_to_compare_button": {
+            "type": "boolean",
+            "description": "Show the Add to Compare button."
+          },
+          "display_add_to_wishlist_button": {
+            "type": "boolean",
+            "description": "Show the Add to Wishlist button."
+          }
+        }
+      },
+      "ProductPageDetails": {
+        "type": "object",
+        "description": "Which parts of the product's details show.",
+        "properties": {
+          "display_description": {
+            "type": "boolean",
+            "description": "Show the product description."
+          },
+          "display_sale_percentage": {
+            "type": "boolean",
+            "description": "Show the sale percentage."
+          },
+          "use_strike_through_on_previous_price": {
+            "type": "boolean",
+            "description": "Show the previous price struck through."
+          },
+          "display_tax_with_expect_to_pay_price": {
+            "type": "boolean",
+            "description": "Show tax with the expect to pay price."
+          }
+        }
+      },
+      "ProductPageSocialSharing": {
+        "type": "object",
+        "description": "The social media share buttons, the networks they offer, and the title beside them.",
+        "properties": {
+          "enable_share_on_social_media": {
+            "type": "boolean",
+            "description": "Show the social media share buttons."
+          },
+          "facebook": {
+            "type": "boolean",
+            "description": "Offer sharing on Facebook. Depends on `configuration.social_sharing.enable_share_on_social_media`."
+          },
+          "twitter": {
+            "type": "boolean",
+            "description": "Offer sharing on Twitter. Depends on `configuration.social_sharing.enable_share_on_social_media`."
+          },
+          "pinterest": {
+            "type": "boolean",
+            "description": "Offer sharing on Pinterest. Depends on `configuration.social_sharing.enable_share_on_social_media`."
+          },
+          "messenger": {
+            "type": "boolean",
+            "description": "Offer sharing on Messenger."
+          },
+          "linkedin": {
+            "type": "boolean",
+            "description": "Offer sharing on LinkedIn."
+          },
+          "email": {
+            "type": "boolean",
+            "description": "Offer sharing by email."
+          },
+          "snapchat": {
+            "type": "boolean",
+            "description": "Offer sharing on Snapchat."
+          },
+          "telegram": {
+            "type": "boolean",
+            "description": "Offer sharing on Telegram."
+          },
+          "reddit": {
+            "type": "boolean",
+            "description": "Offer sharing on Reddit."
+          },
+          "instagram": {
+            "type": "boolean",
+            "description": "Offer sharing on Instagram."
+          },
+          "youtube": {
+            "type": "boolean",
+            "description": "Offer sharing on YouTube."
+          },
+          "tiktok": {
+            "type": "boolean",
+            "description": "Offer sharing on TikTok."
+          },
+          "threads": {
+            "type": "boolean",
+            "description": "Offer sharing on Threads."
+          },
+          "whatsapp": {
+            "type": "boolean",
+            "description": "Offer sharing on WhatsApp."
+          },
+          "bluesky": {
+            "type": "boolean",
+            "description": "Offer sharing on Bluesky."
+          },
+          "mastodon": {
+            "type": "boolean",
+            "description": "Offer sharing on Mastodon."
+          },
+          "copy_link": {
+            "type": "boolean",
+            "description": "Offer a button that copies the product link."
+          },
+          "display_title": {
+            "type": "boolean",
+            "description": "Show a title beside the share buttons."
+          },
+          "title": {
+            "type": "string",
+            "description": "The share title text."
+          }
+        }
+      },
+      "ProductPageProductProperties": {
+        "type": "object",
+        "description": "Whether the product page lists the product's height, width, length and weight, and whether it shows Add to Gift Registry.",
+        "properties": {
+          "display_height": {
+            "type": "boolean",
+            "description": "Show the product's height."
+          },
+          "display_width": {
+            "type": "boolean",
+            "description": "Show the product's width."
+          },
+          "display_length": {
+            "type": "boolean",
+            "description": "Show the product's length."
+          },
+          "display_weight": {
+            "type": "boolean",
+            "description": "Show the product's weight."
+          },
+          "display_add_to_gift_registry": {
+            "type": "boolean",
+            "description": "Show Add to Gift Registry."
+          }
+        }
+      },
+      "ProductPageVariations": {
+        "type": "object",
+        "description": "How a product's variations are labelled and laid out.",
+        "properties": {
+          "labels_and_display": {
+            "$ref": "#/components/schemas/ProductPageVariationLabels"
+          },
+          "layout": {
+            "$ref": "#/components/schemas/ProductPageVariationLayout"
+          }
+        }
+      },
+      "ProductPageVariationLabels": {
+        "type": "object",
+        "description": "How a variation is labelled and drawn.",
+        "properties": {
+          "disable_variation_label_for_price": {
+            "type": "boolean",
+            "description": "Turn off the variation label for the price."
+          },
+          "display_product_image_as_variation_icons": {
+            "type": "boolean",
+            "description": "Show product images as variation icons."
+          },
+          "display_selected_variation_value": {
+            "type": "boolean",
+            "description": "Show the selected variation value."
+          },
+          "enable_colour_type_variation_image_display": {
+            "type": "boolean",
+            "description": "Show images for colour type variations."
+          },
+          "use_strike_through_for_out_of_stock_variations": {
+            "type": "boolean",
+            "description": "Strike through variations that are out of stock."
+          },
+          "enable_single_click_variation_loading": {
+            "type": "boolean",
+            "description": "Load a variation with a single click."
+          }
+        }
+      },
+      "ProductPageVariationLayout": {
+        "type": "object",
+        "description": "How variations are laid out, and which price shows.",
+        "properties": {
+          "select_variation_view": {
+            "type": "boolean",
+            "description": "Turn on the variation view that `select_variation_view_type` names."
+          },
+          "select_variation_view_type": {
+            "type": "string",
+            "enum": [
+              "matrix_view",
+              "flat_chooser",
+              "advanced_view"
+            ],
+            "description": "The variation view: `matrix_view`, `flat_chooser` or `advanced_view`."
+          },
+          "display_variation_combinations": {
+            "type": "boolean",
+            "description": "Show variation combinations."
+          },
+          "variation_combinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductPageVariationType"
+            },
+            "description": "The variation types shown as combinations, each with the variation type's `id` and `name`."
+          },
+          "variation_price_display_mode": {
+            "type": "boolean",
+            "description": "Turn on the variation price display that `variation_price_display_type` names."
+          },
+          "variation_price_display_type": {
+            "type": "string",
+            "enum": [
+              "lowest",
+              "highest"
+            ],
+            "description": "Which variation price shows: `lowest` or `highest`."
+          }
+        }
+      },
+      "ProductPageVariationType": {
+        "type": "object",
+        "description": "One variation type shown as a combination.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The variation type's `id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The variation type's name."
+          }
+        }
+      },
+      "ProductPageImageAndVideo": {
+        "type": "object",
+        "description": "Whether a product takes a single file upload, how product images show and zoom, and the video preview.",
+        "properties": {
+          "allow_single_file_upload_per_product": {
+            "type": "boolean",
+            "description": "Allow a single file upload per product."
+          },
+          "image_display": {
+            "$ref": "#/components/schemas/ProductPageImageDisplay"
+          },
+          "video": {
+            "$ref": "#/components/schemas/ProductPageVideo"
+          }
+        }
+      },
+      "ProductPageImageDisplay": {
+        "type": "object",
+        "description": "How product images are laid out and zoomed.",
+        "properties": {
+          "enable_image_slider": {
+            "type": "boolean",
+            "description": "Turn on the image slider. Depends on `image_and_video.image_display.product_image_view`."
+          },
+          "product_thumbnail_vertical_view": {
+            "type": "boolean",
+            "description": "Show product thumbnails in a vertical view. Depends on `image_and_video.image_display.product_image_view`."
+          },
+          "product_image_view": {
+            "type": "boolean",
+            "description": "Turn on the product image view that `product_image_view_type` names."
+          },
+          "product_image_view_type": {
+            "type": "string",
+            "enum": [
+              "default",
+              "enable_split_slider",
+              "enable_grid_view"
+            ],
+            "description": "The product image view: `default`, `enable_split_slider` or `enable_grid_view`."
+          },
+          "image_zoom_type": {
+            "type": "boolean",
+            "description": "Turn on the image zoom that `zoom_type` names. Depends on `image_and_video.image_display.product_image_view`."
+          },
+          "zoom_type": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "tints",
+              "inner",
+              "lens",
+              "fade_in_out",
+              "easing",
+              "mousewheel",
+              "mousewheel_inner",
+              "mousewheel_lens"
+            ],
+            "description": "The image zoom effect."
+          }
+        }
+      },
+      "ProductPageVideo": {
+        "type": "object",
+        "description": "The video preview, and where its thumbnail sits.",
+        "properties": {
+          "enable_video_preview": {
+            "type": "boolean",
+            "description": "Turn on the video preview."
+          },
+          "display_video_thumbnail_in_first_order": {
+            "type": "boolean",
+            "description": "Show the video thumbnail first."
+          }
+        }
+      },
+      "ProductPageListing": {
+        "type": "object",
+        "description": "A product listing on the product page. `up_sell` and `related_products` have the same fields.",
+        "properties": {
+          "number_of_products": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999999,
+            "description": "The number of products the listing shows, from `1` to `999999`."
+          },
+          "allow_viewers_to_change_display_mode": {
+            "type": "boolean",
+            "description": "Let visitors change the display mode."
+          },
+          "grid_view": {
+            "type": "boolean",
+            "description": "Turn on the grid view. Depends on `allow_viewers_to_change_display_mode` in the same section."
+          },
+          "list_view": {
+            "type": "boolean",
+            "description": "Turn on the list view. Depends on `allow_viewers_to_change_display_mode` in the same section."
+          },
+          "tabular_view": {
+            "type": "boolean",
+            "description": "Turn on the tabular view. Depends on `allow_viewers_to_change_display_mode` in the same section."
+          },
+          "select_display_type": {
+            "type": "string",
+            "enum": [
+              "image",
+              "list",
+              "scrollable",
+              "tabular"
+            ],
+            "description": "The display type: `image`, `list`, `scrollable` or `tabular`."
+          },
+          "maximum_number_of_columns_per_row": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "description": "The most columns per row, from `1` to `6`."
+          },
+          "maximum_number_of_columns_per_row_list": {
+            "type": "integer",
+            "enum": [
+              1,
+              2
+            ],
+            "description": "The most columns per row in list view: `1` or `2`."
+          },
+          "short_description": {
+            "type": "boolean",
+            "description": "Show each product's short description."
+          },
+          "display_on_hover": {
+            "type": "boolean",
+            "description": "Show the buttons on hover."
+          },
+          "display_add_to_cart_button": {
+            "type": "boolean",
+            "description": "Show the Add to Cart button."
+          },
+          "display_add_to_compare_button": {
+            "type": "boolean",
+            "description": "Show the Add to Compare button."
+          },
+          "display_add_to_wishlist_button": {
+            "type": "boolean",
+            "description": "Show the Add to Wishlist button."
+          },
+          "price": {
+            "type": "boolean",
+            "description": "Show the price."
+          },
+          "show_expect_to_pay_price": {
+            "type": "boolean",
+            "description": "Show the expect to pay price. Depends on `price` in the same section."
+          },
+          "display_rating": {
+            "type": "boolean",
+            "description": "Show the product rating."
+          },
+          "display_review_count": {
+            "type": "boolean",
+            "description": "Show the review count. Depends on `display_rating` in the same section."
+          }
+        }
+      },
+      "ProductPageReviewAndRatings": {
+        "type": "object",
+        "description": "Where product reviews show, and which version shows them. The product review plugin backs this section.",
+        "properties": {
+          "capabilities": {
+            "$ref": "#/components/schemas/ProductPageReviewCapabilities"
+          },
+          "enable_review_in_tab": {
+            "type": "boolean",
+            "description": "Show reviews in a tab."
+          },
+          "enable_new_version": {
+            "type": "boolean",
+            "description": "Show reviews with the new version. Depends on `review_and_ratings.enable_review_in_tab`."
+          }
+        }
+      },
+      "ProductPageReviewCapabilities": {
+        "type": "object",
+        "description": "What the product review plugin offers. Read-only.",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "Whether the product review plugin is installed. Read-only: a write that changes it is rejected with `400` and the code `read_only`."
+          }
+        }
+      },
+      "ProductPageQuickView": {
+        "type": "object",
+        "description": "The product quick view popup and what it shows. Every field except `product_quick_view` depends on `quick_view.product_quick_view`.",
+        "properties": {
+          "product_quick_view": {
+            "type": "boolean",
+            "description": "Turn on the product quick view popup."
+          },
+          "display_product_name": {
+            "type": "boolean",
+            "description": "Show the product name."
+          },
+          "display_sku": {
+            "type": "boolean",
+            "description": "Show the SKU."
+          },
+          "display_product_rating": {
+            "type": "boolean",
+            "description": "Show the product rating."
+          },
+          "display_product_stock": {
+            "type": "boolean",
+            "description": "Show the product stock."
+          },
+          "display_product_variation": {
+            "type": "boolean",
+            "description": "Show the product variations."
+          },
+          "display_product_image": {
+            "type": "boolean",
+            "description": "Show the product image."
+          },
+          "display_variation_image": {
+            "type": "boolean",
+            "description": "Show the variation image."
+          },
+          "display_product_summary": {
+            "type": "boolean",
+            "description": "Show the product summary."
+          },
+          "display_add_to_cart_button": {
+            "type": "boolean",
+            "description": "Show the Add to Cart button."
+          },
+          "display_add_to_compare_button": {
+            "type": "boolean",
+            "description": "Show the Add to Compare button."
+          },
+          "display_add_to_wishlist_button": {
+            "type": "boolean",
+            "description": "Show the Add to Wishlist button."
+          }
+        }
+      },
+      "ProductPageGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get product page settings](/api-reference/product-page/get-product-page-settings) and [Update product page settings](/api-reference/product-page/update-product-page-settings) return it.",
+        "properties": {
+          "configuration": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          },
+          "variations": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          },
+          "image_and_video": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          },
+          "up_sell": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          },
+          "related_products": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          },
+          "review_and_ratings": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          },
+          "quick_view": {
+            "$ref": "#/components/schemas/ProductPageSectionMeta"
+          }
+        }
+      },
+      "ProductPageSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is. `setting` for all seven sections."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `true` for all seven sections."
+          },
+          "plugin": {
+            "type": "string",
+            "description": "The plugin behind the section. Only `review_and_ratings` has it, set to `product-review`."
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether that plugin is available. Only the entry that has `plugin` has it."
+          },
+          "ui_label": {
+            "type": "string",
+            "description": "The section's label, such as `Up-sell`."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/page_settings/product_page/up_sell`."
+          }
+        }
+      },
+      "ProductPageFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Has the same nesting as the settings, with a `ProductPageFieldMetadataEntry` in place of each value."
+      },
+      "ProductPageFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field does."
+          },
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes: `boolean`, `enum`, `integer`, `string` or `reference_list`."
+          },
+          "default": {
+            "description": "The field's default value."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "Whether the field is read-only. `true` only on `review_and_ratings.capabilities.available`."
+          },
+          "depends_on": {
+            "type": "string",
+            "description": "The field this one depends on, such as `quick_view.product_quick_view`. In `up_sell` and `related_products` it is the field name alone, such as `display_rating`. A write that sets this field to `true` while that field is off is rejected with `400`."
+          },
+          "allowed_values": {
+            "type": "array",
+            "items": {},
+            "description": "The values the field accepts. Every `enum` field has it. On `variations.layout.variation_combinations` it lists the store's variation types, each with the variation type's `id` and `name`."
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "A label for each allowed value. Four `enum` fields have it: `image_and_video.image_display.product_image_view_type`, `image_and_video.image_display.zoom_type`, and `select_display_type` in `up_sell` and `related_products`."
+          },
+          "accepts": {
+            "type": "string",
+            "description": "The forms an item can take when you write the field. Only `variations.layout.variation_combinations` has it: the variation type's `id`, an object with its `id`, an object with its `id` and `name`, or its name in any letter case."
+          },
+          "min": {
+            "type": "integer",
+            "description": "The lowest value, for an `integer` field."
+          },
+          "max": {
+            "type": "integer",
+            "description": "The highest value, for an `integer` field."
+          },
+          "item_shape": {
+            "type": "string",
+            "description": "The shape of each item, for a `reference_list` field: `{id,name}`."
+          }
+        }
+      },
+      "ProductPageError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `malformed_json`, `not_found`, `method_not_allowed` or `rate_limited`."
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field. Empty when the error is not about a field.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The rejected field, such as `configuration.details.display_description`."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field`, `required`, `constraint_violation`, `read_only`, `invalid_type`, `invalid_enum` or `out_of_range`."
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "The identifier the store gives this request."
               }
             }
           }
