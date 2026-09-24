@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "tax_profiles",
+  "endpoints": {
+    "list_tax_profiles": {
+      "function": "listTaxProfiles",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.listTaxProfiles(client, {limit: 20});\nfor (const taxProfile of response.map.tax_profiles) {\n    console.log(taxProfile.id, taxProfile.name, taxProfile.default);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "head_tax_profiles": {
+      "function": "headTaxProfiles",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.headTaxProfiles(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_tax_profile": {
+      "function": "createTaxProfile",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.createTaxProfile(client, {\n    tax_profile: {name: 'Wholesale', description: 'Profile for wholesale customers'},\n});\nconsole.log(response.map.tax_profile.id);\n"
+    },
+    "get_tax_profile": {
+      "function": "getTaxProfile",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.getTaxProfile(client, 2);\nconsole.log(response.map.tax_profile.name, response.map.tax_profile.default);\n"
+    },
+    "head_tax_profile": {
+      "function": "headTaxProfile",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.headTaxProfile(client, 2);\nconsole.log(response.statusCode);\n"
+    },
+    "update_tax_profile": {
+      "function": "updateTaxProfile",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.updateTaxProfile(client, 4, {tax_profile: {name: 'Wholesale AU'}});\nconsole.log(response.map.tax_profile.name);\n"
+    },
+    "delete_tax_profile": {
+      "function": "deleteTaxProfile",
+      "code": "import {taxProfiles} from 'webcommander-sdk';\n\nconst response = await taxProfiles.deleteTaxProfile(client, 4);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

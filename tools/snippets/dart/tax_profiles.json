@@ -1,0 +1,34 @@
+{
+  "sdk": "dart",
+  "module": "tax_profiles",
+  "endpoints": {
+    "list_tax_profiles": {
+      "function": "listTaxProfiles",
+      "code": "final response =\n    await client.taxProfiles.listTaxProfiles(queryParams: {'limit': 20});\nfinal taxProfiles = (response.map as Map)['tax_profiles'] as List;\nfor (final taxProfile in taxProfiles) {\n  print('${(taxProfile as Map)['id']} ${taxProfile['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
+    },
+    "head_tax_profiles": {
+      "function": "headTaxProfiles",
+      "code": "final response = await client.taxProfiles.headTaxProfiles();\nprint(response.statusCode);"
+    },
+    "create_tax_profile": {
+      "function": "createTaxProfile",
+      "code": "final response = await client.taxProfiles.createTaxProfile({\n  'tax_profile': {\n    'name': 'Wholesale',\n    'description': 'Profile for wholesale customers',\n  },\n});\nfinal taxProfile = (response.map as Map)['tax_profile'] as Map;\nprint(taxProfile['id']);"
+    },
+    "get_tax_profile": {
+      "function": "getTaxProfile",
+      "code": "final response = await client.taxProfiles.getTaxProfile(2);\nfinal taxProfile = (response.map as Map)['tax_profile'] as Map;\nprint('${taxProfile['name']} ${taxProfile['default']}');"
+    },
+    "head_tax_profile": {
+      "function": "headTaxProfile",
+      "code": "final response = await client.taxProfiles.headTaxProfile(2);\nprint(response.statusCode);"
+    },
+    "update_tax_profile": {
+      "function": "updateTaxProfile",
+      "code": "final response = await client.taxProfiles.updateTaxProfile(4, {\n  'tax_profile': {'name': 'Wholesale AU'},\n});\nfinal taxProfile = (response.map as Map)['tax_profile'] as Map;\nprint('${taxProfile['name']} ${taxProfile['updated_at']}');"
+    },
+    "delete_tax_profile": {
+      "function": "deleteTaxProfile",
+      "code": "final response = await client.taxProfiles.deleteTaxProfile(4);\nprint(response.statusCode);"
+    }
+  }
+}

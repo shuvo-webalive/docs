@@ -343,6 +343,20 @@
                 ]
               },
               {
+                "group": "Tax profiles",
+                "expanded": false,
+                "pages": [
+                  "tax-profiles",
+                  "api-reference/tax-profiles/list-tax-profiles",
+                  "api-reference/tax-profiles/check-the-tax-profiles-list",
+                  "api-reference/tax-profiles/create-a-tax-profile",
+                  "api-reference/tax-profiles/retrieve-a-tax-profile",
+                  "api-reference/tax-profiles/check-a-tax-profile",
+                  "api-reference/tax-profiles/update-a-tax-profile",
+                  "api-reference/tax-profiles/delete-a-tax-profile"
+                ]
+              },
+              {
                 "group": "Tax rules",
                 "expanded": false,
                 "pages": [

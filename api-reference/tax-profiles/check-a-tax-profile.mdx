@@ -1,0 +1,9 @@
+---
+title: "Check a tax profile"
+description: "Returns headers only, and `200` even when no tax profile has that `tax_profile_id`."
+openapi: "HEAD /admin/tax_profiles/{tax_profile_id}"
+---
+
+Returns `200` with headers only and no body, and no `ETag` or `Last-Modified` header. It returns `200` even when no tax profile has that `tax_profile_id`, so it does not tell you whether the profile exists. To check that, use [Retrieve a tax profile](/api-reference/tax-profiles/retrieve-a-tax-profile), which returns `404` when no tax profile has it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

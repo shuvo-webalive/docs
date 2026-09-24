@@ -1,0 +1,9 @@
+---
+title: "Update a tax profile"
+description: "Changes the fields you send and returns the updated tax profile."
+openapi: "PUT /admin/tax_profiles/{tax_profile_id}"
+---
+
+Changes the fields you send, wrapped in `tax_profile`, and returns the whole tax profile. A field you leave out keeps its value. Sending `default: true` makes this profile the default, takes the flag from the profile that had it, and sets `default_tax_profile` in the tax settings to this profile's `id`. Sending `default: false` returns `200` and leaves the flag on, so to move the default, set it on another profile.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
