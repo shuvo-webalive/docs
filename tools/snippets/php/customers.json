@@ -1,7 +1,6 @@
 {
   "sdk": "php",
-  "language": "php",
-  "setup": "require __DIR__ . '/vendor/autoload.php';\n\nuse WebCommander\\Sdk\\Client\\WebCommanderClient;\nuse WebCommander\\Sdk\\Config\\AuthConfig;\nuse WebCommander\\Sdk\\Config\\SdkConfig;\nuse WebCommander\\Sdk\\Resources\\Customers\\AdminCustomers;\n\n$auth = new AuthConfig(\n    baseUrl: (string) getenv('WC_BASE_URL'),\n    clientId: (string) getenv('WC_CLIENT_ID'),\n    clientSecret: (string) getenv('WC_CLIENT_SECRET'),\n    redirectUri: (string) getenv('WC_REDIRECT_URI'),\n    authString: (string) getenv('WC_AUTH_STRING'),\n    clientName: 'default',\n    grantType: 'client_credentials',\n);\n\n$client = new WebCommanderClient(new SdkConfig($auth, raiseOnError: true));",
+  "module": "customers",
   "endpoints": {
     "list_customers": {
       "function": "getCustomers",

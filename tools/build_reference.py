@@ -1,16 +1,16 @@
-"""Builds the API reference: api-reference/openapi.json and one page per endpoint.
+"""Builds the API reference: api-reference/openapi.json, the endpoint pages, each module's overview
+page, the client setup snippet and the API reference part of the docs.json navigation.
 
-Endpoint facts come from customers.py. Code samples come from snippets/<sdk>.json, one file
-per SDK, each compiled against that SDK. An endpoint is written only when all seven SDKs
-have a sample for it; the build fails otherwise.
+Modules are listed in modules.json. Each module's endpoint facts live in modules/<module>.py, and its
+code samples in snippets/<sdk>/<module>.json, one file per SDK, each compiled against that SDK. An
+endpoint is written only when all seven SDKs have a sample for it; the build fails otherwise.
 """
 
+import importlib.util
 import json
 import pathlib
 import re
 import sys
-
-import customers
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 DOCS = TOOLS.parent
@@ -25,42 +25,53 @@ SDKS = [
     ("go", "go", "Go"),
 ]
 STORE_ADDRESS = re.compile(r"[a-z0-9-]+\.mywebcommander\.com", re.I)
+METHOD_COLOURS = {"GET": "#0f7b6c", "POST": "#2563eb", "PUT": "#b45309", "PATCH": "#7a5af8",
+                  "DELETE": "#c2410c", "HEAD": "#475467"}
 
 
-def load_snippets():
-    loaded = {}
-    missing = []
-    for sdk, _, _ in SDKS:
-        path = TOOLS / "snippets" / (sdk + ".json")
-        if not path.is_file():
-            missing.append(sdk)
-            continue
-        loaded[sdk] = json.loads(path.read_text(encoding="utf-8"))
-    return loaded, missing
+def load_module(name):
+    spec = importlib.util.spec_from_file_location("reference_" + name, TOOLS / "modules" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.NAME = name
+    return module
+
+
+def load_areas():
+    listing = json.loads((TOOLS / "modules.json").read_text(encoding="utf-8"))
+    return [dict(area, modules=[load_module(name) for name in area["modules"]]) for area in listing["areas"]]
+
+
+def load_json(path, problems, what):
+    if not path.is_file():
+        problems.append("no %s (%s)" % (what, path.relative_to(TOOLS)))
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def curl(endpoint):
-    path = endpoint["path"].replace("{customer_id}", "123")
-    url = "$WC_BASE_URL/api/v4" + path
-    query = {
-        "list_customers": "?limit=20&status=active",
-        "count_customers": "?status=active",
-        "check_email": "?email=jane@example.com",
-        "list_store_credit_adjustments": "?limit=20",
-    }.get(endpoint["key"], "")
-    lines = ["curl -X %s \"%s%s\" \\" % (endpoint["method"], url, query),
+    call = endpoint.get("example_call", {})
+    path = endpoint["path"]
+    for name, value in call.get("path", {}).items():
+        path = path.replace("{%s}" % name, str(value))
+    query = call.get("query", "")
+    if isinstance(query, dict):
+        query = "&".join("%s=%s" % (key, value) for key, value in query.items())
+    url = "$WC_BASE_URL/api/v4" + path + ("?" + query if query else "")
+    method = endpoint["method"]
+    lines = ["curl %s\"%s\" \\" % ("-I " if method == "HEAD" else "-X %s " % method, url),
              "  -H \"Authorization: Bearer $ACCESS_TOKEN\""]
-    if endpoint["key"] == "export_customers":
+    body = call.get("body", endpoint.get("body", {}).get("example"))
+    if call.get("output"):
         lines[-1] += " \\"
-        lines.append("  -o customers.xlsx")
+        lines.append("  -o %s" % call["output"])
     elif endpoint.get("multipart"):
         lines[-1] += " \\"
-        lines.append("  -F \"file=@customers.csv\"")
-    elif endpoint.get("body"):
+        lines.append("  -F \"file=@%s\"" % call.get("file", "file"))
+    elif body is not None:
         lines[-1] += " \\"
         lines.append("  -H \"Content-Type: application/json\" \\")
-        body = json.dumps(endpoint["body"]["example"], indent=2)
-        lines.append("  -d '%s'" % body.replace("\n", "\n  "))
+        lines.append("  -d '%s'" % json.dumps(body, indent=2).replace("\n", "\n  "))
     return "\n".join(lines)
 
 
@@ -71,12 +82,12 @@ def without_path_example(parameter):
     return dict({k: v for k, v in parameter.items() if k != "example"}, schema=schema)
 
 
-def operation(endpoint, snippets):
+def operation(module, endpoint, snippets):
     samples = [{"lang": "bash", "label": "cURL", "source": curl(endpoint)}]
     for sdk, lang, label in SDKS:
         samples.append({"lang": lang, "label": label, "source": snippets[sdk]["endpoints"][endpoint["key"]]["code"]})
     op = {
-        "tags": [customers.TAG],
+        "tags": [module.TAG],
         "summary": endpoint["title"],
         "operationId": endpoint["key"],
         "description": endpoint["description"],
@@ -171,11 +182,47 @@ cURL, another HTTP client, or to try the API on this site.
 </Warning>
 """
 
+CURL_SETUP = """curl -X POST "$WC_BASE_URL/api/v4/oauth2/token" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "'"$WC_CLIENT_ID"'",
+    "client_secret": "'"$WC_CLIENT_SECRET"'",
+    "redirect_uri": "'"$WC_REDIRECT_URI"'",
+    "auth_string": "'"$WC_AUTH_STRING"'"
+  }'"""
 
-def spec(snippets):
+
+def prefixed_schemas(areas):
+    """Merge every module's schemas; a name already taken by an earlier module gets the module's prefix."""
+    merged, renames = {}, {}
+    for area in areas:
+        for module in area["modules"]:
+            mapping = {}
+            for name, schema in module.SCHEMAS.items():
+                if name in merged and merged[name] != schema:
+                    mapping[name] = "".join(part.capitalize() for part in module.NAME.split("_")) + name
+            renames[module.NAME] = mapping
+            for name, schema in module.SCHEMAS.items():
+                merged[mapping.get(name, name)] = json.loads(rename_refs(json.dumps(schema), mapping))
+    return merged, renames
+
+
+def rename_refs(text, mapping):
+    for old, new in mapping.items():
+        text = text.replace('"#/components/schemas/%s"' % old, '"#/components/schemas/%s"' % new)
+    return text
+
+
+def spec(areas, snippets, schemas, renames):
     paths = {"/oauth2/token": {"post": token_operation()}}
-    for endpoint in customers.ENDPOINTS:
-        paths.setdefault(endpoint["path"], {})[endpoint["method"].lower()] = operation(endpoint, snippets)
+    tags = [{"name": "Authentication"}]
+    for area in areas:
+        for module in area["modules"]:
+            tags.append({"name": module.TAG})
+            for endpoint in module.ENDPOINTS:
+                op = json.loads(rename_refs(json.dumps(operation(module, endpoint, snippets[module.NAME])), renames[module.NAME]))
+                paths.setdefault(endpoint["path"], {})[endpoint["method"].lower()] = op
     return {
         "openapi": "3.1.0",
         "info": {"title": "WebCommander API", "version": "v4"},
@@ -184,11 +231,11 @@ def spec(snippets):
             "variables": {"store": {"default": "your-store.example.com", "description": "Your store's host name, without https://."}},
         }],
         "security": [{"bearerAuth": []}],
-        "tags": [{"name": "Authentication"}, {"name": customers.TAG}],
+        "tags": tags,
         "paths": paths,
         "components": {
             "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from `POST /api/v4/oauth2/token`. The SDKs get and renew it for you."}},
-            "schemas": customers.SCHEMAS,
+            "schemas": schemas,
         },
     }
 
@@ -205,6 +252,12 @@ def sdk_call(snippet):
 def page(endpoint, snippets):
     rows = ["| %s | `%s` |" % (label, sdk_call(snippets[sdk]["endpoints"][endpoint["key"]]))
             for sdk, _, label in SDKS]
+    note = ("Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, "
+            "as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` "
+            "to your store's host name and paste an access token from "
+            "[Get an access token](/api-reference/authentication/get-an-access-token).")
+    if endpoint.get("body") and not endpoint.get("multipart"):
+        note += " To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload."
     return "\n".join([
         "---",
         "title: \"%s\"" % endpoint["title"],
@@ -220,22 +273,9 @@ def page(endpoint, snippets):
         "| --- | --- |",
     ] + rows + [
         "",
-        "<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>",
+        "<Note>%s</Note>" % note,
         "",
     ])
-
-
-METHOD_COLOURS = {"GET": "#0f7b6c", "POST": "#2563eb", "PUT": "#b45309", "DELETE": "#c2410c"}
-
-CURL_SETUP = """curl -X POST "$WC_BASE_URL/api/v4/oauth2/token" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "grant_type": "client_credentials",
-    "client_id": "'"$WC_CLIENT_ID"'",
-    "client_secret": "'"$WC_CLIENT_SECRET"'",
-    "redirect_uri": "'"$WC_REDIRECT_URI"'",
-    "auth_string": "'"$WC_AUTH_STRING"'"
-  }'"""
 
 
 def badge(method):
@@ -243,36 +283,36 @@ def badge(method):
             'letterSpacing: "0.02em", color: "%s"}}>%s</span>' % (METHOD_COLOURS[method], method))
 
 
-def client_setup(snippets):
+def client_setup(setups):
     tabs = ["<CodeGroup>", "```bash cURL", CURL_SETUP, "```", ""]
     for sdk, lang, label in SDKS:
-        tabs += ["```%s %s" % (lang, label), snippets[sdk]["setup"].rstrip(), "```", ""]
+        tabs += ["```%s %s" % (lang, label), setups[sdk]["setup"].rstrip(), "```", ""]
     tabs.append("</CodeGroup>")
     return "\n".join(tabs) + "\n"
 
 
-def overview():
-    rows = []
-    for endpoint in customers.ENDPOINTS:
-        rows.append("| [%s](/api-reference/customers/%s) | %s | `%s` | %s |" % (
-            endpoint["title"], endpoint["slug"], badge(endpoint["method"]),
-            endpoint["path"].replace("/admin/customers", "…/customers"), endpoint["summary"]))
-    return "\n".join([
+def short_path(module, path):
+    tail = module.BASE[module.BASE.rfind("/"):]
+    return path.replace(module.BASE, "…" + tail, 1)
+
+
+def overview(module):
+    rows = ["| [%s](/api-reference/%s/%s) | %s | `%s` | %s |" % (
+        endpoint["title"], module.SLUG, endpoint["slug"], badge(endpoint["method"]),
+        short_path(module, endpoint["path"]), endpoint["summary"]) for endpoint in module.ENDPOINTS]
+    lines = [
         "---",
-        "title: \"Customers\"",
+        "title: \"%s\"" % module.TAG,
         "sidebarTitle: \"Overview\"",
-        "description: \"Read, create, update and remove customers, and manage their addresses, passwords and store credit.\"",
+        "description: \"%s\"" % module.OVERVIEW_DESCRIPTION.replace("\"", "'"),
         "---",
         "",
-        "The Customers API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/customers`.",
+        module.INTRO,
         "",
-        "<Warning>",
-        "  Paths take the customer's `customer_id`. Each customer also has an `internal_id`, a separate",
-        "  number that no path takes. If you send an `internal_id` by mistake and it matches another",
-        "  customer's `customer_id`, you get **that other customer with a `200`** instead of a `404`.",
-        "  Check that the customer you get back is the one you asked for.",
-        "</Warning>",
-        "",
+    ]
+    if getattr(module, "WARNING", None):
+        lines += ["<Warning>", "  " + module.WARNING, "</Warning>", ""]
+    lines += [
         "## At a glance",
         "",
         "| Endpoint | Method | Path | What it does |",
@@ -285,52 +325,84 @@ def overview():
         "The SDK samples on these pages use that client. With cURL, send the access token in an",
         "`Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.",
         "",
-        "## Things to know",
-        "",
-        "- **A listing returns at most 20 records per call.** A larger `limit` is not rejected, but you",
-        "  still get at most 20, and `pagination.limit` shows `20`. To get more, send the next `page`",
-        "  number or a higher `offset` for as long as `pagination.has_next` is `true`.",
-        "- **A new customer cannot sign in until it is active.** If you create a customer without",
-        "  `status: \"active\"`, it is created as `awaiting_verification` with no usable login, even if you",
-        "  send a `password`, and changing its password fails with `401`. Send `status: \"active\"` with a",
-        "  `password` to create a customer who can sign in.",
-        "- **An export always contains every customer.** Its parameters choose columns, not customers: a",
-        "  column is removed when its parameter is anything other than `1`, `true`, `on` or `yes`, so",
-        "  `status=active` exports everyone and removes the `Status` column. Importing an export rewrites",
-        "  every customer in the store, so build import files from only the customers you want to change.",
-        "- **Every error response has the same fields:** `status`, `code` and `message`, plus `error` (a",
-        "  machine-readable reason) and `errors` (one entry per rejected field) when the API provides them.",
-        "",
-    ])
+    ]
+    if getattr(module, "NOTES", None):
+        lines += ["## Things to know", ""] + ["- " + note for note in module.NOTES] + [""]
+    return "\n".join(lines)
+
+
+def module_pages(module):
+    return [module.SLUG] + ["api-reference/%s/%s" % (module.SLUG, endpoint["slug"]) for endpoint in module.ENDPOINTS]
+
+
+def navigation(areas):
+    groups = [{"group": "Authentication", "icon": "key", "expanded": True,
+               "pages": ["api-reference/authentication/get-an-access-token"]}]
+    for area in areas:
+        modules = area["modules"]
+        if len(modules) == 1 and modules[0].TAG == area["name"]:
+            groups.append({"group": area["name"], "icon": area["icon"], "expanded": True, "pages": module_pages(modules[0])})
+        else:
+            groups.append({"group": area["name"], "icon": area["icon"], "expanded": False, "pages": [
+                {"group": module.TAG, "expanded": False, "pages": module_pages(module)} for module in modules]})
+    return groups
 
 
 def main():
-    snippets, missing = load_snippets()
-    problems = ["no samples for %s" % sdk for sdk in missing]
-    for sdk, data in snippets.items():
-        for endpoint in customers.ENDPOINTS:
-            if endpoint["key"] not in data.get("endpoints", {}):
-                problems.append("%s has no sample for %s" % (sdk, endpoint["key"]))
+    areas = load_areas()
+    problems = []
+    setups = {sdk: load_json(TOOLS / "snippets" / sdk / "setup.json", problems, "%s setup" % sdk) for sdk, _, _ in SDKS}
+    snippets = {}
+    for area in areas:
+        for module in area["modules"]:
+            snippets[module.NAME] = {}
+            for sdk, _, _ in SDKS:
+                data = load_json(TOOLS / "snippets" / sdk / (module.NAME + ".json"), problems, "%s samples for %s" % (sdk, module.NAME))
+                snippets[module.NAME][sdk] = data
+                if data is None:
+                    continue
+                for endpoint in module.ENDPOINTS:
+                    if endpoint["key"] not in data.get("endpoints", {}):
+                        problems.append("%s has no sample for %s.%s" % (sdk, module.NAME, endpoint["key"]))
     if problems:
         print("Build failed: an endpoint is documented only when all seven SDKs have a sample.")
         for problem in problems:
             print("  - " + problem)
         return 1
 
-    document = json.dumps(spec(snippets), indent=2, ensure_ascii=False)
+    keys = [endpoint["key"] for area in areas for module in area["modules"] for endpoint in module.ENDPOINTS]
+    duplicates = sorted({key for key in keys if keys.count(key) > 1})
+    if duplicates:
+        print("Build failed: endpoint keys are not unique across modules: %s" % ", ".join(duplicates))
+        return 1
+    schemas, renames = prefixed_schemas(areas)
+    document = json.dumps(spec(areas, snippets, schemas, renames), indent=2, ensure_ascii=False)
     if STORE_ADDRESS.search(document):
         print("Build failed: the spec contains a store address")
         return 1
-    (OUT / "customers").mkdir(parents=True, exist_ok=True)
+    OUT.mkdir(exist_ok=True)
     (OUT / "openapi.json").write_text(document + "\n", encoding="utf-8")
-    for endpoint in customers.ENDPOINTS:
-        (OUT / "customers" / (endpoint["slug"] + ".mdx")).write_text(page(endpoint, snippets), encoding="utf-8")
-    (DOCS / "customers.mdx").write_text(overview(), encoding="utf-8")
+    count = 0
+    for area in areas:
+        for module in area["modules"]:
+            (OUT / module.SLUG).mkdir(parents=True, exist_ok=True)
+            for endpoint in module.ENDPOINTS:
+                (OUT / module.SLUG / (endpoint["slug"] + ".mdx")).write_text(page(endpoint, snippets[module.NAME]), encoding="utf-8")
+                count += 1
+            (DOCS / (module.SLUG + ".mdx")).write_text(overview(module), encoding="utf-8")
     (OUT / "authentication").mkdir(exist_ok=True)
     (OUT / "authentication" / "get-an-access-token.mdx").write_text(TOKEN_PAGE, encoding="utf-8")
     (DOCS / "snippets").mkdir(exist_ok=True)
-    (DOCS / "snippets" / "client-setup.mdx").write_text(client_setup(snippets), encoding="utf-8")
-    print("Built the overview, %d endpoint pages and openapi.json" % len(customers.ENDPOINTS))
+    (DOCS / "snippets" / "client-setup.mdx").write_text(client_setup(setups), encoding="utf-8")
+
+    docs_json = json.loads((DOCS / "docs.json").read_text(encoding="utf-8"))
+    for group in docs_json["navigation"]["groups"]:
+        if group["group"] == "API reference":
+            group["pages"] = navigation(areas)
+    (DOCS / "docs.json").write_text(json.dumps(docs_json, indent=2) + "\n", encoding="utf-8")
+
+    modules = sum(len(area["modules"]) for area in areas)
+    print("Built %d modules, %d endpoint pages, their overviews and openapi.json" % (modules, count))
     return 0
 
 
