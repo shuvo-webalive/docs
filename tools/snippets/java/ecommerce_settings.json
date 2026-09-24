@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "getEcommerceSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.ecommerceSettings().getEcommerceSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"ecommerce_settings\");\nMap<?, ?> continueShopping = (Map<?, ?>) settings.get(\"continue_shopping\");\nMap<?, ?> orderFilters = (Map<?, ?>) settings.get(\"order_filters\");\nSystem.out.println(continueShopping.get(\"continue_shopping_target\"));\nSystem.out.println(orderFilters.get(\"default_shipment_status\"));\nfor (Object row : (List<?>) settings.get(\"order_flags\")) {\n    Map<?, ?> orderFlag = (Map<?, ?>) row;\n    System.out.println(orderFlag.get(\"id\") + \" \" + orderFlag.get(\"name\"));\n}"
+    },
+    "patch_ecommerce_settings": {
+      "function": "patchEcommerceSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.ecommerceSettings().patchEcommerceSettings(Map.of(\"ecommerce_settings\", Map.of(\n        \"continue_shopping\", Map.of(\"continue_shopping_target\", \"previous\"),\n        \"order_filters\", Map.of(\"default_payment_status\", \"unpaid\"))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"ecommerce_settings\");\nSystem.out.println(((Map<?, ?>) settings.get(\"continue_shopping\")).get(\"continue_shopping_target\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"order_filters\")).get(\"default_payment_status\"));"
+    },
+    "head_ecommerce_settings": {
+      "function": "headEcommerceSettings",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.ecommerceSettings().headEcommerceSettings();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "getEcommerceSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.ecommerceSettings().getEcommerceSettingsSection(\"order_filters\");\nMap<?, ?> orderFilters = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_filters\");\nSystem.out.println(orderFilters.get(\"default_order_status\"));\nSystem.out.println(orderFilters.get(\"default_payment_status\"));\nSystem.out.println(orderFilters.get(\"default_shipment_status\"));"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "patchEcommerceSettingsSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.ecommerceSettings().patchEcommerceSettingsSection(\"order_filters\",\n        Map.of(\"order_filters\", Map.of(\"default_shipment_status\", \"unshipped\")));\nMap<?, ?> orderFilters = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_filters\");\nSystem.out.println(orderFilters.get(\"default_shipment_status\"));"
+    }
+  }
+}

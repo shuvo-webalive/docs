@@ -164,6 +164,18 @@
                   "api-reference/customer-portal/get-a-customer-portal-section",
                   "api-reference/customer-portal/update-a-customer-portal-section"
                 ]
+              },
+              {
+                "group": "Ecommerce settings",
+                "expanded": false,
+                "pages": [
+                  "ecommerce-settings",
+                  "api-reference/ecommerce-settings/get-ecommerce-settings",
+                  "api-reference/ecommerce-settings/update-ecommerce-settings",
+                  "api-reference/ecommerce-settings/get-ecommerce-settings-headers",
+                  "api-reference/ecommerce-settings/get-a-settings-section",
+                  "api-reference/ecommerce-settings/update-a-settings-section"
+                ]
               }
             ]
           },

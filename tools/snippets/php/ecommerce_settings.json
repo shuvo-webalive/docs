@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "getEcommerceSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$response = EcommerceSettings::getEcommerceSettings($client);\n\n$settings = $response->map['ecommerce_settings'];\necho 'continue shopping: ', $settings['continue_shopping']['continue_shopping_target'], PHP_EOL;\necho 'update stock: ', $settings['product_inventory']['update_stock'], PHP_EOL;"
+    },
+    "patch_ecommerce_settings": {
+      "function": "patchEcommerceSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$response = EcommerceSettings::patchEcommerceSettings($client, [\n    'ecommerce_settings' => [\n        'continue_shopping' => ['continue_shopping_target' => 'previous'],\n        'order_filters' => ['default_payment_status' => 'unpaid'],\n    ],\n]);\n\n$settings = $response->map['ecommerce_settings'];\necho $settings['continue_shopping']['continue_shopping_target'], PHP_EOL;\necho $settings['order_filters']['default_payment_status'], PHP_EOL;"
+    },
+    "head_ecommerce_settings": {
+      "function": "headEcommerceSettings",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$response = EcommerceSettings::headEcommerceSettings($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "getEcommerceSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$response = EcommerceSettings::getEcommerceSettingsSection($client, 'order_filters');\n\necho 'default shipment status: ', $response->map['order_filters']['default_shipment_status'], PHP_EOL;"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "patchEcommerceSettingsSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\EcommerceSettings\\EcommerceSettings;\n\n$response = EcommerceSettings::patchEcommerceSettingsSection($client, 'order_filters', [\n    'order_filters' => ['default_shipment_status' => 'unshipped'],\n]);\n\necho $response->map['order_filters']['default_shipment_status'], PHP_EOL;"
+    }
+  }
+}

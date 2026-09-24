@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "get_ecommerce_settings",
+      "code": "response = client.ecommerce_settings.get_ecommerce_settings()\nsettings = response.map[\"ecommerce_settings\"]\nprint(settings[\"continue_shopping\"][\"continue_shopping_target\"])\nprint(settings[\"order_filters\"][\"default_shipment_status\"])\n"
+    },
+    "patch_ecommerce_settings": {
+      "function": "patch_ecommerce_settings",
+      "code": "response = client.ecommerce_settings.patch_ecommerce_settings({\n    \"ecommerce_settings\": {\n        \"continue_shopping\": {\"continue_shopping_target\": \"previous\"},\n        \"order_filters\": {\"default_payment_status\": \"unpaid\"},\n    },\n})\nsettings = response.map[\"ecommerce_settings\"]\nprint(settings[\"continue_shopping\"][\"continue_shopping_target\"])\nprint(settings[\"order_filters\"][\"default_payment_status\"])\n"
+    },
+    "head_ecommerce_settings": {
+      "function": "head_ecommerce_settings",
+      "code": "response = client.ecommerce_settings.head_ecommerce_settings()\nprint(response.status_code)\n"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "get_ecommerce_settings_section",
+      "code": "response = client.ecommerce_settings.get_ecommerce_settings_section(\"order_filters\")\nfilters = response.map[\"order_filters\"]\nprint(filters[\"default_payment_status\"], filters[\"default_shipment_status\"])\n"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "patch_ecommerce_settings_section",
+      "code": "response = client.ecommerce_settings.patch_ecommerce_settings_section(\n    \"order_filters\", {\"order_filters\": {\"default_shipment_status\": \"unshipped\"}}\n)\nprint(response.map[\"order_filters\"][\"default_shipment_status\"])\n"
+    }
+  }
+}

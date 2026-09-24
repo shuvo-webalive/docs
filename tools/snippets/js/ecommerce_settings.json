@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "ecommerce_settings",
+  "endpoints": {
+    "get_ecommerce_settings": {
+      "function": "getEcommerceSettings",
+      "code": "import {ecommerceSettings} from 'webcommander-sdk';\n\nconst response = await ecommerceSettings.getEcommerceSettings(client);\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status, settings.order_filters.default_shipment_status);\n"
+    },
+    "patch_ecommerce_settings": {
+      "function": "patchEcommerceSettings",
+      "code": "import {ecommerceSettings} from 'webcommander-sdk';\n\nconst response = await ecommerceSettings.patchEcommerceSettings(client, {\n    ecommerce_settings: {\n        continue_shopping: {continue_shopping_target: 'previous'},\n        order_filters: {default_payment_status: 'unpaid'},\n    },\n});\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status);\n"
+    },
+    "head_ecommerce_settings": {
+      "function": "headEcommerceSettings",
+      "code": "import {ecommerceSettings} from 'webcommander-sdk';\n\nconst response = await ecommerceSettings.headEcommerceSettings(client);\nconsole.log(response.statusCode);\n"
+    },
+    "get_ecommerce_settings_section": {
+      "function": "getEcommerceSettingsSection",
+      "code": "import {ecommerceSettings} from 'webcommander-sdk';\n\nconst response = await ecommerceSettings.getEcommerceSettingsSection(client, 'order_filters');\nconst filters = response.map.order_filters;\nconsole.log(filters.default_order_status, filters.default_payment_status, filters.default_shipment_status);\n"
+    },
+    "patch_ecommerce_settings_section": {
+      "function": "patchEcommerceSettingsSection",
+      "code": "import {ecommerceSettings} from 'webcommander-sdk';\n\nconst response = await ecommerceSettings.patchEcommerceSettingsSection(client, 'order_filters', {\n    order_filters: {default_shipment_status: 'unshipped'},\n});\nconsole.log(response.map.order_filters.default_shipment_status);\n"
+    }
+  }
+}
