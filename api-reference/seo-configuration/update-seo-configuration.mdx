@@ -1,0 +1,9 @@
+---
+title: "Update SEO configuration"
+description: "Changes the fields you send in one or more sections and returns the whole configuration."
+openapi: "PATCH /admin/settings/seo_configuration"
+---
+
+Send the fields to change inside `seo_configuration`, grouped by section name. Only the fields you send change: other fields, and sections you leave out, keep their stored values. Returns the whole configuration with `group_meta`, as [Get SEO configuration](/api-reference/seo-configuration/get-seo-configuration) does. A section name that does not exist, or a body that is not valid JSON, is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

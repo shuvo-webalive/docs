@@ -1,0 +1,9 @@
+---
+title: "Get a settings section"
+description: "Returns one settings section under its own key, such as `url_settings`."
+openapi: "GET /admin/settings/seo_configuration/{section}"
+---
+
+Returns one section under the section's own name rather than under `seo_configuration`, and without `group_meta`. `url_settings` also includes the rows of `redirects`, which you cannot write through this section. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. A section name that does not exist returns `404 not_found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

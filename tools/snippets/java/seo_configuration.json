@@ -1,0 +1,66 @@
+{
+  "sdk": "java",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "getSeoConfiguration",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfiguration();\nMap<?, ?> configuration = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"seo_configuration\");\nMap<?, ?> globalStoreSettings = (Map<?, ?>) configuration.get(\"global_store_settings\");\nMap<?, ?> urlSettings = (Map<?, ?>) configuration.get(\"url_settings\");\nSystem.out.println(globalStoreSettings.get(\"store_name\") + \" \" + globalStoreSettings.get(\"title_separator\"));\nSystem.out.println(urlSettings.get(\"regenerate_url_on_item_update\") + \" \" + urlSettings.get(\"auto_redirect_on_url_change\"));\nfor (Object row : (List<?>) ((Map<?, ?>) urlSettings.get(\"redirects\")).get(\"items\")) {\n    Map<?, ?> redirect = (Map<?, ?>) row;\n    System.out.println(redirect.get(\"id\") + \" \" + redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));\n}"
+    },
+    "patch_seo_configuration": {
+      "function": "patchSeoConfiguration",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().patchSeoConfiguration(Map.of(\"seo_configuration\",\n        Map.of(\"url_settings\", Map.of(\"regenerate_url_on_item_update\", true))));\nMap<?, ?> configuration = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"seo_configuration\");\nSystem.out.println(((Map<?, ?>) configuration.get(\"url_settings\")).get(\"regenerate_url_on_item_update\"));"
+    },
+    "put_seo_configuration": {
+      "function": "putSeoConfiguration",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().putSeoConfiguration(Map.of(\"seo_configuration\", Map.of(\"url_settings\",\n        Map.of(\"regenerate_url_on_item_update\", true, \"auto_redirect_on_url_change\", true))));\nMap<?, ?> configuration = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"seo_configuration\");\nMap<?, ?> urlSettings = (Map<?, ?>) configuration.get(\"url_settings\");\nSystem.out.println(urlSettings.get(\"regenerate_url_on_item_update\") + \" \" + urlSettings.get(\"auto_redirect_on_url_change\"));"
+    },
+    "head_seo_configuration": {
+      "function": "headSeoConfiguration",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.seoConfiguration().headSeoConfiguration();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_seo_configuration_section": {
+      "function": "getSeoConfigurationSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationSection(\"url_settings\");\nMap<?, ?> urlSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"url_settings\");\nSystem.out.println(urlSettings.get(\"regenerate_url_on_item_update\") + \" \" + urlSettings.get(\"auto_redirect_on_url_change\"));\nfor (Object row : (List<?>) ((Map<?, ?>) urlSettings.get(\"redirects\")).get(\"items\")) {\n    Map<?, ?> redirect = (Map<?, ?>) row;\n    System.out.println(redirect.get(\"id\") + \" \" + redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));\n}"
+    },
+    "patch_seo_configuration_section": {
+      "function": "patchSeoConfigurationSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().patchSeoConfigurationSection(\"url_settings\",\n        Map.of(\"url_settings\", Map.of(\"regenerate_url_on_item_update\", true)));\nMap<?, ?> urlSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"url_settings\");\nSystem.out.println(urlSettings.get(\"regenerate_url_on_item_update\"));"
+    },
+    "put_seo_configuration_section": {
+      "function": "putSeoConfigurationSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().putSeoConfigurationSection(\"url_settings\",\n        Map.of(\"url_settings\", Map.of(\"regenerate_url_on_item_update\", true, \"auto_redirect_on_url_change\", true)));\nMap<?, ?> urlSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"url_settings\");\nSystem.out.println(urlSettings.get(\"regenerate_url_on_item_update\") + \" \" + urlSettings.get(\"auto_redirect_on_url_change\"));"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "getSeoConfigurationDocumentRoot",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationDocumentRoot(Map.of(\"limit\", 100));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> file = (Map<?, ?>) row;\n    System.out.println(file.get(\"config_key\") + \" \" + file.get(\"file_name\") + \" \" + file.get(\"file_path\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "uploadSeoConfigurationDocumentRoot",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().uploadSeoConfigurationDocumentRoot(\n        Map.of(\"file\", Path.of(\"verification.txt\")));\nMap<?, ?> file = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"document_root_file\");\nSystem.out.println(file.get(\"config_key\") + \" \" + file.get(\"file_name\") + \" \" + file.get(\"file_path\"));"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "deleteSeoConfigurationDocumentRootFile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.seoConfiguration().deleteSeoConfigurationDocumentRootFile(\"seo-upload-6\");\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "getSeoConfigurationRedirects",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationRedirects(Map.of(\"limit\", 100));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> redirect = (Map<?, ?>) row;\n    System.out.println(redirect.get(\"id\") + \" \" + redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "createSeoConfigurationRedirect",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().createSeoConfigurationRedirect(\n        Map.of(\"source_url\", \"/old-page\", \"destination_url\", \"https://your-store.example.com/new-page\"));\nMap<?, ?> redirect = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"redirect\");\nSystem.out.println(redirect.get(\"id\") + \" \" + redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "getSeoConfigurationRedirect",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationRedirect(16);\nMap<?, ?> redirect = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"redirect\");\nSystem.out.println(redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "patchSeoConfigurationRedirect",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().patchSeoConfigurationRedirect(280,\n        Map.of(\"destination_url\", \"https://your-store.example.com/newer-page\"));\nMap<?, ?> redirect = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"redirect\");\nSystem.out.println(redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "deleteSeoConfigurationRedirect",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.seoConfiguration().deleteSeoConfigurationRedirect(280);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Get SEO configuration"
+description: "Returns all three settings sections, the document root files, the redirects and a `group_meta` block."
+openapi: "GET /admin/settings/seo_configuration"
+---
+
+Returns every SEO setting under `seo_configuration`: the `global_store_settings`, `custom_code` and `url_settings` sections, the files of `document_root`, and, inside `url_settings`, the rows of `redirects`. The files and redirects come without a `pagination` block. Beside it, `group_meta` gives each part's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field in the three settings sections, keyed by section.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

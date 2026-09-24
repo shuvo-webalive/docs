@@ -1,0 +1,9 @@
+---
+title: "Replace SEO configuration sections"
+description: "Replaces each section you send and returns the whole configuration. Omitted fields reset to defaults."
+openapi: "PUT /admin/settings/seo_configuration"
+---
+
+Send whole sections inside `seo_configuration`, grouped by section name. A section you leave out keeps its stored values. Inside a section you send, every field you leave out is reset to its default. Returns the whole configuration with `group_meta`; to change some fields and keep the rest, use [Update SEO configuration](/api-reference/seo-configuration/update-seo-configuration) instead.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

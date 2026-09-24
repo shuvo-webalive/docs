@@ -27,7 +27,8 @@
         "ecommerce_settings",
         "price_display_settings",
         "product_listing",
-        "search_settings"
+        "search_settings",
+        "seo_configuration"
       ]
     },
     {

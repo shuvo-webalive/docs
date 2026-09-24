@@ -213,6 +213,28 @@
                   "api-reference/search-settings/replace-a-search-settings-section",
                   "api-reference/search-settings/get-the-reindex-status"
                 ]
+              },
+              {
+                "group": "SEO configuration",
+                "expanded": false,
+                "pages": [
+                  "seo-configuration",
+                  "api-reference/seo-configuration/get-seo-configuration",
+                  "api-reference/seo-configuration/update-seo-configuration",
+                  "api-reference/seo-configuration/replace-seo-configuration-sections",
+                  "api-reference/seo-configuration/get-seo-configuration-headers",
+                  "api-reference/seo-configuration/get-a-settings-section",
+                  "api-reference/seo-configuration/update-a-settings-section",
+                  "api-reference/seo-configuration/replace-a-settings-section",
+                  "api-reference/seo-configuration/list-document-root-files",
+                  "api-reference/seo-configuration/upload-a-document-root-file",
+                  "api-reference/seo-configuration/delete-a-document-root-file",
+                  "api-reference/seo-configuration/list-redirects",
+                  "api-reference/seo-configuration/create-a-redirect",
+                  "api-reference/seo-configuration/retrieve-a-redirect",
+                  "api-reference/seo-configuration/update-a-redirect",
+                  "api-reference/seo-configuration/delete-a-redirect"
+                ]
               }
             ]
           },

@@ -1,0 +1,66 @@
+{
+  "sdk": "js",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "getSeoConfiguration",
+      "code": "const response = await client.seoConfiguration.getSeoConfiguration();\nconst settings = response.map.seo_configuration;\nconsole.log(settings.global_store_settings.store_name, settings.global_store_settings.title_separator);\nconsole.log(settings.url_settings.regenerate_url_on_item_update, settings.url_settings.auto_redirect_on_url_change);\nconsole.log(settings.document_root.items.length, settings.url_settings.redirects.items.length);\n"
+    },
+    "patch_seo_configuration": {
+      "function": "patchSeoConfiguration",
+      "code": "const response = await client.seoConfiguration.patchSeoConfiguration({\n    seo_configuration: {url_settings: {regenerate_url_on_item_update: true}},\n});\nconsole.log(response.map.seo_configuration.url_settings.regenerate_url_on_item_update);\n"
+    },
+    "put_seo_configuration": {
+      "function": "putSeoConfiguration",
+      "code": "const response = await client.seoConfiguration.putSeoConfiguration({\n    seo_configuration: {url_settings: {regenerate_url_on_item_update: true, auto_redirect_on_url_change: true}},\n});\nconst urlSettings = response.map.seo_configuration.url_settings;\nconsole.log(urlSettings.regenerate_url_on_item_update, urlSettings.auto_redirect_on_url_change);\n"
+    },
+    "head_seo_configuration": {
+      "function": "headSeoConfiguration",
+      "code": "const response = await client.seoConfiguration.headSeoConfiguration();\nconsole.log(response.statusCode);\n"
+    },
+    "get_seo_configuration_section": {
+      "function": "getSeoConfigurationSection",
+      "code": "const response = await client.seoConfiguration.getSeoConfigurationSection('url_settings');\nconst urlSettings = response.map.url_settings;\nconsole.log(urlSettings.regenerate_url_on_item_update, urlSettings.auto_redirect_on_url_change);\nfor (const redirect of urlSettings.redirects.items) {\n    console.log(redirect.id, redirect.source_url, redirect.destination_url);\n}\n"
+    },
+    "patch_seo_configuration_section": {
+      "function": "patchSeoConfigurationSection",
+      "code": "const response = await client.seoConfiguration.patchSeoConfigurationSection('url_settings', {\n    url_settings: {regenerate_url_on_item_update: true},\n});\nconsole.log(response.map.url_settings.regenerate_url_on_item_update);\n"
+    },
+    "put_seo_configuration_section": {
+      "function": "putSeoConfigurationSection",
+      "code": "const response = await client.seoConfiguration.putSeoConfigurationSection('url_settings', {\n    url_settings: {regenerate_url_on_item_update: true, auto_redirect_on_url_change: true},\n});\nconst urlSettings = response.map.url_settings;\nconsole.log(urlSettings.regenerate_url_on_item_update, urlSettings.auto_redirect_on_url_change);\n"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "getSeoConfigurationDocumentRoot",
+      "code": "const response = await client.seoConfiguration.getSeoConfigurationDocumentRoot({limit: 100});\nfor (const file of response.map.items) {\n    console.log(file.config_key, file.file_name, file.file_path);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "uploadSeoConfigurationDocumentRoot",
+      "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.seoConfiguration.uploadSeoConfigurationDocumentRoot({\n    file: ['verification.txt', readFileSync('verification.txt'), 'text/plain'],\n});\nconst file = response.map.document_root_file;\nconsole.log(file.config_key, file.file_name, file.file_path);\n"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "deleteSeoConfigurationDocumentRootFile",
+      "code": "const response = await client.seoConfiguration.deleteSeoConfigurationDocumentRootFile('seo-upload-6');\nconsole.log(response.statusCode);\n"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "getSeoConfigurationRedirects",
+      "code": "const response = await client.seoConfiguration.getSeoConfigurationRedirects({limit: 100});\nfor (const redirect of response.map.items) {\n    console.log(redirect.id, redirect.source_url, redirect.destination_url);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "createSeoConfigurationRedirect",
+      "code": "const response = await client.seoConfiguration.createSeoConfigurationRedirect({\n    source_url: '/old-page',\n    destination_url: 'https://your-store.example.com/new-page',\n});\nconst redirect = response.map.redirect;\nconsole.log(redirect.id, redirect.source_url, redirect.destination_url);\n"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "getSeoConfigurationRedirect",
+      "code": "const response = await client.seoConfiguration.getSeoConfigurationRedirect(16);\nconst redirect = response.map.redirect;\nconsole.log(redirect.id, redirect.source_url, redirect.destination_url);\n"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "patchSeoConfigurationRedirect",
+      "code": "const response = await client.seoConfiguration.patchSeoConfigurationRedirect(280, {\n    destination_url: 'https://your-store.example.com/newer-page',\n});\nconsole.log(response.map.redirect.id, response.map.redirect.destination_url);\n"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "deleteSeoConfigurationRedirect",
+      "code": "const response = await client.seoConfiguration.deleteSeoConfigurationRedirect(280);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

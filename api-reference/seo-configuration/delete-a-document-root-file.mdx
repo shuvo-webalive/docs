@@ -1,0 +1,9 @@
+---
+title: "Delete a document root file"
+description: "Deletes a document root file by its `config_key` and returns `204` with no body."
+openapi: "DELETE /admin/settings/seo_configuration/document_root/{config_key}"
+---
+
+Deletes the file and returns `204` with no body. The file leaves the listing. Pass the file's `config_key`, such as `seo-upload-6`, not its `file_name`. No call restores a deleted file.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

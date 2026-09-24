@@ -1,0 +1,66 @@
+{
+  "sdk": "python",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "get_seo_configuration",
+      "code": "response = client.seo_configuration.get_seo_configuration()\nsettings = response.map[\"seo_configuration\"]\nprint(settings[\"global_store_settings\"][\"store_name\"], settings[\"global_store_settings\"][\"title_separator\"])\nprint(settings[\"url_settings\"][\"regenerate_url_on_item_update\"])\n"
+    },
+    "patch_seo_configuration": {
+      "function": "patch_seo_configuration",
+      "code": "response = client.seo_configuration.patch_seo_configuration({\n    \"seo_configuration\": {\"url_settings\": {\"regenerate_url_on_item_update\": True}},\n})\nprint(response.map[\"seo_configuration\"][\"url_settings\"][\"regenerate_url_on_item_update\"])\n"
+    },
+    "put_seo_configuration": {
+      "function": "put_seo_configuration",
+      "code": "response = client.seo_configuration.put_seo_configuration({\n    \"seo_configuration\": {\n        \"url_settings\": {\"regenerate_url_on_item_update\": True, \"auto_redirect_on_url_change\": True},\n    },\n})\nurl_settings = response.map[\"seo_configuration\"][\"url_settings\"]\nprint(url_settings[\"regenerate_url_on_item_update\"], url_settings[\"auto_redirect_on_url_change\"])\n"
+    },
+    "head_seo_configuration": {
+      "function": "head_seo_configuration",
+      "code": "response = client.seo_configuration.head_seo_configuration()\nprint(response.status_code)\n"
+    },
+    "get_seo_configuration_section": {
+      "function": "get_seo_configuration_section",
+      "code": "response = client.seo_configuration.get_seo_configuration_section(\"url_settings\")\nurl_settings = response.map[\"url_settings\"]\nprint(url_settings[\"regenerate_url_on_item_update\"], url_settings[\"auto_redirect_on_url_change\"])\nfor redirect in url_settings[\"redirects\"][\"items\"]:\n    print(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\n"
+    },
+    "patch_seo_configuration_section": {
+      "function": "patch_seo_configuration_section",
+      "code": "response = client.seo_configuration.patch_seo_configuration_section(\n    \"url_settings\", {\"url_settings\": {\"regenerate_url_on_item_update\": True}}\n)\nprint(response.map[\"url_settings\"][\"regenerate_url_on_item_update\"])\n"
+    },
+    "put_seo_configuration_section": {
+      "function": "put_seo_configuration_section",
+      "code": "response = client.seo_configuration.put_seo_configuration_section(\"url_settings\", {\n    \"url_settings\": {\"regenerate_url_on_item_update\": True, \"auto_redirect_on_url_change\": True},\n})\nurl_settings = response.map[\"url_settings\"]\nprint(url_settings[\"regenerate_url_on_item_update\"], url_settings[\"auto_redirect_on_url_change\"])\n"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "get_seo_configuration_document_root",
+      "code": "response = client.seo_configuration.get_seo_configuration_document_root({\"limit\": 100})\nfor document_root_file in response.map[\"items\"]:\n    print(document_root_file[\"config_key\"], document_root_file[\"file_name\"], document_root_file[\"file_path\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "upload_seo_configuration_document_root",
+      "code": "with open(\"verification.txt\", \"rb\") as handle:\n    response = client.seo_configuration.upload_seo_configuration_document_root({\"file\": handle})\ndocument_root_file = response.map[\"document_root_file\"]\nprint(document_root_file[\"config_key\"], document_root_file[\"file_name\"], document_root_file[\"file_path\"])\n"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "delete_seo_configuration_document_root_file",
+      "code": "response = client.seo_configuration.delete_seo_configuration_document_root_file(\"seo-upload-6\")\nprint(response.status_code)\n"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "get_seo_configuration_redirects",
+      "code": "response = client.seo_configuration.get_seo_configuration_redirects({\"limit\": 100})\nfor redirect in response.map[\"items\"]:\n    print(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "create_seo_configuration_redirect",
+      "code": "response = client.seo_configuration.create_seo_configuration_redirect({\n    \"source_url\": \"/old-page\",\n    \"destination_url\": \"https://your-store.example.com/new-page\",\n})\nredirect = response.map[\"redirect\"]\nprint(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\n"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "get_seo_configuration_redirect",
+      "code": "response = client.seo_configuration.get_seo_configuration_redirect(16)\nredirect = response.map[\"redirect\"]\nprint(redirect[\"source_url\"], redirect[\"destination_url\"])\n"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "patch_seo_configuration_redirect",
+      "code": "response = client.seo_configuration.patch_seo_configuration_redirect(280, {\n    \"destination_url\": \"https://your-store.example.com/newer-page\",\n})\nprint(response.map[\"redirect\"][\"destination_url\"])\n"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "delete_seo_configuration_redirect",
+      "code": "response = client.seo_configuration.delete_seo_configuration_redirect(280)\nprint(response.status_code)\n"
+    }
+  }
+}

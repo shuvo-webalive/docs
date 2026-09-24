@@ -1,0 +1,66 @@
+{
+  "sdk": "php",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "getSeoConfiguration",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfiguration($client);\n\n$seo = $response->map['seo_configuration'];\necho 'store name: ', $seo['global_store_settings']['store_name'], PHP_EOL;\nforeach ($seo['url_settings']['redirects']['items'] as $redirect) {\n    echo $redirect['source_url'], ' -> ', $redirect['destination_url'], PHP_EOL;\n}"
+    },
+    "patch_seo_configuration": {
+      "function": "patchSeoConfiguration",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::patchSeoConfiguration($client, [\n    'seo_configuration' => ['url_settings' => ['regenerate_url_on_item_update' => true]],\n]);\n\n$urlSettings = $response->map['seo_configuration']['url_settings'];\necho $urlSettings['regenerate_url_on_item_update'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "put_seo_configuration": {
+      "function": "putSeoConfiguration",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::putSeoConfiguration($client, [\n    'seo_configuration' => [\n        'url_settings' => ['regenerate_url_on_item_update' => true, 'auto_redirect_on_url_change' => true],\n    ],\n]);\n\n$urlSettings = $response->map['seo_configuration']['url_settings'];\necho 'regenerate: ', $urlSettings['regenerate_url_on_item_update'] ? 'on' : 'off', PHP_EOL;\necho 'auto redirect: ', $urlSettings['auto_redirect_on_url_change'] ? 'on' : 'off', PHP_EOL;"
+    },
+    "head_seo_configuration": {
+      "function": "headSeoConfiguration",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::headSeoConfiguration($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_seo_configuration_section": {
+      "function": "getSeoConfigurationSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationSection($client, 'url_settings');\n\n$urlSettings = $response->map['url_settings'];\necho 'auto redirect: ', $urlSettings['auto_redirect_on_url_change'] ? 'on' : 'off', PHP_EOL;\necho count($urlSettings['redirects']['items']), ' redirects', PHP_EOL;"
+    },
+    "patch_seo_configuration_section": {
+      "function": "patchSeoConfigurationSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::patchSeoConfigurationSection($client, 'url_settings', [\n    'url_settings' => ['regenerate_url_on_item_update' => true],\n]);\n\necho $response->map['url_settings']['regenerate_url_on_item_update'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "put_seo_configuration_section": {
+      "function": "putSeoConfigurationSection",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::putSeoConfigurationSection($client, 'url_settings', [\n    'url_settings' => ['regenerate_url_on_item_update' => true, 'auto_redirect_on_url_change' => true],\n]);\n\n$urlSettings = $response->map['url_settings'];\necho 'regenerate: ', $urlSettings['regenerate_url_on_item_update'] ? 'on' : 'off', PHP_EOL;\necho 'auto redirect: ', $urlSettings['auto_redirect_on_url_change'] ? 'on' : 'off', PHP_EOL;"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "getSeoConfigurationDocumentRoot",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationDocumentRoot($client, ['limit' => 100]);\n\nforeach ($response->map['items'] as $file) {\n    echo $file['config_key'], ' ', $file['file_name'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' files', PHP_EOL;"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "uploadSeoConfigurationDocumentRoot",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::uploadSeoConfigurationDocumentRoot($client, [\n    'file' => ['verification.txt', file_get_contents('verification.txt'), 'text/plain'],\n]);\n\n$file = $response->map['document_root_file'];\necho $file['config_key'], ' ', $file['file_path'], PHP_EOL;"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "deleteSeoConfigurationDocumentRootFile",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::deleteSeoConfigurationDocumentRootFile($client, 'seo-upload-6');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "getSeoConfigurationRedirects",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationRedirects($client, ['limit' => 100]);\n\nforeach ($response->map['items'] as $redirect) {\n    echo $redirect['id'], ' ', $redirect['source_url'], ' -> ', $redirect['destination_url'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more to fetch' : 'all fetched', PHP_EOL;"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "createSeoConfigurationRedirect",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::createSeoConfigurationRedirect($client, [\n    'source_url' => '/old-page',\n    'destination_url' => 'https://your-store.example.com/new-page',\n]);\n\necho $response->map['redirect']['id'], PHP_EOL;"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "getSeoConfigurationRedirect",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationRedirect($client, 16);\n\n$redirect = $response->map['redirect'];\necho $redirect['source_url'], ' -> ', $redirect['destination_url'], PHP_EOL;"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "patchSeoConfigurationRedirect",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::patchSeoConfigurationRedirect($client, 280, [\n    'destination_url' => 'https://your-store.example.com/newer-page',\n]);\n\necho $response->map['redirect']['destination_url'], PHP_EOL;"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "deleteSeoConfigurationRedirect",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::deleteSeoConfigurationRedirect($client, 280);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "sdk": "dotnet",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "GetSeoConfigurationAsync",
+      "code": "var response = await client.SeoConfiguration.GetSeoConfigurationAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar seoConfiguration = (IReadOnlyDictionary<string, object?>)body[\"seo_configuration\"]!;\nvar globalStoreSettings = (IReadOnlyDictionary<string, object?>)seoConfiguration[\"global_store_settings\"]!;\nConsole.WriteLine($\"{globalStoreSettings[\"store_name\"]} {globalStoreSettings[\"title_separator\"]}\");"
+    },
+    "patch_seo_configuration": {
+      "function": "PatchSeoConfigurationAsync",
+      "code": "var response = await client.SeoConfiguration.PatchSeoConfigurationAsync(new Dictionary<string, object?>\n{\n    [\"seo_configuration\"] = new Dictionary<string, object?>\n    {\n        [\"url_settings\"] = new Dictionary<string, object?> { [\"regenerate_url_on_item_update\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar seoConfiguration = (IReadOnlyDictionary<string, object?>)body[\"seo_configuration\"]!;\nvar urlSettings = (IReadOnlyDictionary<string, object?>)seoConfiguration[\"url_settings\"]!;\nConsole.WriteLine(urlSettings[\"regenerate_url_on_item_update\"]);"
+    },
+    "put_seo_configuration": {
+      "function": "PutSeoConfigurationAsync",
+      "code": "var response = await client.SeoConfiguration.PutSeoConfigurationAsync(new Dictionary<string, object?>\n{\n    [\"seo_configuration\"] = new Dictionary<string, object?>\n    {\n        [\"url_settings\"] = new Dictionary<string, object?>\n        {\n            [\"regenerate_url_on_item_update\"] = true, [\"auto_redirect_on_url_change\"] = true,\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar seoConfiguration = (IReadOnlyDictionary<string, object?>)body[\"seo_configuration\"]!;\nvar urlSettings = (IReadOnlyDictionary<string, object?>)seoConfiguration[\"url_settings\"]!;\nConsole.WriteLine($\"{urlSettings[\"regenerate_url_on_item_update\"]} {urlSettings[\"auto_redirect_on_url_change\"]}\");"
+    },
+    "head_seo_configuration": {
+      "function": "HeadSeoConfigurationAsync",
+      "code": "var response = await client.SeoConfiguration.HeadSeoConfigurationAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_seo_configuration_section": {
+      "function": "GetSeoConfigurationSectionAsync",
+      "code": "var response = await client.SeoConfiguration.GetSeoConfigurationSectionAsync(\"url_settings\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar urlSettings = (IReadOnlyDictionary<string, object?>)body[\"url_settings\"]!;\nConsole.WriteLine($\"{urlSettings[\"regenerate_url_on_item_update\"]} {urlSettings[\"auto_redirect_on_url_change\"]}\");"
+    },
+    "patch_seo_configuration_section": {
+      "function": "PatchSeoConfigurationSectionAsync",
+      "code": "var response = await client.SeoConfiguration.PatchSeoConfigurationSectionAsync(\"url_settings\", new Dictionary<string, object?>\n{\n    [\"url_settings\"] = new Dictionary<string, object?> { [\"regenerate_url_on_item_update\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar urlSettings = (IReadOnlyDictionary<string, object?>)body[\"url_settings\"]!;\nConsole.WriteLine(urlSettings[\"regenerate_url_on_item_update\"]);"
+    },
+    "put_seo_configuration_section": {
+      "function": "PutSeoConfigurationSectionAsync",
+      "code": "var response = await client.SeoConfiguration.PutSeoConfigurationSectionAsync(\"url_settings\", new Dictionary<string, object?>\n{\n    [\"url_settings\"] = new Dictionary<string, object?>\n    {\n        [\"regenerate_url_on_item_update\"] = true, [\"auto_redirect_on_url_change\"] = true,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar urlSettings = (IReadOnlyDictionary<string, object?>)body[\"url_settings\"]!;\nConsole.WriteLine($\"{urlSettings[\"regenerate_url_on_item_update\"]} {urlSettings[\"auto_redirect_on_url_change\"]}\");"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "GetSeoConfigurationDocumentRootAsync",
+      "code": "var response = await client.SeoConfiguration.GetSeoConfigurationDocumentRootAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 100 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var file in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{file[\"config_key\"]} {file[\"file_name\"]}\");"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "UploadSeoConfigurationDocumentRootAsync",
+      "code": "var response = await client.SeoConfiguration.UploadSeoConfigurationDocumentRootAsync(new Dictionary<string, object?>\n{\n    [\"file\"] = new List<object?> { \"verification.txt\", File.ReadAllBytes(\"verification.txt\"), \"text/plain\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar documentRootFile = (IReadOnlyDictionary<string, object?>)body[\"document_root_file\"]!;\nConsole.WriteLine($\"{documentRootFile[\"config_key\"]} {documentRootFile[\"file_path\"]}\");"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "DeleteSeoConfigurationDocumentRootFileAsync",
+      "code": "var response = await client.SeoConfiguration.DeleteSeoConfigurationDocumentRootFileAsync(\"seo-upload-6\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "GetSeoConfigurationRedirectsAsync",
+      "code": "var response = await client.SeoConfiguration.GetSeoConfigurationRedirectsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 100 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var redirect in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{redirect[\"id\"]} {redirect[\"source_url\"]} {redirect[\"destination_url\"]}\");"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "CreateSeoConfigurationRedirectAsync",
+      "code": "var response = await client.SeoConfiguration.CreateSeoConfigurationRedirectAsync(new Dictionary<string, object?>\n{\n    [\"source_url\"] = \"/old-page\", [\"destination_url\"] = \"https://your-store.example.com/new-page\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar redirect = (IReadOnlyDictionary<string, object?>)body[\"redirect\"]!;\nConsole.WriteLine(redirect[\"id\"]);"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "GetSeoConfigurationRedirectAsync",
+      "code": "var response = await client.SeoConfiguration.GetSeoConfigurationRedirectAsync(16);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar redirect = (IReadOnlyDictionary<string, object?>)body[\"redirect\"]!;\nConsole.WriteLine($\"{redirect[\"source_url\"]} {redirect[\"destination_url\"]}\");"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "PatchSeoConfigurationRedirectAsync",
+      "code": "var response = await client.SeoConfiguration.PatchSeoConfigurationRedirectAsync(280, new Dictionary<string, object?>\n{\n    [\"destination_url\"] = \"https://your-store.example.com/newer-page\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar redirect = (IReadOnlyDictionary<string, object?>)body[\"redirect\"]!;\nConsole.WriteLine(redirect[\"destination_url\"]);"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "DeleteSeoConfigurationRedirectAsync",
+      "code": "var response = await client.SeoConfiguration.DeleteSeoConfigurationRedirectAsync(280);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}
