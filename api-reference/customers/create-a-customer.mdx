@@ -1,9 +1,21 @@
 ---
 title: "Create a customer"
-description: "Add a customer and get back its new `customer_id`."
+description: "Creates a customer and returns it, including the `customer_id` you use in later calls."
 openapi: "POST /admin/customers"
 ---
 
-Creates a customer and returns it with its new `customer_id`. Without `status`, a new customer is `awaiting_verification` and has no usable login, whatever `password` was sent; send `status: "active"` with a `password` for a customer who can sign in. Address fields sent inline are accepted and discarded: use [Add addresses](/api-reference/customers/add-addresses) instead. The answer always carries three addresses of the store's own making: primary, shipping and billing.
+Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id`, not its `internal_id`, in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: "active"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` share one `id`, so they are one saved address.
 
-<Note>The SDK samples assume a client set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
+## SDK method
+
+| SDK | Call |
+| --- | --- |
+| Python | `client.admin_customers.create_customer()` |
+| JavaScript | `client.adminCustomers.createCustomer()` |
+| PHP | `AdminCustomers::createCustomer()` |
+| Java | `client.adminCustomers().createCustomer()` |
+| .NET | `client.AdminCustomers.CreateCustomerAsync()` |
+| Dart | `client.adminCustomers.createCustomer()` |
+| Go | `client.AdminCustomers().CreateCustomer()` |
+
+<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client).</Note>
