@@ -6,16 +6,4 @@ openapi: "DELETE /admin/customers/{customer_id}"
 
 Deletes a customer and returns `204` with no body. The API moves the customer to the trash; it does not erase the record. [Retrieve a customer](/api-reference/customers/retrieve-a-customer) still returns it, with `is_in_trash: true`. Its email address stays registered: [Create a customer](/api-reference/customers/create-a-customer) rejects that address with `409`, and [Check an email address](/api-reference/customers/check-an-email-address) returns `exists: true` for it. [Export customers](/api-reference/customers/export-customers) leaves deleted customers out. You cannot restore a deleted customer through the API; use the WebCommander admin interface. Deleting the same customer again returns `404` with the message `Customer already in trash`.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.delete_customer()` |
-| JavaScript | `client.adminCustomers.deleteCustomer()` |
-| PHP | `AdminCustomers::deleteCustomer()` |
-| Java | `client.adminCustomers().deleteCustomer()` |
-| .NET | `client.AdminCustomers.DeleteCustomerAsync()` |
-| Dart | `client.adminCustomers.deleteCustomer()` |
-| Go | `client.AdminCustomers().DeleteCustomer()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>Each SDK sample is a complete program: it reads your credentials from the `WC_` environment variables listed in [Authentication](/authentication#set-up-a-client), sets up a client and makes the call. To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

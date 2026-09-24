@@ -15,8 +15,8 @@ python build_reference.py
 | `modules.json` | The areas and modules to publish, in sidebar order. Add a module here to publish it. |
 | `modules/<module>.py` | One module's facts: `TAG`, `SLUG`, `BASE`, overview text (`INTRO`, `WARNING`, `NOTES`), `ENDPOINTS` (paths, parameters, bodies, responses, plain-language wording, `example_call` for the cURL sample) and `SCHEMAS`. Written from the SDKs' `ENDPOINTS.md`, which records live-store measurements. |
 | `modules/customers_copy.json` | The reviewed plain-language wording for Customers, applied by `modules/customers.py`. |
-| `snippets/<sdk>/setup.json` | That SDK's client setup. |
-| `snippets/<sdk>/<module>.json` | One sample per endpoint, compiled or type-checked against that SDK's `development` branch. |
+| `snippets/<sdk>/setup.json` | That SDK's client setup, shown on the Authentication page and at the top of every sample. |
+| `snippets/<sdk>/<module>.json` | One sample per endpoint: the call and any imports it needs. The build puts the setup in front and merges the imports, so every code tab is a complete program. |
 | `build_reference.py` | Writes everything listed above. |
 
 The build fails when:
@@ -25,6 +25,10 @@ The build fails when:
   when all seven SDKs have it),
 - endpoint keys repeat across modules,
 - the spec contains a store address.
+
+To compile the complete programs the pages show, write them out with
+`python build_reference.py --programs <folder>` (one folder per SDK, module and endpoint) and build
+each one against that SDK's `development` branch before publishing.
 
 Two modules may use the same schema name; the later one is prefixed with its module name. Do not edit
 generated files by hand; change the inputs here and rebuild.

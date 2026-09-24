@@ -54,7 +54,6 @@ require __DIR__ . '/vendor/autoload.php';
 use WebCommander\Sdk\Client\WebCommanderClient;
 use WebCommander\Sdk\Config\AuthConfig;
 use WebCommander\Sdk\Config\SdkConfig;
-use WebCommander\Sdk\Resources\Customers\AdminCustomers;
 
 $auth = new AuthConfig(
     baseUrl: (string) getenv('WC_BASE_URL'),
@@ -144,7 +143,6 @@ client, err := wc.NewClient(wc.SdkConfig{
 		RedirectURI:  os.Getenv("WC_REDIRECT_URI"),
 		AuthString:   os.Getenv("WC_AUTH_STRING"),
 	},
-	// Return a failed HTTP call as an error instead of a response with Succeeded() false.
 	RaiseOnError: true,
 })
 if err != nil {

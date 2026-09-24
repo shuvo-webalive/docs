@@ -6,16 +6,4 @@ openapi: "GET /admin/settings/page_settings/category_page"
 
 Returns every category page setting under `category_page`, with both sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.category_page.get_category_page()` |
-| JavaScript | `client.categoryPage.getCategoryPage()` |
-| PHP | `CategoryPage::getCategoryPage()` |
-| Java | `client.categoryPage().getCategoryPage()` |
-| .NET | `client.CategoryPage.GetCategoryPageAsync()` |
-| Dart | `client.categoryPage.getCategoryPage()` |
-| Go | `client.CategoryPageSettings().GetCategoryPage()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>Each SDK sample is a complete program: it reads your credentials from the `WC_` environment variables listed in [Authentication](/authentication#set-up-a-client), sets up a client and makes the call. To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,5 +1,5 @@
 {
   "sdk": "go",
   "language": "go",
-  "setup": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.NewClient(wc.SdkConfig{\n\tAuth: wc.AuthConfig{\n\t\tClientName:   \"default\",\n\t\tBaseURL:      os.Getenv(\"WC_BASE_URL\"),\n\t\tClientID:     os.Getenv(\"WC_CLIENT_ID\"),\n\t\tClientSecret: os.Getenv(\"WC_CLIENT_SECRET\"),\n\t\tRedirectURI:  os.Getenv(\"WC_REDIRECT_URI\"),\n\t\tAuthString:   os.Getenv(\"WC_AUTH_STRING\"),\n\t},\n\t// Return a failed HTTP call as an error instead of a response with Succeeded() false.\n\tRaiseOnError: true,\n})\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()"
+  "setup": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.NewClient(wc.SdkConfig{\n\tAuth: wc.AuthConfig{\n\t\tClientName:   \"default\",\n\t\tBaseURL:      os.Getenv(\"WC_BASE_URL\"),\n\t\tClientID:     os.Getenv(\"WC_CLIENT_ID\"),\n\t\tClientSecret: os.Getenv(\"WC_CLIENT_SECRET\"),\n\t\tRedirectURI:  os.Getenv(\"WC_REDIRECT_URI\"),\n\t\tAuthString:   os.Getenv(\"WC_AUTH_STRING\"),\n\t},\n\tRaiseOnError: true,\n})\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()"
 }

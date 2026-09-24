@@ -6,16 +6,4 @@ openapi: "GET /admin/customers/{customer_id}/store-credit/adjustments"
 
 To get the next page, send the response's `pagination.next_page` as `page`; it is `null` when there are no more pages. Only `limit`, `offset` and `page` change the result: `sort`, an `action` filter and unknown parameters are ignored, not rejected. Entries do not include `balance_before` or `balance_after`, so save them from the [Adjust store credit](/api-reference/customers/adjust-store-credit) response each time you make an adjustment. You cannot rebuild a customer's balance from this list, because setting `store_credit` with [Update a customer](/api-reference/customers/update-a-customer) changes the balance without adding an entry.
 
-## SDK method
-
-| SDK | Call |
-| --- | --- |
-| Python | `client.admin_customers.get_customer_store_credit_adjustments()` |
-| JavaScript | `client.adminCustomers.getCustomerStoreCreditAdjustments()` |
-| PHP | `AdminCustomers::getCustomerStoreCreditAdjustments()` |
-| Java | `client.adminCustomers().getCustomerStoreCreditAdjustments()` |
-| .NET | `client.AdminCustomers.GetCustomerStoreCreditAdjustmentsAsync()` |
-| Dart | `client.adminCustomers.getCustomerStoreCreditAdjustments()` |
-| Go | `client.AdminCustomers().GetCustomerStoreCreditAdjustments()` |
-
-<Note>Each call above gives you the response body documented on this page. The SDK samples use a client you set up once, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>Each SDK sample is a complete program: it reads your credentials from the `WC_` environment variables listed in [Authentication](/authentication#set-up-a-client), sets up a client and makes the call. To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
