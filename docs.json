@@ -82,9 +82,6 @@
     "playground": {
       "display": "interactive",
       "proxy": true
-    },
-    "examples": {
-      "prefill": true
     }
   },
   "interaction": {

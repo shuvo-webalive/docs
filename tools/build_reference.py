@@ -120,7 +120,7 @@ def token_operation():
         "security": [],
         "requestBody": {"required": True, "content": {"application/json": {
             "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret", "redirect_uri", "auth_string"], "properties": {
-                "grant_type": {"type": "string", "enum": ["client_credentials"], "description": "Always `client_credentials`."},
+                "grant_type": {"type": "string", "enum": ["client_credentials"], "description": "Choose `client_credentials` from the list."},
                 "client_id": {"type": "string", "description": "Your integration's client ID."},
                 "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
                 "redirect_uri": {"type": "string", "description": "The redirect URI registered for your integration."},
@@ -152,8 +152,9 @@ cURL, another HTTP client, or to try the API on this site.
 
 <Steps>
   <Step title="Enter your store and credentials">
-    Click **Try it**, set `store` to your store's host name (without `https://`), and fill in the
-    request body with your credentials.
+    Click **Try it**, set `store` to your store's host name (without `https://`), choose
+    `client_credentials` for `grant_type`, and fill in your client ID, client secret, redirect URI
+    and auth string.
   </Step>
   <Step title="Send the request">
     The response holds `access_token`.

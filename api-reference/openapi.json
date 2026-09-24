@@ -57,7 +57,7 @@
                     "enum": [
                       "client_credentials"
                     ],
-                    "description": "Always `client_credentials`."
+                    "description": "Choose `client_credentials` from the list."
                   },
                   "client_id": {
                     "type": "string",
