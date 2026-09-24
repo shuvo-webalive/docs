@@ -1,0 +1,66 @@
+{
+  "sdk": "dart",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "getSeoConfiguration",
+      "code": "final response = await client.seoConfiguration.getSeoConfiguration();\nfinal seoConfiguration = (response.map as Map)['seo_configuration'] as Map;\nprint(seoConfiguration['global_store_settings']);\nprint(seoConfiguration['url_settings']);"
+    },
+    "patch_seo_configuration": {
+      "function": "patchSeoConfiguration",
+      "code": "final response = await client.seoConfiguration.patchSeoConfiguration({\n  'seo_configuration': {\n    'url_settings': {'regenerate_url_on_item_update': true},\n  },\n});\nfinal seoConfiguration = (response.map as Map)['seo_configuration'] as Map;\nprint(seoConfiguration['url_settings']);"
+    },
+    "put_seo_configuration": {
+      "function": "putSeoConfiguration",
+      "code": "final response = await client.seoConfiguration.putSeoConfiguration({\n  'seo_configuration': {\n    'url_settings': {\n      'regenerate_url_on_item_update': true,\n      'auto_redirect_on_url_change': true,\n    },\n  },\n});\nfinal seoConfiguration = (response.map as Map)['seo_configuration'] as Map;\nprint(seoConfiguration['url_settings']);"
+    },
+    "head_seo_configuration": {
+      "function": "headSeoConfiguration",
+      "code": "final response = await client.seoConfiguration.headSeoConfiguration();\nprint(response.statusCode);"
+    },
+    "get_seo_configuration_section": {
+      "function": "getSeoConfigurationSection",
+      "code": "final response =\n    await client.seoConfiguration.getSeoConfigurationSection('url_settings');\nfinal urlSettings = (response.map as Map)['url_settings'] as Map;\nprint(urlSettings['regenerate_url_on_item_update']);\nprint(urlSettings['auto_redirect_on_url_change']);\nprint(urlSettings['redirects']);"
+    },
+    "patch_seo_configuration_section": {
+      "function": "patchSeoConfigurationSection",
+      "code": "final response =\n    await client.seoConfiguration.patchSeoConfigurationSection('url_settings', {\n  'url_settings': {'regenerate_url_on_item_update': true},\n});\nfinal urlSettings = (response.map as Map)['url_settings'] as Map;\nprint(urlSettings['regenerate_url_on_item_update']);"
+    },
+    "put_seo_configuration_section": {
+      "function": "putSeoConfigurationSection",
+      "code": "final response =\n    await client.seoConfiguration.putSeoConfigurationSection('url_settings', {\n  'url_settings': {\n    'regenerate_url_on_item_update': true,\n    'auto_redirect_on_url_change': true,\n  },\n});\nfinal urlSettings = (response.map as Map)['url_settings'] as Map;\nprint(urlSettings['regenerate_url_on_item_update']);\nprint(urlSettings['auto_redirect_on_url_change']);"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "getSeoConfigurationDocumentRoot",
+      "code": "final response = await client.seoConfiguration\n    .getSeoConfigurationDocumentRoot(queryParams: {'limit': 100});\nfinal files = (response.map as Map)['items'] as List;\nfor (final file in files) {\n  print('${(file as Map)['config_key']} ${file['file_name']}');\n}"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "uploadSeoConfigurationDocumentRoot",
+      "code": "import 'dart:io';\n\nfinal contents = await File('verification.txt').readAsBytes();\nfinal response =\n    await client.seoConfiguration.uploadSeoConfigurationDocumentRoot({\n  'file': ['verification.txt', contents, 'text/plain'],\n});\nfinal documentRootFile = (response.map as Map)['document_root_file'] as Map;\nprint(documentRootFile['config_key']);"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "deleteSeoConfigurationDocumentRootFile",
+      "code": "final response = await client.seoConfiguration\n    .deleteSeoConfigurationDocumentRootFile('seo-upload-6');\nprint(response.statusCode);"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "getSeoConfigurationRedirects",
+      "code": "final response = await client.seoConfiguration\n    .getSeoConfigurationRedirects(queryParams: {'limit': 100});\nfinal redirects = (response.map as Map)['items'] as List;\nfor (final redirect in redirects) {\n  print('${(redirect as Map)['id']} ${redirect['source_url']}');\n}"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "createSeoConfigurationRedirect",
+      "code": "final response = await client.seoConfiguration.createSeoConfigurationRedirect({\n  'source_url': '/old-page',\n  'destination_url': 'https://your-store.example.com/new-page',\n});\nfinal redirect = (response.map as Map)['redirect'] as Map;\nprint(redirect['id']);"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "getSeoConfigurationRedirect",
+      "code": "final response = await client.seoConfiguration.getSeoConfigurationRedirect(16);\nfinal redirect = (response.map as Map)['redirect'] as Map;\nprint('${redirect['source_url']} ${redirect['destination_url']}');"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "patchSeoConfigurationRedirect",
+      "code": "final response =\n    await client.seoConfiguration.patchSeoConfigurationRedirect(280, {\n  'destination_url': 'https://your-store.example.com/newer-page',\n});\nfinal redirect = (response.map as Map)['redirect'] as Map;\nprint(redirect['destination_url']);"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "deleteSeoConfigurationRedirect",
+      "code": "final response =\n    await client.seoConfiguration.deleteSeoConfigurationRedirect(280);\nprint(response.statusCode);"
+    }
+  }
+}

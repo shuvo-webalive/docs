@@ -1,0 +1,9 @@
+---
+title: "Update a redirect"
+description: "Changes a redirect's `source_url` or `destination_url` and returns the updated redirect."
+openapi: "PATCH /admin/settings/seo_configuration/redirects/{redirect_id}"
+---
+
+Send only the fields that change, as the body itself, such as a new `destination_url`. A field you leave out keeps its stored value. Returns the redirect as it now stands, under `redirect`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

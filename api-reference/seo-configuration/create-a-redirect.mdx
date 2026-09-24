@@ -1,0 +1,9 @@
+---
+title: "Create a redirect"
+description: "Creates a redirect and returns it with its `id`, which the other calls take as `redirect_id`."
+openapi: "POST /admin/settings/seo_configuration/redirects"
+---
+
+Send `source_url` and `destination_url` as the body itself, with no wrapping key; a body wrapped in `redirect` is accepted too. Both fields are required. Returns the new redirect under `redirect`, with the `id` that the other redirect calls take as `redirect_id`, and a `Location` header that gives its path. A `source_url` that another redirect already has is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

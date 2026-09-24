@@ -1,0 +1,66 @@
+---
+title: "SEO configuration"
+sidebarTitle: "Overview"
+description: "Read and change your store's SEO title and description templates, custom header and footer code and URL settings, and manage its redirects and document root files."
+---
+
+The SEO configuration API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/seo_configuration`.
+
+<Warning>
+  **A `PUT` resets every field you leave out of a section you send.** This applies on
+  `/seo_configuration` and on `/seo_configuration/{section}`. A section you leave out keeps its
+  values, but inside a section you send, each missing field goes back to its default: sending only
+  `regenerate_url_on_item_update` in `url_settings` resets a stored `true` in
+  `auto_redirect_on_url_change` to `false`. To change some fields and keep the rest, use `PATCH`,
+  or send each section whole.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get SEO configuration](/api-reference/seo-configuration/get-seo-configuration) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/seo_configuration` | Returns all three settings sections, the document root files, the redirects and a `group_meta` block. |
+| [Update SEO configuration](/api-reference/seo-configuration/update-seo-configuration) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/seo_configuration` | Changes the fields you send in one or more sections and returns the whole configuration. |
+| [Replace SEO configuration sections](/api-reference/seo-configuration/replace-seo-configuration-sections) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/seo_configuration` | Replaces each section you send and returns the whole configuration. Omitted fields reset to defaults. |
+| [Get SEO configuration headers](/api-reference/seo-configuration/get-seo-configuration-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/seo_configuration` | Returns the headers for the whole SEO configuration, with no body. |
+| [Get a settings section](/api-reference/seo-configuration/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/seo_configuration/{section}` | Returns one settings section under its own key, such as `url_settings`. |
+| [Update a settings section](/api-reference/seo-configuration/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/seo_configuration/{section}` | Changes the fields you send in one section and returns that whole section. |
+| [Replace a settings section](/api-reference/seo-configuration/replace-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/seo_configuration/{section}` | Replaces one section, resetting omitted fields to their defaults, and returns that whole section. |
+| [List document root files](/api-reference/seo-configuration/list-document-root-files) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/seo_configuration/document_root` | Returns up to 100 document root files per call, with paging details. |
+| [Upload a document root file](/api-reference/seo-configuration/upload-a-document-root-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/seo_configuration/document_root` | Uploads a file to the document root and returns it with its `config_key`. |
+| [Delete a document root file](/api-reference/seo-configuration/delete-a-document-root-file) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/seo_configuration/document_root/{config_key}` | Deletes a document root file by its `config_key` and returns `204` with no body. |
+| [List redirects](/api-reference/seo-configuration/list-redirects) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/seo_configuration/redirects` | Returns up to 100 redirects per call, with paging details. |
+| [Create a redirect](/api-reference/seo-configuration/create-a-redirect) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/seo_configuration/redirects` | Creates a redirect and returns it with its `id`, which the other calls take as `redirect_id`. |
+| [Retrieve a redirect](/api-reference/seo-configuration/retrieve-a-redirect) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/seo_configuration/redirects/{redirect_id}` | Returns the redirect whose `id` you pass as `redirect_id`. |
+| [Update a redirect](/api-reference/seo-configuration/update-a-redirect) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/seo_configuration/redirects/{redirect_id}` | Changes a redirect's `source_url` or `destination_url` and returns the updated redirect. |
+| [Delete a redirect](/api-reference/seo-configuration/delete-a-redirect) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/seo_configuration/redirects/{redirect_id}` | Deletes a redirect permanently and returns `204` with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **SEO configuration has three settings sections and two collections.** `global_store_settings`,
+  `custom_code` and `url_settings` are settings: read or write all three through `/seo_configuration`,
+  or one through `/seo_configuration/{section}`. `document_root` (the uploaded files) and
+  `redirects` are collections that you manage through their own paths. `group_meta` marks both
+  collections `writable: false`, even though you can add and delete their rows.
+- **Settings writes are wrapped, and the wrapper depends on the path.** On `/seo_configuration`, wrap
+  the fields in `seo_configuration` and then in the section name. On `/seo_configuration/{section}`,
+  wrap them in the section's own name, such as `url_settings`: a body that is not wrapped is rejected
+  with `400 invalid_request`. Redirect writes need no wrapper: send `source_url` and
+  `destination_url` as the body itself.
+- **`custom_code` is code the storefront serves on every page.** `header.code` is raw HTML or
+  JavaScript added to `<head>`, and `footer.code` is added before `</body>`. `field_metadata` lists
+  each `code` as requiring its block's `enabled` (`header.enabled` or `footer.enabled`).
+- **A collection listing returns at most 100 rows per call.** The default and the maximum `limit` are
+  `100`: a larger value is capped, and `pagination.limit` shows `100`. Send a higher `offset` to get
+  the next rows while `pagination.has_next` is `true`. `pagination` has five keys: `total`, `limit`,
+  `offset`, `has_previous` and `has_next`.
+- **Writes are limited in a ten-second window.** The store accepts fewer writes than reads in each
+  fixed ten-second window, and a write over the limit is rejected with a `Retry-After` header. A retry
+  sent before then counts against the same limit, so wait the time `Retry-After` gives before you
+  write again.

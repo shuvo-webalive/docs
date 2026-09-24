@@ -1,0 +1,9 @@
+---
+title: "Upload a document root file"
+description: "Uploads a file to the document root and returns it with its `config_key`."
+openapi: "POST /admin/settings/seo_configuration/document_root"
+---
+
+Send the file as `multipart/form-data`, in a part named `file`. The file name must have an extension. Returns the new file under `document_root_file`, with the `config_key` that [Delete a document root file](/api-reference/seo-configuration/delete-a-document-root-file) takes. The response has no `Location` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,9 @@
+---
+title: "Replace a settings section"
+description: "Replaces one section, resetting omitted fields to their defaults, and returns that whole section."
+openapi: "PUT /admin/settings/seo_configuration/{section}"
+---
+
+Send the whole section, wrapped in the section's own name, such as `url_settings`. Every field you leave out is reset to its default: sending only `regenerate_url_on_item_update` to `url_settings` resets a stored `true` in `auto_redirect_on_url_change` to `false`. Returns the whole section under the same key. To change some fields and keep the rest, use [Update a settings section](/api-reference/seo-configuration/update-a-settings-section) instead.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

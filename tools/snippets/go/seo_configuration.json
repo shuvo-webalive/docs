@@ -1,0 +1,66 @@
+{
+  "sdk": "go",
+  "module": "seo_configuration",
+  "endpoints": {
+    "get_seo_configuration": {
+      "function": "GetSeoConfiguration",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().GetSeoConfiguration(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nconfiguration := resp.Map().(map[string]any)[\"seo_configuration\"].(map[string]any)\nstore := configuration[\"global_store_settings\"].(map[string]any)\nfmt.Println(store[\"store_name\"], store[\"title_separator\"])\nfor _, row := range configuration[\"document_root\"].(map[string]any)[\"items\"].([]any) {\n\tfile := row.(map[string]any)\n\tfmt.Println(file[\"config_key\"], file[\"file_name\"])\n}"
+    },
+    "patch_seo_configuration": {
+      "function": "PatchSeoConfiguration",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().PatchSeoConfiguration(ctx, map[string]any{\n\t\"seo_configuration\": map[string]any{\n\t\t\"url_settings\": map[string]any{\"regenerate_url_on_item_update\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nconfiguration := resp.Map().(map[string]any)[\"seo_configuration\"].(map[string]any)\nfmt.Println(configuration[\"url_settings\"].(map[string]any)[\"regenerate_url_on_item_update\"])"
+    },
+    "put_seo_configuration": {
+      "function": "PutSeoConfiguration",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().PutSeoConfiguration(ctx, map[string]any{\n\t\"seo_configuration\": map[string]any{\n\t\t\"url_settings\": map[string]any{\"regenerate_url_on_item_update\": true, \"auto_redirect_on_url_change\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"seo_configuration\"].(map[string]any)[\"url_settings\"].(map[string]any)\nfmt.Println(settings[\"regenerate_url_on_item_update\"], settings[\"auto_redirect_on_url_change\"])"
+    },
+    "head_seo_configuration": {
+      "function": "HeadSeoConfiguration",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().HeadSeoConfiguration(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_seo_configuration_section": {
+      "function": "GetSeoConfigurationSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().GetSeoConfigurationSection(ctx, \"url_settings\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"url_settings\"].(map[string]any)\nfmt.Println(settings[\"regenerate_url_on_item_update\"], settings[\"auto_redirect_on_url_change\"])\nfor _, row := range settings[\"redirects\"].(map[string]any)[\"items\"].([]any) {\n\tredirect := row.(map[string]any)\n\tfmt.Println(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\n}"
+    },
+    "patch_seo_configuration_section": {
+      "function": "PatchSeoConfigurationSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().PatchSeoConfigurationSection(ctx, \"url_settings\", map[string]any{\n\t\"url_settings\": map[string]any{\"regenerate_url_on_item_update\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"url_settings\"].(map[string]any)[\"regenerate_url_on_item_update\"])"
+    },
+    "put_seo_configuration_section": {
+      "function": "PutSeoConfigurationSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().PutSeoConfigurationSection(ctx, \"url_settings\", map[string]any{\n\t\"url_settings\": map[string]any{\"regenerate_url_on_item_update\": true, \"auto_redirect_on_url_change\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"url_settings\"].(map[string]any)\nfmt.Println(settings[\"regenerate_url_on_item_update\"], settings[\"auto_redirect_on_url_change\"])"
+    },
+    "get_seo_configuration_document_root": {
+      "function": "GetSeoConfigurationDocumentRoot",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().GetSeoConfigurationDocumentRoot(ctx, map[string]any{\"limit\": 100}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)\nfor _, row := range page[\"items\"].([]any) {\n\tfile := row.(map[string]any)\n\tfmt.Println(file[\"config_key\"], file[\"file_name\"], file[\"file_path\"])\n}\nfmt.Println(page[\"pagination\"].(map[string]any)[\"has_next\"])"
+    },
+    "upload_seo_configuration_document_root": {
+      "function": "UploadSeoConfigurationDocumentRoot",
+      "code": "import (\n\t\"fmt\"\n\t\"os\"\n)\n\ncontents, err := os.ReadFile(\"verification.txt\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresp, err := client.SeoConfigurationSettings().UploadSeoConfigurationDocumentRoot(ctx, map[string]any{\n\t\"file\": []any{\"verification.txt\", contents, \"text/plain\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfile := resp.Map().(map[string]any)[\"document_root_file\"].(map[string]any)\nfmt.Println(file[\"config_key\"], file[\"file_name\"], file[\"file_path\"])"
+    },
+    "delete_seo_configuration_document_root_file": {
+      "function": "DeleteSeoConfigurationDocumentRootFile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().DeleteSeoConfigurationDocumentRootFile(ctx, \"seo-upload-6\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_seo_configuration_redirects": {
+      "function": "GetSeoConfigurationRedirects",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().GetSeoConfigurationRedirects(ctx, map[string]any{\"limit\": 100}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)\nfor _, row := range page[\"items\"].([]any) {\n\tredirect := row.(map[string]any)\n\tfmt.Println(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\n}\nfmt.Println(page[\"pagination\"].(map[string]any)[\"has_next\"])"
+    },
+    "create_seo_configuration_redirect": {
+      "function": "CreateSeoConfigurationRedirect",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().CreateSeoConfigurationRedirect(ctx, map[string]any{\n\t\"source_url\":      \"/old-page\",\n\t\"destination_url\": \"https://your-store.example.com/new-page\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nredirect := resp.Map().(map[string]any)[\"redirect\"].(map[string]any)\nfmt.Println(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])"
+    },
+    "get_seo_configuration_redirect": {
+      "function": "GetSeoConfigurationRedirect",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().GetSeoConfigurationRedirect(ctx, 16, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nredirect := resp.Map().(map[string]any)[\"redirect\"].(map[string]any)\nfmt.Println(redirect[\"source_url\"], redirect[\"destination_url\"])"
+    },
+    "patch_seo_configuration_redirect": {
+      "function": "PatchSeoConfigurationRedirect",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().PatchSeoConfigurationRedirect(ctx, 280, map[string]any{\n\t\"destination_url\": \"https://your-store.example.com/newer-page\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nredirect := resp.Map().(map[string]any)[\"redirect\"].(map[string]any)\nfmt.Println(redirect[\"source_url\"], redirect[\"destination_url\"])"
+    },
+    "delete_seo_configuration_redirect": {
+      "function": "DeleteSeoConfigurationRedirect",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SeoConfigurationSettings().DeleteSeoConfigurationRedirect(ctx, 280, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}
