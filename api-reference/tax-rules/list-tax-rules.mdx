@@ -1,0 +1,9 @@
+---
+title: "List tax rules"
+description: "Returns up to 20 tax rules per call, each with its tax code and tax zones."
+openapi: "GET /admin/tax_rules"
+---
+
+Returns up to 20 tax rules under `tax_rules`, and the rule count and page position under `pagination`. Each rule has ten fields, including its tax code in `code` and its tax zones in `zones`. To read every rule, step `offset` by the number of rules each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored: `q` does not filter the rules.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

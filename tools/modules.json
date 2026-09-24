@@ -40,7 +40,8 @@
       "name": "Tax",
       "icon": "percent",
       "modules": [
-        "tax_codes"
+        "tax_codes",
+        "tax_rules"
       ]
     }
   ]

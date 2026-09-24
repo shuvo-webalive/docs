@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "tax_rules",
+  "endpoints": {
+    "list_tax_rules": {
+      "function": "listTaxRules",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.listTaxRules(client, {limit: 20});\nfor (const taxRule of response.map.tax_rules) {\n    console.log(taxRule.id, taxRule.name, taxRule.default);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "head_tax_rules": {
+      "function": "headTaxRules",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.headTaxRules(client);\nconsole.log(response.statusCode);\n"
+    },
+    "create_tax_rule": {
+      "function": "createTaxRule",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.createTaxRule(client, {\n    tax_rule: {name: 'Reduced rate', description: 'Rule for reduced-rate goods'},\n});\nconsole.log(response.map.tax_rule.id);\n"
+    },
+    "get_tax_rule": {
+      "function": "getTaxRule",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.getTaxRule(client, 7);\nconst taxRule = response.map.tax_rule;\nconsole.log(taxRule.name, taxRule.code.name);\nfor (const zone of taxRule.zones) {\n    console.log(zone.id, zone.name);\n}\n"
+    },
+    "head_tax_rule": {
+      "function": "headTaxRule",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.headTaxRule(client, 7);\nconsole.log(response.statusCode);\n"
+    },
+    "update_tax_rule": {
+      "function": "updateTaxRule",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.updateTaxRule(client, 42, {tax_rule: {name: 'Reduced rate goods'}});\nconsole.log(response.map.tax_rule.name);\n"
+    },
+    "delete_tax_rule": {
+      "function": "deleteTaxRule",
+      "code": "import {taxRules} from 'webcommander-sdk';\n\nconst response = await taxRules.deleteTaxRule(client, 42);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

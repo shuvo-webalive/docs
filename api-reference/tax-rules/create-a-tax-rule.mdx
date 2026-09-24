@@ -1,0 +1,9 @@
+---
+title: "Create a tax rule"
+description: "Creates a tax rule and returns the new rule, whose `id` other calls take as `tax_rule_id`."
+openapi: "POST /admin/tax_rules"
+---
+
+Creates a tax rule and returns it, with the rule's `id` set by the store. Pass that `id` as `tax_rule_id` to retrieve, update or delete the rule. Wrap the fields in `tax_rule`: `name` is required, and `description` is the only other field the store reads. `code`, `zones`, `decimal_point` and `rounding_type` are accepted and not stored, so the new rule has `code: {}`, `zones: []`, `decimal_point` set to `2` and `rounding_type` set to `nearest`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

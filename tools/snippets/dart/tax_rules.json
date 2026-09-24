@@ -1,0 +1,34 @@
+{
+  "sdk": "dart",
+  "module": "tax_rules",
+  "endpoints": {
+    "list_tax_rules": {
+      "function": "listTaxRules",
+      "code": "final response = await client.taxRules.listTaxRules(queryParams: {'limit': 20});\nfinal taxRules = (response.map as Map)['tax_rules'] as List;\nfor (final taxRule in taxRules) {\n  print('${(taxRule as Map)['id']} ${taxRule['name']} ${taxRule['zones']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
+    },
+    "head_tax_rules": {
+      "function": "headTaxRules",
+      "code": "final response = await client.taxRules.headTaxRules();\nprint(response.statusCode);"
+    },
+    "create_tax_rule": {
+      "function": "createTaxRule",
+      "code": "final response = await client.taxRules.createTaxRule({\n  'tax_rule': {\n    'name': 'Reduced rate',\n    'description': 'Rule for reduced-rate goods',\n  },\n});\nfinal taxRule = (response.map as Map)['tax_rule'] as Map;\nprint(taxRule['id']);"
+    },
+    "get_tax_rule": {
+      "function": "getTaxRule",
+      "code": "final response = await client.taxRules.getTaxRule(7);\nfinal taxRule = (response.map as Map)['tax_rule'] as Map;\nprint(taxRule['name']);\nprint(taxRule['code']);\nprint(taxRule['zones']);"
+    },
+    "head_tax_rule": {
+      "function": "headTaxRule",
+      "code": "final response = await client.taxRules.headTaxRule(7);\nprint(response.statusCode);"
+    },
+    "update_tax_rule": {
+      "function": "updateTaxRule",
+      "code": "final response = await client.taxRules.updateTaxRule(42, {\n  'tax_rule': {'name': 'Reduced rate goods'},\n});\nfinal taxRule = (response.map as Map)['tax_rule'] as Map;\nprint('${taxRule['name']} ${taxRule['updated_at']}');"
+    },
+    "delete_tax_rule": {
+      "function": "deleteTaxRule",
+      "code": "final response = await client.taxRules.deleteTaxRule(42);\nprint(response.statusCode);"
+    }
+  }
+}

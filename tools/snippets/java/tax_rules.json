@@ -1,0 +1,34 @@
+{
+  "sdk": "java",
+  "module": "tax_rules",
+  "endpoints": {
+    "list_tax_rules": {
+      "function": "listTaxRules",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxRules().listTaxRules(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"tax_rules\")) {\n    Map<?, ?> taxRule = (Map<?, ?>) row;\n    System.out.println(taxRule.get(\"id\") + \" \" + taxRule.get(\"name\") + \" \" + taxRule.get(\"default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "head_tax_rules": {
+      "function": "headTaxRules",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.taxRules().headTaxRules();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_tax_rule": {
+      "function": "createTaxRule",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxRules().createTaxRule(Map.of(\"tax_rule\",\n        Map.of(\"name\", \"Reduced rate\", \"description\", \"Rule for reduced-rate goods\")));\nMap<?, ?> taxRule = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_rule\");\nSystem.out.println(taxRule.get(\"id\") + \" \" + taxRule.get(\"name\"));"
+    },
+    "get_tax_rule": {
+      "function": "getTaxRule",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxRules().getTaxRule(7);\nMap<?, ?> taxRule = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_rule\");\nSystem.out.println(taxRule.get(\"name\") + \" \" + ((Map<?, ?>) taxRule.get(\"code\")).get(\"name\"));\nfor (Object zone : (List<?>) taxRule.get(\"zones\")) {\n    System.out.println(((Map<?, ?>) zone).get(\"id\") + \" \" + ((Map<?, ?>) zone).get(\"name\"));\n}"
+    },
+    "head_tax_rule": {
+      "function": "headTaxRule",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.taxRules().headTaxRule(7);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_tax_rule": {
+      "function": "updateTaxRule",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxRules().updateTaxRule(42,\n        Map.of(\"tax_rule\", Map.of(\"name\", \"Reduced rate goods\")));\nMap<?, ?> taxRule = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_rule\");\nSystem.out.println(taxRule.get(\"name\") + \" \" + taxRule.get(\"updated_at\"));"
+    },
+    "delete_tax_rule": {
+      "function": "deleteTaxRule",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.taxRules().deleteTaxRule(42);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

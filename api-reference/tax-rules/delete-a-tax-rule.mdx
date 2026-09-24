@@ -1,0 +1,9 @@
+---
+title: "Delete a tax rule"
+description: "Deletes a tax rule permanently and returns `204` with no body."
+openapi: "DELETE /admin/tax_rules/{tax_rule_id}"
+---
+
+Deletes the tax rule permanently and returns `204` with no body. Retrieving it afterwards returns `404` with the message `Rule not found`. If the tax request just before this one was rejected, this call returns that same error instead and deletes nothing, so check the status before you treat the rule as gone.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
