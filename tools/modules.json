@@ -14,7 +14,8 @@
         "category_page",
         "checkout_page",
         "product_page",
-        "search_result_page"
+        "search_result_page",
+        "shopping_cart"
       ]
     },
     {

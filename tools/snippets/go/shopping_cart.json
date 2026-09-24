@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "GetShoppingCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShoppingCartSettings().GetShoppingCart(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shopping_cart\"].(map[string]any)\ncartPage := settings[\"cart_page\"].(map[string]any)\nflyingCart := settings[\"flying_cart\"].(map[string]any)\nfmt.Println(cartPage[\"show_product_thumbnail\"], cartPage[\"save_cart\"], flyingCart[\"enabled\"], flyingCart[\"save_cart\"])"
+    },
+    "patch_shopping_cart": {
+      "function": "PatchShoppingCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShoppingCartSettings().PatchShoppingCart(ctx, map[string]any{\n\t\"shopping_cart\": map[string]any{\n\t\t\"cart_page\":   map[string]any{\"show_product_thumbnail\": true},\n\t\t\"flying_cart\": map[string]any{\"save_cart\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shopping_cart\"].(map[string]any)\nfmt.Println(settings[\"cart_page\"].(map[string]any)[\"show_product_thumbnail\"], settings[\"flying_cart\"].(map[string]any)[\"save_cart\"])"
+    },
+    "head_shopping_cart": {
+      "function": "HeadShoppingCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShoppingCartSettings().HeadShoppingCart(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_shopping_cart_section": {
+      "function": "GetShoppingCartSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShoppingCartSettings().GetShoppingCartSection(ctx, \"cart_page\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncartPage := resp.Map().(map[string]any)[\"cart_page\"].(map[string]any)\nfmt.Println(cartPage[\"show_product_thumbnail\"], cartPage[\"enable_clear_cart\"], cartPage[\"save_cart\"])"
+    },
+    "patch_shopping_cart_section": {
+      "function": "PatchShoppingCartSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShoppingCartSettings().PatchShoppingCartSection(ctx, \"cart_page\", map[string]any{\n\t\"cart_page\": map[string]any{\"show_product_thumbnail\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"cart_page\"].(map[string]any)[\"show_product_thumbnail\"])"
+    }
+  }
+}

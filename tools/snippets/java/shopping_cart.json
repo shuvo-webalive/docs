@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "shopping_cart",
+  "endpoints": {
+    "get_shopping_cart": {
+      "function": "getShoppingCart",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shoppingCart().getShoppingCart();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shopping_cart\");\nMap<?, ?> cartPage = (Map<?, ?>) settings.get(\"cart_page\");\nMap<?, ?> flyingCart = (Map<?, ?>) settings.get(\"flying_cart\");\nSystem.out.println(cartPage.get(\"show_product_thumbnail\") + \" \" + cartPage.get(\"save_cart\"));\nSystem.out.println(flyingCart.get(\"enabled\") + \" \" + flyingCart.get(\"enable_clear_cart\"));"
+    },
+    "patch_shopping_cart": {
+      "function": "patchShoppingCart",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shoppingCart().patchShoppingCart(Map.of(\"shopping_cart\", Map.of(\n        \"cart_page\", Map.of(\"show_product_thumbnail\", true),\n        \"flying_cart\", Map.of(\"save_cart\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shopping_cart\");\nSystem.out.println(((Map<?, ?>) settings.get(\"cart_page\")).get(\"show_product_thumbnail\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"flying_cart\")).get(\"save_cart\"));"
+    },
+    "head_shopping_cart": {
+      "function": "headShoppingCart",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.shoppingCart().headShoppingCart();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_shopping_cart_section": {
+      "function": "getShoppingCartSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shoppingCart().getShoppingCartSection(\"cart_page\");\nMap<?, ?> cartPage = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart_page\");\nSystem.out.println(cartPage.get(\"show_product_thumbnail\") + \" \" + cartPage.get(\"enable_clear_cart\"));\nSystem.out.println(cartPage.get(\"save_cart\"));"
+    },
+    "patch_shopping_cart_section": {
+      "function": "patchShoppingCartSection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shoppingCart().patchShoppingCartSection(\"cart_page\",\n        Map.of(\"cart_page\", Map.of(\"show_product_thumbnail\", true)));\nMap<?, ?> cartPage = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart_page\");\nSystem.out.println(cartPage.get(\"show_product_thumbnail\"));"
+    }
+  }
+}

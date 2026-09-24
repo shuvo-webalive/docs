@@ -40,6 +40,9 @@
       "name": "Search result page"
     },
     {
+      "name": "Shopping cart"
+    },
+    {
       "name": "Shipping methods"
     }
   ],
@@ -6337,6 +6340,586 @@
         }
       }
     },
+    "/admin/settings/page_settings/shopping_cart": {
+      "get": {
+        "tags": [
+          "Shopping cart"
+        ],
+        "summary": "Get shopping cart settings",
+        "operationId": "get_shopping_cart",
+        "description": "Returns every shopping cart setting under `shopping_cart`, with the `cart_page` and `flying_cart` sections in full. Beside it, `group_meta` gives each section's `kind`, whether it is `writable`, and the `href` of its own path. Add `field_metadata=true` to also get a description of every field, keyed by section.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes every field in both sections, keyed by section. The settings and `group_meta` are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Both sections and `group_meta`. With `field_metadata=true`, a `field_metadata` key is added beside them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shopping_cart": {
+                      "$ref": "#/components/schemas/ShoppingCartSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ShoppingCartGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ShoppingCartFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by section, then by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "shopping_cart": {
+                    "cart_page": {
+                      "show_product_thumbnail": false,
+                      "enable_clear_cart": true,
+                      "save_cart": true
+                    },
+                    "flying_cart": {
+                      "enabled": true,
+                      "enable_clear_cart": true,
+                      "save_cart": false
+                    }
+                  },
+                  "group_meta": {
+                    "cart_page": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/shopping_cart/cart_page"
+                    },
+                    "flying_cart": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/shopping_cart/flying_cart"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/shopping_cart\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shopping_cart.get_shopping_cart()\ncart_page = response.map[\"shopping_cart\"][\"cart_page\"]\nflying_cart = response.map[\"shopping_cart\"][\"flying_cart\"]\nprint(cart_page[\"show_product_thumbnail\"], cart_page[\"save_cart\"])\nprint(flying_cart[\"enabled\"], flying_cart[\"save_cart\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shoppingCart.getShoppingCart();\nconst settings = response.map.shopping_cart;\nconsole.log(settings.cart_page.show_product_thumbnail, settings.cart_page.save_cart);\nconsole.log(settings.flying_cart.enabled, settings.flying_cart.save_cart);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShoppingCart::getShoppingCart($client);\n\n$settings = $response->map['shopping_cart'];\necho 'Cart page thumbnails: ', $settings['cart_page']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;\necho 'Flying cart: ', $settings['flying_cart']['enabled'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shoppingCart().getShoppingCart();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shopping_cart\");\nMap<?, ?> cartPage = (Map<?, ?>) settings.get(\"cart_page\");\nMap<?, ?> flyingCart = (Map<?, ?>) settings.get(\"flying_cart\");\nSystem.out.println(cartPage.get(\"show_product_thumbnail\") + \" \" + cartPage.get(\"save_cart\"));\nSystem.out.println(flyingCart.get(\"enabled\") + \" \" + flyingCart.get(\"enable_clear_cart\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShoppingCart.GetShoppingCartAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shoppingCart = (IReadOnlyDictionary<string, object?>)body[\"shopping_cart\"]!;\nvar cartPage = (IReadOnlyDictionary<string, object?>)shoppingCart[\"cart_page\"]!;\nConsole.WriteLine(cartPage[\"show_product_thumbnail\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shoppingCart.getShoppingCart();\nfinal shoppingCart = (response.map as Map)['shopping_cart'] as Map;\nprint(shoppingCart['cart_page']);\nprint(shoppingCart['flying_cart']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShoppingCartSettings().GetShoppingCart(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shopping_cart\"].(map[string]any)\ncartPage := settings[\"cart_page\"].(map[string]any)\nflyingCart := settings[\"flying_cart\"].(map[string]any)\nfmt.Println(cartPage[\"show_product_thumbnail\"], cartPage[\"save_cart\"], flyingCart[\"enabled\"], flyingCart[\"save_cart\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Shopping cart"
+        ],
+        "summary": "Update shopping cart settings",
+        "operationId": "patch_shopping_cart",
+        "description": "Send the fields to change inside `shopping_cart`, grouped by section name. One body can change both sections. Only the fields you send change: other fields in the same section, and a section you leave out, keep their stored values. Returns all the settings after the change, with `group_meta`, as [Get shopping cart settings](/api-reference/shopping-cart/get-shopping-cart-settings) does.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All the settings after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shopping_cart": {
+                      "$ref": "#/components/schemas/ShoppingCartSettings"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/ShoppingCartGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "shopping_cart": {
+                    "cart_page": {
+                      "show_product_thumbnail": true,
+                      "enable_clear_cart": true,
+                      "save_cart": true
+                    },
+                    "flying_cart": {
+                      "enabled": true,
+                      "enable_clear_cart": true,
+                      "save_cart": true
+                    }
+                  },
+                  "group_meta": {
+                    "cart_page": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/shopping_cart/cart_page"
+                    },
+                    "flying_cart": {
+                      "kind": "setting",
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/page_settings/shopping_cart/flying_cart"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `shopping_cart`. The error `code` is `invalid_request`, and the error names `shopping_cart`. After this rejection, the next write on the same client returns the same rejection under a new `request_id`, even when that write is correct. The write after it succeeds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCartError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. Writes to both sections and to `/shopping_cart` are rejected until the time in the `Retry-After` header has passed. Reads still return `200`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCartError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/shopping_cart\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shopping_cart\": {\n      \"cart_page\": {\n        \"show_product_thumbnail\": true\n      },\n      \"flying_cart\": {\n        \"save_cart\": true\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shopping_cart.patch_shopping_cart({\n    \"shopping_cart\": {\n        \"cart_page\": {\"show_product_thumbnail\": True},\n        \"flying_cart\": {\"save_cart\": True},\n    },\n})\nsettings = response.map[\"shopping_cart\"]\nprint(settings[\"cart_page\"][\"show_product_thumbnail\"])\nprint(settings[\"flying_cart\"][\"save_cart\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shoppingCart.patchShoppingCart({\n    shopping_cart: {cart_page: {show_product_thumbnail: true}, flying_cart: {save_cart: true}},\n});\nconst settings = response.map.shopping_cart;\nconsole.log(settings.cart_page.show_product_thumbnail, settings.flying_cart.save_cart);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShoppingCart::patchShoppingCart($client, [\n    'shopping_cart' => [\n        'cart_page' => ['show_product_thumbnail' => true],\n        'flying_cart' => ['save_cart' => true],\n    ],\n]);\n\n$settings = $response->map['shopping_cart'];\necho $settings['cart_page']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;\necho $settings['flying_cart']['save_cart'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shoppingCart().patchShoppingCart(Map.of(\"shopping_cart\", Map.of(\n        \"cart_page\", Map.of(\"show_product_thumbnail\", true),\n        \"flying_cart\", Map.of(\"save_cart\", true))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shopping_cart\");\nSystem.out.println(((Map<?, ?>) settings.get(\"cart_page\")).get(\"show_product_thumbnail\"));\nSystem.out.println(((Map<?, ?>) settings.get(\"flying_cart\")).get(\"save_cart\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShoppingCart.PatchShoppingCartAsync(new Dictionary<string, object?>\n{\n    [\"shopping_cart\"] = new Dictionary<string, object?>\n    {\n        [\"cart_page\"] = new Dictionary<string, object?> { [\"show_product_thumbnail\"] = true },\n        [\"flying_cart\"] = new Dictionary<string, object?> { [\"save_cart\"] = true },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shoppingCart = (IReadOnlyDictionary<string, object?>)body[\"shopping_cart\"]!;\nvar flyingCart = (IReadOnlyDictionary<string, object?>)shoppingCart[\"flying_cart\"]!;\nConsole.WriteLine(flyingCart[\"save_cart\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shoppingCart.patchShoppingCart({\n  'shopping_cart': {\n    'cart_page': {'show_product_thumbnail': true},\n    'flying_cart': {'save_cart': true},\n  },\n});\nfinal shoppingCart = (response.map as Map)['shopping_cart'] as Map;\nprint(shoppingCart['cart_page']);\nprint(shoppingCart['flying_cart']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShoppingCartSettings().PatchShoppingCart(ctx, map[string]any{\n\t\"shopping_cart\": map[string]any{\n\t\t\"cart_page\":   map[string]any{\"show_product_thumbnail\": true},\n\t\t\"flying_cart\": map[string]any{\"save_cart\": true},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shopping_cart\"].(map[string]any)\nfmt.Println(settings[\"cart_page\"].(map[string]any)[\"show_product_thumbnail\"], settings[\"flying_cart\"].(map[string]any)[\"save_cart\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "shopping_cart"
+                ],
+                "properties": {
+                  "shopping_cart": {
+                    "$ref": "#/components/schemas/ShoppingCartSettings",
+                    "description": "The fields to change, grouped by section. Send only the fields that change."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Shopping cart"
+        ],
+        "summary": "Check the shopping cart settings",
+        "operationId": "head_shopping_cart",
+        "description": "Returns `200` with headers only and no body. The headers include `Content-Length: 0` and an `ETag`. Use it to check that the settings are reachable without downloading them.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including `Content-Length: 0` and an `ETag`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/page_settings/shopping_cart\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shopping_cart.head_shopping_cart()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shoppingCart.headShoppingCart();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShoppingCart::headShoppingCart($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shoppingCart().headShoppingCart();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShoppingCart.HeadShoppingCartAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shoppingCart.headShoppingCart();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShoppingCartSettings().HeadShoppingCart(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/settings/page_settings/shopping_cart/{section}": {
+      "get": {
+        "tags": [
+          "Shopping cart"
+        ],
+        "summary": "Get a shopping cart section",
+        "operationId": "get_shopping_cart_section",
+        "description": "Returns one section, wrapped in the section's own name, such as `flying_cart`, rather than in `shopping_cart`. The response has no `group_meta`. Add `field_metadata=true` to also get a description of each of the section's fields, keyed by field name. An unknown section returns `404 not_found`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `cart_page` for the cart page, or `flying_cart` for the slide-out flying cart.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cart_page",
+                "flying_cart"
+              ]
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each of the section's fields, keyed by field name. The section's settings are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section under its own key. With `field_metadata=true`, a `field_metadata` key is added beside it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Holds only the key of the section you asked for, and `field_metadata` when you ask for it.",
+                  "properties": {
+                    "cart_page": {
+                      "$ref": "#/components/schemas/CartPage"
+                    },
+                    "flying_cart": {
+                      "$ref": "#/components/schemas/FlyingCart"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ShoppingCartSectionFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`. Keyed by field name."
+                    }
+                  }
+                },
+                "example": {
+                  "cart_page": {
+                    "show_product_thumbnail": false,
+                    "enable_clear_cart": true,
+                    "save_cart": true
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The error `code` is `not_found` and the message is `Unknown page-settings section: shopping_cart/<section>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown page-settings section: shopping_cart/bogus",
+                    "details": [],
+                    "request_id": "6a2f9c41-3b7e-4d18-9c05-8e1d4f7a2b63"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/page_settings/shopping_cart/cart_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shopping_cart.get_shopping_cart_section(\"cart_page\")\ncart_page = response.map[\"cart_page\"]\nprint(cart_page[\"show_product_thumbnail\"], cart_page[\"enable_clear_cart\"])\nprint(cart_page[\"save_cart\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shoppingCart.getShoppingCartSection('cart_page');\nconst cartPage = response.map.cart_page;\nconsole.log(cartPage.show_product_thumbnail, cartPage.enable_clear_cart, cartPage.save_cart);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShoppingCart::getShoppingCartSection($client, 'cart_page');\n\nforeach ($response->map['cart_page'] as $field => $value) {\n    echo $field, ': ', $value ? 'true' : 'false', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shoppingCart().getShoppingCartSection(\"cart_page\");\nMap<?, ?> cartPage = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart_page\");\nSystem.out.println(cartPage.get(\"show_product_thumbnail\") + \" \" + cartPage.get(\"enable_clear_cart\"));\nSystem.out.println(cartPage.get(\"save_cart\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShoppingCart.GetShoppingCartSectionAsync(\"cart_page\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cartPage = (IReadOnlyDictionary<string, object?>)body[\"cart_page\"]!;\nConsole.WriteLine(cartPage[\"show_product_thumbnail\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.shoppingCart.getShoppingCartSection('cart_page');\nfinal section = (response.map as Map)['cart_page'] as Map;\nprint(section['show_product_thumbnail']);\nprint(section['save_cart']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShoppingCartSettings().GetShoppingCartSection(ctx, \"cart_page\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncartPage := resp.Map().(map[string]any)[\"cart_page\"].(map[string]any)\nfmt.Println(cartPage[\"show_product_thumbnail\"], cartPage[\"enable_clear_cart\"], cartPage[\"save_cart\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Shopping cart"
+        ],
+        "summary": "Update a shopping cart section",
+        "operationId": "patch_shopping_cart_section",
+        "description": "Send the fields to change, wrapped in the section's own name, such as `cart_page`. That is the only wrapper accepted: a body wrapped in `shopping_cart`, or not wrapped at all, is rejected with `400 invalid_request`. Returns the whole section after the change, under the same key and without `group_meta`.",
+        "parameters": [
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `cart_page` for the cart page, or `flying_cart` for the slide-out flying cart.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cart_page",
+                "flying_cart"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, under its own key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cart_page": {
+                      "$ref": "#/components/schemas/CartPage"
+                    },
+                    "flying_cart": {
+                      "$ref": "#/components/schemas/FlyingCart"
+                    }
+                  }
+                },
+                "example": {
+                  "cart_page": {
+                    "show_product_thumbnail": true,
+                    "enable_clear_cart": true,
+                    "save_cart": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `shopping_cart` or not wrapped at all, instead of in the section's name. The error `code` is `invalid_request`, `details[0].field` names the section and `details[0].code` is `required`. After this rejection, the next write on the same client returns the same rejection under a new `request_id`, even when that write is correct. The write after it succeeds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCartError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name. The error `code` is `not_found` and the message is `Unknown page-settings section: shopping_cart/<section>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Unknown page-settings section: shopping_cart/bogus",
+                    "details": [],
+                    "request_id": "6a2f9c41-3b7e-4d18-9c05-8e1d4f7a2b63"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many writes in a short time. Writes to both sections and to `/shopping_cart` are rejected until the time in the `Retry-After` header has passed. Reads still return `200`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShoppingCartError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/page_settings/shopping_cart/cart_page\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"cart_page\": {\n      \"show_product_thumbnail\": true\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shopping_cart.patch_shopping_cart_section(\n    \"cart_page\", {\"cart_page\": {\"show_product_thumbnail\": True}}\n)\nprint(response.map[\"cart_page\"][\"show_product_thumbnail\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shoppingCart.patchShoppingCartSection('cart_page', {\n    cart_page: {show_product_thumbnail: true},\n});\nconsole.log(response.map.cart_page.show_product_thumbnail);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\ShoppingCart;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShoppingCart::patchShoppingCartSection($client, 'cart_page', [\n    'cart_page' => ['show_product_thumbnail' => true],\n]);\n\necho $response->map['cart_page']['show_product_thumbnail'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shoppingCart().patchShoppingCartSection(\"cart_page\",\n        Map.of(\"cart_page\", Map.of(\"show_product_thumbnail\", true)));\nMap<?, ?> cartPage = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart_page\");\nSystem.out.println(cartPage.get(\"show_product_thumbnail\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShoppingCart.PatchShoppingCartSectionAsync(\"cart_page\", new Dictionary<string, object?>\n{\n    [\"cart_page\"] = new Dictionary<string, object?> { [\"show_product_thumbnail\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cartPage = (IReadOnlyDictionary<string, object?>)body[\"cart_page\"]!;\nConsole.WriteLine(cartPage[\"show_product_thumbnail\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander_sdk/webcommander_sdk.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.shoppingCart.patchShoppingCartSection('cart_page', {\n  'cart_page': {'show_product_thumbnail': true},\n});\nfinal section = (response.map as Map)['cart_page'] as Map;\nprint(section['show_product_thumbnail']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"bitbucket.org/webalive/webcommander-sdk-go/v3\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShoppingCartSettings().PatchShoppingCartSection(ctx, \"cart_page\", map[string]any{\n\t\"cart_page\": map[string]any{\"show_product_thumbnail\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"cart_page\"].(map[string]any)[\"show_product_thumbnail\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cart_page": {
+                    "$ref": "#/components/schemas/CartPage"
+                  },
+                  "flying_cart": {
+                    "$ref": "#/components/schemas/FlyingCart"
+                  }
+                },
+                "description": "Wrap the fields in the name of the section in the path. No other wrapper is accepted."
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/shipping_methods": {
       "get": {
         "tags": [
@@ -10028,6 +10611,170 @@
               "request_id": {
                 "type": "string",
                 "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "ShoppingCartSettings": {
+        "type": "object",
+        "description": "Both shopping cart sections.",
+        "properties": {
+          "cart_page": {
+            "$ref": "#/components/schemas/CartPage"
+          },
+          "flying_cart": {
+            "$ref": "#/components/schemas/FlyingCart"
+          }
+        }
+      },
+      "CartPage": {
+        "type": "object",
+        "description": "What the cart page offers a shopper.",
+        "properties": {
+          "show_product_thumbnail": {
+            "type": "boolean",
+            "description": "Show product images on the cart page. The store's default is `true`."
+          },
+          "enable_clear_cart": {
+            "type": "boolean",
+            "description": "Show a button that empties the cart. The store's default is `false`."
+          },
+          "save_cart": {
+            "type": "boolean",
+            "description": "Show the Save cart button on the cart page. The button comes from the `save-cart` plugin. The store's default is `false`."
+          }
+        }
+      },
+      "FlyingCart": {
+        "type": "object",
+        "description": "The slide-out flying cart, and what it offers a shopper.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Show the slide-out flying cart. The store's default is `false`."
+          },
+          "enable_clear_cart": {
+            "type": "boolean",
+            "description": "Show the empty cart button inside the flying cart. Its `field_metadata` entry has `requires: \"enabled\"`. Setting `enabled` to `false` does not change this field's stored value. The store's default is `false`."
+          },
+          "save_cart": {
+            "type": "boolean",
+            "description": "Show the Save cart action inside the flying cart. The action comes from the `save-cart` plugin. Its `field_metadata` entry has `requires: \"enabled\"`. Setting `enabled` to `false` does not change this field's stored value. The store's default is `false`."
+          }
+        }
+      },
+      "ShoppingCartGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. Only [Get shopping cart settings](/api-reference/shopping-cart/get-shopping-cart-settings) and [Update shopping cart settings](/api-reference/shopping-cart/update-shopping-cart-settings) return it.",
+        "properties": {
+          "cart_page": {
+            "$ref": "#/components/schemas/ShoppingCartSectionMeta"
+          },
+          "flying_cart": {
+            "$ref": "#/components/schemas/ShoppingCartSectionMeta"
+          }
+        }
+      },
+      "ShoppingCartSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the section is. `setting` for both sections."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write to the section. `true` for both sections."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's own path, such as `/api/v4/admin/settings/page_settings/shopping_cart/cart_page`."
+          }
+        }
+      },
+      "ShoppingCartFieldMetadata": {
+        "type": "object",
+        "description": "Describes every field, keyed by section and then by field name.",
+        "properties": {
+          "cart_page": {
+            "$ref": "#/components/schemas/ShoppingCartSectionFieldMetadata"
+          },
+          "flying_cart": {
+            "$ref": "#/components/schemas/ShoppingCartSectionFieldMetadata"
+          }
+        }
+      },
+      "ShoppingCartSectionFieldMetadata": {
+        "type": "object",
+        "description": "One entry for each of the section's fields, keyed by field name.",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/ShoppingCartFieldMetadataEntry"
+        }
+      },
+      "ShoppingCartFieldMetadataEntry": {
+        "type": "object",
+        "properties": {
+          "ui_label": {
+            "type": "string",
+            "description": "The field's label, such as `Display Flying Cart`."
+          },
+          "description": {
+            "type": "string",
+            "description": "What the field does."
+          },
+          "type": {
+            "type": "string",
+            "description": "The kind of value the field takes. `boolean` for every shopping cart field."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "The field's default value."
+          },
+          "plugin": {
+            "type": "string",
+            "description": "The plugin that provides the feature: `save-cart`. Only the two `save_cart` fields have it."
+          },
+          "requires": {
+            "type": "string",
+            "description": "The field of the same section that this one depends on: `enabled`. Only `flying_cart.enable_clear_cart` and `flying_cart.save_cart` have it."
+          }
+        }
+      },
+      "ShoppingCartError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `method_not_allowed`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong. For an unknown section, it is `Unknown page-settings section: shopping_cart/<section>`."
+              },
+              "details": {
+                "type": "array",
+                "description": "More about the rejection. When a section write is not wrapped in the section's name, the first entry's `field` names the section and its `code` is `required`.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or wrapper the rejection is about."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `required`."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies the request. A response that repeats an earlier rejection has a new `request_id`."
               }
             }
           }

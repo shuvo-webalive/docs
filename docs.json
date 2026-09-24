@@ -121,6 +121,18 @@
                   "api-reference/search-result-page/turn-a-product-promotion-on-or-off",
                   "api-reference/search-result-page/delete-a-product-promotion"
                 ]
+              },
+              {
+                "group": "Shopping cart",
+                "expanded": false,
+                "pages": [
+                  "shopping-cart",
+                  "api-reference/shopping-cart/get-shopping-cart-settings",
+                  "api-reference/shopping-cart/update-shopping-cart-settings",
+                  "api-reference/shopping-cart/check-the-shopping-cart-settings",
+                  "api-reference/shopping-cart/get-a-shopping-cart-section",
+                  "api-reference/shopping-cart/update-a-shopping-cart-section"
+                ]
               }
             ]
           },
