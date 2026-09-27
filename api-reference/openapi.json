@@ -22391,7 +22391,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.listInventoryLocations(client, {q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.is_default);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.listInventoryLocations({q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.is_default);\n}\n"
           },
           {
             "lang": "php",
@@ -22447,7 +22447,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.headInventoryLocations(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.headInventoryLocations();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -22546,7 +22546,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.createInventoryLocation(client, {\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.is_active);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.createInventoryLocation({\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.is_active);\n"
           },
           {
             "lang": "php",
@@ -22662,7 +22662,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.getInventoryLocation(client, 4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.is_active);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.getInventoryLocation(4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.is_active);\n"
           },
           {
             "lang": "php",
@@ -22728,7 +22728,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.headInventoryLocation(client, 4);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.headInventoryLocation(4);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -22827,7 +22827,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.updateInventoryLocation(client, 19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    is_active: true,\n    is_default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.is_active, inventoryLocation.is_default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.updateInventoryLocation(19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    is_active: true,\n    is_default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.is_active, inventoryLocation.is_default);\n"
           },
           {
             "lang": "php",
@@ -22928,7 +22928,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.deleteInventoryLocation(client, 19);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.deleteInventoryLocation(19);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -23088,7 +23088,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.getInventoryLocationStock(client, 4);\nfor (const product of response.map.products) {\n    console.log(product.product_id, product.name, product.stock);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.getInventoryLocationStock(4);\nfor (const product of response.map.products) {\n    console.log(product.product_id, product.name, product.stock);\n}\n"
           },
           {
             "lang": "php",
@@ -23194,7 +23194,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.setInventoryLocationDefault(client, 4);\nconsole.log(response.map.inventory_location.is_default, response.map.inventory_location.is_active);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.setInventoryLocationDefault(4);\nconsole.log(response.map.inventory_location.is_default, response.map.inventory_location.is_active);\n"
           },
           {
             "lang": "php",
@@ -23295,7 +23295,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, inventoryLocations} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await inventoryLocations.updateInventoryLocationStatus(client, 19, {is_active: true});\nconsole.log(response.map.inventory_location.is_active);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.updateInventoryLocationStatus(19, {is_active: true});\nconsole.log(response.map.inventory_location.is_active);\n"
           },
           {
             "lang": "php",
