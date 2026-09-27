@@ -21324,7 +21324,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxSettings.getTaxSettings(client);\nconst settings = response.map.tax_settings;\nconsole.log(settings.default_country, settings.default_tax_code, settings.default_tax_profile);\nconsole.log(settings.show_price_with_tax, settings.tax_message);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.getTaxSettings();\nconst settings = response.map.tax_settings;\nconsole.log(settings.default_country, settings.default_tax_code, settings.default_tax_profile);\nconsole.log(settings.show_price_with_tax, settings.tax_message);\n"
           },
           {
             "lang": "php",
@@ -21423,7 +21423,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxSettings.putTaxSettings(client, {settings: {tax_message: 'All prices include GST'}});\nconsole.log(response.map.tax_settings.tax_message);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.putTaxSettings({settings: {tax_message: 'All prices include GST'}});\nconsole.log(response.map.tax_settings.tax_message);\n"
           },
           {
             "lang": "php",
