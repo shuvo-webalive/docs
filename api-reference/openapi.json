@@ -17087,7 +17087,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.listShippingClasses(client, {limit: 20});\nfor (const shippingClass of response.map.shipping_classes) {\n    console.log(shippingClass.id, shippingClass.name, shippingClass.is_default);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.listShippingClasses({limit: 20});\nfor (const shippingClass of response.map.shipping_classes) {\n    console.log(shippingClass.id, shippingClass.name, shippingClass.is_default);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
           },
           {
             "lang": "php",
@@ -17143,7 +17143,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.headShippingClasses(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.headShippingClasses();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -17259,7 +17259,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.createShippingClass(client, {\n    shipping_class: {name: 'Bulky Goods', description: 'Items over 20kg'},\n});\nconsole.log(response.map.shipping_class.id, response.map.shipping_class.is_default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.createShippingClass({\n    shipping_class: {name: 'Bulky Goods', description: 'Items over 20kg'},\n});\nconsole.log(response.map.shipping_class.id, response.map.shipping_class.is_default);\n"
           },
           {
             "lang": "php",
@@ -17357,7 +17357,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.countShippingClasses(client);\nconsole.log(response.map.shipping_classes.count);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.countShippingClasses();\nconsole.log(response.map.shipping_classes.count);\n"
           },
           {
             "lang": "php",
@@ -17475,7 +17475,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.getShippingClass(client, 2);\nconst shippingClass = response.map.shipping_class;\nconsole.log(shippingClass.name, shippingClass.description, shippingClass.is_default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.getShippingClass(2);\nconst shippingClass = response.map.shipping_class;\nconsole.log(shippingClass.name, shippingClass.description, shippingClass.is_default);\n"
           },
           {
             "lang": "php",
@@ -17541,7 +17541,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.headShippingClass(client, 2);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.headShippingClass(2);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -17667,7 +17667,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.updateShippingClass(client, 3, {\n    shipping_class: {name: 'Bulky Goods', description: 'Items over 25kg'},\n});\nconsole.log(response.map.shipping_class.name, response.map.shipping_class.description);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.updateShippingClass(3, {\n    shipping_class: {name: 'Bulky Goods', description: 'Items over 25kg'},\n});\nconsole.log(response.map.shipping_class.name, response.map.shipping_class.description);\n"
           },
           {
             "lang": "php",
@@ -17791,7 +17791,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.deleteShippingClass(client, 3);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.deleteShippingClass(3);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -17879,7 +17879,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingClasses} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingClasses.setShippingClassDefault(client, 2);\nconsole.log(response.map.shipping_class.name, response.map.shipping_class.is_default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingClasses.setShippingClassDefault(2);\nconsole.log(response.map.shipping_class.name, response.map.shipping_class.is_default);\n"
           },
           {
             "lang": "php",
