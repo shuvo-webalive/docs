@@ -9214,7 +9214,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.getEcommerceSettings(client);\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status, settings.order_filters.default_shipment_status);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.ecommerceSettings.getEcommerceSettings();\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status, settings.order_filters.default_shipment_status);\n"
           },
           {
             "lang": "php",
@@ -9431,7 +9431,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.patchEcommerceSettings(client, {\n    ecommerce_settings: {\n        continue_shopping: {continue_shopping_target: 'previous'},\n        order_filters: {default_payment_status: 'unpaid'},\n    },\n});\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.ecommerceSettings.patchEcommerceSettings({\n    ecommerce_settings: {\n        continue_shopping: {continue_shopping_target: 'previous'},\n        order_filters: {default_payment_status: 'unpaid'},\n    },\n});\nconst settings = response.map.ecommerce_settings;\nconsole.log(settings.continue_shopping.continue_shopping_target);\nconsole.log(settings.order_filters.default_payment_status);\n"
           },
           {
             "lang": "php",
@@ -9506,7 +9506,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.headEcommerceSettings(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.ecommerceSettings.headEcommerceSettings();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -9648,7 +9648,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.getEcommerceSettingsSection(client, 'order_filters');\nconst filters = response.map.order_filters;\nconsole.log(filters.default_order_status, filters.default_payment_status, filters.default_shipment_status);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.ecommerceSettings.getEcommerceSettingsSection('order_filters');\nconst filters = response.map.order_filters;\nconsole.log(filters.default_order_status, filters.default_payment_status, filters.default_shipment_status);\n"
           },
           {
             "lang": "php",
@@ -9781,7 +9781,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, ecommerceSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await ecommerceSettings.patchEcommerceSettingsSection(client, 'order_filters', {\n    order_filters: {default_shipment_status: 'unshipped'},\n});\nconsole.log(response.map.order_filters.default_shipment_status);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.ecommerceSettings.patchEcommerceSettingsSection('order_filters', {\n    order_filters: {default_shipment_status: 'unshipped'},\n});\nconsole.log(response.map.order_filters.default_shipment_status);\n"
           },
           {
             "lang": "php",
