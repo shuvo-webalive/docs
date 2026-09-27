@@ -5024,7 +5024,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPage(client);\nconst information = response.map.search_result_page.product_information;\nconsole.log(information.display_short_description, information.number_of_searches_per_result.items_per_page);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.getSearchResultPage();\nconst information = response.map.search_result_page.product_information;\nconsole.log(information.display_short_description, information.number_of_searches_per_result.items_per_page);\n"
           },
           {
             "lang": "php",
@@ -5202,7 +5202,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPage(client, {\n    search_result_page: {product_information: {display_short_description: true}},\n});\nconsole.log(response.map.search_result_page.product_information.display_short_description);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.patchSearchResultPage({\n    search_result_page: {product_information: {display_short_description: true}},\n});\nconsole.log(response.map.search_result_page.product_information.display_short_description);\n"
           },
           {
             "lang": "php",
@@ -5282,7 +5282,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.headSearchResultPage(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.headSearchResultPage();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -5461,7 +5461,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPageSection(client, 'product_information');\nconst information = response.map.search_result_page.product_information;\nconsole.log(information.display_short_description, information.set_product_display_preferences.display_mode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.getSearchResultPageSection('product_information');\nconst information = response.map.search_result_page.product_information;\nconsole.log(information.display_short_description, information.set_product_display_preferences.display_mode);\n"
           },
           {
             "lang": "php",
@@ -5635,7 +5635,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPageSection(client, 'product_information', {\n    product_information: {display_short_description: true},\n});\nconsole.log(response.map.search_result_page.product_information.display_short_description);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.patchSearchResultPageSection('product_information', {\n    product_information: {display_short_description: true},\n});\nconsole.log(response.map.search_result_page.product_information.display_short_description);\n"
           },
           {
             "lang": "php",
@@ -5815,7 +5815,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPageProductPromotions(client);\nfor (const promotion of response.map.product_promotions) {\n    console.log(promotion.id, promotion.name, promotion.position, promotion.is_active);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.getSearchResultPageProductPromotions();\nfor (const promotion of response.map.product_promotions) {\n    console.log(promotion.id, promotion.name, promotion.position, promotion.is_active);\n}\n"
           },
           {
             "lang": "php",
@@ -5917,7 +5917,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.createSearchResultPageProductPromotion(client, {\n    product_promotion: {name: 'Spring campaign', rule: 'all_search_result', position: 'top'},\n});\nconsole.log(response.map.product_promotion.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.createSearchResultPageProductPromotion({\n    product_promotion: {name: 'Spring campaign', rule: 'all_search_result', position: 'top'},\n});\nconsole.log(response.map.product_promotion.id);\n"
           },
           {
             "lang": "php",
@@ -6051,7 +6051,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.getSearchResultPageProductPromotion(client, 4);\nconst promotion = response.map.product_promotion;\nconsole.log(promotion.name, promotion.rule, promotion.position, promotion.is_active);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.getSearchResultPageProductPromotion(4);\nconst promotion = response.map.product_promotion;\nconsole.log(promotion.name, promotion.rule, promotion.position, promotion.is_active);\n"
           },
           {
             "lang": "php",
@@ -6145,7 +6145,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPageProductPromotion(client, 6, {\n    product_promotion: {position: 'bottom'},\n});\nconsole.log(response.map.product_promotion.position);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.patchSearchResultPageProductPromotion(6, {\n    product_promotion: {position: 'bottom'},\n});\nconsole.log(response.map.product_promotion.position);\n"
           },
           {
             "lang": "php",
@@ -6247,7 +6247,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.deleteSearchResultPageProductPromotion(client, 6);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.deleteSearchResultPageProductPromotion(6);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -6343,7 +6343,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchResultPage} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchResultPage.patchSearchResultPageProductPromotionActive(client, 6, {\n    product_promotion: {is_active: false},\n});\nconsole.log(response.map.product_promotion.is_active);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.patchSearchResultPageProductPromotionActive(6, {\n    product_promotion: {is_active: false},\n});\nconsole.log(response.map.product_promotion.is_active);\n"
           },
           {
             "lang": "php",
