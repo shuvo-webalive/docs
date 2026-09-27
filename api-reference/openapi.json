@@ -24228,7 +24228,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, aliases} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await aliases.listAliases(client, {limit: 20});\nfor (const alias of response.map.aliases) {\n    console.log(alias.id, alias.alias);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.aliases.listAliases({limit: 20});\nfor (const alias of response.map.aliases) {\n    console.log(alias.id, alias.alias);\n}\n"
           },
           {
             "lang": "php",
@@ -24284,7 +24284,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, aliases} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await aliases.headAliases(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.aliases.headAliases();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -24414,7 +24414,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, aliases} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await aliases.createAlias(client, {alias: 'shop.example.com'});\nconsole.log(response.map.alias.id, response.map.alias.alias);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.aliases.createAlias({alias: 'shop.example.com'});\nconsole.log(response.map.alias.id, response.map.alias.alias);\n"
           },
           {
             "lang": "php",
@@ -24507,7 +24507,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, aliases} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await aliases.deleteAlias(client, 115);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.aliases.deleteAlias(115);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
