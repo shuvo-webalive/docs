@@ -21625,7 +21625,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.listTaxZones(client, {limit: 2});\nfor (const taxZone of response.map.tax_zones) {\n    console.log(taxZone.id, taxZone.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.next_page);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.listTaxZones({limit: 2});\nfor (const taxZone of response.map.tax_zones) {\n    console.log(taxZone.id, taxZone.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.next_page);\n"
           },
           {
             "lang": "php",
@@ -21681,7 +21681,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.headTaxZones(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.headTaxZones();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -21804,7 +21804,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.createTaxZone(client, {\n    tax_zone: {\n        name: 'Sydney Metro',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '3000'],\n    },\n});\nconsole.log(response.map.tax_zone.id, response.map.tax_zone.post_code);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.createTaxZone({\n    tax_zone: {\n        name: 'Sydney Metro',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '3000'],\n    },\n});\nconsole.log(response.map.tax_zone.id, response.map.tax_zone.post_code);\n"
           },
           {
             "lang": "php",
@@ -21940,7 +21940,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.getTaxZone(client, 1);\nconst taxZone = response.map.tax_zone;\nconsole.log(taxZone.name, taxZone.countries, taxZone.states, taxZone.post_code);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.getTaxZone(1);\nconst taxZone = response.map.tax_zone;\nconsole.log(taxZone.name, taxZone.countries, taxZone.states, taxZone.post_code);\n"
           },
           {
             "lang": "php",
@@ -22006,7 +22006,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.headTaxZone(client, 1);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.headTaxZone(1);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -22139,7 +22139,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.updateTaxZone(client, 83, {\n    tax_zone: {\n        name: 'Sydney Metro and Parramatta',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '2150'],\n    },\n});\nconsole.log(response.map.tax_zone.name, response.map.tax_zone.post_code);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.updateTaxZone(83, {\n    tax_zone: {\n        name: 'Sydney Metro and Parramatta',\n        countries: [{id: 12}],\n        states: [{id: 67}],\n        post_code: ['2000', '2150'],\n    },\n});\nconsole.log(response.map.tax_zone.name, response.map.tax_zone.post_code);\n"
           },
           {
             "lang": "php",
@@ -22233,7 +22233,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxZones} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxZones.deleteTaxZone(client, 83);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxZones.deleteTaxZone(83);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
