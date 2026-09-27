@@ -19991,7 +19991,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.listTaxProfiles(client, {limit: 20});\nfor (const taxProfile of response.map.tax_profiles) {\n    console.log(taxProfile.id, taxProfile.name, taxProfile.default);\n}\nconsole.log(response.map.pagination.total);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.listTaxProfiles({limit: 20});\nfor (const taxProfile of response.map.tax_profiles) {\n    console.log(taxProfile.id, taxProfile.name, taxProfile.default);\n}\nconsole.log(response.map.pagination.total);\n"
           },
           {
             "lang": "php",
@@ -20047,7 +20047,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.headTaxProfiles(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.headTaxProfiles();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -20145,7 +20145,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.createTaxProfile(client, {\n    tax_profile: {name: 'Wholesale', description: 'Profile for wholesale customers'},\n});\nconsole.log(response.map.tax_profile.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.createTaxProfile({\n    tax_profile: {name: 'Wholesale', description: 'Profile for wholesale customers'},\n});\nconsole.log(response.map.tax_profile.id);\n"
           },
           {
             "lang": "php",
@@ -20263,7 +20263,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.getTaxProfile(client, 2);\nconsole.log(response.map.tax_profile.name, response.map.tax_profile.default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.getTaxProfile(2);\nconsole.log(response.map.tax_profile.name, response.map.tax_profile.default);\n"
           },
           {
             "lang": "php",
@@ -20329,7 +20329,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.headTaxProfile(client, 2);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.headTaxProfile(2);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -20427,7 +20427,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.updateTaxProfile(client, 4, {tax_profile: {name: 'Wholesale AU'}});\nconsole.log(response.map.tax_profile.name);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.updateTaxProfile(4, {tax_profile: {name: 'Wholesale AU'}});\nconsole.log(response.map.tax_profile.name);\n"
           },
           {
             "lang": "php",
@@ -20521,7 +20521,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxProfiles.deleteTaxProfile(client, 4);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxProfiles.deleteTaxProfile(4);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
