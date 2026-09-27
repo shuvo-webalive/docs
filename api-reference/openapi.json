@@ -19406,7 +19406,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.listTaxCustomProfiles(client, {limit: 20});\nfor (const customProfile of response.map.custom_profiles) {\n    console.log(customProfile.id, customProfile.name, customProfile.rate_rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.listTaxCustomProfiles({limit: 20});\nfor (const customProfile of response.map.custom_profiles) {\n    console.log(customProfile.id, customProfile.name, customProfile.rate_rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
           },
           {
             "lang": "php",
@@ -19497,7 +19497,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.createTaxCustomProfile(client, {\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n});\nconsole.log(response.map.custom_profile.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n});\nconsole.log(response.map.custom_profile.id);\n"
           },
           {
             "lang": "php",
@@ -19637,7 +19637,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.getTaxCustomProfile(client, 1);\nconst customProfile = response.map.custom_profile;\nconsole.log(customProfile.name, customProfile.description, customProfile.rate_rules_count);\nfor (const rateRule of customProfile.rate_rules) {\n    console.log(rateRule.id, rateRule.name, rateRule.zones_count);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nconst customProfile = response.map.custom_profile;\nconsole.log(customProfile.name, customProfile.description, customProfile.rate_rules_count);\nfor (const rateRule of customProfile.rate_rules) {\n    console.log(rateRule.id, rateRule.name, rateRule.zones_count);\n}\n"
           },
           {
             "lang": "php",
@@ -19746,7 +19746,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.updateTaxCustomProfile(client, 7, {\n    custom_profile: {name: 'Wholesale and trade customers', description: 'Rates for wholesale and trade accounts'},\n});\nconsole.log(response.map.custom_profile.name, response.map.custom_profile.description);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.updateTaxCustomProfile(7, {\n    custom_profile: {name: 'Wholesale and trade customers', description: 'Rates for wholesale and trade accounts'},\n});\nconsole.log(response.map.custom_profile.name, response.map.custom_profile.description);\n"
           },
           {
             "lang": "php",
@@ -19830,7 +19830,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCustomProfiles} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCustomProfiles.deleteTaxCustomProfile(client, 7);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.deleteTaxCustomProfile(7);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
