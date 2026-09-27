@@ -18057,7 +18057,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.listTaxCodes(client, {limit: 20});\nfor (const taxCode of response.map.tax_codes) {\n    console.log(taxCode.id, taxCode.name, taxCode.rate);\n}\nconsole.log(response.map.pagination.total);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCodes.listTaxCodes({limit: 20});\nfor (const taxCode of response.map.tax_codes) {\n    console.log(taxCode.id, taxCode.name, taxCode.rate);\n}\nconsole.log(response.map.pagination.total);\n"
           },
           {
             "lang": "php",
@@ -18113,7 +18113,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.headTaxCodes(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCodes.headTaxCodes();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -18213,7 +18213,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst taxCode = {\n    name: 'LUXURY',\n    label: 'Luxury goods',\n    description: 'Higher rate for luxury goods',\n    rate: 15.0,\n    resolver_type: 'flat',\n    priority: 1,\n};\nconst response = await taxCodes.createTaxCode(client, {tax_code: taxCode});\nconsole.log(response.map.tax_code.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst taxCode = {\n    name: 'LUXURY',\n    label: 'Luxury goods',\n    description: 'Higher rate for luxury goods',\n    rate: 15.0,\n    resolver_type: 'flat',\n    priority: 1,\n};\nconst response = await client.taxCodes.createTaxCode({tax_code: taxCode});\nconsole.log(response.map.tax_code.id);\n"
           },
           {
             "lang": "php",
@@ -18333,7 +18333,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.getTaxCode(client, 2);\nconsole.log(response.map.tax_code.name, response.map.tax_code.rate);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCodes.getTaxCode(2);\nconsole.log(response.map.tax_code.name, response.map.tax_code.rate);\n"
           },
           {
             "lang": "php",
@@ -18399,7 +18399,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.headTaxCode(client, 2);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCodes.headTaxCode(2);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -18499,7 +18499,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.updateTaxCode(client, 105, {\n    tax_code: {label: 'Luxury items', priority: 1, resolver_type: 'flat'},\n});\nconsole.log(response.map.tax_code.label, response.map.tax_code.priority);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCodes.updateTaxCode(105, {\n    tax_code: {label: 'Luxury items', priority: 1, resolver_type: 'flat'},\n});\nconsole.log(response.map.tax_code.label, response.map.tax_code.priority);\n"
           },
           {
             "lang": "php",
@@ -18593,7 +18593,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxCodes} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxCodes.deleteTaxCode(client, 105);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxCodes.deleteTaxCode(105);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
