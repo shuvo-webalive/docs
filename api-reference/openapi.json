@@ -23476,7 +23476,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.listOrderFlags(client, {limit: 20});\nfor (const orderFlag of response.map.order_flags) {\n    console.log(orderFlag.id, orderFlag.name, orderFlag.color);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.listOrderFlags({limit: 20});\nfor (const orderFlag of response.map.order_flags) {\n    console.log(orderFlag.id, orderFlag.name, orderFlag.color);\n}\n"
           },
           {
             "lang": "php",
@@ -23532,7 +23532,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.headOrderFlags(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.headOrderFlags();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -23658,7 +23658,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.createOrderFlag(client, {\n    order_flag: {name: 'Awaiting Stock', color: '#5A7BD4', description: 'Waiting for stock to arrive.'},\n});\nconsole.log(response.map.order_flag.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.createOrderFlag({\n    order_flag: {name: 'Awaiting Stock', color: '#5A7BD4', description: 'Waiting for stock to arrive.'},\n});\nconsole.log(response.map.order_flag.id);\n"
           },
           {
             "lang": "php",
@@ -23783,7 +23783,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.getOrderFlag(client, 2);\nconsole.log(response.map.order_flag.name, response.map.order_flag.color);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.getOrderFlag(2);\nconsole.log(response.map.order_flag.name, response.map.order_flag.color);\n"
           },
           {
             "lang": "php",
@@ -23849,7 +23849,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.headOrderFlag(client, 2);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.headOrderFlag(2);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -23960,7 +23960,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.updateOrderFlag(client, 4, {\n    order_flag: {name: 'Awaiting Stock', color: '#B02E2E', description: 'Waiting for stock from the supplier.'},\n});\nconsole.log(response.map.order_flag.color, response.map.order_flag.description);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.updateOrderFlag(4, {\n    order_flag: {name: 'Awaiting Stock', color: '#B02E2E', description: 'Waiting for stock from the supplier.'},\n});\nconsole.log(response.map.order_flag.color, response.map.order_flag.description);\n"
           },
           {
             "lang": "php",
@@ -24062,7 +24062,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, orderFlags} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await orderFlags.deleteOrderFlag(client, 4);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.orderFlags.deleteOrderFlag(4);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
