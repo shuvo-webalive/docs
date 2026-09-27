@@ -16122,7 +16122,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.listShippingMethods(client, {limit: 20});\nfor (const shippingMethod of response.map.shipping_methods) {\n    console.log(shippingMethod.id, shippingMethod.name, shippingMethod.is_default);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.listShippingMethods({limit: 20});\nfor (const shippingMethod of response.map.shipping_methods) {\n    console.log(shippingMethod.id, shippingMethod.name, shippingMethod.is_default);\n}\n"
           },
           {
             "lang": "php",
@@ -16178,7 +16178,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.headShippingMethods(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.headShippingMethods();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -16293,7 +16293,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.createShippingMethod(client, {shipping_method: {name: 'Express Post'}});\nconsole.log(response.map.shipping_method.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.createShippingMethod({shipping_method: {name: 'Express Post'}});\nconsole.log(response.map.shipping_method.id);\n"
           },
           {
             "lang": "php",
@@ -16391,7 +16391,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.countShippingMethods(client);\nconsole.log(response.map.shipping_methods.count);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.countShippingMethods();\nconsole.log(response.map.shipping_methods.count);\n"
           },
           {
             "lang": "php",
@@ -16508,7 +16508,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.getShippingMethod(client, 2);\nconsole.log(response.map.shipping_method.name, response.map.shipping_method.is_default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.getShippingMethod(2);\nconsole.log(response.map.shipping_method.name, response.map.shipping_method.is_default);\n"
           },
           {
             "lang": "php",
@@ -16574,7 +16574,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.headShippingMethod(client, 2);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.headShippingMethod(2);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -16699,7 +16699,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.updateShippingMethod(client, 4, {\n    shipping_method: {name: 'Express Post Next Day'},\n});\nconsole.log(response.map.shipping_method.name);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.updateShippingMethod(4, {\n    shipping_method: {name: 'Express Post Next Day'},\n});\nconsole.log(response.map.shipping_method.name);\n"
           },
           {
             "lang": "php",
@@ -16823,7 +16823,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.deleteShippingMethod(client, 4);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.deleteShippingMethod(4);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -16910,7 +16910,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, shippingMethods} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await shippingMethods.setShippingMethodDefault(client, 2);\nconsole.log(response.map.shipping_method.is_default);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.shippingMethods.setShippingMethodDefault(2);\nconsole.log(response.map.shipping_method.is_default);\n"
           },
           {
             "lang": "php",
