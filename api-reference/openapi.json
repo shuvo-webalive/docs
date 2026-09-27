@@ -20688,7 +20688,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.listTaxRules(client, {limit: 20});\nfor (const taxRule of response.map.tax_rules) {\n    console.log(taxRule.id, taxRule.name, taxRule.default);\n}\nconsole.log(response.map.pagination.total);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.listTaxRules({limit: 20});\nfor (const taxRule of response.map.tax_rules) {\n    console.log(taxRule.id, taxRule.name, taxRule.default);\n}\nconsole.log(response.map.pagination.total);\n"
           },
           {
             "lang": "php",
@@ -20744,7 +20744,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.headTaxRules(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.headTaxRules();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -20846,7 +20846,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.createTaxRule(client, {\n    tax_rule: {name: 'Reduced rate', description: 'Rule for reduced-rate goods'},\n});\nconsole.log(response.map.tax_rule.id);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.createTaxRule({\n    tax_rule: {name: 'Reduced rate', description: 'Rule for reduced-rate goods'},\n});\nconsole.log(response.map.tax_rule.id);\n"
           },
           {
             "lang": "php",
@@ -20979,7 +20979,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.getTaxRule(client, 7);\nconst taxRule = response.map.tax_rule;\nconsole.log(taxRule.name, taxRule.code.name);\nfor (const zone of taxRule.zones) {\n    console.log(zone.id, zone.name);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.getTaxRule(7);\nconst taxRule = response.map.tax_rule;\nconsole.log(taxRule.name, taxRule.code.name);\nfor (const zone of taxRule.zones) {\n    console.log(zone.id, zone.name);\n}\n"
           },
           {
             "lang": "php",
@@ -21045,7 +21045,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.headTaxRule(client, 7);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.headTaxRule(7);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -21147,7 +21147,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.updateTaxRule(client, 42, {tax_rule: {name: 'Reduced rate goods'}});\nconsole.log(response.map.tax_rule.name);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.updateTaxRule(42, {tax_rule: {name: 'Reduced rate goods'}});\nconsole.log(response.map.tax_rule.name);\n"
           },
           {
             "lang": "php",
@@ -21241,7 +21241,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, taxRules} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await taxRules.deleteTaxRule(client, 42);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.taxRules.deleteTaxRule(42);\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
