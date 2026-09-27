@@ -11501,7 +11501,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.getSearchSettings(client);\nconst settings = response.map.search_settings;\nconsole.log(settings.searchable_content.placeholder_text, settings.searchable_content.product.enabled);\nconsole.log(settings.search_fields.match_keywords_exactly, settings.search_fields.fields.length);\nconsole.log(settings.synonyms.groups.length);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.getSearchSettings();\nconst settings = response.map.search_settings;\nconsole.log(settings.searchable_content.placeholder_text, settings.searchable_content.product.enabled);\nconsole.log(settings.search_fields.match_keywords_exactly, settings.search_fields.fields.length);\nconsole.log(settings.synonyms.groups.length);\n"
           },
           {
             "lang": "php",
@@ -11709,7 +11709,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.patchSearchSettings(client, {\n    search_settings: {\n        searchable_content: {placeholder_text: 'Search products'},\n        search_fields: {match_keywords_exactly: true},\n    },\n});\nconst settings = response.map.search_settings;\nconsole.log(settings.searchable_content.placeholder_text, settings.search_fields.match_keywords_exactly);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.patchSearchSettings({\n    search_settings: {\n        searchable_content: {placeholder_text: 'Search products'},\n        search_fields: {match_keywords_exactly: true},\n    },\n});\nconst settings = response.map.search_settings;\nconsole.log(settings.searchable_content.placeholder_text, settings.search_fields.match_keywords_exactly);\n"
           },
           {
             "lang": "php",
@@ -11912,7 +11912,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.putSearchSettings(client, {\n    search_settings: {\n        searchable_content: {\n            placeholder_text: 'Search products',\n            product: {enabled: true, display_heading: 'Product', excluded: [{id: 4, name: 'Gift Card'}]},\n            product_categories: {\n                enabled: true,\n                hide_parent_category: true,\n                display_heading: 'Product Categories',\n                excluded: [{id: 16, name: 'Clearance'}],\n            },\n            blog: {enabled: true, display_heading: 'Blog Posts', excluded: [{id: 13, name: 'Store News'}]},\n            other_pages: {enabled: true, display_heading: 'Other Pages', excluded: [{id: 4, name: 'Home - Copy'}]},\n        },\n        search_fields: {\n            match_keywords_exactly: false,\n            match_full_sentences: false,\n            fields: [\n                {field: 'title', priority: 1},\n                {field: 'tags', priority: 2},\n                {field: 'category', priority: 3},\n                {field: 'description', priority: 4},\n                {field: 'sku', priority: 5},\n                {field: 'brand', priority: 6},\n            ],\n        },\n        synonyms: {groups: [{keywords: ['mobile', 'phone', 'telephone']}, {keywords: ['shoe', 'footwear', 'sneaker']}]},\n    },\n});\nconst settings = response.map.search_settings;\nconsole.log(settings.searchable_content.placeholder_text, settings.search_fields.fields.length);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.putSearchSettings({\n    search_settings: {\n        searchable_content: {\n            placeholder_text: 'Search products',\n            product: {enabled: true, display_heading: 'Product', excluded: [{id: 4, name: 'Gift Card'}]},\n            product_categories: {\n                enabled: true,\n                hide_parent_category: true,\n                display_heading: 'Product Categories',\n                excluded: [{id: 16, name: 'Clearance'}],\n            },\n            blog: {enabled: true, display_heading: 'Blog Posts', excluded: [{id: 13, name: 'Store News'}]},\n            other_pages: {enabled: true, display_heading: 'Other Pages', excluded: [{id: 4, name: 'Home - Copy'}]},\n        },\n        search_fields: {\n            match_keywords_exactly: false,\n            match_full_sentences: false,\n            fields: [\n                {field: 'title', priority: 1},\n                {field: 'tags', priority: 2},\n                {field: 'category', priority: 3},\n                {field: 'description', priority: 4},\n                {field: 'sku', priority: 5},\n                {field: 'brand', priority: 6},\n            ],\n        },\n        synonyms: {groups: [{keywords: ['mobile', 'phone', 'telephone']}, {keywords: ['shoe', 'footwear', 'sneaker']}]},\n    },\n});\nconst settings = response.map.search_settings;\nconsole.log(settings.searchable_content.placeholder_text, settings.search_fields.fields.length);\n"
           },
           {
             "lang": "php",
@@ -11987,7 +11987,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.headSearchSettings(client);\nconsole.log(response.statusCode);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.headSearchSettings();\nconsole.log(response.statusCode);\n"
           },
           {
             "lang": "php",
@@ -12142,7 +12142,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.getSearchSettingsSection(client, 'search_fields');\nconst searchFields = response.map.search_fields;\nconsole.log(searchFields.match_keywords_exactly, searchFields.match_full_sentences);\nfor (const {field, priority} of searchFields.fields) {\n    console.log(field, priority);\n}\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.getSearchSettingsSection('search_fields');\nconst searchFields = response.map.search_fields;\nconsole.log(searchFields.match_keywords_exactly, searchFields.match_full_sentences);\nfor (const {field, priority} of searchFields.fields) {\n    console.log(field, priority);\n}\n"
           },
           {
             "lang": "php",
@@ -12274,7 +12274,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.patchSearchSettingsSection(client, 'search_fields', {\n    search_fields: {match_keywords_exactly: true},\n});\nconsole.log(response.map.search_fields.match_keywords_exactly);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.patchSearchSettingsSection('search_fields', {\n    search_fields: {match_keywords_exactly: true},\n});\nconsole.log(response.map.search_fields.match_keywords_exactly);\n"
           },
           {
             "lang": "php",
@@ -12428,7 +12428,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.putSearchSettingsSection(client, 'search_fields', {\n    search_fields: {\n        match_keywords_exactly: true,\n        match_full_sentences: false,\n        fields: [\n            {field: 'title', priority: 1},\n            {field: 'tags', priority: 2},\n            {field: 'category', priority: 3},\n            {field: 'description', priority: 4},\n            {field: 'sku', priority: 5},\n            {field: 'brand', priority: 6},\n        ],\n    },\n});\nconst searchFields = response.map.search_fields;\nconsole.log(searchFields.match_keywords_exactly, searchFields.match_full_sentences, searchFields.fields.length);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.putSearchSettingsSection('search_fields', {\n    search_fields: {\n        match_keywords_exactly: true,\n        match_full_sentences: false,\n        fields: [\n            {field: 'title', priority: 1},\n            {field: 'tags', priority: 2},\n            {field: 'category', priority: 3},\n            {field: 'description', priority: 4},\n            {field: 'sku', priority: 5},\n            {field: 'brand', priority: 6},\n        ],\n    },\n});\nconst searchFields = response.map.search_fields;\nconsole.log(searchFields.match_keywords_exactly, searchFields.match_full_sentences, searchFields.fields.length);\n"
           },
           {
             "lang": "php",
@@ -12531,7 +12531,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient, searchSettings} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await searchSettings.getSearchSettingsReindexStatus(client);\nconsole.log(response.map.state, response.map.started_at, response.map.finished_at, response.map.error);\n"
+            "source": "import {buildClient} from 'webcommander-sdk';\n\nconst client = await buildClient();\n\nconst response = await client.searchSettings.getSearchSettingsReindexStatus();\nconsole.log(response.map.state, response.map.started_at, response.map.finished_at, response.map.error);\n"
           },
           {
             "lang": "php",
