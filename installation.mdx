@@ -138,7 +138,7 @@ projects/
         <dependency>
             <groupId>com.webcommander</groupId>
             <artifactId>webcommander-sdk</artifactId>
-            <version>3.5.0</version>
+            <version>4.0.0</version>
         </dependency>
         ```
 
@@ -221,16 +221,16 @@ projects/
 
         go 1.24
 
-        require bitbucket.org/webalive/webcommander-sdk-go/v3 v3.0.0
+        require bitbucket.org/webalive/webcommander-sdk-go/v4 v4.0.0
 
-        replace bitbucket.org/webalive/webcommander-sdk-go/v3 => ../webcommander-sdk-go
+        replace bitbucket.org/webalive/webcommander-sdk-go/v4 => ../webcommander-sdk-go
         ```
 
-        `v3.0.0` is a placeholder that the `replace` line overrides. A `/v3` module needs a `v3` version here: Go rejects `v0.0.0`.
+        `v4.0.0` is a placeholder that the `replace` line overrides. A `/v4` module needs a `v4` version here: Go rejects `v0.0.0`.
       </Step>
       <Step title="Import it">
         ```go
-        import wc "bitbucket.org/webalive/webcommander-sdk-go/v3"
+        import wc "bitbucket.org/webalive/webcommander-sdk-go/v4"
         ```
       </Step>
     </Steps>
