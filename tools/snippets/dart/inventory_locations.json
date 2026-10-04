@@ -24,7 +24,7 @@
     },
     "update_inventory_location": {
       "function": "updateInventoryLocation",
-      "code": "final response = await client.inventoryLocations.updateInventoryLocation(19, {\n  'name': 'Perth Warehouse',\n  'address': '10 Example Street, Perth WA 6000',\n  'is_active': true,\n  'is_default': false,\n});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['address']} ${location['is_active']}');"
+      "code": "final response = await client.inventoryLocations.updateInventoryLocation(19, {\n  'name': 'Perth Warehouse',\n  'address': '10 Example Street, Perth WA 6000',\n  'active': true,\n  'default': false,\n});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['address']} ${location['active']}');"
     },
     "delete_inventory_location": {
       "function": "deleteInventoryLocation",
@@ -32,15 +32,15 @@
     },
     "get_inventory_location_stock": {
       "function": "getInventoryLocationStock",
-      "code": "final response = await client.inventoryLocations.getInventoryLocationStock(4);\nfinal products = (response.map as Map)['products'] as List;\nfor (final product in products) {\n  print('${(product as Map)['sku']} ${product['stock']}');\n}"
+      "code": "final response = await client.inventoryLocations.getInventoryLocationStock(4);\nfinal items = (response.map as Map)['items'] as List;\nfor (final item in items) {\n  final product = (item as Map)['product'] as Map;\n  print('${product['sku']} ${item['available_stock']}');\n}"
     },
     "set_inventory_location_default": {
       "function": "setInventoryLocationDefault",
-      "code": "final response =\n    await client.inventoryLocations.setInventoryLocationDefault(4);\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['is_default']}');"
+      "code": "final response =\n    await client.inventoryLocations.setInventoryLocationDefault(4);\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['default']}');"
     },
     "update_inventory_location_status": {
       "function": "updateInventoryLocationStatus",
-      "code": "final response = await client.inventoryLocations\n    .updateInventoryLocationStatus(19, {'is_active': true});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['is_active']}');"
+      "code": "final response = await client.inventoryLocations\n    .updateInventoryLocationStatus(19, {'active': true});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['active']}');"
     }
   }
 }

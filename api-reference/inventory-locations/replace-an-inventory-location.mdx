@@ -1,9 +1,9 @@
 ---
 title: "Replace an inventory location"
-description: "Replaces the location's `name`, `address`, `is_active` and `is_default` with your body and returns it."
+description: "Replaces the location's `name`, `address` and `active` with your body, sets `default` if you send it, and returns the location."
 openapi: "PUT /admin/inventory_locations/{inventory_location_id}"
 ---
 
-Send every field you want to keep, at the top level of the body. This call replaces the location rather than merging: a field you leave out is reset, so `address` becomes `""` and `is_active` and `is_default` become `false`. Leaving out `is_default` on the default location leaves the store with no default location. `name` is required, and a body without it returns `500`, not `400`.
+Send every field you want to keep, at the top level of the body. This call replaces the location rather than merging: `address` you leave out becomes `null`, and `active` you leave out becomes `true`. `default` you leave out keeps its value; `"default": true` makes this location the default, and `"default": false` on the default location is rejected with `409`. `name` is required. The call accepts the same fields as [Create an inventory location](/api-reference/inventory-locations/create-an-inventory-location), including `is_active` and `is_default`, and rejects the same fields.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

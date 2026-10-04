@@ -4,6 +4,6 @@ description: "Returns the inventory location whose `id` you pass as `inventory_l
 openapi: "GET /admin/inventory_locations/{inventory_location_id}"
 ---
 
-Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `is_active`, `is_default`, `created` and `updated`. The response has no `ETag` header. Unknown query parameters are ignored.
+Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `active`, `default`, `created_at` and `updated_at`. The response has no `ETag` header.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
