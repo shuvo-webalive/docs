@@ -4,7 +4,7 @@
   "endpoints": {
     "list_inventory_locations": {
       "function": "listInventoryLocations",
-      "code": "const response = await client.inventoryLocations.listInventoryLocations({q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.is_default);\n}\n"
+      "code": "const response = await client.inventoryLocations.listInventoryLocations({q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.default);\n}\n"
     },
     "head_inventory_locations": {
       "function": "headInventoryLocations",
@@ -12,11 +12,11 @@
     },
     "create_inventory_location": {
       "function": "createInventoryLocation",
-      "code": "const response = await client.inventoryLocations.createInventoryLocation({\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.is_active);\n"
+      "code": "const response = await client.inventoryLocations.createInventoryLocation({\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.active);\n"
     },
     "get_inventory_location": {
       "function": "getInventoryLocation",
-      "code": "const response = await client.inventoryLocations.getInventoryLocation(4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.is_active);\n"
+      "code": "const response = await client.inventoryLocations.getInventoryLocation(4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.active);\n"
     },
     "head_inventory_location": {
       "function": "headInventoryLocation",
@@ -24,7 +24,7 @@
     },
     "update_inventory_location": {
       "function": "updateInventoryLocation",
-      "code": "const response = await client.inventoryLocations.updateInventoryLocation(19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    is_active: true,\n    is_default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.is_active, inventoryLocation.is_default);\n"
+      "code": "const response = await client.inventoryLocations.updateInventoryLocation(19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    active: true,\n    default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.active, inventoryLocation.default);\n"
     },
     "delete_inventory_location": {
       "function": "deleteInventoryLocation",
@@ -32,15 +32,15 @@
     },
     "get_inventory_location_stock": {
       "function": "getInventoryLocationStock",
-      "code": "const response = await client.inventoryLocations.getInventoryLocationStock(4);\nfor (const product of response.map.products) {\n    console.log(product.product_id, product.name, product.stock);\n}\n"
+      "code": "const response = await client.inventoryLocations.getInventoryLocationStock(4);\nfor (const item of response.map.items) {\n    console.log(item.product.id, item.product.name, item.available_stock);\n}\n"
     },
     "set_inventory_location_default": {
       "function": "setInventoryLocationDefault",
-      "code": "const response = await client.inventoryLocations.setInventoryLocationDefault(4);\nconsole.log(response.map.inventory_location.is_default, response.map.inventory_location.is_active);\n"
+      "code": "const response = await client.inventoryLocations.setInventoryLocationDefault(4);\nconsole.log(response.map.inventory_location.default, response.map.inventory_location.active);\n"
     },
     "update_inventory_location_status": {
       "function": "updateInventoryLocationStatus",
-      "code": "const response = await client.inventoryLocations.updateInventoryLocationStatus(19, {is_active: true});\nconsole.log(response.map.inventory_location.is_active);\n"
+      "code": "const response = await client.inventoryLocations.updateInventoryLocationStatus(19, {active: true});\nconsole.log(response.map.inventory_location.active);\n"
     }
   }
 }

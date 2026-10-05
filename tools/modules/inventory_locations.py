@@ -13,33 +13,34 @@ DEFAULT_PAGE = "/api-reference/inventory-locations/set-the-default-inventory-loc
 STATUS_PAGE = "/api-reference/inventory-locations/activate-or-deactivate-an-inventory-location"
 
 WARNING = (
-    "**Replacing a location resets every field you leave out of the body.** `PUT` on a location does\n"
-    "  not merge: `address` becomes `\"\"`, and `is_active` and `is_default` become `false`. If you\n"
-    "  replace the default location and leave out `is_default`, the store has no default location\n"
-    "  until you give the flag back with [Set the default inventory location](" + DEFAULT_PAGE + ").\n"
-    "  Send every field you want to keep, `is_default` included."
+    "**Replacing a location resets `address` and `active` when you leave them out of the body.** `PUT`\n"
+    "  on a location does not merge: `address` becomes `null` and `active` becomes `true`. A `default`\n"
+    "  you leave out keeps its value. Send every field you want to keep."
 )
 
 NOTES = [
     "**Send the fields at the top level of the body, not inside `inventory_location`.** Create and\n"
-    "  replace both read `name`, `address`, `is_active` and `is_default` from the top level. A create\n"
-    "  wrapped in `{\"inventory_location\": {...}}` is rejected with `400` and the message\n"
-    "  `name is required`. Responses return the location inside `inventory_location`.",
+    "  replace both accept only `name`, `address`, `active` and `default`, at the top level. Any other\n"
+    "  field, including a wrapping `inventory_location`, is rejected with `400`. Responses return the\n"
+    "  location inside `inventory_location`.",
+    "**`is_active` and `is_default` are still accepted in request bodies.** The store reads them as\n"
+    "  `active` and `default` and returns only the new names. If you send both spellings of a field with\n"
+    "  different values, the request is rejected with `400` and the reason `conflicting_field`.",
     "**At most one location is the default.**\n"
     "  [Set the default inventory location](" + DEFAULT_PAGE + ") gives the flag to the location you name and\n"
-    "  takes it from the location that had it. A create with `\"is_default\": true` takes the flag the same\n"
-    "  way, and a replace that leaves out `is_default` clears it. You cannot delete the default location:\n"
-    "  make another location the default first, or the delete is rejected with `409`.",
-    "**A listing returns at most 20 locations per call, whatever `limit` you send.** The store checks\n"
-    "  `limit` but does not apply it: `pagination.limit` always shows `20`, and `limit=0` is rejected\n"
-    "  with `400`. To get more, send a higher `offset`, or a `page` (read as `offset = (page - 1) * 20`),\n"
-    "  while `pagination.has_next` is `true`. The stock listing pages the same way, 20 products at a\n"
-    "  time. Unknown query parameters are ignored, not rejected.",
+    "  takes it from the location that had it. A create or replace with `\"default\": true` takes the flag\n"
+    "  the same way. You cannot take the flag away with `\"default\": false` or delete the default\n"
+    "  location: make another location the default first, or the request is rejected with `409`.",
+    "**A listing returns 20 locations per call unless you send `limit`.** `limit` takes `1` to `100`,\n"
+    "  and `pagination.limit` shows the page size applied. To get more, send a higher `offset` while\n"
+    "  `pagination.has_next` is `true`. The listing accepts only `q`, `limit` and `offset`, and the stock\n"
+    "  listing only `limit` and `offset`: any other query parameter, `page` included, is rejected with\n"
+    "  `400`.",
     "**A `200` does not prove a write worked.** For a method these paths do not support, such as\n"
     "  `PATCH` on a location or any write to `/stock`, the store returns `200` with\n"
     "  `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and stores nothing. Use `PUT` to\n"
     "  replace a location, and [Activate or deactivate an inventory location](" + STATUS_PAGE + ") to change\n"
-    "  only `is_active`. No call changes stock.",
+    "  only `active`. No call changes stock.",
 ]
 
 INVENTORY_LOCATION_ID = {
@@ -51,41 +52,34 @@ INVENTORY_LOCATION_ID = {
 }
 
 Q = {"name": "q", "in": "query", "description": "Keeps only locations whose `name` contains this text, in any letter case. It does not search `address`.", "schema": {"type": "string", "example": "Sydney"}}
-LIMIT = {"name": "limit", "in": "query", "description": "The store checks `limit` but does not apply it: every page holds up to 20 locations, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`. A value that is not an integer is rejected with `400` and the message `'limit' must be a non-negative integer`.", "schema": {"type": "integer", "minimum": 1, "example": 20}}
-OFFSET = {"name": "offset", "in": "query", "description": "Number of locations to skip. When you send both `offset` and `page`, `offset` wins.", "schema": {"type": "integer", "example": 0}}
-PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * 20` whatever `limit` you send. When you send both `offset` and `page`, `offset` wins.", "schema": {"type": "integer", "example": 1}}
+LIMIT = {"name": "limit", "in": "query", "description": "The number of locations per page, from `1` to `100`. Defaults to `20`. `pagination.limit` shows the value applied. `0` and values above `100` are rejected with `400`.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 20}}
+OFFSET = {"name": "offset", "in": "query", "description": "Number of locations to skip.", "schema": {"type": "integer", "example": 0}}
 
-STOCK_LIMIT = {"name": "limit", "in": "query", "description": "The store does not apply `limit`: every page holds up to 20 products, and `pagination.limit` shows `20`.", "schema": {"type": "integer", "minimum": 1, "example": 20}}
-STOCK_OFFSET = {"name": "offset", "in": "query", "description": "Number of products to skip. When you send both `offset` and `page`, `offset` wins.", "schema": {"type": "integer", "example": 0}}
-STOCK_PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * 20` whatever `limit` you send. When you send both `offset` and `page`, `offset` wins.", "schema": {"type": "integer", "example": 1}}
+STOCK_LIMIT = {"name": "limit", "in": "query", "description": "The number of products per page. Defaults to `20`. `pagination.limit` shows the value applied.", "schema": {"type": "integer", "minimum": 1, "example": 20}}
+STOCK_OFFSET = {"name": "offset", "in": "query", "description": "Number of products to skip.", "schema": {"type": "integer", "example": 0}}
 
 ERROR_REF = {"$ref": "#/components/schemas/InventoryLocationError"}
-NOT_FOUND = {"status": "error", "code": 404, "message": "Inventory location not found"}
-DEFAULT_NOT_DELETABLE = {"status": "error", "code": 409, "message": "the default inventory location can not be deleted"}
-NOT_FOUND_RESPONSE = {"description": "No inventory location has that `inventory_location_id`. The message is `Inventory location not found`.", "schema": ERROR_REF, "example": NOT_FOUND}
+NOT_FOUND_RESPONSE = {"description": "No inventory location has that `inventory_location_id`.", "schema": ERROR_REF}
 
 ROW_REF = {"$ref": "#/components/schemas/InventoryLocation"}
 PAGINATION_REF = {"$ref": "#/components/schemas/InventoryLocationPagination"}
 ROW_RESPONSE = {"type": "object", "properties": {"inventory_location": ROW_REF}}
 
 SAMPLE_ROWS = [
-    {"id": 1, "name": "Sydney Warehouse", "address": "1 Example Street, Sydney NSW 2000", "is_active": True, "is_default": True, "created": "2026-07-16T06:24:24", "updated": "2026-08-19T11:14:38"},
-    {"id": 4, "name": "Sydney Store Room", "address": "2 Example Road, Sydney NSW 2000", "is_active": True, "is_default": False, "created": "2026-07-17T05:16:21", "updated": "2026-08-16T14:19:53"},
+    {"id": 1, "name": "Sydney Warehouse", "address": "1 Example Street, Sydney NSW 2000", "active": True, "default": True, "created_at": "2026-07-16T06:24:24", "updated_at": "2026-08-19T11:14:38"},
+    {"id": 4, "name": "Sydney Store Room", "address": "2 Example Road, Sydney NSW 2000", "active": True, "default": False, "created_at": "2026-07-17T05:16:21", "updated_at": "2026-08-16T14:19:53"},
 ]
 
-SAMPLE_PAGINATION = {
-    "total": 2, "limit": 20, "offset": 0, "count": 2, "current_page": 1, "total_pages": 1,
-    "has_next": False, "has_previous": False, "previous_page": None, "next_page": None,
-}
+SAMPLE_PAGINATION = {"total": 2, "limit": 20, "offset": 0, "has_previous": False, "has_next": False}
 
-CREATED_ROW = {"id": 19, "name": "Perth Warehouse", "address": "4 Example Street, Perth WA 6000", "is_active": False, "is_default": False, "created": "2026-09-24T09:15:02", "updated": "2026-09-24T09:15:02"}
-REPLACED_ROW = dict(CREATED_ROW, address="10 Example Street, Perth WA 6000", is_active=True, updated="2026-09-24T09:20:41")
-ACTIVATED_ROW = dict(CREATED_ROW, is_active=True, updated="2026-09-24T09:18:30")
-DEFAULT_ROW = dict(SAMPLE_ROWS[1], is_default=True, updated="2026-09-24T09:25:10")
+CREATED_ROW = {"id": 19, "name": "Perth Warehouse", "address": "4 Example Street, Perth WA 6000", "active": True, "default": False, "created_at": "2026-09-24T09:15:02", "updated_at": "2026-09-24T09:15:02"}
+REPLACED_ROW = dict(CREATED_ROW, address="10 Example Street, Perth WA 6000", updated_at="2026-09-24T09:20:41")
+DEACTIVATED_ROW = dict(CREATED_ROW, active=False, updated_at="2026-09-24T09:18:30")
+DEFAULT_ROW = dict(SAMPLE_ROWS[1], default=True, updated_at="2026-09-24T09:25:10")
 
-SAMPLE_PRODUCTS = [
-    {"product_id": 101, "name": "Cotton T-Shirt", "sku": "TSHIRT-001", "is_variation": False, "stock": 25, "low_stock_level": 5, "is_default": False},
-    {"product_id": 102, "name": "Canvas Tote Bag", "sku": "TOTE-001", "is_variation": False, "stock": 8, "low_stock_level": None, "is_default": False},
+SAMPLE_ITEMS = [
+    {"product": {"id": 101, "name": "Cotton T-Shirt", "sku": "TSHIRT-001"}, "variation": None, "available_stock": 25, "low_stock_level": 5, "default_for_product": False},
+    {"product": {"id": 102, "name": "Canvas Tote Bag", "sku": "TOTE-001"}, "variation": None, "available_stock": 8, "low_stock_level": None, "default_for_product": False},
 ]
 
 ENDPOINTS = [
@@ -95,19 +89,22 @@ ENDPOINTS = [
         "title": "List inventory locations",
         "method": "GET",
         "path": BASE,
-        "summary": "Returns up to 20 inventory locations per call, default location first, with paging details.",
-        "description": "Returns the inventory locations, up to 20 per call, with a `pagination` block. The default location comes first, then the rest, newest `created` first. Send `q` to keep only locations whose `name` contains that text. `field_metadata` and unknown parameters change nothing and are not rejected. After a rejected `limit=0`, the next request on the same client returns that rejection's body instead of its own.",
-        "parameters": [Q, LIMIT, OFFSET, PAGE],
+        "summary": "Returns up to 20 inventory locations per call, or the `limit` you send, default location first, with paging details.",
+        "description": "Returns the inventory locations, 20 per call unless you send `limit`, with a `pagination` block. The default location comes first, then the rest, newest `created_at` first. Send `q` to keep only locations whose `name` contains that text. Only `q`, `limit` and `offset` are accepted; any other query parameter, such as `page` or `field_metadata`, is rejected with `400`. After a `400`, the next one or two requests on the same connection can return that rejection's body instead of their own.",
+        "parameters": [Q, LIMIT, OFFSET],
         "responses": {
             "200": {
-                "description": "Up to 20 inventory locations in `inventory_locations`, and the paging details in `pagination`. The response has no `ETag` or `Last-Modified` header.",
+                "description": "The inventory locations on this page in `inventory_locations`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`. The response has no `ETag` or `Last-Modified` header.",
                 "schema": {"type": "object", "properties": {
                     "inventory_locations": {"type": "array", "items": ROW_REF},
                     "pagination": PAGINATION_REF,
                 }},
                 "example": {"inventory_locations": SAMPLE_ROWS, "pagination": SAMPLE_PAGINATION},
             },
-            "400": {"description": "You sent `limit=0`: the message is `'limit' must be a positive integer`. Or you sent a `limit` that is not an integer: the message is `'limit' must be a non-negative integer`."},
+            "400": {
+                "description": "You sent a query parameter the listing does not accept: the message is `unsupported query parameter '<name>'; supported: q, limit, offset`. Or you sent a `limit` of `0` or more than `100`.",
+                "schema": ERROR_REF,
+            },
         },
         "example_call": {"query": "q=Sydney"},
     },
@@ -131,7 +128,7 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE,
         "summary": "Creates an inventory location and returns it with its `id`, which other calls take as `inventory_location_id`.",
-        "description": "Send the fields at the top level of the body, not wrapped in `inventory_location`; only `name` is required. A new location has `is_active` and `is_default` set to `false` unless you send `true`, and sending `\"is_default\": true` takes the flag from the location that had it. The store sets the location's `id`, `created` and `updated` itself, and ignores any values you send for them and any unknown field. A `name` another location already has is accepted.",
+        "description": "Send the fields at the top level of the body, not wrapped in `inventory_location`; only `name` is required. A new location has `active` set to `true` and `default` set to `false` unless you send otherwise, and sending `\"default\": true` takes the flag from the location that had it. The store sets the location's `id`, `created_at` and `updated_at` itself: sending any of them is rejected with `400` and the reason `read_only_field`. Any field other than `name`, `address`, `active` and `default` is rejected with `400` and the reason `unknown_field`. `is_active` and `is_default` are accepted as other names for `active` and `default`. A `name` another location already has is accepted.",
         "body": {"schema": {"$ref": "#/components/schemas/InventoryLocationInput"}, "example": {"name": "Perth Warehouse", "address": "4 Example Street, Perth WA 6000"}},
         "responses": {
             "201": {
@@ -139,7 +136,7 @@ ENDPOINTS = [
                 "schema": ROW_RESPONSE,
                 "example": {"inventory_location": CREATED_ROW},
             },
-            "400": {"description": "`name` is missing or blank, or the body is wrapped in `inventory_location`. The message is `name is required`."},
+            "400": {"description": "`name` is missing or blank; the body has a field the store does not accept (reason `unknown_field`, message `accepted fields are: name, address, active, default`) or one it sets itself (reason `read_only_field`); `active` or `default` is not a boolean (reason `invalid_boolean`); or `active` and `is_active`, or `default` and `is_default`, have different values (reason `conflicting_field`).", "schema": ERROR_REF},
             "500": {"description": "`address` is an object instead of a string."},
         },
         "example_call": {},
@@ -151,7 +148,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{inventory_location_id}",
         "summary": "Returns the inventory location whose `id` you pass as `inventory_location_id`.",
-        "description": "Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `is_active`, `is_default`, `created` and `updated`. The response has no `ETag` header. Unknown query parameters are ignored.",
+        "description": "Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `active`, `default`, `created_at` and `updated_at`. The response has no `ETag` header.",
         "parameters": [INVENTORY_LOCATION_ID],
         "responses": {
             "200": {
@@ -183,17 +180,17 @@ ENDPOINTS = [
         "title": "Replace an inventory location",
         "method": "PUT",
         "path": BASE + "/{inventory_location_id}",
-        "summary": "Replaces the location's `name`, `address`, `is_active` and `is_default` with your body and returns it.",
-        "description": "Send every field you want to keep, at the top level of the body. This call replaces the location rather than merging: a field you leave out is reset, so `address` becomes `\"\"` and `is_active` and `is_default` become `false`. Leaving out `is_default` on the default location leaves the store with no default location. `name` is required, and a body without it returns `500`, not `400`.",
+        "summary": "Replaces the location's `name`, `address` and `active` with your body, sets `default` if you send it, and returns the location.",
+        "description": "Send every field you want to keep, at the top level of the body. This call replaces the location rather than merging: `address` you leave out becomes `null`, and `active` you leave out becomes `true`. `default` you leave out keeps its value; `\"default\": true` makes this location the default, and `\"default\": false` on the default location is rejected with `409`. `name` is required. The call accepts the same fields as [Create an inventory location](/api-reference/inventory-locations/create-an-inventory-location), including `is_active` and `is_default`, and rejects the same fields.",
         "parameters": [INVENTORY_LOCATION_ID],
-        "body": {"schema": {"$ref": "#/components/schemas/InventoryLocationInput"}, "example": {"name": "Perth Warehouse", "address": "10 Example Street, Perth WA 6000", "is_active": True, "is_default": False}},
+        "body": {"schema": {"$ref": "#/components/schemas/InventoryLocationInput"}, "example": {"name": "Perth Warehouse", "address": "10 Example Street, Perth WA 6000", "active": True}},
         "responses": {
             "200": {
                 "description": "The inventory location after the replace, with the values you sent.",
                 "schema": ROW_RESPONSE,
                 "example": {"inventory_location": REPLACED_ROW},
             },
-            "500": {"description": "The body has no `name`, for example `{}` or a body with only `address`. The message is `Unexpected Error Occurred`."},
+            "409": {"description": "You sent `\"default\": false` for the default location. The message is `the default inventory location can not be un-set; make another location the default instead`.", "schema": ERROR_REF},
         },
         "example_call": {"path": {"inventory_location_id": 19}},
     },
@@ -208,8 +205,8 @@ ENDPOINTS = [
         "parameters": [INVENTORY_LOCATION_ID],
         "responses": {
             "204": {"description": "Deleted. No body."},
-            "404": {"description": "No inventory location has that `inventory_location_id`, for example because you already deleted it."},
-            "409": {"description": "The location is the default. The message is `the default inventory location can not be deleted`.", "schema": ERROR_REF, "example": DEFAULT_NOT_DELETABLE},
+            "404": {"description": "No inventory location has that `inventory_location_id`, for example because you already deleted it.", "schema": ERROR_REF},
+            "409": {"description": "The location is the default. The message is `the default inventory location can not be deleted; make another location the default first`.", "schema": ERROR_REF},
         },
         "example_call": {"path": {"inventory_location_id": 19}},
     },
@@ -219,19 +216,20 @@ ENDPOINTS = [
         "title": "List stock at an inventory location",
         "method": "GET",
         "path": BASE + "/{inventory_location_id}/stock",
-        "summary": "Returns an inventory location and up to 20 of the products it holds, with paging details.",
-        "description": "Returns the location under `inventory_location`, up to 20 of its products under `products`, and a `pagination` block that counts products. A location that holds no products returns an empty `products` list, with `total` and `total_pages` set to `0`. Send `offset` or `page` to get the next products. This call is read-only: no call on this API changes stock.",
-        "parameters": [INVENTORY_LOCATION_ID, STOCK_LIMIT, STOCK_OFFSET, STOCK_PAGE],
+        "summary": "Returns an inventory location and up to 20 of the products it holds, or the `limit` you send, with paging details.",
+        "description": "Returns the location under `inventory_location`, its products under `items`, 20 per call unless you send `limit`, and a `pagination` block that counts products. Each item names the product in `product` and gives its `available_stock` at this location. A location that holds no products returns an empty `items` list, with `total` set to `0`. Send `offset` to get the next products. Only `limit` and `offset` are accepted; `q`, `page` and any other query parameter are rejected with `400`. This call is read-only: no call on this API changes stock.",
+        "parameters": [INVENTORY_LOCATION_ID, STOCK_LIMIT, STOCK_OFFSET],
         "responses": {
             "200": {
-                "description": "The inventory location in `inventory_location`, up to 20 of its products in `products`, and the paging details in `pagination`.",
+                "description": "The inventory location in `inventory_location`, its products in `items`, and the paging details in `pagination`.",
                 "schema": {"type": "object", "properties": {
                     "inventory_location": ROW_REF,
-                    "products": {"type": "array", "items": {"$ref": "#/components/schemas/InventoryLocationStockItem"}},
+                    "items": {"type": "array", "items": {"$ref": "#/components/schemas/InventoryLocationStockItem"}},
                     "pagination": PAGINATION_REF,
                 }},
-                "example": {"inventory_location": SAMPLE_ROWS[1], "products": SAMPLE_PRODUCTS, "pagination": SAMPLE_PAGINATION},
+                "example": {"inventory_location": SAMPLE_ROWS[1], "items": SAMPLE_ITEMS, "pagination": SAMPLE_PAGINATION},
             },
+            "400": {"description": "You sent a query parameter other than `limit` and `offset`.", "schema": ERROR_REF},
         },
         "example_call": {"path": {"inventory_location_id": 4}},
     },
@@ -242,7 +240,7 @@ ENDPOINTS = [
         "method": "PUT",
         "path": BASE + "/{inventory_location_id}/default",
         "summary": "Makes an inventory location the default and removes the flag from the previous one.",
-        "description": "Makes this location the default and returns it with `is_default` and `is_active` both `true`. The location that had the flag loses it, so this call also changes a location you did not name. The call reads no body, so anything you send is ignored.",
+        "description": "Makes this location the default and returns it with `default` and `active` both `true`. The location that had the flag loses it, so this call also changes a location you did not name. Send no body.",
         "parameters": [INVENTORY_LOCATION_ID],
         "responses": {
             "200": {
@@ -260,17 +258,17 @@ ENDPOINTS = [
         "title": "Activate or deactivate an inventory location",
         "method": "PUT",
         "path": BASE + "/{inventory_location_id}/status",
-        "summary": "Sets `is_active` on an inventory location and leaves every other field as it is.",
-        "description": "Send `{\"is_active\": true}` to activate the location or `{\"is_active\": false}` to deactivate it. The store reads only `is_active`: `name`, `is_default` and any other field stay as they are, even if you send them. A value that is not a boolean is read as true or false, so `1` and `\"yes\"` both activate. You can deactivate the default location with this call.",
+        "summary": "Sets `active` on an inventory location and leaves every other field as it is.",
+        "description": "Send `{\"active\": true}` to activate the location or `{\"active\": false}` to deactivate it. `active` is the only field the body accepts; `is_active` is accepted as another name for it. Any other field, `name` included, is rejected with `400`. You can deactivate the default location with this call: it stays the default.",
         "parameters": [INVENTORY_LOCATION_ID],
-        "body": {"schema": {"$ref": "#/components/schemas/InventoryLocationStatusInput"}, "example": {"is_active": True}},
+        "body": {"schema": {"$ref": "#/components/schemas/InventoryLocationStatusInput"}, "example": {"active": False}},
         "responses": {
             "200": {
-                "description": "The inventory location with its new `is_active` value.",
+                "description": "The inventory location with its new `active` value.",
                 "schema": ROW_RESPONSE,
-                "example": {"inventory_location": ACTIVATED_ROW},
+                "example": {"inventory_location": DEACTIVATED_ROW},
             },
-            "400": {"description": "`is_active` is missing. The message is `is_active is required`."},
+            "400": {"description": "`active` is missing: the message is `active: is required`. Or the body has another field: the message is `accepted fields are: active`. Or it sends both `active` and `is_active` (reason `conflicting_field`).", "schema": ERROR_REF},
         },
         "example_call": {"path": {"inventory_location_id": 19}},
     },
@@ -280,45 +278,49 @@ SCHEMAS = {
     "InventoryLocation": {"type": "object", "properties": {
         "id": {"type": "integer", "description": "The inventory location's id, assigned by the store. Pass it as `inventory_location_id` in a path."},
         "name": {"type": "string", "description": "The location's name. Two locations can have the same name."},
-        "address": {"type": "string", "description": "The location's address, as free text. `\"\"` when none is set."},
-        "is_active": {"type": "boolean", "description": "Whether the location is active. `false` on a new location unless you send `true`."},
-        "is_default": {"type": "boolean", "description": "`true` on the default location. At most one location has it."},
-        "created": {"type": "string", "description": "When the location was created, such as `2026-07-16T06:24:24`."},
-        "updated": {"type": "string", "description": "When the location last changed."},
+        "address": {"type": ["string", "null"], "description": "The location's address, as free text, or `null` when none is set."},
+        "active": {"type": "boolean", "description": "Whether the location is active. `true` on a new location unless you send `false`."},
+        "default": {"type": "boolean", "description": "`true` on the default location. At most one location has it."},
+        "created_at": {"type": "string", "description": "When the location was created, such as `2026-07-16T06:24:24`."},
+        "updated_at": {"type": "string", "description": "When the location last changed."},
     }},
-    "InventoryLocationInput": {"type": "object", "required": ["name"], "description": "Send these fields at the top level of the body. On a replace, a field you leave out is reset.", "properties": {
-        "name": {"type": "string", "description": "Required. On create, a blank `name` is rejected with `400`."},
-        "address": {"type": "string", "description": "Free text. Defaults to `\"\"`, and a replace without it sets it to `\"\"`. On create, an object here returns `500`."},
-        "is_active": {"type": "boolean", "description": "Defaults to `false`, and a replace without it sets it to `false`."},
-        "is_default": {"type": "boolean", "description": "On create, send `true` to make the new location the default; the location that had the flag loses it. Defaults to `false`, and a replace without it sets it to `false`."},
+    "InventoryLocationInput": {"type": "object", "required": ["name"], "description": "Send these fields at the top level of the body. Any other field is rejected with `400`. `is_active` and `is_default` are accepted as other names for `active` and `default`.", "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 250, "description": "Required, 1 to 250 characters."},
+        "address": {"type": ["string", "null"], "description": "Free text. A replace without it sets it to `null`. On create, an object here returns `500`."},
+        "active": {"type": "boolean", "description": "Defaults to `true`, and a replace without it sets it to `true`."},
+        "default": {"type": "boolean", "description": "Send `true` to make this location the default; the location that had the flag loses it. Defaults to `false` on create. A replace without it keeps the current value, and `false` on the default location is rejected with `409`."},
     }},
-    "InventoryLocationStatusInput": {"type": "object", "required": ["is_active"], "properties": {
-        "is_active": {"type": "boolean", "description": "Required. `true` activates the location and `false` deactivates it. Other values are read as true or false: `1` and `\"yes\"` both activate."},
+    "InventoryLocationStatusInput": {"type": "object", "required": ["active"], "description": "`active` is the only field accepted. `is_active` is accepted as another name for it.", "properties": {
+        "active": {"type": "boolean", "description": "Required. `true` activates the location and `false` deactivates it."},
     }},
-    "InventoryLocationStockItem": {"type": "object", "description": "One product held at the location.", "properties": {
-        "product_id": {"type": "integer", "description": "The product's id."},
+    "InventoryLocationStockProduct": {"type": "object", "description": "The product a stock item is for.", "properties": {
+        "id": {"type": "integer", "description": "The product's id."},
         "name": {"type": "string", "description": "The product's name."},
         "sku": {"type": "string", "description": "The product's SKU."},
-        "stock": {"type": "integer", "description": "How many of the product this location holds."},
+    }},
+    "InventoryLocationStockItem": {"type": "object", "description": "One product held at the location.", "properties": {
+        "product": {"$ref": "#/components/schemas/InventoryLocationStockProduct"},
+        "variation": {"type": ["object", "null"], "description": "The product variation this item is for, or `null` when the item is for the product itself."},
+        "available_stock": {"type": "integer", "description": "How many of the product are available at this location."},
         "low_stock_level": {"type": ["integer", "null"], "description": "The product's low-stock level, or `null`."},
-        "is_default": {"type": "boolean", "description": "A flag on the product itself. It does not say whether this location is the default."},
-        "is_variation": {"type": "boolean"},
+        "default_for_product": {"type": "boolean", "description": "Whether this location is the product's default location. It does not say whether this location is the store's default."},
     }},
     "InventoryLocationPagination": {"type": "object", "properties": {
         "total": {"type": "integer", "description": "On the listing, the number of locations that match your request. On the stock listing, the number of products at the location."},
-        "limit": {"type": "integer", "description": "The page size the store applied. Always `20`, whatever `limit` you send."},
+        "limit": {"type": "integer", "description": "The page size applied: the `limit` you sent, or `20`."},
         "offset": {"type": "integer", "description": "The number of items skipped before this page."},
-        "count": {"type": "integer", "description": "The number of items on this page."},
-        "current_page": {"type": "integer", "description": "The number of this page, counting from `1`."},
-        "total_pages": {"type": "integer", "description": "The number of pages. `0` when nothing matches."},
-        "has_next": {"type": "boolean", "description": "`true` when there is a page after this one."},
         "has_previous": {"type": "boolean", "description": "`true` when there is a page before this one."},
-        "previous_page": {"type": ["string", "null"], "description": "The full URL of the previous page, such as `https://your-store.example.com/api/v4/admin/inventory_locations?limit=20&offset=0`, or `null` when `has_previous` is `false`. It is set whenever `offset` is more than `0`, even when `current_page` is `1`."},
-        "next_page": {"type": ["string", "null"], "description": "The next page, or `null` when `has_next` is `false`. Check `has_next` before you request it."},
+        "has_next": {"type": "boolean", "description": "`true` when there is a page after this one."},
     }},
-    "InventoryLocationError": {"type": "object", "properties": {
-        "status": {"type": "string", "description": "`error`."},
-        "code": {"type": "integer", "description": "The HTTP status, such as `404` or `409`."},
-        "message": {"type": "string", "description": "What went wrong, such as `Inventory location not found`."},
-    }},
+    "InventoryLocationError": {"type": "object", "properties": {"error": {"type": "object", "properties": {
+        "code": {"type": "string", "description": "A machine-readable reason for the rejection."},
+        "message": {"type": "string", "description": "What went wrong, such as `accepted fields are: name, address, active, default`."},
+        "details": {"type": "array", "description": "One entry per rejected field or parameter, or an empty list.", "items": {"type": "object", "properties": {
+            "field": {"type": "string", "description": "The field or query parameter that was rejected."},
+            "code": {"type": "string", "description": "Why it was rejected."},
+            "message": {"type": ["string", "null"]},
+            "value": {"description": "The value you sent, when the API includes it."},
+        }}},
+        "request_id": {"type": "string", "description": "Identifies this request."},
+    }}}},
 }

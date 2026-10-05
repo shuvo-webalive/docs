@@ -74,10 +74,10 @@ SAMPLE_ORDER_FILTERS = {
 SAMPLE_LOCATION_SETTINGS = {
     "enable_multi_location": False,
     "locations": [
-        {"id": 1, "name": "Main Warehouse", "address": "1 Example Street, Sydney NSW 2000", "is_active": True,
-         "is_default": True, "created": "2026-07-16T06:24:24", "updated": "2026-08-25T05:00:56"},
-        {"id": 4, "name": "Second Warehouse", "address": "2 Example Street, Sydney NSW 2000", "is_active": True,
-         "is_default": False, "created": "2026-07-16T06:58:32", "updated": "2026-08-16T14:19:49"},
+        {"id": 1, "name": "Main Warehouse", "address": "1 Example Street, Sydney NSW 2000", "active": True,
+         "default": True, "created_at": "2026-07-16T06:24:24", "updated_at": "2026-08-25T05:00:56"},
+        {"id": 4, "name": "Second Warehouse", "address": "2 Example Street, Sydney NSW 2000", "active": True,
+         "default": False, "created_at": "2026-07-16T06:58:32", "updated_at": "2026-08-16T14:19:49"},
     ],
 }
 
@@ -325,11 +325,11 @@ SCHEMAS = {
     "EcommerceSettingsLocation": {"type": "object", "description": "One stock location, as `location_settings.locations` lists it.", "properties": {
         "id": {"type": "integer", "description": "The stock location's `id`, which `/api/v4/admin/inventory_locations/{inventory_location_id}` takes as `inventory_location_id`."},
         "name": {"type": "string", "description": "The location's name."},
-        "address": {"type": "string", "description": "The location's address."},
-        "is_active": {"type": "boolean", "description": "Whether the location is active."},
-        "is_default": {"type": "boolean", "description": "`true` on the store's default location."},
-        "created": {"type": "string", "description": "When the location was created, such as `2026-07-16T06:24:24`."},
-        "updated": {"type": "string", "description": "When the location was last changed."},
+        "address": {"type": ["string", "null"], "description": "The location's address, or `null` when none is set."},
+        "active": {"type": "boolean", "description": "Whether the location is active."},
+        "default": {"type": "boolean", "description": "`true` on the store's default location."},
+        "created_at": {"type": "string", "description": "When the location was created, such as `2026-07-16T06:24:24`."},
+        "updated_at": {"type": "string", "description": "When the location was last changed."},
     }},
     "EcommerceSettingsOrderFlag": {"type": "object", "description": "One order flag, as `order_flags` lists it.", "properties": {
         "id": {"type": "integer", "description": "The order flag's `id`, which `/api/v4/admin/order_flags/{order_flag_id}` takes as `order_flag_id`."},
