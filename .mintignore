@@ -6,13 +6,5 @@
 drafts/
 *.draft.mdx
 
-# Starter template pages, not yet written for WebCommander
-index.mdx
-quickstart.mdx
-concepts/
-guides/
-sdk/
-support/
-
 # Reference generator and its inputs
 tools/
