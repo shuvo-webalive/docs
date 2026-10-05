@@ -464,6 +464,19 @@
     "playground": {
       "display": "interactive",
       "proxy": true
+    },
+    "examples": {
+      "languages": [
+        "bash",
+        "python",
+        "javascript",
+        "php",
+        "java",
+        "csharp",
+        "dart",
+        "go"
+      ],
+      "autogenerate": false
     }
   },
   "interaction": {
