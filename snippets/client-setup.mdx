@@ -32,7 +32,7 @@ register_instances([
 ```
 
 ```javascript JavaScript
-import {AuthConfig, SdkConfig, registerInstances} from 'webcommander-sdk';
+import {AuthConfig, SdkConfig, registerInstances} from 'webcommander';
 
 registerInstances([
     new SdkConfig(
@@ -112,7 +112,7 @@ ClientRegistry.RegisterInstances([new SdkConfig(auth, raiseOnError: true)]);
 ```dart Dart
 import 'dart:io';
 
-import 'package:webcommander_sdk/webcommander_sdk.dart';
+import 'package:webcommander/webcommander.dart';
 
 Future<void> main() async {
   final env = Platform.environment;
@@ -139,7 +139,7 @@ import (
 	"log"
 	"os"
 
-	wc "bitbucket.org/webalive/webcommander-sdk-go/v4"
+	wc "github.com/WebCommanderCMS/webcommander-sdk-go/v4"
 )
 
 func main() {
