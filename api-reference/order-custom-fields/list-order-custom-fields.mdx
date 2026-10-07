@@ -1,0 +1,9 @@
+---
+title: "List order custom fields"
+description: "Returns up to 20 order custom fields per call, with the total and paging details."
+openapi: "GET /admin/order_custom_fields"
+---
+
+Returns up to 20 of the store's order custom fields under `order_custom_fields`, each with 12 keys; [Retrieve an order custom field](/api-reference/order-custom-fields/retrieve-an-order-custom-field) returns all 21. `pagination` gives the total number of matching fields and the page you are on, and `group_meta` marks the list read-only with `writable: false`. Send `filterBy` to keep one field type, `sort` and `dir` to order the fields, and `field_metadata=true` to add a description of each key. `q`, `search`, `name`, `label`, `is_active` and unknown parameters are accepted and ignored: no parameter searches the fields.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

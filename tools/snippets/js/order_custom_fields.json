@@ -1,0 +1,22 @@
+{
+  "sdk": "js",
+  "module": "order_custom_fields",
+  "endpoints": {
+    "list_order_custom_fields": {
+      "function": "listOrderCustomFields",
+      "code": "const response = await client.orderCustomFields.listOrderCustomFields({sort: 'label', dir: 'asc'});\nfor (const orderCustomField of response.map.order_custom_fields) {\n    console.log(orderCustomField.id, orderCustomField.label, orderCustomField.field_type);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "count_order_custom_fields": {
+      "function": "countOrderCustomFields",
+      "code": "const response = await client.orderCustomFields.countOrderCustomFields({filterBy: 'date'});\nconsole.log(response.map.count);\n"
+    },
+    "get_order_custom_field": {
+      "function": "getOrderCustomField",
+      "code": "const response = await client.orderCustomFields.getOrderCustomField(42);\nconst orderCustomField = response.map.order_custom_field;\nconsole.log(orderCustomField.label, orderCustomField.field_type, orderCustomField.is_required);\nconsole.log(orderCustomField.hover_text, orderCustomField.placeholder, orderCustomField.options);\n"
+    },
+    "validate_order_custom_field_timeslot": {
+      "function": "validateOrderCustomFieldTimeslot",
+      "code": "const response = await client.orderCustomFields.validateOrderCustomFieldTimeslot(42, {\n    selected_date: '25/10/2026',\n    weekday_id: 1,\n    start_hour: 9,\n    end_hour: 12,\n    order_limit: 10,\n});\nconsole.log(response.map.valid, response.map.message);\n"
+    }
+  }
+}

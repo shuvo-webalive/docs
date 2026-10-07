@@ -434,6 +434,24 @@
             ]
           },
           {
+            "group": "Orders",
+            "icon": "receipt",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Order custom fields",
+                "expanded": false,
+                "pages": [
+                  "order-custom-fields",
+                  "api-reference/order-custom-fields/list-order-custom-fields",
+                  "api-reference/order-custom-fields/count-order-custom-fields",
+                  "api-reference/order-custom-fields/retrieve-an-order-custom-field",
+                  "api-reference/order-custom-fields/validate-a-timeslot"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
