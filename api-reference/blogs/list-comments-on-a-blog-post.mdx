@@ -1,0 +1,9 @@
+---
+title: "List comments on a blog post"
+description: "Returns every comment on a blog post, oldest first, in one response."
+openapi: "GET /admin/blogs/{blog_id}/comments"
+---
+
+Returns every comment on the blog post under `comments`, oldest first and with no paging. The top-level `id` beside `comments` is the blog post's `id`, not a comment's. Query parameters are ignored. It returns the comments of a blog post in the trash too, and `404` for a `blog_id` that matches no blog post.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

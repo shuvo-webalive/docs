@@ -1,0 +1,9 @@
+---
+title: "Update a blog post"
+description: "Changes only the fields you send and returns the blog post."
+openapi: "PATCH /admin/blogs/{blog_id}"
+---
+
+Changes only the fields you send inside `blog`, and returns the blog post with `group_meta`. A new `title` leaves `url` as it was: to change `url`, send it beside `title`, because a `url` sent without `title` is ignored. Moving a restricted post to `open` or `hidden` sets `visible_to` to `null` but keeps `selected_customers`. Each field you send is checked the same way as on [Create a blog post](/api-reference/blogs/create-a-blog-post).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

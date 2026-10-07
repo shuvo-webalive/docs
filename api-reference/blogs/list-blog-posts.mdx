@@ -1,0 +1,9 @@
+---
+title: "List blog posts"
+description: "Returns up to 20 blog posts, latest `date` first, with the total and page links."
+openapi: "GET /admin/blogs"
+---
+
+Returns up to 20 blog posts under `blogs`, latest `date` first, with `group_meta` and a `pagination` block that holds the total and the links to the next and previous pages. Filter with `ids`, `category` and `visibility`, change the order with `sort` and `dir`, and send `page` or `offset` to get the next page. Any query parameter other than the ten on this page is rejected with `400`. After the listing rejects `limit=0`, a `sort` or a `dir`, your next request on the same client returns that same `400`, even when its own parameters are valid.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

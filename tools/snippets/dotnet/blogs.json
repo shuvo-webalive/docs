@@ -1,0 +1,54 @@
+{
+  "sdk": "dotnet",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "ListBlogsAsync",
+      "code": "var response = await client.Blogs.ListBlogsAsync(\n    new Dictionary<string, object?> { [\"visibility\"] = \"open\", [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var blog in ((IReadOnlyList<object?>)body[\"blogs\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{blog[\"id\"]} {blog[\"title\"]} {blog[\"date\"]} {blog[\"is_published\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "count_blogs": {
+      "function": "CountBlogsAsync",
+      "code": "var response = await client.Blogs.CountBlogsAsync(\n    new Dictionary<string, object?> { [\"visibility\"] = \"open\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogs = (IReadOnlyDictionary<string, object?>)body[\"blogs\"]!;\nConsole.WriteLine(blogs[\"count\"]);"
+    },
+    "create_blog": {
+      "function": "CreateBlogAsync",
+      "code": "var response = await client.Blogs.CreateBlogAsync(new Dictionary<string, object?>\n{\n    [\"blog\"] = new Dictionary<string, object?>\n    {\n        [\"title\"] = \"Spring Sale Announcement\",\n        [\"content\"] = \"<p>Save up to 40% on selected products until the end of the month.</p>\",\n        [\"date\"] = \"2026-09-28\", [\"is_published\"] = true, [\"visibility\"] = \"open\",\n        [\"categories\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 31 } },\n        [\"image\"] = new Dictionary<string, object?> { [\"file_name\"] = \"spring-cover.png\", [\"title\"] = \"Spring sale cover\",\n            [\"alternative_text\"] = \"Spring sale banner\", [\"base64\"] = \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\" },\n        [\"seo_configs\"] = new Dictionary<string, object?> { [\"meta_tag\"] = new List<object?>\n            { new Dictionary<string, object?> { [\"name\"] = \"description\", [\"value\"] = \"Spring sale: up to 40% off\" } } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blog = (IReadOnlyDictionary<string, object?>)body[\"blog\"]!;\nConsole.WriteLine($\"{blog[\"id\"]} {blog[\"title\"]} {blog[\"url\"]}\");"
+    },
+    "get_blog": {
+      "function": "GetBlogAsync",
+      "code": "var response = await client.Blogs.GetBlogAsync(1201);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blog = (IReadOnlyDictionary<string, object?>)body[\"blog\"]!;\nConsole.WriteLine($\"{blog[\"title\"]} {blog[\"url\"]} {blog[\"date\"]} {blog[\"visibility\"]} {blog[\"is_published\"]}\");\nforeach (var category in ((IReadOnlyList<object?>)blog[\"categories\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{category[\"id\"]} {category[\"name\"]}\");"
+    },
+    "update_blog": {
+      "function": "UpdateBlogAsync",
+      "code": "var response = await client.Blogs.UpdateBlogAsync(1201, new Dictionary<string, object?>\n{\n    [\"blog\"] = new Dictionary<string, object?>\n    {\n        [\"title\"] = \"Spring Sale Extended\", [\"content\"] = \"<p>The spring sale now runs one more week.</p>\",\n        [\"date\"] = \"2026-09-28\", [\"is_published\"] = true, [\"visibility\"] = \"restricted\", [\"visible_to\"] = \"selected\",\n        [\"categories\"] = new List<object?> { new Dictionary<string, object?> { [\"id\"] = 31 } },\n        [\"seo_configs\"] = new Dictionary<string, object?> { [\"meta_tag\"] = new List<object?>\n            { new Dictionary<string, object?> { [\"name\"] = \"description\", [\"value\"] = \"Spring sale: up to 40% off\" } } },\n        [\"selected_customers\"] = new Dictionary<string, object?>\n            { [\"customers\"] = new List<object?> { 5501 }, [\"groups\"] = new List<object?>() },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blog = (IReadOnlyDictionary<string, object?>)body[\"blog\"]!;\nConsole.WriteLine($\"{blog[\"title\"]} {blog[\"visibility\"]} {blog[\"visible_to\"]}\");\nvar audience = (IReadOnlyDictionary<string, object?>)blog[\"selected_customers\"]!;\nforeach (var customer in ((IReadOnlyList<object?>)audience[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"id\"]} {customer[\"name\"]}\");"
+    },
+    "patch_blog": {
+      "function": "PatchBlogAsync",
+      "code": "var response = await client.Blogs.PatchBlogAsync(1201, new Dictionary<string, object?>\n{\n    [\"blog\"] = new Dictionary<string, object?> { [\"title\"] = \"Spring Sale: Final Week\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blog = (IReadOnlyDictionary<string, object?>)body[\"blog\"]!;\nConsole.WriteLine($\"{blog[\"title\"]} {blog[\"url\"]} {blog[\"last_updated_on\"]}\");"
+    },
+    "delete_blog": {
+      "function": "DeleteBlogAsync",
+      "code": "var response = await client.Blogs.DeleteBlogAsync(1201);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "list_blog_comments": {
+      "function": "ListBlogCommentsAsync",
+      "code": "var response = await client.Blogs.ListBlogCommentsAsync(1201);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var comment in ((IReadOnlyList<object?>)body[\"comments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{comment[\"id\"]} {comment[\"status\"]} {comment[\"name\"]} {comment[\"content\"]}\");"
+    },
+    "create_blog_comment": {
+      "function": "CreateBlogCommentAsync",
+      "code": "var response = await client.Blogs.CreateBlogCommentAsync(1201, new Dictionary<string, object?>\n{\n    [\"blog\"] = new Dictionary<string, object?>\n    {\n        [\"comment\"] = new Dictionary<string, object?>\n            { [\"content\"] = \"Great article, thanks for the sale details!\", [\"name\"] = \"Ada Reader\", [\"email\"] = \"ada@example.com\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar comment = (IReadOnlyDictionary<string, object?>)body[\"comment\"]!;\nConsole.WriteLine($\"{comment[\"id\"]} {comment[\"status\"]} {comment[\"post_title\"]}\");"
+    },
+    "get_blog_comment": {
+      "function": "GetBlogCommentAsync",
+      "code": "var response = await client.Blogs.GetBlogCommentAsync(1201, 77);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar comment = (IReadOnlyDictionary<string, object?>)body[\"comment\"]!;\nConsole.WriteLine($\"{comment[\"status\"]} {comment[\"name\"]} {comment[\"email\"]}\");\nConsole.WriteLine(comment[\"content\"]);"
+    },
+    "approve_blog_comment": {
+      "function": "ApproveBlogCommentAsync",
+      "code": "var response = await client.Blogs.ApproveBlogCommentAsync(1201, 77);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar comment = (IReadOnlyDictionary<string, object?>)body[\"comment\"]!;\nConsole.WriteLine($\"{comment[\"id\"]} {comment[\"status\"]} {comment[\"spam\"]}\");"
+    },
+    "mark_blog_comment_spam": {
+      "function": "MarkBlogCommentSpamAsync",
+      "code": "var response = await client.Blogs.MarkBlogCommentSpamAsync(1201, 77);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar comment = (IReadOnlyDictionary<string, object?>)body[\"comment\"]!;\nConsole.WriteLine($\"{comment[\"id\"]} {comment[\"status\"]} {comment[\"spam\"]}\");"
+    }
+  }
+}

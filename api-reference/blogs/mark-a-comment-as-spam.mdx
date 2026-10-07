@@ -1,0 +1,9 @@
+---
+title: "Mark a comment as spam"
+description: "Sets a comment's `status` to `spam` and `spam` to `true`, and returns the comment."
+openapi: "POST /admin/blogs/{blog_id}/comments/{blog_comment_id}/mark-spam"
+---
+
+Sets the comment's `status` to `spam` and `spam` to `true`, and returns `201` with the comment. Send no body; one you send is ignored. [Approve a comment](/api-reference/blogs/approve-a-comment) later changes `status` to `approved` but leaves `spam` set to `true`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
