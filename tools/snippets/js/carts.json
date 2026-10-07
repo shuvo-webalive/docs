@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "carts",
+  "endpoints": {
+    "add_cart_item": {
+      "function": "addCartItem",
+      "code": "const response = await client.carts.addCartItem({\n    product_id: 101,\n    quantity: 1,\n    customer_id: 45,\n    session_id: 'cart-7f3a9c2e1b',\n    shipping_address: {\n        first_name: 'Alex', last_name: 'Taylor', address_line1: '1 Example Street', address_line2: '',\n        city: 'Sydney', post_code: '2000', phone: '', mobile: '', fax: '', email: 'alex.taylor@example.com',\n        country_code: 'AU', state_code: 'NSW',\n    },\n});\nconsole.log(response.map.cart.session_id, response.map.cart.items[0].id, response.map.cart.shipping.shipping_tax);\n"
+    },
+    "get_cart": {
+      "function": "getCart",
+      "code": "const response = await client.carts.getCart('cart-7f3a9c2e1b');\nconst cart = response.map.cart;\nfor (const item of cart.items) {\n    console.log(item.id, item.product.name, item.quantity, item.pricing.total);\n}\nconsole.log(cart.totals.subtotal, cart.shipping.shipping_tax, cart.totals.grand_total);\n"
+    },
+    "resolve_cart_session": {
+      "function": "resolveCartSession",
+      "code": "const response = await client.carts.resolveCartSession('cart-7f3a9c2e1b', {});\nconsole.log(response.map.sessionId);\n"
+    },
+    "update_cart_item": {
+      "function": "updateCartItem",
+      "code": "const response = await client.carts.updateCartItem('cart-7f3a9c2e1b', {cart_item_id: 42, quantity: 2});\nconst cart = response.map.cart;\nfor (const item of cart.items) {\n    console.log(item.id, item.quantity, item.pricing.total);\n}\nconsole.log(cart.totals.subtotal, cart.totals.grand_total);\n"
+    },
+    "delete_cart": {
+      "function": "deleteCart",
+      "code": "const response = await client.carts.deleteCart('cart-7f3a9c2e1b');\nconsole.log(response.statusCode);\n"
+    },
+    "delete_cart_item": {
+      "function": "deleteCartItem",
+      "code": "const response = await client.carts.deleteCartItem('cart-7f3a9c2e1b', 42);\nconsole.log(response.statusCode);\n"
+    },
+    "create_order_from_cart": {
+      "function": "createOrderFromCart",
+      "code": "const response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n    customer_id: 123,\n    payment_gateway: 'PIS',\n    delivery_type: 'shipping',\n    transaction_no: 'web-order-0001',\n});\nconst order = response.map.order;\nconsole.log(response.map.status, order.order_id, order.order_status, order.payment_status, order.grand_total);\n"
+    }
+  }
+}

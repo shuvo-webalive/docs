@@ -1,0 +1,9 @@
+---
+title: "Remove an item from a cart"
+description: "Removes one item from the cart and returns `204` with no body."
+openapi: "DELETE /carts/{session_id}/cart_items/{cart_item_id}"
+---
+
+Removes the cart item whose `id` you pass as `cart_item_id`, and returns `204` with no body. Take `cart_item_id` from `items[].id` in a cart response: the store numbers cart items across all carts, so do not count from `1`. Removing the last item empties the cart, so reading it afterwards returns `400` with the message `Your shopping cart is empty`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

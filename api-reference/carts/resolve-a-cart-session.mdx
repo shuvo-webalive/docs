@@ -1,0 +1,9 @@
+---
+title: "Resolve a cart session"
+description: "Returns the `session_id` to use, as `sessionId`, and changes no cart."
+openapi: "PUT /carts/{session_id}"
+---
+
+Returns `sessionId` and changes nothing: no cart moves or merges, even when `sessionId` names another cart. Send `{}` to get back the `session_id` from the path, or send a `sessionId` to get that value back. Send `"sessionId": null` or `""` to get your HTTP session's `JSESSIONID`: the cookie your client sends, or a new value when it sends none. A `session_id` key in the body is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
