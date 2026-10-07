@@ -1,0 +1,69 @@
+---
+title: "Discount profiles"
+sidebarTitle: "Overview"
+description: "List, create, replace and delete discount profiles, generate coupon codes for a profile, and assign a code to a customer."
+---
+
+The Discount profiles API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/discount_profiles`, except [Assign a coupon code to a customer](/api-reference/discount-profiles/assign-a-coupon-code-to-a-customer), which is `/api/v4/admin/discount_coupons/assign-customer`.
+
+<Warning>
+  **Replacing a discount profile resets every flag, date and limit you leave out of the body.** On `PUT`,
+  an omitted `is_*` flag becomes `false`, `start_date` becomes `null`, `end_date` becomes `""`, and
+  `maximum_use_count`, `maximum_use_customer_count` and `maximum_discount_allowed_amount` become
+  `null`. Send every value you want to keep, and always send the details block of the profile's
+  `discount_details_type`: without it the call returns `500` and changes nothing.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List discount profiles](/api-reference/discount-profiles/list-discount-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/discount_profiles` | Returns up to 20 discount profiles per call, newest first, with paging details. |
+| [Create a discount profile](/api-reference/discount-profiles/create-a-discount-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/discount_profiles` | Creates a discount profile and returns it with its `id`, which other calls take as `discount_profile_id`. |
+| [Retrieve a discount profile](/api-reference/discount-profiles/retrieve-a-discount-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/discount_profiles/{discount_profile_id}` | Returns the discount profile whose `id` you pass as `discount_profile_id`, with its coupon codes. |
+| [Replace a discount profile](/api-reference/discount-profiles/replace-a-discount-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/discount_profiles/{discount_profile_id}` | Replaces a discount profile and returns it, resetting any flag, date or limit you leave out. |
+| [Delete a discount profile](/api-reference/discount-profiles/delete-a-discount-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/discount_profiles/{discount_profile_id}` | Deletes a discount profile and its coupon codes permanently, and returns no body. |
+| [Generate coupon codes](/api-reference/discount-profiles/generate-coupon-codes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/discount_profiles/{discount_profile_id}/create-coupons` | Generates new coupon codes for a discount profile and returns them in `codes`. |
+| [Assign a coupon code to a customer](/api-reference/discount-profiles/assign-a-coupon-code-to-a-customer) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/admin/discount_coupons/assign-customer` | Assigns a coupon code to an existing customer by email and returns `status` set to `success`. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send a profile at the top level of the body, not inside `discount_profile`.** Create and replace
+  take the fields unwrapped, and responses return the profile inside `discount_profile`. A create
+  wrapped in `discount_profile` is rejected with `400` and the message
+  `name: Discount profile name is required`. A create drops any top-level field the store does not
+  know, without an error.
+- **Each profile has one details block, chosen by `discount_details_type`.** `amount` uses
+  `amount_details`, `shipping` uses `shipping_details` and `product` uses `product_details`. A profile
+  returns only its own block, and the other two keys are absent. A create with a missing or empty block
+  is rejected with `400`, but a block without a field the store needs returns `500 internal_error` and
+  stores nothing: a `single` `amount_details` needs `type`, `apply_to`, `single_amount` and
+  `single_amount_type`, a `shipping_details` needs `apply_to` and `minimum_qty_on`, and a
+  `product_details` needs `free_product_min_qty_on`.
+- **Dates go in as `yyyy-MM-dd HH:mm:ss` and come back in UTC.** The store reads `start_date` and
+  `end_date` in its own time zone and returns them converted to UTC as `yyyy-MM-ddTHH:mm:ss`, with no
+  zone suffix, so the time you read back can differ from the time you sent. A profile without dates
+  returns `start_date` as `null` and `end_date` as `""`. A create stores `end_date` only when the
+  same body sets `is_specify_end_date` to `true`.
+- **The listing returns at most 20 profiles per call and ignores unknown query parameters.** A larger
+  `limit` is capped at `20`. The listing reads only `limit`, `offset`, `page`, `sort`, `dir`, `type`,
+  `name` and `field_metadata`: any other parameter, such as `q`, `search` or `is_active`, is ignored, so
+  a misspelt filter returns the unfiltered listing. `dir` sorts descending when it is absent, empty or
+  exactly `desc`, and ascending for any other value, `DESC` included.
+- **Coupon codes belong to a profile.** [Generate coupon codes](/api-reference/discount-profiles/generate-coupon-codes) adds codes to a
+  profile that has `is_apply_coupon_code` set to `true`, and
+  [Assign a coupon code to a customer](/api-reference/discount-profiles/assign-a-coupon-code-to-a-customer) gives a code to a customer by email
+  address. Errors from the assign call come as a flat body with `status`, `message` and
+  `detailsMessage`, not the `error` object the other calls return. Deleting a profile deletes its codes.
+- **After a rejected read, the client's next call to the same endpoint can return the same error.**
+  After a listing is rejected with `400`, the next listing on that client can return the same `400`, even
+  when its own parameters are valid. After a `400` or `404` from
+  [Retrieve a discount profile](/api-reference/discount-profiles/retrieve-a-discount-profile), the next read of an existing profile on that
+  client can return the same error. A client created after the rejection is not affected, so send the
+  call again on a new client.

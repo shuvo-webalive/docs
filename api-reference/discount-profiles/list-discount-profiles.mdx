@@ -1,0 +1,9 @@
+---
+title: "List discount profiles"
+description: "Returns up to 20 discount profiles per call, newest first, with paging details."
+openapi: "GET /admin/discount_profiles"
+---
+
+Returns the discount profiles in `discount_profiles`, newest first, 20 per call unless you send a smaller `limit`. `pagination` gives the number of profiles that match your filters in `total`, and the URLs of the next and previous pages in `next_page` and `previous_page`. Send `name` to keep profiles whose name contains that text, `type` to keep one profile type, and `sort` with `dir` to change the order. A query parameter the listing does not read, such as `q`, `search` or `is_active`, is ignored, so a misspelt filter returns the unfiltered listing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
