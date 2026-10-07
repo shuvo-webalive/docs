@@ -1,0 +1,9 @@
+---
+title: "Retrieve a blog category"
+description: "Returns the blog category whose `id` you pass as `blog_category_id`."
+openapi: "GET /admin/blog_categories/{blog_category_id}"
+---
+
+Returns the blog category whose `id` you pass as `blog_category_id`, under the `blog_category` key, with the same ten fields as a listing entry. Query parameters are ignored, and the response has no `ETag` or `Last-Modified` header. `HEAD` on this path returns `404` even for a category that exists, so use this call to check that a category exists.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

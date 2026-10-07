@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "ListBlogCategories",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.BlogCategories().ListBlogCategories(ctx, map[string]any{\"limit\": 20, \"offset\": 0}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"blog_categories\"].([]any) {\n\tcategory := row.(map[string]any)\n\tfmt.Println(category[\"id\"], category[\"name\"], category[\"url\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "create_blog_category": {
+      "function": "CreateBlogCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.BlogCategories().CreateBlogCategory(ctx, map[string]any{\n\t\"blog_category\": map[string]any{\n\t\t\"name\":        \"Seasonal Promotions\",\n\t\t\"url\":         \"seasonal-promotions\",\n\t\t\"description\": \"Sale announcements and limited-time offers.\",\n\t\t\"image\": map[string]any{\n\t\t\t\"file_name\":        \"seasonal-promotions.png\",\n\t\t\t\"base64\":           \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n\t\t\t\"title\":            \"Seasonal promotions\",\n\t\t\t\"alternative_text\": \"Seasonal promotions banner\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"blog_category\"].(map[string]any)\nfmt.Println(category[\"id\"], category[\"url\"], category[\"image\"].(map[string]any)[\"link\"])"
+    },
+    "get_blog_category": {
+      "function": "GetBlogCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.BlogCategories().GetBlogCategory(ctx, 15, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"blog_category\"].(map[string]any)\nfmt.Println(category[\"name\"], category[\"url\"], category[\"description\"])\nfmt.Println(category[\"created_on\"], category[\"last_updated_on\"])"
+    },
+    "update_blog_category": {
+      "function": "UpdateBlogCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.BlogCategories().UpdateBlogCategory(ctx, 15, map[string]any{\n\t\"blog_category\": map[string]any{\n\t\t\"name\":        \"Seasonal Offers\",\n\t\t\"url\":         \"seasonal-offers\",\n\t\t\"description\": \"Offers and clearance announcements.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"blog_category\"].(map[string]any)\nfmt.Println(category[\"name\"], category[\"url\"], category[\"description\"])"
+    },
+    "delete_blog_category": {
+      "function": "DeleteBlogCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.BlogCategories().DeleteBlogCategory(ctx, 15, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}
