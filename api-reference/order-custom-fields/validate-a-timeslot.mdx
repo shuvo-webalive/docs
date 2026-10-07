@@ -1,0 +1,9 @@
+---
+title: "Validate a timeslot"
+description: "Checks a timeslot against an order limit and returns whether it is available. Stores nothing."
+openapi: "POST /admin/order_custom_fields/{order_custom_field_id}/validate_timeslot"
+---
+
+Checks a date and timeslot against an order limit, for the order custom field whose `id` you pass as `order_custom_field_id`, and returns `valid` and `message`. Send the keys at the top level of the body: `selected_date`, written `dd/MM/yyyy`, is required, and `start_hour` and `end_hour` are required when `order_limit` is above `0`. An `order_limit` of `0` returns `valid: false`, and a negative `order_limit`, or none, returns `valid: true`. Nothing is stored, and the field does not need to be a `delivery` field.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

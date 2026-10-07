@@ -1,0 +1,22 @@
+{
+  "sdk": "dotnet",
+  "module": "order_custom_fields",
+  "endpoints": {
+    "list_order_custom_fields": {
+      "function": "ListOrderCustomFieldsAsync",
+      "code": "var response = await client.OrderCustomFields.ListOrderCustomFieldsAsync(\n    new Dictionary<string, object?> { [\"sort\"] = \"label\", [\"dir\"] = \"asc\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var orderCustomField in ((IReadOnlyList<object?>)body[\"order_custom_fields\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderCustomField[\"id\"]} {orderCustomField[\"label\"]} {orderCustomField[\"field_type\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine(pagination[\"total\"]);"
+    },
+    "count_order_custom_fields": {
+      "function": "CountOrderCustomFieldsAsync",
+      "code": "var response = await client.OrderCustomFields.CountOrderCustomFieldsAsync(\n    new Dictionary<string, object?> { [\"filterBy\"] = \"date\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"count\"]);"
+    },
+    "get_order_custom_field": {
+      "function": "GetOrderCustomFieldAsync",
+      "code": "var response = await client.OrderCustomFields.GetOrderCustomFieldAsync(42);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orderCustomField = (IReadOnlyDictionary<string, object?>)body[\"order_custom_field\"]!;\nConsole.WriteLine($\"{orderCustomField[\"label\"]} {orderCustomField[\"field_type\"]} {orderCustomField[\"is_required\"]}\");\nConsole.WriteLine($\"{orderCustomField[\"hover_text\"]} {orderCustomField[\"placeholder\"]}\");"
+    },
+    "validate_order_custom_field_timeslot": {
+      "function": "ValidateOrderCustomFieldTimeslotAsync",
+      "code": "var response = await client.OrderCustomFields.ValidateOrderCustomFieldTimeslotAsync(42, new Dictionary<string, object?>\n{\n    [\"selected_date\"] = \"25/10/2026\", [\"weekday_id\"] = 1,\n    [\"start_hour\"] = 9, [\"end_hour\"] = 12, [\"order_limit\"] = 10,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"valid\"]} {body[\"message\"]}\");"
+    }
+  }
+}

@@ -63,6 +63,13 @@
       ]
     },
     {
+      "name": "Orders",
+      "icon": "receipt",
+      "modules": [
+        "order_custom_fields"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [
