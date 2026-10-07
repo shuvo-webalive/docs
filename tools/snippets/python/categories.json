@@ -1,0 +1,46 @@
+{
+  "sdk": "python",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "list_categories",
+      "code": "response = client.categories.list_categories(\n    {\"limit\": 10, \"offset\": 10, \"sort\": \"name\", \"dir\": \"asc\"}\n)\nfor category in response.map[\"categories\"]:\n    print(category[\"id\"], category[\"general\"][\"name\"], category[\"general\"][\"url\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "count_categories": {
+      "function": "count_categories",
+      "code": "response = client.categories.count_categories({\"searchText\": \"seasonal\"})\nprint(response.map[\"categories\"][\"count\"])\n"
+    },
+    "check_category_name": {
+      "function": "check_category_name",
+      "code": "response = client.categories.check_category_name(\"Seasonal Produce\")\nprint(response.map[\"available\"])\n"
+    },
+    "create_category": {
+      "function": "create_category",
+      "code": "response = client.categories.create_category({\"category\": {\n    \"general\": {\n        \"name\": \"Seasonal Produce\", \"title\": \"Seasonal Produce\", \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\", \"parent_category\": {\"id\": 4310},\n    },\n    \"description\": {\"content\": \"<p>What is in season right now.</p>\"},\n    \"availability_visibility\": {\"visible\": True, \"custom_sorting\": True, \"default_sorting\": \"alpha_asc\"},\n    \"tax_shipping\": {\"tax_message\": \"Prices include GST\"},\n    \"assign_products\": {\"products\": [101, 102]},\n}})\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"sku\"], category[\"general\"][\"url\"])\n"
+    },
+    "get_category": {
+      "function": "get_category",
+      "code": "response = client.categories.get_category(4321)\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"name\"], category[\"general\"][\"url\"])\nprint(category[\"in_trash\"], category[\"general\"][\"parent_category\"])\n"
+    },
+    "update_category": {
+      "function": "update_category",
+      "code": "response = client.categories.update_category(4321, {\n    \"category\": {\"general\": {\"name\": \"Seasonal Produce\", \"heading\": \"New heading\"}},\n})\ngeneral = response.map[\"category\"][\"general\"]\nprint(general[\"name\"], general[\"heading\"], general[\"summary\"])\n"
+    },
+    "patch_category": {
+      "function": "patch_category",
+      "code": "response = client.categories.patch_category(4321, {\n    \"category\": {\n        \"general\": {\"summary\": \"Updated summary\"},\n        \"availability_visibility\": {\"visible\": False},\n    },\n})\ncategory = response.map[\"category\"]\nprint(category[\"general\"][\"summary\"], category[\"availability_visibility\"][\"visible\"])\n"
+    },
+    "delete_category": {
+      "function": "delete_category",
+      "code": "response = client.categories.delete_category(4321)\nprint(response.status_code)\n"
+    },
+    "get_category_section": {
+      "function": "get_category_section",
+      "code": "response = client.categories.get_category_section(4321, \"tax_shipping\")\ntax_shipping = response.map[\"category\"][\"tax_shipping\"]\nprint(tax_shipping[\"tax_message\"], tax_shipping[\"enable_shipping\"])\nprint(tax_shipping[\"shipping_profile\"])\n"
+    },
+    "patch_category_section": {
+      "function": "patch_category_section",
+      "code": "response = client.categories.patch_category_section(\n    4321, \"assign_products\", {\"category\": {\"assign_products\": {\"products\": [101, 102, 103]}}}\n)\nfor product in response.map[\"category\"][\"assign_products\"][\"products\"]:\n    print(product[\"id\"], product[\"sku\"], product[\"name\"])\n"
+    }
+  }
+}

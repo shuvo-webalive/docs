@@ -1,0 +1,9 @@
+---
+title: "Retrieve a category"
+description: "Returns the category whose `id` you pass as `category_id`, with all six sections."
+openapi: "GET /admin/categories/{category_id}"
+---
+
+Returns the category under `category`, with its six sections and eight read-only fields, and `group_meta`. A category in the trash still returns `200`, with `in_trash` set to `true`. Send `field_metadata=true` to add a description of every field. The response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

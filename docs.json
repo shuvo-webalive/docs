@@ -434,6 +434,24 @@
             ]
           },
           {
+            "group": "Categories",
+            "icon": "folder-tree",
+            "expanded": false,
+            "pages": [
+              "categories",
+              "api-reference/categories/list-categories",
+              "api-reference/categories/count-categories",
+              "api-reference/categories/check-a-category-name",
+              "api-reference/categories/create-a-category",
+              "api-reference/categories/retrieve-a-category",
+              "api-reference/categories/replace-a-category",
+              "api-reference/categories/update-a-category",
+              "api-reference/categories/delete-a-category",
+              "api-reference/categories/retrieve-a-category-section",
+              "api-reference/categories/update-a-category-section"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
