@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "listBlogCategories",
+      "code": "final response = await client.blogCategories\n    .listBlogCategories(queryParams: {'limit': 20, 'offset': 0});\nfinal categories = (response.map as Map)['blog_categories'] as List;\nfor (final category in categories) {\n  print('${(category as Map)['id']} ${category['name']} ${category['url']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
+    "create_blog_category": {
+      "function": "createBlogCategory",
+      "code": "final response = await client.blogCategories.createBlogCategory({\n  'blog_category': {\n    'name': 'Seasonal Promotions',\n    'url': 'seasonal-promotions',\n    'description': 'Sale announcements and limited-time offers.',\n    'image': {\n      'file_name': 'seasonal-promotions.png',\n      'base64':\n          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',\n      'title': 'Seasonal promotions',\n      'alternative_text': 'Seasonal promotions banner',\n    },\n  },\n});\nfinal category = (response.map as Map)['blog_category'] as Map;\nprint('${category['id']} ${(category['image'] as Map)['link']}');"
+    },
+    "get_blog_category": {
+      "function": "getBlogCategory",
+      "code": "final response = await client.blogCategories.getBlogCategory(15);\nfinal category = (response.map as Map)['blog_category'] as Map;\nprint('${category['name']} ${category['url']} ${category['description']}');\nprint('${category['created_on']} ${category['last_updated_on']}');"
+    },
+    "update_blog_category": {
+      "function": "updateBlogCategory",
+      "code": "final response = await client.blogCategories.updateBlogCategory(15, {\n  'blog_category': {\n    'name': 'Seasonal Offers',\n    'url': 'seasonal-offers',\n    'description': 'Offers and clearance announcements.',\n  },\n});\nfinal category = (response.map as Map)['blog_category'] as Map;\nprint('${category['name']} ${category['url']} ${category['description']}');"
+    },
+    "delete_blog_category": {
+      "function": "deleteBlogCategory",
+      "code": "final response = await client.blogCategories.deleteBlogCategory(15);\nprint(response.statusCode);"
+    }
+  }
+}

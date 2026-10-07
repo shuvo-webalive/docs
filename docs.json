@@ -434,6 +434,25 @@
             ]
           },
           {
+            "group": "Blogs",
+            "icon": "newspaper",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Blog categories",
+                "expanded": false,
+                "pages": [
+                  "blog-categories",
+                  "api-reference/blog-categories/list-blog-categories",
+                  "api-reference/blog-categories/create-a-blog-category",
+                  "api-reference/blog-categories/retrieve-a-blog-category",
+                  "api-reference/blog-categories/update-a-blog-category",
+                  "api-reference/blog-categories/delete-a-blog-category"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

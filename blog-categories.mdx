@@ -1,0 +1,64 @@
+---
+title: "Blog categories"
+sidebarTitle: "Overview"
+description: "List, create, retrieve, update and delete the categories you file your blog posts under."
+---
+
+The Blog categories API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/blog_categories`.
+
+<Warning>
+  **Updating a blog category clears its `description` unless you send it again.** A `description`
+  you leave out of a `PUT`, or send as `null`, is saved as `""`, while a `url` or an `image` you
+  leave out keeps its value. `name` is required on every update. To keep the description, send it
+  with every call to [Update a blog category](/api-reference/blog-categories/update-a-blog-category).
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List blog categories](/api-reference/blog-categories/list-blog-categories) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blog_categories` | Returns up to 20 blog categories, ordered by `name`, with the total and page links. |
+| [Create a blog category](/api-reference/blog-categories/create-a-blog-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/blog_categories` | Creates a blog category and returns it with its `id`, which other calls take as `blog_category_id`. |
+| [Retrieve a blog category](/api-reference/blog-categories/retrieve-a-blog-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blog_categories/{blog_category_id}` | Returns the blog category whose `id` you pass as `blog_category_id`. |
+| [Update a blog category](/api-reference/blog-categories/update-a-blog-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/blog_categories/{blog_category_id}` | Changes a blog category and returns it. A `description` you leave out is cleared. |
+| [Delete a blog category](/api-reference/blog-categories/delete-a-blog-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/blog_categories/{blog_category_id}` | Deletes a blog category and its uploaded image permanently. Its blog posts are kept. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create and update wrap the category in `blog_category`.** Send
+  `{"blog_category": {"name": "Recipes"}}` to create a category. A body that sends the fields
+  without the wrapper, wraps them in the plural `blog_categories`, or is `{}` or
+  `{"blog_category": {}}`, is rejected with `400` and the message `blog_category info missing`.
+  Create, retrieve and update return the category inside `blog_category` too.
+- **`name` must be unique, and a create without `url` makes one from `name`.** `name` is required on
+  create and update, 2 to 255 characters. A `name` another category already has is rejected with
+  `400`, not `409`, and the message `Blog category name exists`. Whether the store makes the `url`
+  from `name` or you send one, it lowercases it, turns each run of characters other than ASCII
+  letters, digits and `_` into one hyphen, drops a hyphen at either end and cuts it to 50
+  characters. A `url` another category already has is saved with `-1` added to the end.
+- **An image is stored only when you send `base64`.** `image` takes `file_name`, `base64`, `title` and
+  `alternative_text`. Send `base64` without a `data:` prefix: a value such as
+  `data:image/png;base64,...` is rejected with `400`. Without `base64`, the other image fields are
+  ignored, so to change `title` or `alternative_text`, upload the image again. `image.link` ends in a
+  query string that changes on every read, and deleting the category deletes the uploaded file.
+- **Link blog posts with `blogs`; a category's responses never list them.** On a create, send `blogs`
+  as a list of entries that each hold a blog post's `id`, such as `[{"id": 1234}]`: each post then
+  lists the category in its `categories`. An update without `blogs`, or with `[]`, keeps every link.
+  Deleting a category keeps its blog posts and takes the category off their `categories`.
+- **A listing returns at most 20 categories per call, ordered by `name`.** The default order ignores
+  letter case; send `sort` and `dir` to change it. A larger `limit` is capped at `20`. To get more,
+  send the next `page` or a higher `offset` while `pagination.has_next` is `true`. Only `limit`,
+  `offset`, `page`, `sort`, `dir` and `field_metadata` are accepted: any other parameter, such as
+  `q`, `search` or `name`, is rejected with `400`. There is no count endpoint:
+  `GET /admin/blog_categories/count` is rejected with `400` and the message `id must be a number`,
+  so read `pagination.total` instead.
+- **After a rejected `limit`, `offset`, `page`, `sort` or `dir`, your next request on the same client returns the same `400`.**
+  It does so even when its own parameters are valid, with a new `request_id`. The request after that
+  runs normally, and so does every request on a new client: send the request that got the repeated
+  `400` again.

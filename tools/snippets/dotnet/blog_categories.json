@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "ListBlogCategoriesAsync",
+      "code": "var response = await client.BlogCategories.ListBlogCategoriesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20, [\"offset\"] = 0 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var blogCategory in ((IReadOnlyList<object?>)body[\"blog_categories\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{blogCategory[\"id\"]} {blogCategory[\"name\"]} {blogCategory[\"url\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "create_blog_category": {
+      "function": "CreateBlogCategoryAsync",
+      "code": "var response = await client.BlogCategories.CreateBlogCategoryAsync(new Dictionary<string, object?>\n{\n    [\"blog_category\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Seasonal Promotions\", [\"url\"] = \"seasonal-promotions\", [\"description\"] = \"Sale announcements and limited-time offers.\",\n        [\"image\"] = new Dictionary<string, object?> { [\"file_name\"] = \"seasonal-promotions.png\", [\"title\"] = \"Seasonal promotions\",\n            [\"alternative_text\"] = \"Seasonal promotions banner\", [\"base64\"] = \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogCategory = (IReadOnlyDictionary<string, object?>)body[\"blog_category\"]!;\nConsole.WriteLine($\"{blogCategory[\"id\"]} {blogCategory[\"name\"]} {blogCategory[\"url\"]}\");"
+    },
+    "get_blog_category": {
+      "function": "GetBlogCategoryAsync",
+      "code": "var response = await client.BlogCategories.GetBlogCategoryAsync(15);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogCategory = (IReadOnlyDictionary<string, object?>)body[\"blog_category\"]!;\nConsole.WriteLine($\"{blogCategory[\"name\"]} {blogCategory[\"url\"]} {blogCategory[\"description\"]}\");\nConsole.WriteLine($\"{blogCategory[\"created_on\"]} {blogCategory[\"last_updated_on\"]}\");"
+    },
+    "update_blog_category": {
+      "function": "UpdateBlogCategoryAsync",
+      "code": "var response = await client.BlogCategories.UpdateBlogCategoryAsync(15, new Dictionary<string, object?>\n{\n    [\"blog_category\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Seasonal Offers\", [\"url\"] = \"seasonal-offers\", [\"description\"] = \"Offers and clearance announcements.\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogCategory = (IReadOnlyDictionary<string, object?>)body[\"blog_category\"]!;\nConsole.WriteLine($\"{blogCategory[\"name\"]} {blogCategory[\"url\"]} {blogCategory[\"description\"]}\");"
+    },
+    "delete_blog_category": {
+      "function": "DeleteBlogCategoryAsync",
+      "code": "var response = await client.BlogCategories.DeleteBlogCategoryAsync(15);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

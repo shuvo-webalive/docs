@@ -103,6 +103,9 @@
       "name": "Order flags"
     },
     {
+      "name": "Blog categories"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -24064,6 +24067,716 @@
         ]
       }
     },
+    "/admin/blog_categories": {
+      "get": {
+        "tags": [
+          "Blog categories"
+        ],
+        "summary": "List blog categories",
+        "operationId": "list_blog_categories",
+        "description": "Returns up to 20 blog categories under `blog_categories`, ordered by `name` and ignoring letter case, and `pagination` with the total and the links to the next and previous pages. Send `sort` and `dir` to change the order, and `page` or `offset` to get the next page. Only `limit`, `offset`, `page`, `sort`, `dir` and `field_metadata` are accepted; any other parameter, such as `q` or `name`, is rejected with `400`. After a rejected `limit`, `offset`, `page`, `sort` or `dir`, your next request on the same client returns that same `400`, even when its own parameters are valid.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of blog categories per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`. A negative number, or a value that is not a number such as `abc`, is rejected with `400` and the message `'limit' must be a non-negative integer`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of blog categories to skip. When you send both `offset` and `page`, `offset` wins. A negative number, or a value that is not a number such as `abc`, is rejected with `400` and the message `'offset' must be a non-negative integer`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit` against the limit the store applied. `page=2` alone skips 20 categories; `limit=1&page=2` skips 1. A page past the last category returns no categories. A negative number, or a value that is not a number such as `abc`, is rejected with `400` and the message `'page' must be a non-negative integer`.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "What to sort the blog categories by: `id`, `name`, `url`, `description`, `created` or `updated`. Without `sort`, the categories are ordered by `name`, ignoring letter case. Any other value, such as `Name` or `-id`, is rejected with `400` and the message `Sort field not exist`. So are `created_on` and `last_updated_on`, although a blog category has fields with those names. To reverse the order, send `dir=desc`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name",
+                "url",
+                "description",
+                "created",
+                "updated"
+              ],
+              "example": "id"
+            }
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`, in lower case. `dir=desc` without `sort` lists the categories by `name` in reverse. `DESC`, `Desc` or any other capitalised form is not rejected, but the store ignores it and returns the categories in ascending order. Any other value, such as `sideways`, is rejected with `400` and the message `Sort order must be asc or desc`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "desc"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Accepted, but adds nothing: the response still has only `blog_categories` and `pagination`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blog categories on this page under `blog_categories`, and `pagination` with the total, the page size and links to the next and previous pages. `field_metadata=true` adds no key. The response has no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "blog_categories": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BlogCategory"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/BlogCategoryPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "blog_categories": [
+                    {
+                      "id": 12,
+                      "name": "Product News",
+                      "url": "product-news",
+                      "description": "New arrivals and product updates.",
+                      "is_disposable": false,
+                      "is_in_trash": false,
+                      "image": {},
+                      "created_on": "2026-07-16T06:24:24",
+                      "last_updated_on": "2026-08-19T11:14:38",
+                      "seo_configs": []
+                    },
+                    {
+                      "id": 9,
+                      "name": "Recipes",
+                      "url": "recipes",
+                      "description": "Cooking with our products.",
+                      "is_disposable": false,
+                      "is_in_trash": false,
+                      "image": {},
+                      "created_on": "2026-07-14T02:10:51",
+                      "last_updated_on": "2026-07-14T02:10:51",
+                      "seo_configs": []
+                    },
+                    {
+                      "id": 15,
+                      "name": "Seasonal Promotions",
+                      "url": "seasonal-promotions",
+                      "description": "Sale announcements and limited-time offers.",
+                      "is_disposable": false,
+                      "is_in_trash": false,
+                      "image": {
+                        "title": "Seasonal promotions",
+                        "alternative_text": "Seasonal promotions banner",
+                        "file_name": "seasonal-promotions.png",
+                        "link": "https://your-store.example.com/resources/your-store-id/blog-category/category-15/450-seasonal-promotions.png?20261007091544871+1100"
+                      },
+                      "created_on": "2026-10-06T22:15:02",
+                      "last_updated_on": "2026-10-06T22:15:02",
+                      "seo_configs": []
+                    }
+                  ],
+                  "pagination": {
+                    "total": 3,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 3,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The listing rejected a query parameter, and the message says which. A parameter it does not accept returns `unknown query parameter(s): <name>`, with `details[0].field` naming the parameter and `details[0].code` set to `unknown_parameter`. A `sort` value it does not accept returns `Sort field not exist`, with `details[0].code` set to `invalid_sort_field`. A `dir` other than `asc` or `desc` in any letter case, such as `sideways`, returns `Sort order must be asc or desc`, with an empty `details`. `limit=0` returns `'limit' must be a positive integer`, with `details[0].code` set to `out_of_range`, and a negative or non-numeric `limit` returns `'limit' must be a non-negative integer`, with `details[0].code` set to `invalid_integer`. A negative or non-numeric `offset` returns `'offset' must be a non-negative integer`, and a negative or non-numeric `page` returns `'page' must be a non-negative integer`, each with `details[0].code` set to `invalid_integer`. After a rejected `limit`, `offset`, `page`, `sort` or `dir`, your next request on the same client returns this `400` too; send that request again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "unknown query parameter(s): q",
+                    "details": [
+                      {
+                        "field": "q",
+                        "code": "unknown_parameter",
+                        "message": null
+                      }
+                    ],
+                    "request_id": "6a3f9c2e-1b7d-4e58-9f0a-2c4b8d1e7a35"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/blog_categories?limit=20&offset=0\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.blog_categories.list_blog_categories({\"limit\": 20, \"offset\": 0})\nfor category in response.map[\"blog_categories\"]:\n    print(category[\"id\"], category[\"name\"], category[\"url\"])\npagination = response.map[\"pagination\"]\nprint(pagination[\"total\"], pagination[\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.blogCategories.listBlogCategories({limit: 20, offset: 0});\nfor (const blogCategory of response.map.blog_categories) {\n    console.log(blogCategory.id, blogCategory.name, blogCategory.url);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$client = ClientRegistry::buildClient();\n\n$response = BlogCategories::listBlogCategories($client, ['limit' => 20, 'offset' => 0]);\n\nforeach ($response->map['blog_categories'] as $category) {\n    echo $category['id'], ' ', $category['name'], ' (', $category['url'], ')', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' categories in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.blogCategories().listBlogCategories(Map.of(\"limit\", 20, \"offset\", 0));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"blog_categories\")) {\n    Map<?, ?> category = (Map<?, ?>) row;\n    System.out.println(category.get(\"id\") + \" \" + category.get(\"name\") + \" \" + category.get(\"url\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.BlogCategories.ListBlogCategoriesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20, [\"offset\"] = 0 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var blogCategory in ((IReadOnlyList<object?>)body[\"blog_categories\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{blogCategory[\"id\"]} {blogCategory[\"name\"]} {blogCategory[\"url\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.blogCategories\n    .listBlogCategories(queryParams: {'limit': 20, 'offset': 0});\nfinal categories = (response.map as Map)['blog_categories'] as List;\nfor (final category in categories) {\n  print('${(category as Map)['id']} ${category['name']} ${category['url']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.BlogCategories().ListBlogCategories(ctx, map[string]any{\"limit\": 20, \"offset\": 0}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"blog_categories\"].([]any) {\n\tcategory := row.(map[string]any)\n\tfmt.Println(category[\"id\"], category[\"name\"], category[\"url\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Blog categories"
+        ],
+        "summary": "Create a blog category",
+        "operationId": "create_blog_category",
+        "description": "Creates a blog category and returns it with the `id` the store assigned, which the other calls take as `blog_category_id`. Wrap the fields in `blog_category`; only `name` is required, and a `url` you leave out is made from `name`. Send `base64` inside `image` to upload an image, and `blogs` to file existing blog posts under the new category. Do not send the category's `id`: a create with an `id` inside `blog_category` returns `500` and stores nothing.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new blog category under `blog_category`, with the `id` the store assigned: the other calls take it as `blog_category_id`. `name`, `url` and `description` are as saved, `is_disposable` and `is_in_trash` are `false`, and `seo_configs` is `[]`. After an upload, `image.link` points to the store's copy of the file; without one, `image` is `{}`. The response has no `Location` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "blog_category": {
+                      "$ref": "#/components/schemas/BlogCategory"
+                    }
+                  }
+                },
+                "example": {
+                  "blog_category": {
+                    "id": 15,
+                    "name": "Seasonal Promotions",
+                    "url": "seasonal-promotions",
+                    "description": "Sale announcements and limited-time offers.",
+                    "is_disposable": false,
+                    "is_in_trash": false,
+                    "image": {
+                      "title": "Seasonal promotions",
+                      "alternative_text": "Seasonal promotions banner",
+                      "file_name": "seasonal-promotions.png",
+                      "link": "https://your-store.example.com/resources/your-store-id/blog-category/category-15/450-seasonal-promotions.png?20261007091502113+1100"
+                    },
+                    "created_on": "2026-10-06T22:15:02",
+                    "last_updated_on": "2026-10-06T22:15:02",
+                    "seo_configs": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body was rejected, and the message says why. The body is not wrapped in `blog_category`, or the wrapper is empty (`blog_category info missing`); `name` is missing or empty (`name: is required`) or longer than 255 characters (`name: must be between 2 and 255 characters`); another blog category already has that `name` (`Blog category name exists`); or `image.base64` starts with a `data:` prefix (`Image upload operation failed. Please upload a valid Image.`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "name: is required",
+                    "details": [
+                      {
+                        "field": "name",
+                        "code": "required",
+                        "message": "is required"
+                      }
+                    ],
+                    "request_id": "6a3f9c2e-1b7d-4e58-9f0a-2c4b8d1e7a35"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has an `id` field inside `blog_category`. The `code` is `internal_error`, and nothing is stored. Leave `id` out: the store assigns the category's `id` itself.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/blog_categories\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"blog_category\": {\n      \"name\": \"Seasonal Promotions\",\n      \"url\": \"seasonal-promotions\",\n      \"description\": \"Sale announcements and limited-time offers.\",\n      \"image\": {\n        \"file_name\": \"seasonal-promotions.png\",\n        \"base64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n        \"title\": \"Seasonal promotions\",\n        \"alternative_text\": \"Seasonal promotions banner\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.blog_categories.create_blog_category({\"blog_category\": {\n    \"name\": \"Seasonal Promotions\",\n    \"url\": \"seasonal-promotions\",\n    \"description\": \"Sale announcements and limited-time offers.\",\n    \"image\": {\n        \"file_name\": \"seasonal-promotions.png\",\n        \"base64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n        \"title\": \"Seasonal promotions\",\n        \"alternative_text\": \"Seasonal promotions banner\",\n    },\n}})\nprint(response.map[\"blog_category\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.blogCategories.createBlogCategory({blog_category: {\n    name: 'Seasonal Promotions',\n    url: 'seasonal-promotions',\n    description: 'Sale announcements and limited-time offers.',\n    image: {\n        file_name: 'seasonal-promotions.png',\n        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',\n        title: 'Seasonal promotions',\n        alternative_text: 'Seasonal promotions banner',\n    },\n}});\nconsole.log(response.map.blog_category.id, response.map.blog_category.image.link);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$client = ClientRegistry::buildClient();\n\n$response = BlogCategories::createBlogCategory($client, [\n    'blog_category' => [\n        'name' => 'Seasonal Promotions',\n        'url' => 'seasonal-promotions',\n        'description' => 'Sale announcements and limited-time offers.',\n        'image' => ['file_name' => 'seasonal-promotions.png', 'base64' => 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'title' => 'Seasonal promotions', 'alternative_text' => 'Seasonal promotions banner'],\n    ],\n]);\n\necho $response->map['blog_category']['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.blogCategories().createBlogCategory(Map.of(\"blog_category\", Map.of(\n        \"name\", \"Seasonal Promotions\", \"url\", \"seasonal-promotions\",\n        \"description\", \"Sale announcements and limited-time offers.\",\n        \"image\", Map.of(\"file_name\", \"seasonal-promotions.png\",\n                \"base64\", \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n                \"title\", \"Seasonal promotions\", \"alternative_text\", \"Seasonal promotions banner\"))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog_category\");\nSystem.out.println(category.get(\"id\") + \" \" + category.get(\"name\") + \" \" + category.get(\"url\"));\nSystem.out.println(((Map<?, ?>) category.get(\"image\")).get(\"link\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.BlogCategories.CreateBlogCategoryAsync(new Dictionary<string, object?>\n{\n    [\"blog_category\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Seasonal Promotions\", [\"url\"] = \"seasonal-promotions\", [\"description\"] = \"Sale announcements and limited-time offers.\",\n        [\"image\"] = new Dictionary<string, object?> { [\"file_name\"] = \"seasonal-promotions.png\", [\"title\"] = \"Seasonal promotions\",\n            [\"alternative_text\"] = \"Seasonal promotions banner\", [\"base64\"] = \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogCategory = (IReadOnlyDictionary<string, object?>)body[\"blog_category\"]!;\nConsole.WriteLine($\"{blogCategory[\"id\"]} {blogCategory[\"name\"]} {blogCategory[\"url\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.blogCategories.createBlogCategory({\n  'blog_category': {\n    'name': 'Seasonal Promotions',\n    'url': 'seasonal-promotions',\n    'description': 'Sale announcements and limited-time offers.',\n    'image': {\n      'file_name': 'seasonal-promotions.png',\n      'base64':\n          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',\n      'title': 'Seasonal promotions',\n      'alternative_text': 'Seasonal promotions banner',\n    },\n  },\n});\nfinal category = (response.map as Map)['blog_category'] as Map;\nprint('${category['id']} ${(category['image'] as Map)['link']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.BlogCategories().CreateBlogCategory(ctx, map[string]any{\n\t\"blog_category\": map[string]any{\n\t\t\"name\":        \"Seasonal Promotions\",\n\t\t\"url\":         \"seasonal-promotions\",\n\t\t\"description\": \"Sale announcements and limited-time offers.\",\n\t\t\"image\": map[string]any{\n\t\t\t\"file_name\":        \"seasonal-promotions.png\",\n\t\t\t\"base64\":           \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n\t\t\t\"title\":            \"Seasonal promotions\",\n\t\t\t\"alternative_text\": \"Seasonal promotions banner\",\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"blog_category\"].(map[string]any)\nfmt.Println(category[\"id\"], category[\"url\"], category[\"image\"].(map[string]any)[\"link\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "blog_category"
+                ],
+                "properties": {
+                  "blog_category": {
+                    "$ref": "#/components/schemas/BlogCategoryInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/blog_categories/{blog_category_id}": {
+      "get": {
+        "tags": [
+          "Blog categories"
+        ],
+        "summary": "Retrieve a blog category",
+        "operationId": "get_blog_category",
+        "description": "Returns the blog category whose `id` you pass as `blog_category_id`, under the `blog_category` key, with the same ten fields as a listing entry. Query parameters are ignored, and the response has no `ETag` or `Last-Modified` header. `HEAD` on this path returns `404` even for a category that exists, so use this call to check that a category exists.",
+        "parameters": [
+          {
+            "name": "blog_category_id",
+            "in": "path",
+            "required": true,
+            "description": "The blog category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blog category under `blog_category`. Two reads of a category with an image differ in the query string at the end of `image.link`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "blog_category": {
+                      "$ref": "#/components/schemas/BlogCategory"
+                    }
+                  }
+                },
+                "example": {
+                  "blog_category": {
+                    "id": 15,
+                    "name": "Seasonal Promotions",
+                    "url": "seasonal-promotions",
+                    "description": "Sale announcements and limited-time offers.",
+                    "is_disposable": false,
+                    "is_in_trash": false,
+                    "image": {
+                      "title": "Seasonal promotions",
+                      "alternative_text": "Seasonal promotions banner",
+                      "file_name": "seasonal-promotions.png",
+                      "link": "https://your-store.example.com/resources/your-store-id/blog-category/category-15/450-seasonal-promotions.png?20261007091610342+1100"
+                    },
+                    "created_on": "2026-10-06T22:15:02",
+                    "last_updated_on": "2026-10-06T22:15:02",
+                    "seo_configs": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The `blog_category_id` is not a number, such as `abc` or `count`. The `code` is `invalid_request` and the message is `id must be a number`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "id must be a number",
+                    "details": [],
+                    "request_id": "6a3f9c2e-1b7d-4e58-9f0a-2c4b8d1e7a35"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No blog category has that `blog_category_id`. The `code` is `not_found` and the message is `blog category not found`. A `blog_category_id` with a dot, such as `1.5`, also returns `404`, but as a `text/html` page instead of JSON.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "blog category not found",
+                    "details": [],
+                    "request_id": "6a3f9c2e-1b7d-4e58-9f0a-2c4b8d1e7a35"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/blog_categories/15\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.blog_categories.get_blog_category(15)\ncategory = response.map[\"blog_category\"]\nprint(category[\"name\"], category[\"url\"], category[\"description\"])\nprint(category[\"created_on\"], category[\"last_updated_on\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.blogCategories.getBlogCategory(15);\nconst blogCategory = response.map.blog_category;\nconsole.log(blogCategory.name, blogCategory.url, blogCategory.description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$client = ClientRegistry::buildClient();\n\n$response = BlogCategories::getBlogCategory($client, 15);\n\n$category = $response->map['blog_category'];\necho $category['name'], ' (', $category['url'], ')', PHP_EOL;\necho $category['description'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.blogCategories().getBlogCategory(15);\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog_category\");\nSystem.out.println(category.get(\"name\") + \" \" + category.get(\"url\") + \" \" + category.get(\"description\"));\nSystem.out.println(category.get(\"created_on\") + \" \" + category.get(\"last_updated_on\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.BlogCategories.GetBlogCategoryAsync(15);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogCategory = (IReadOnlyDictionary<string, object?>)body[\"blog_category\"]!;\nConsole.WriteLine($\"{blogCategory[\"name\"]} {blogCategory[\"url\"]} {blogCategory[\"description\"]}\");\nConsole.WriteLine($\"{blogCategory[\"created_on\"]} {blogCategory[\"last_updated_on\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.blogCategories.getBlogCategory(15);\nfinal category = (response.map as Map)['blog_category'] as Map;\nprint('${category['name']} ${category['url']} ${category['description']}');\nprint('${category['created_on']} ${category['last_updated_on']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.BlogCategories().GetBlogCategory(ctx, 15, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"blog_category\"].(map[string]any)\nfmt.Println(category[\"name\"], category[\"url\"], category[\"description\"])\nfmt.Println(category[\"created_on\"], category[\"last_updated_on\"])\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Blog categories"
+        ],
+        "summary": "Update a blog category",
+        "operationId": "update_blog_category",
+        "description": "Changes the blog category whose `id` you pass as `blog_category_id`, and returns the updated category. Wrap the fields in `blog_category` and send `name` every time, even when it does not change. Leaving out `description` saves it as `\"\"`; leaving out `url`, `image` or `blogs` keeps what the category has. `PATCH` is rejected with `405 method_not_allowed`, so send every change with `PUT`.",
+        "parameters": [
+          {
+            "name": "blog_category_id",
+            "in": "path",
+            "required": true,
+            "description": "The blog category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blog category after the update, under `blog_category`. `created_on` keeps its value, and `last_updated_on` changes only when a value changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "blog_category": {
+                      "$ref": "#/components/schemas/BlogCategory"
+                    }
+                  }
+                },
+                "example": {
+                  "blog_category": {
+                    "id": 15,
+                    "name": "Seasonal Offers",
+                    "url": "seasonal-offers",
+                    "description": "Offers and clearance announcements.",
+                    "is_disposable": false,
+                    "is_in_trash": false,
+                    "image": {
+                      "title": "Seasonal promotions",
+                      "alternative_text": "Seasonal promotions banner",
+                      "file_name": "seasonal-promotions.png",
+                      "link": "https://your-store.example.com/resources/your-store-id/blog-category/category-15/450-seasonal-promotions.png?20261007092035208+1100"
+                    },
+                    "created_on": "2026-10-06T22:15:02",
+                    "last_updated_on": "2026-10-06T22:20:35",
+                    "seo_configs": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body was rejected, and the message says why. The body is not wrapped in `blog_category`, or the wrapper is empty (`blog_category info missing`); `name` is missing or empty (`name: is required`) or longer than 255 characters (`name: must be between 2 and 255 characters`); or another blog category already has that `name` (`Blog category name exists`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "blog_category info missing",
+                    "details": [],
+                    "request_id": "6a3f9c2e-1b7d-4e58-9f0a-2c4b8d1e7a35"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/blog_categories/15\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"blog_category\": {\n      \"name\": \"Seasonal Offers\",\n      \"url\": \"seasonal-offers\",\n      \"description\": \"Offers and clearance announcements.\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.blog_categories.update_blog_category(15, {\"blog_category\": {\n    \"name\": \"Seasonal Offers\",\n    \"url\": \"seasonal-offers\",\n    \"description\": \"Offers and clearance announcements.\",\n}})\ncategory = response.map[\"blog_category\"]\nprint(category[\"name\"], category[\"url\"], category[\"description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.blogCategories.updateBlogCategory(15, {\n    blog_category: {\n        name: 'Seasonal Offers',\n        url: 'seasonal-offers',\n        description: 'Offers and clearance announcements.',\n    },\n});\nconst blogCategory = response.map.blog_category;\nconsole.log(blogCategory.name, blogCategory.url, blogCategory.description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$client = ClientRegistry::buildClient();\n\n$response = BlogCategories::updateBlogCategory($client, 15, [\n    'blog_category' => [\n        'name' => 'Seasonal Offers',\n        'url' => 'seasonal-offers',\n        'description' => 'Offers and clearance announcements.',\n    ],\n]);\n\n$category = $response->map['blog_category'];\necho $category['name'], ' (', $category['url'], ')', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.blogCategories().updateBlogCategory(15, Map.of(\"blog_category\", Map.of(\n        \"name\", \"Seasonal Offers\", \"url\", \"seasonal-offers\",\n        \"description\", \"Offers and clearance announcements.\")));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog_category\");\nSystem.out.println(category.get(\"name\") + \" \" + category.get(\"url\") + \" \" + category.get(\"description\"));\nSystem.out.println(category.get(\"last_updated_on\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.BlogCategories.UpdateBlogCategoryAsync(15, new Dictionary<string, object?>\n{\n    [\"blog_category\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Seasonal Offers\", [\"url\"] = \"seasonal-offers\", [\"description\"] = \"Offers and clearance announcements.\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar blogCategory = (IReadOnlyDictionary<string, object?>)body[\"blog_category\"]!;\nConsole.WriteLine($\"{blogCategory[\"name\"]} {blogCategory[\"url\"]} {blogCategory[\"description\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.blogCategories.updateBlogCategory(15, {\n  'blog_category': {\n    'name': 'Seasonal Offers',\n    'url': 'seasonal-offers',\n    'description': 'Offers and clearance announcements.',\n  },\n});\nfinal category = (response.map as Map)['blog_category'] as Map;\nprint('${category['name']} ${category['url']} ${category['description']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.BlogCategories().UpdateBlogCategory(ctx, 15, map[string]any{\n\t\"blog_category\": map[string]any{\n\t\t\"name\":        \"Seasonal Offers\",\n\t\t\"url\":         \"seasonal-offers\",\n\t\t\"description\": \"Offers and clearance announcements.\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"blog_category\"].(map[string]any)\nfmt.Println(category[\"name\"], category[\"url\"], category[\"description\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "blog_category"
+                ],
+                "properties": {
+                  "blog_category": {
+                    "$ref": "#/components/schemas/BlogCategoryInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Blog categories"
+        ],
+        "summary": "Delete a blog category",
+        "operationId": "delete_blog_category",
+        "description": "Deletes the blog category whose `id` you pass as `blog_category_id`, with its uploaded image, and returns `204` with no body. The category leaves the listing, and `pagination.total` goes down by one. Blog posts filed under the category are kept, without it in their `categories`. Rarely, retrieving the category straight after the delete still returns it with `200`, while deleting it again returns `404`.",
+        "parameters": [
+          {
+            "name": "blog_category_id",
+            "in": "path",
+            "required": true,
+            "description": "The blog category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The blog category is deleted. No body."
+          },
+          "404": {
+            "description": "No blog category has that `blog_category_id`. Deleting a category you already deleted returns this `404` with the message `Blog Category not found`, which differs in letter case from the `blog category not found` that a retrieve returns.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogCategoryError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/blog_categories/15\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.blog_categories.delete_blog_category(15)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.blogCategories.deleteBlogCategory(15);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$client = ClientRegistry::buildClient();\n\n$response = BlogCategories::deleteBlogCategory($client, 15);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.blogCategories().deleteBlogCategory(15);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.BlogCategories.DeleteBlogCategoryAsync(15);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.blogCategories.deleteBlogCategory(15);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.BlogCategories().DeleteBlogCategory(ctx, 15, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -34147,6 +34860,277 @@
                     },
                     "value": {
                       "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "BlogCategory": {
+        "type": "object",
+        "description": "One blog category. A listing entry, a retrieve, a create and an update return the same ten fields.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The blog category's `id`, assigned by the store. Pass it as `blog_category_id` in a path."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 255,
+            "description": "The category's name, 2 to 255 characters. No two blog categories have the same name."
+          },
+          "url": {
+            "type": "string",
+            "description": "The category's URL slug, such as `seasonal-promotions`. A create without one gets a `url` made from `name`, and a `url` another category already has is saved with `-1` added to the end."
+          },
+          "description": {
+            "type": "string",
+            "description": "The category's description, saved as sent, HTML included. `\"\"` when none is set."
+          },
+          "is_disposable": {
+            "type": "boolean",
+            "description": "`false` on a category you create. A create ignores a value you send for it."
+          },
+          "is_in_trash": {
+            "type": "boolean",
+            "description": "`false` on a category you create. A create ignores a value you send for it."
+          },
+          "image": {
+            "$ref": "#/components/schemas/BlogCategoryImage",
+            "description": "The category's image, or `{}` when it has none."
+          },
+          "created_on": {
+            "type": "string",
+            "description": "When the category was created, in UTC, written `YYYY-MM-DDTHH:MM:SS` without a time zone, such as `2026-07-16T06:24:24`. An update never changes it."
+          },
+          "last_updated_on": {
+            "type": "string",
+            "description": "When the category last changed, written like `created_on`. On a new category it equals `created_on` or is one second later, so do not expect the two to match. An update changes it only when a value changed."
+          },
+          "seo_configs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BlogCategorySeoConfig"
+            },
+            "description": "The category's SEO entries. You cannot set them through this API: a category you create has `[]`, and a create or update that sends `seo_configs` stores nothing."
+          }
+        }
+      },
+      "BlogCategoryImage": {
+        "type": "object",
+        "description": "An uploaded image. `{}` when the category has no image; otherwise all four keys.",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The image title, or `\"\"` when the upload sent none."
+          },
+          "alternative_text": {
+            "type": "string",
+            "description": "The image's alternative text, or `\"\"` when the upload sent none."
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The `file_name` sent with the upload, or a name the store chose when the upload sent none."
+          },
+          "link": {
+            "type": "string",
+            "description": "Where the image is served. An upload made through the API is served from your store's own host at `/resources/<store id>/blog-category/category-<blog_category_id>/450-<file_name>`; some categories link to a CDN copy whose name differs from `file_name`. The link ends in a query string that changes on every read, so compare links without it. Once the category is deleted, the link returns `404`."
+          }
+        }
+      },
+      "BlogCategorySeoConfig": {
+        "type": "object",
+        "description": "One SEO entry of a blog category.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The SEO entry's `id`."
+          },
+          "value": {
+            "type": "string",
+            "description": "The entry's value, as text."
+          },
+          "type": {
+            "type": "string",
+            "description": "The entry's type, such as `page_seo`."
+          },
+          "config_key": {
+            "type": "string",
+            "description": "The entry's key."
+          }
+        }
+      },
+      "BlogCategoryInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "description": "Send these fields inside `blog_category`, on a create and on an update. A create ignores unknown fields and the fields you cannot write here: `is_disposable`, `is_in_trash`, `created_on`, `last_updated_on` and `seo_configs`. An update ignores `seo_configs` too. Do not send the category's `id`: inside `blog_category`, it returns `500` on a create and is ignored on an update.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 255,
+            "description": "Required on create and update, 2 to 255 characters. A `name` another blog category already has is rejected with `400`."
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional. The store lowercases it, turns each run of characters other than ASCII letters, digits and `_` into one hyphen, drops a hyphen at either end and cuts it to 50 characters. On a create without it, the store makes it from `name` the same way. A `url` another blog category already has is saved with `-1` added to the end. On an update, sending the category's current `url` keeps it as it is, and a `url` you leave out, or send as `\"\"` or `null`, keeps its value."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional. Saved as sent, HTML included, and `\"\"` when you leave it out. On an update, a `description` you leave out, or send as `null`, is saved as `\"\"`."
+          },
+          "image": {
+            "$ref": "#/components/schemas/BlogCategoryImageInput",
+            "description": "Optional. An image to upload. On an update, an `image` you leave out, or send as `{}` or `null`, keeps the current image."
+          },
+          "blogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BlogCategoryBlogLink"
+            },
+            "description": "Optional. Blog posts to file under the category. On a create, each post then lists the category in its `categories`. On an update, `blogs` left out or sent as `[]` keeps every link."
+          }
+        }
+      },
+      "BlogCategoryImageInput": {
+        "type": "object",
+        "description": "An image upload. Nothing in `image` is stored without `base64`.",
+        "properties": {
+          "file_name": {
+            "type": "string",
+            "description": "The name to save the file under. Without it, the store chooses a name."
+          },
+          "base64": {
+            "type": "string",
+            "description": "The image file, base64-encoded, without a `data:` prefix: a value such as `data:image/png;base64,...` is rejected with `400`. On an update, a new `base64` replaces the current image."
+          },
+          "title": {
+            "type": "string",
+            "description": "The image title. Saved only with a `base64` in the same request; otherwise ignored, on a create and on an update."
+          },
+          "alternative_text": {
+            "type": "string",
+            "description": "The image's alternative text. Saved only with a `base64` in the same request; otherwise ignored."
+          }
+        }
+      },
+      "BlogCategoryBlogLink": {
+        "type": "object",
+        "description": "A blog post to file under the category.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The blog post's `id`."
+          }
+        }
+      },
+      "BlogCategoryPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of blog categories in the listing, across all pages."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size the store applied: the `limit` you sent, at most `20`, or `20` when you sent none."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of categories skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of categories on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The number of this page, counting from `1`. Past the last category it does not follow `page`: `page=2` with 20 or fewer categories returns `1`."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "`total` divided by `limit`, rounded up."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when more categories follow this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when categories come before this page. `false` on a page past the last category, such as `page=2` with 20 or fewer categories."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the previous page, with `limit` and `offset`, or `null` when `has_previous` is `false`."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the next page, with `limit` and `offset`, or `null` when `has_next` is `false`."
+          }
+        }
+      },
+      "BlogCategoryError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found`, `method_not_allowed` or `internal_error`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `blog category not found`."
+              },
+              "details": {
+                "type": "array",
+                "description": "Names the rejected field when the listing rejects `limit`, `offset`, `page`, `sort` or a parameter it does not accept, or when a write rejects a missing or too-long `name`. An empty list on every other error, including a rejected `dir` and a `name` another category already has.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The query parameter or body field that was rejected, such as `limit`, `sort` or `name`."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_parameter`, `invalid_sort_field`, `out_of_range`, `invalid_integer`, `required` or `invalid_length`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "`null` when the listing rejects a query parameter. When a write rejects `name`, the reason without the field name, such as `is required`."
+                    },
+                    "value": {
+                      "type": [
+                        "integer",
+                        "string"
+                      ],
+                      "description": "The value you sent, such as `abc` or `created_on`. On the `out_of_range` error for `limit=0` it is the number `0`; on the `invalid_integer` error for `limit=-1` it is the string `\"-1\"`. On a `name` rejected for its length, it is the number of characters you sent. Absent on a parameter the listing does not accept and on a missing `name`."
                     }
                   }
                 }

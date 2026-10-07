@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "listBlogCategories",
+      "code": "use WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$response = BlogCategories::listBlogCategories($client, ['limit' => 20, 'offset' => 0]);\n\nforeach ($response->map['blog_categories'] as $category) {\n    echo $category['id'], ' ', $category['name'], ' (', $category['url'], ')', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' categories in total', PHP_EOL;"
+    },
+    "create_blog_category": {
+      "function": "createBlogCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$response = BlogCategories::createBlogCategory($client, [\n    'blog_category' => [\n        'name' => 'Seasonal Promotions',\n        'url' => 'seasonal-promotions',\n        'description' => 'Sale announcements and limited-time offers.',\n        'image' => ['file_name' => 'seasonal-promotions.png', 'base64' => 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'title' => 'Seasonal promotions', 'alternative_text' => 'Seasonal promotions banner'],\n    ],\n]);\n\necho $response->map['blog_category']['id'], PHP_EOL;"
+    },
+    "get_blog_category": {
+      "function": "getBlogCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$response = BlogCategories::getBlogCategory($client, 15);\n\n$category = $response->map['blog_category'];\necho $category['name'], ' (', $category['url'], ')', PHP_EOL;\necho $category['description'], PHP_EOL;"
+    },
+    "update_blog_category": {
+      "function": "updateBlogCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$response = BlogCategories::updateBlogCategory($client, 15, [\n    'blog_category' => [\n        'name' => 'Seasonal Offers',\n        'url' => 'seasonal-offers',\n        'description' => 'Offers and clearance announcements.',\n    ],\n]);\n\n$category = $response->map['blog_category'];\necho $category['name'], ' (', $category['url'], ')', PHP_EOL;"
+    },
+    "delete_blog_category": {
+      "function": "deleteBlogCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\BlogCategories\\BlogCategories;\n\n$response = BlogCategories::deleteBlogCategory($client, 15);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}
