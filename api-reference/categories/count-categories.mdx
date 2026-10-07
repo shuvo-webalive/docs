@@ -1,0 +1,9 @@
+---
+title: "Count categories"
+description: "Returns how many categories are outside the trash, narrowed by any filters you send."
+openapi: "GET /admin/categories/count"
+---
+
+Returns the number of categories as `count`, inside a `categories` object. Categories in the trash are not counted. `name`, `searchText` and `parent` narrow the count as they narrow [List categories](/api-reference/categories/list-categories), so the count matches that listing's `pagination.total`. `limit`, `sort` and `field_metadata` are accepted and change nothing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

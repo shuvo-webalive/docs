@@ -1,0 +1,9 @@
+---
+title: "Create a category"
+description: "Creates a category and returns it with its `id`, which other calls take as `category_id`."
+openapi: "POST /admin/categories"
+---
+
+Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

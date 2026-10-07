@@ -1,0 +1,80 @@
+---
+title: "Categories"
+sidebarTitle: "Overview"
+description: "List, count, create, retrieve, replace, update and delete your store's product categories, check whether a name is taken, and read or update one section of a category at a time."
+---
+
+The Categories API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/categories`.
+
+<Warning>
+  **After a `404`, the next request that sends the same `JSESSIONID` cookie gets that `404` back instead of its own result.**
+  A read of a category that exists then returns `404`, and a delete returns the earlier `404`, such as
+  `Category already in trash`, and leaves the category in place. Send the request that follows a `404`
+  without that cookie.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List categories](/api-reference/categories/list-categories) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/categories` | Returns up to 20 categories per call, from every tree level, most recently updated first. |
+| [Count categories](/api-reference/categories/count-categories) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/categories/count` | Returns how many categories are outside the trash, narrowed by any filters you send. |
+| [Check a category name](/api-reference/categories/check-a-category-name) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/categories/check-name` | Returns `available`: `false` when any category, even one in the trash, has the name. |
+| [Create a category](/api-reference/categories/create-a-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/categories` | Creates a category and returns it with its `id`, which other calls take as `category_id`. |
+| [Retrieve a category](/api-reference/categories/retrieve-a-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/categories/{category_id}` | Returns the category whose `id` you pass as `category_id`, with all six sections. |
+| [Replace a category](/api-reference/categories/replace-a-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/categories/{category_id}` | Replaces a category: most fields you leave out reset, but `name`, `sku`, `url` and images stay. |
+| [Update a category](/api-reference/categories/update-a-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/categories/{category_id}` | Changes only the fields you send, in any number of sections, and returns the category. |
+| [Delete a category](/api-reference/categories/delete-a-category) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/categories/{category_id}` | Moves a category to the trash. You can still retrieve it, but it leaves the listing. |
+| [Retrieve a category section](/api-reference/categories/retrieve-a-category-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/categories/{category_id}/{section}` | Returns one section of a category, inside `category`, such as its `tax_shipping` settings. |
+| [Update a category section](/api-reference/categories/update-a-category-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/categories/{category_id}/{section}` | Changes only the fields you send in one section and returns the whole section. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A category has six sections, and every write wraps them in `category`.** The sections are
+  `general`, `description`, `images_media`, `availability_visibility`, `tax_shipping` and
+  `assign_products`, as in `{"category": {"general": {"name": "Seasonal Produce"}}}`.
+  [Retrieve a category section](/api-reference/categories/retrieve-a-category-section) and [Update a category section](/api-reference/categories/update-a-category-section)
+  read or write one section at a time, and the update takes the same wrapper. A key that a section does
+  not have is rejected with `400`, with `details[0].code` set to `unknown_field`. So is an unknown key
+  beside the sections, except in a section update, which ignores everything but its own section. A key
+  beside `category` is ignored.
+- **`PUT` resets most fields you leave out, and `PATCH` keeps them.**
+  [Replace a category](/api-reference/categories/replace-a-category) sets the fields you leave out back to the values of a new
+  category, except `name`, `sku`, `url`, both images and the `tax_shipping` fields `tax_exempt`,
+  `tax_message`, `show_price_with_tax`, `prices_entered_with_tax` and `base_price_rounding`. A `PUT`
+  without `general.parent_category` therefore moves a child category to the top level, one without
+  `assign_products` removes all its products, and one without `tax_shipping.tax_profile` or
+  `tax_shipping.shipping_profile` sets that profile to `null`, even when it sends other `tax_shipping`
+  fields. [Update a category](/api-reference/categories/update-a-category) and [Update a category section](/api-reference/categories/update-a-category-section)
+  change only the fields you send, except that a `products` list you send replaces the category's
+  products.
+- **Deleting moves a category to the trash.** The category leaves the listing and the count, but
+  [Retrieve a category](/api-reference/categories/retrieve-a-category) still returns it with `in_trash` set to `true`, and
+  [Check a category name](/api-reference/categories/check-a-category-name) still reports its name as taken. Deleting it again returns
+  `404` with the message `Category already in trash`. No call restores a category from the trash or
+  deletes it permanently.
+- **A create rejects only a name that a top-level category has.** [Create a category](/api-reference/categories/create-a-category)
+  rejects that name with `409 conflict`, in any letter case and even when the top-level category is in
+  the trash, whatever parent you give the new category. A name that only child categories have is
+  accepted at any level, even under the same parent, and the new category's `url` gets a suffix such
+  as `-1` or `-2`. [Check a category name](/api-reference/categories/check-a-category-name) returns `"available": false` for a name
+  any category has, anywhere in the tree or in the trash, so it can report a name as taken that a
+  create accepts.
+- **A listing returns at most 20 categories per call, from every level of the tree.** A larger
+  `limit` is capped at `20`. To get the next categories, send a higher `offset` while
+  `pagination.has_next` is `true`. Send `parent` with the parent category's `id` to list only its
+  children. The listing ignores query parameters it does not know instead of rejecting them, so a
+  misspelled filter filters nothing.
+- **Point to another record by its `id`, send images as a file name and base64 data, and send booleans as `true` or `false`.**
+  `parent_category`, `layout`, `tax_profile` and `shipping_profile` take `{"id": ...}`, and responses
+  return them as `{"id": ..., "name": ...}`. `selected_customers` takes customer and group `id`
+  values, and `assign_products.products` takes product `id` values. Send an image as
+  `{"filename": "banner.png", "base64": "..."}`: a `data:` URI string returns `500`, and no call
+  removes a stored image. A string such as `"false"`, or `null`, sent for a boolean returns `200`
+  and leaves the stored value unchanged.

@@ -103,6 +103,9 @@
       "name": "Order flags"
     },
     {
+      "name": "Categories"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -24064,6 +24067,1877 @@
         ]
       }
     },
+    "/admin/categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "List categories",
+        "operationId": "list_categories",
+        "description": "Returns your categories in `categories`, from every level of the tree in one list, 20 per call unless you send a lower `limit`. Categories in the trash are left out, and the most recently updated come first unless you send `sort`. Narrow the list with `name`, `searchText` and `parent`; a category must match every filter you send. Query parameters the listing does not know, such as `q` or `search`, are ignored instead of rejected.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of categories per page. Defaults to `20`, which is also the most you can get: a larger value is capped at `20`, and `pagination.limit` shows the value applied. `0`, negative values and values that are not numbers are rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "example": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of categories to skip. When you send both `offset` and `page`, `offset` wins.",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "A 1-based page number, read as `offset = (page - 1) * limit` against the `limit` applied, so `page=2` alone skips 20 categories. `pagination.next_page` and `pagination.previous_page` use `offset`, not `page`.",
+            "schema": {
+              "type": "integer",
+              "example": 2
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "What to sort by: `id`, `name`, `title`, `sku`, `url`, `created` or `updated`. Values such as `created_on`, `last_updated_on` and `-id` are rejected with `400`. Sorting by `name` ignores letter case. Without `sort`, the most recently updated categories come first. `dir` defaults to `desc`, so `sort=name` alone sorts Z to A.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name",
+                "title",
+                "sku",
+                "url",
+                "created",
+                "updated"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`, in any letter case. Defaults to `desc`. Any other value is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "asc"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Keeps only categories whose name contains this text, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "seasonal"
+            }
+          },
+          {
+            "name": "searchText",
+            "in": "query",
+            "description": "Keeps only categories whose name or `sku` contains this text, in any letter case. Every `sku` the store generates starts with `CATEGORY-`, so a value such as `cat` matches every category whose `sku` the store generated.",
+            "schema": {
+              "type": "string",
+              "example": "seasonal"
+            }
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "description": "The parent category's `id`. Keeps only that category's children, and `0` keeps none. A value that is not a number returns `500`.",
+            "schema": {
+              "type": "integer",
+              "example": 4310
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key that describes every field of a category: its type, whether you can write it, whether a write must send it, and its limits or accepted values. The categories are still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The categories on this page in `categories`. `group_meta` gives the path of each of the six sections, and `pagination` gives the `total` that match your filters and the URLs of the previous and next pages. With `field_metadata=true`, a `field_metadata` key is added. The response has no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Category"
+                      }
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CategoryGroupMeta"
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/CategoryPagination"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CategoryFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "categories": [
+                    {
+                      "general": {
+                        "name": "Seasonal Produce",
+                        "title": "Seasonal Produce",
+                        "sku": "CATEGORY-5e0c7a91d2f",
+                        "url": "seasonal-produce",
+                        "heading": "Fresh this season",
+                        "parent_category": {
+                          "id": 4310,
+                          "name": "Fresh Food"
+                        },
+                        "filter_profile": null,
+                        "layout": null,
+                        "summary": "Fruit and vegetables picked this week"
+                      },
+                      "description": {
+                        "content": "<p>What is in season right now.</p>"
+                      },
+                      "images_media": {
+                        "image_url": "",
+                        "background_image_url": ""
+                      },
+                      "availability_visibility": {
+                        "available": true,
+                        "visible": true,
+                        "available_for": "everyone",
+                        "selected_customers": {
+                          "customers": [],
+                          "groups": []
+                        },
+                        "available_on_date_range": false,
+                        "available_from_date": null,
+                        "available_to_date": null,
+                        "password_protected": false,
+                        "custom_sorting": true,
+                        "default_sorting": "alpha_asc",
+                        "disable_tracking": false
+                      },
+                      "tax_shipping": {
+                        "tax_exempt": false,
+                        "tax_profile": {
+                          "id": 3,
+                          "name": "GST"
+                        },
+                        "tax_message": "Prices include GST",
+                        "show_price_with_tax": true,
+                        "prices_entered_with_tax": false,
+                        "base_price_rounding": "nearest",
+                        "enable_shipping": true,
+                        "shipping_profile": {
+                          "id": 12,
+                          "name": "Standard Shipping"
+                        }
+                      },
+                      "assign_products": {
+                        "products": [
+                          {
+                            "id": 101,
+                            "name": "Royal Gala Apples 1kg",
+                            "sku": "APPLE-GALA-1KG"
+                          },
+                          {
+                            "id": 102,
+                            "name": "Navel Oranges 1kg",
+                            "sku": "ORANGE-NAVEL-1KG"
+                          }
+                        ]
+                      },
+                      "id": 4321,
+                      "disposable": false,
+                      "in_trash": false,
+                      "parent_in_trash": false,
+                      "created_by": "admin@example.com",
+                      "created_on": "2026-10-05T03:12:44Z",
+                      "last_updated_by": "",
+                      "last_updated_on": "2026-10-06T08:40:10Z"
+                    },
+                    {
+                      "general": {
+                        "name": "Vegetables",
+                        "title": null,
+                        "sku": "CATEGORY-a41b8e2c903",
+                        "url": "vegetables",
+                        "heading": null,
+                        "parent_category": {
+                          "id": 4310,
+                          "name": "Fresh Food"
+                        },
+                        "filter_profile": null,
+                        "layout": null,
+                        "summary": null
+                      },
+                      "description": {
+                        "content": null
+                      },
+                      "images_media": {
+                        "image_url": "",
+                        "background_image_url": ""
+                      },
+                      "availability_visibility": {
+                        "available": true,
+                        "visible": true,
+                        "available_for": "everyone",
+                        "selected_customers": {
+                          "customers": [],
+                          "groups": []
+                        },
+                        "available_on_date_range": false,
+                        "available_from_date": null,
+                        "available_to_date": null,
+                        "password_protected": false,
+                        "custom_sorting": false,
+                        "default_sorting": null,
+                        "disable_tracking": false
+                      },
+                      "tax_shipping": {
+                        "tax_exempt": false,
+                        "tax_profile": null,
+                        "tax_message": "",
+                        "show_price_with_tax": true,
+                        "prices_entered_with_tax": false,
+                        "base_price_rounding": "nearest",
+                        "enable_shipping": false,
+                        "shipping_profile": null
+                      },
+                      "assign_products": {
+                        "products": [
+                          {
+                            "id": 103,
+                            "name": "Butternut Pumpkin",
+                            "sku": "PUMPKIN-BUTTERNUT"
+                          }
+                        ]
+                      },
+                      "id": 4325,
+                      "disposable": false,
+                      "in_trash": false,
+                      "parent_in_trash": false,
+                      "created_by": "admin@example.com",
+                      "created_on": "2026-09-30T22:05:31Z",
+                      "last_updated_by": "",
+                      "last_updated_on": "2026-09-30T22:05:31Z"
+                    }
+                  ],
+                  "group_meta": {
+                    "general": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/general"
+                    },
+                    "description": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/description"
+                    },
+                    "images_media": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/images_media"
+                    },
+                    "availability_visibility": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/availability_visibility"
+                    },
+                    "tax_shipping": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/tax_shipping"
+                    },
+                    "assign_products": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/assign_products"
+                    }
+                  },
+                  "pagination": {
+                    "total": 12,
+                    "limit": 10,
+                    "offset": 10,
+                    "count": 2,
+                    "current_page": 2,
+                    "total_pages": 2,
+                    "has_next": false,
+                    "has_previous": true,
+                    "previous_page": "https://your-store.example.com/api/v4/admin/categories?sort=name&dir=asc&limit=10&offset=0",
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`limit` is `0` (`'limit' must be a positive integer`, and `details[0].code` is `out_of_range`), negative or not a number (`'limit' must be a non-negative integer`, and `details[0].code` is `invalid_integer`), or sent twice, such as `limit=1&limit=2` (`limit: must be supplied once, not repeated`, and `details[0].code` is `repeated_param`); `sort` is a value the listing does not accept, such as `created_on` (`Sort field not exist`, and `details[0].code` is `invalid_sort_field`); or `dir` is not `asc` or `desc` (`Sort order must be asc or desc`). After a rejected `sort`, the next listing request sent with the same `JSESSIONID` cookie can return this `400` again.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`parent` is not a number, such as `parent=abc`. The body has no `error` object: it is `{\"status\": \"error\", \"code\": 500, \"message\": \"Unexpected Error Occurred\"}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryServerError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 500,
+                  "message": "Unexpected Error Occurred"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/categories?limit=10&offset=10&sort=name&dir=asc\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.list_categories(\n    {\"limit\": 10, \"offset\": 10, \"sort\": \"name\", \"dir\": \"asc\"}\n)\nfor category in response.map[\"categories\"]:\n    print(category[\"id\"], category[\"general\"][\"name\"], category[\"general\"][\"url\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.listCategories({limit: 10, offset: 10, sort: 'name', dir: 'asc'});\nfor (const category of response.map.categories) {\n    console.log(category.id, category.general.name, category.general.url);\n}\nconsole.log(response.map.pagination.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::listCategories($client, ['limit' => 10, 'offset' => 10, 'sort' => 'name', 'dir' => 'asc']);\n\nforeach ($response->map['categories'] as $category) {\n    echo $category['id'], ' ', $category['general']['name'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' categories in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().listCategories(\n        Map.of(\"limit\", 10, \"offset\", 10, \"sort\", \"name\", \"dir\", \"asc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"categories\")) {\n    Map<?, ?> category = (Map<?, ?>) row;\n    Map<?, ?> general = (Map<?, ?>) category.get(\"general\");\n    System.out.println(category.get(\"id\") + \" \" + general.get(\"name\") + \" \" + general.get(\"url\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.ListCategoriesAsync(new Dictionary<string, object?>\n{\n    [\"limit\"] = 10, [\"offset\"] = 10, [\"sort\"] = \"name\", [\"dir\"] = \"asc\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var category in ((IReadOnlyList<object?>)body[\"categories\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    var general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\n    Console.WriteLine($\"{category[\"id\"]} {general[\"name\"]}\");\n}\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.listCategories(\n  queryParams: {'limit': 10, 'offset': 10, 'sort': 'name', 'dir': 'asc'},\n);\nfinal categories = (response.map as Map)['categories'] as List;\nfor (final category in categories) {\n  final general = (category as Map)['general'] as Map;\n  print('${category['id']} ${general['name']} ${general['url']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().ListCategories(ctx, map[string]any{\"limit\": 10, \"offset\": 10, \"sort\": \"name\", \"dir\": \"asc\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"categories\"].([]any) {\n\tcategory := row.(map[string]any)\n\tfmt.Println(category[\"id\"], category[\"general\"].(map[string]any)[\"name\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"has_next\"])\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Create a category",
+        "operationId": "create_category",
+        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new category in `category`, with its `id`, `sku` and `url`, and `group_meta`. `parent_category` returns as `{id, name}` and each product as `{id, name, sku}`, and `created_on` equals `last_updated_on`. The response has no `Location` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "$ref": "#/components/schemas/Category"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CategoryGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "category": {
+                    "general": {
+                      "name": "Seasonal Produce",
+                      "title": "Seasonal Produce",
+                      "sku": "CATEGORY-5e0c7a91d2f",
+                      "url": "seasonal-produce",
+                      "heading": "Fresh this season",
+                      "parent_category": {
+                        "id": 4310,
+                        "name": "Fresh Food"
+                      },
+                      "filter_profile": null,
+                      "layout": null,
+                      "summary": "Fruit and vegetables picked this week"
+                    },
+                    "description": {
+                      "content": "<p>What is in season right now.</p>"
+                    },
+                    "images_media": {
+                      "image_url": "",
+                      "background_image_url": ""
+                    },
+                    "availability_visibility": {
+                      "available": true,
+                      "visible": true,
+                      "available_for": "everyone",
+                      "selected_customers": {
+                        "customers": [],
+                        "groups": []
+                      },
+                      "available_on_date_range": false,
+                      "available_from_date": null,
+                      "available_to_date": null,
+                      "password_protected": false,
+                      "custom_sorting": true,
+                      "default_sorting": "alpha_asc",
+                      "disable_tracking": false
+                    },
+                    "tax_shipping": {
+                      "tax_exempt": false,
+                      "tax_profile": null,
+                      "tax_message": "Prices include GST",
+                      "show_price_with_tax": true,
+                      "prices_entered_with_tax": false,
+                      "base_price_rounding": "nearest",
+                      "enable_shipping": false,
+                      "shipping_profile": null
+                    },
+                    "assign_products": {
+                      "products": [
+                        {
+                          "id": 101,
+                          "name": "Royal Gala Apples 1kg",
+                          "sku": "APPLE-GALA-1KG"
+                        },
+                        {
+                          "id": 102,
+                          "name": "Navel Oranges 1kg",
+                          "sku": "ORANGE-NAVEL-1KG"
+                        }
+                      ]
+                    },
+                    "id": 4321,
+                    "disposable": false,
+                    "in_trash": false,
+                    "parent_in_trash": false,
+                    "created_by": "admin@example.com",
+                    "created_on": "2026-10-05T03:12:44Z",
+                    "last_updated_by": "",
+                    "last_updated_on": "2026-10-05T03:12:44Z"
+                  },
+                  "group_meta": {
+                    "general": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/general"
+                    },
+                    "description": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/description"
+                    },
+                    "images_media": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/images_media"
+                    },
+                    "availability_visibility": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/availability_visibility"
+                    },
+                    "tax_shipping": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/tax_shipping"
+                    },
+                    "assign_products": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/assign_products"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not a JSON object (`request body must be a JSON object`); the body is not wrapped in `category` (`category is required`); `general.name` is missing (`general.name: Category name is required`, and `details[0].code` is `required`); `general.name` is not 2 to 255 characters long, such as `x` (`general.name: must be 2-255 characters`, and `details[0].code` is `out_of_range`); a section has a key it does not accept, such as `images_media.image_url` (`<section>.<key>: is not a recognised category field`, and `details[0].code` is `unknown_field`); `category` has an unknown key beside the sections (`<key>: is not a recognised category field`); `available_for` or `default_sorting` is not one of its values, `null` included (`details[0].code` is `invalid_enum`); `general.title` is longer than 200 characters (`general.title: must be at most 200 characters`, and `details[0].code` is `too_long`); or `general.filter_profile` names a filter profile `id` on a store without the filter plugin (`general.filter_profile.id: not found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A top-level category already has that name, in any letter case, even one in the trash, whatever parent you give the new category. The `code` is `conflict`, the message is `Category name already exists`, and `details[0].code` is `already_exists`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An image is a `data:` URI string instead of a `{filename, base64}` object. The body has no `error` object: it is `{\"status\": \"error\", \"code\": 500, \"message\": \"Unexpected Error Occurred\"}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryServerError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 500,
+                  "message": "Unexpected Error Occurred"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/categories\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"category\": {\n      \"general\": {\n        \"name\": \"Seasonal Produce\",\n        \"title\": \"Seasonal Produce\",\n        \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\",\n        \"parent_category\": {\n          \"id\": 4310\n        }\n      },\n      \"description\": {\n        \"content\": \"<p>What is in season right now.</p>\"\n      },\n      \"availability_visibility\": {\n        \"visible\": true,\n        \"custom_sorting\": true,\n        \"default_sorting\": \"alpha_asc\"\n      },\n      \"tax_shipping\": {\n        \"tax_message\": \"Prices include GST\"\n      },\n      \"assign_products\": {\n        \"products\": [\n          101,\n          102\n        ]\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.create_category({\"category\": {\n    \"general\": {\n        \"name\": \"Seasonal Produce\", \"title\": \"Seasonal Produce\", \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\", \"parent_category\": {\"id\": 4310},\n    },\n    \"description\": {\"content\": \"<p>What is in season right now.</p>\"},\n    \"availability_visibility\": {\"visible\": True, \"custom_sorting\": True, \"default_sorting\": \"alpha_asc\"},\n    \"tax_shipping\": {\"tax_message\": \"Prices include GST\"},\n    \"assign_products\": {\"products\": [101, 102]},\n}})\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"sku\"], category[\"general\"][\"url\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::createCategory($client, ['category' => [\n    'general' => ['name' => 'Seasonal Produce', 'title' => 'Seasonal Produce', 'heading' => 'Fresh this season',\n        'summary' => 'Fruit and vegetables picked this week', 'parent_category' => ['id' => 4310]],\n    'description' => ['content' => '<p>What is in season right now.</p>'],\n    'availability_visibility' => ['visible' => true, 'custom_sorting' => true, 'default_sorting' => 'alpha_asc'],\n    'tax_shipping' => ['tax_message' => 'Prices include GST'],\n    'assign_products' => ['products' => [101, 102]],\n]]);\n\necho $response->map['category']['id'], ' ', $response->map['category']['general']['url'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().createCategory(Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"name\", \"Seasonal Produce\", \"title\", \"Seasonal Produce\",\n                \"heading\", \"Fresh this season\", \"summary\", \"Fruit and vegetables picked this week\",\n                \"parent_category\", Map.of(\"id\", 4310)),\n        \"description\", Map.of(\"content\", \"<p>What is in season right now.</p>\"),\n        \"availability_visibility\", Map.of(\"visible\", true, \"custom_sorting\", true, \"default_sorting\", \"alpha_asc\"),\n        \"tax_shipping\", Map.of(\"tax_message\", \"Prices include GST\"),\n        \"assign_products\", Map.of(\"products\", List.of(101, 102)))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(category.get(\"id\") + \" \" + general.get(\"sku\") + \" \" + general.get(\"url\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.CreateCategoryAsync(new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Seasonal Produce\", [\"title\"] = \"Seasonal Produce\", [\"heading\"] = \"Fresh this season\",\n            [\"summary\"] = \"Fruit and vegetables picked this week\",\n            [\"parent_category\"] = new Dictionary<string, object?> { [\"id\"] = 4310 },\n        },\n        [\"description\"] = new Dictionary<string, object?> { [\"content\"] = \"<p>What is in season right now.</p>\" },\n        [\"availability_visibility\"] = new Dictionary<string, object?>\n        {\n            [\"visible\"] = true, [\"custom_sorting\"] = true, [\"default_sorting\"] = \"alpha_asc\",\n        },\n        [\"tax_shipping\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"Prices include GST\" },\n        [\"assign_products\"] = new Dictionary<string, object?> { [\"products\"] = new List<object?> { 101, 102 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nConsole.WriteLine(category[\"id\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.createCategory({\n  'category': {\n    'general': {\n      'name': 'Seasonal Produce',\n      'title': 'Seasonal Produce',\n      'heading': 'Fresh this season',\n      'summary': 'Fruit and vegetables picked this week',\n      'parent_category': {'id': 4310},\n    },\n    'description': {'content': '<p>What is in season right now.</p>'},\n    'availability_visibility': {\n      'visible': true,\n      'custom_sorting': true,\n      'default_sorting': 'alpha_asc',\n    },\n    'tax_shipping': {'tax_message': 'Prices include GST'},\n    'assign_products': {\n      'products': [101, 102],\n    },\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${category['id']} ${general['sku']} ${general['url']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().CreateCategory(ctx, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\": map[string]any{\n\t\t\t\"name\":            \"Seasonal Produce\",\n\t\t\t\"title\":           \"Seasonal Produce\",\n\t\t\t\"heading\":         \"Fresh this season\",\n\t\t\t\"summary\":         \"Fruit and vegetables picked this week\",\n\t\t\t\"parent_category\": map[string]any{\"id\": 4310},\n\t\t},\n\t\t\"description\":             map[string]any{\"content\": \"<p>What is in season right now.</p>\"},\n\t\t\"availability_visibility\": map[string]any{\"visible\": true, \"custom_sorting\": true, \"default_sorting\": \"alpha_asc\"},\n\t\t\"tax_shipping\":            map[string]any{\"tax_message\": \"Prices include GST\"},\n\t\t\"assign_products\":         map[string]any{\"products\": []any{101, 102}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\ngeneral := category[\"general\"].(map[string]any)\nfmt.Println(category[\"id\"], general[\"sku\"], general[\"url\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryWriteBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/categories/count": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Count categories",
+        "operationId": "count_categories",
+        "description": "Returns the number of categories as `count`, inside a `categories` object. Categories in the trash are not counted. `name`, `searchText` and `parent` narrow the count as they narrow [List categories](/api-reference/categories/list-categories), so the count matches that listing's `pagination.total`. `limit`, `sort` and `field_metadata` are accepted and change nothing.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Counts only categories whose name contains this text, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "seasonal"
+            }
+          },
+          {
+            "name": "searchText",
+            "in": "query",
+            "description": "Counts only categories whose name or `sku` contains this text, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "seasonal"
+            }
+          },
+          {
+            "name": "parent",
+            "in": "query",
+            "description": "The parent category's `id`. Counts only that category's children. A value that is not a number returns `500`.",
+            "schema": {
+              "type": "integer",
+              "example": 4310
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number of categories, as `count` inside `categories`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "categories": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "description": "The number of categories outside the trash that match your filters."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "categories": {
+                    "count": 2
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "`parent` is not a number, such as `parent=abc`. The body has no `error` object: it is `{\"status\": \"error\", \"code\": 500, \"message\": \"Unexpected Error Occurred\"}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryServerError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 500,
+                  "message": "Unexpected Error Occurred"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/categories/count?searchText=seasonal\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.count_categories({\"searchText\": \"seasonal\"})\nprint(response.map[\"categories\"][\"count\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.countCategories({searchText: 'seasonal'});\nconsole.log(response.map.categories.count);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::countCategories($client, ['searchText' => 'seasonal']);\n\necho $response->map['categories']['count'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().countCategories(Map.of(\"searchText\", \"seasonal\"));\nMap<?, ?> categories = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"categories\");\nSystem.out.println(categories.get(\"count\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.CountCategoriesAsync(\n    new Dictionary<string, object?> { [\"searchText\"] = \"seasonal\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar categories = (IReadOnlyDictionary<string, object?>)body[\"categories\"]!;\nConsole.WriteLine(categories[\"count\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories\n    .countCategories(queryParams: {'searchText': 'seasonal'});\nfinal categories = (response.map as Map)['categories'] as Map;\nprint(categories['count']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().CountCategories(ctx, map[string]any{\"searchText\": \"seasonal\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"categories\"].(map[string]any)[\"count\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/categories/check-name": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Check a category name",
+        "operationId": "check_category_name",
+        "description": "Send the name as `name`; other query parameters, such as `parent`, are ignored. You get `\"available\": false` when any category has exactly that name, in any letter case, wherever it sits in the tree and even when it is in the trash. A leading space counts as part of the name and trailing spaces do not, so a name with a leading space can be reported as available while the name without it is taken. A create rejects only a name that a top-level category has, so [Create a category](/api-reference/categories/create-a-category) can accept a name this call reports as taken.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "description": "The name to check. An empty or missing `name` is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "example": "Seasonal Produce"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`available` is `true` when no category has the name, and `false` when one does.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "available": {
+                      "type": "boolean",
+                      "description": "`true` when no category, in the trash or not, has the name."
+                    }
+                  }
+                },
+                "example": {
+                  "available": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`name` is empty or missing. The `code` is `invalid_request` and the message is `name is required`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/categories/check-name?name=Seasonal%20Produce\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.check_category_name(\"Seasonal Produce\")\nprint(response.map[\"available\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.checkCategoryName('Seasonal Produce');\nconsole.log(response.map.available);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::checkCategoryName($client, 'Seasonal Produce');\n\necho $response->map['available'] ? 'available' : 'taken', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().checkCategoryName(\"Seasonal Produce\");\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"available\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.CheckCategoryNameAsync(\"Seasonal Produce\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"available\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.categories.checkCategoryName('Seasonal Produce');\nprint((response.map as Map)['available']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().CheckCategoryName(ctx, \"Seasonal Produce\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"available\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/categories/{category_id}": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Retrieve a category",
+        "operationId": "get_category",
+        "description": "Returns the category under `category`, with its six sections and eight read-only fields, and `group_meta`. A category in the trash still returns `200`, with `in_trash` set to `true`. Send `field_metadata=true` to add a description of every field. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "description": "The category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key that describes every field of a category: its type, whether you can write it, whether a write must send it, and its limits or accepted values. The category is still returned.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The category and `group_meta`. With `field_metadata=true`, a `field_metadata` key is added.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "$ref": "#/components/schemas/Category"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CategoryGroupMeta"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CategoryFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "category": {
+                    "general": {
+                      "name": "Seasonal Produce",
+                      "title": "Seasonal Produce",
+                      "sku": "CATEGORY-5e0c7a91d2f",
+                      "url": "seasonal-produce",
+                      "heading": "Fresh this season",
+                      "parent_category": {
+                        "id": 4310,
+                        "name": "Fresh Food"
+                      },
+                      "filter_profile": null,
+                      "layout": null,
+                      "summary": "Fruit and vegetables picked this week"
+                    },
+                    "description": {
+                      "content": "<p>What is in season right now.</p>"
+                    },
+                    "images_media": {
+                      "image_url": "",
+                      "background_image_url": ""
+                    },
+                    "availability_visibility": {
+                      "available": true,
+                      "visible": true,
+                      "available_for": "everyone",
+                      "selected_customers": {
+                        "customers": [],
+                        "groups": []
+                      },
+                      "available_on_date_range": false,
+                      "available_from_date": null,
+                      "available_to_date": null,
+                      "password_protected": false,
+                      "custom_sorting": true,
+                      "default_sorting": "alpha_asc",
+                      "disable_tracking": false
+                    },
+                    "tax_shipping": {
+                      "tax_exempt": false,
+                      "tax_profile": {
+                        "id": 3,
+                        "name": "GST"
+                      },
+                      "tax_message": "Prices include GST",
+                      "show_price_with_tax": true,
+                      "prices_entered_with_tax": false,
+                      "base_price_rounding": "nearest",
+                      "enable_shipping": true,
+                      "shipping_profile": {
+                        "id": 12,
+                        "name": "Standard Shipping"
+                      }
+                    },
+                    "assign_products": {
+                      "products": [
+                        {
+                          "id": 101,
+                          "name": "Royal Gala Apples 1kg",
+                          "sku": "APPLE-GALA-1KG"
+                        },
+                        {
+                          "id": 102,
+                          "name": "Navel Oranges 1kg",
+                          "sku": "ORANGE-NAVEL-1KG"
+                        }
+                      ]
+                    },
+                    "id": 4321,
+                    "disposable": false,
+                    "in_trash": false,
+                    "parent_in_trash": false,
+                    "created_by": "admin@example.com",
+                    "created_on": "2026-10-05T03:12:44Z",
+                    "last_updated_by": "",
+                    "last_updated_on": "2026-10-06T08:40:10Z"
+                  },
+                  "group_meta": {
+                    "general": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/general"
+                    },
+                    "description": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/description"
+                    },
+                    "images_media": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/images_media"
+                    },
+                    "availability_visibility": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/availability_visibility"
+                    },
+                    "tax_shipping": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/tax_shipping"
+                    },
+                    "assign_products": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/assign_products"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`category_id` is not a number, such as `abc`. The message is `id: id must be numeric` and `details[0].code` is `invalid_type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No category has that `category_id`. The message is `Category not found`. A `category_id` with a decimal point, such as `1.5`, also returns `404`, but as an HTML page from the web server instead of a JSON error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/categories/4321\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.get_category(4321)\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"name\"], category[\"general\"][\"url\"])\nprint(category[\"in_trash\"], category[\"general\"][\"parent_category\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.getCategory(4321);\nconst category = response.map.category;\nconsole.log(category.general.name, category.general.parent_category.name, category.in_trash);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::getCategory($client, 4321);\n\n$category = $response->map['category'];\necho $category['general']['name'], $category['in_trash'] ? ' (in trash)' : '', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().getCategory(4321);\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(general.get(\"name\") + \" \" + general.get(\"sku\") + \" \" + general.get(\"url\"));\nSystem.out.println(((Map<?, ?>) category.get(\"availability_visibility\")).get(\"visible\") + \" \" + category.get(\"in_trash\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.GetCategoryAsync(4321);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\nConsole.WriteLine($\"{general[\"name\"]} {category[\"in_trash\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.getCategory(4321);\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${category['id']} ${general['name']} ${general['url']}');\nprint('${category['in_trash']} ${general['parent_category']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().GetCategory(ctx, 4321, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\ngeneral := category[\"general\"].(map[string]any)\nfmt.Println(general[\"name\"], general[\"url\"], category[\"in_trash\"])\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Replace a category",
+        "operationId": "update_category",
+        "description": "Most fields you leave out go back to the values of a new category: `title`, `heading`, `summary`, `layout` and `description.content` become `null`, `availability_visibility` returns to its defaults, the category loses its products, and a child category without `general.parent_category` moves to the top level. `name`, `sku`, `url` and both images keep their values, so a new `name` leaves the `url` as it was. In `tax_shipping`, a `tax_profile` or `shipping_profile` you leave out becomes `null` whether or not you send that section, clearing the shipping profile sets `enable_shipping` to `false`, and the other fields keep their values. To change only the fields you send, use [Update a category](/api-reference/categories/update-a-category).",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "description": "The category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The category after the replace, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "$ref": "#/components/schemas/Category"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CategoryGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "category": {
+                    "general": {
+                      "name": "Seasonal Produce",
+                      "title": null,
+                      "sku": "CATEGORY-5e0c7a91d2f",
+                      "url": "seasonal-produce",
+                      "heading": "New heading",
+                      "parent_category": null,
+                      "filter_profile": null,
+                      "layout": null,
+                      "summary": null
+                    },
+                    "description": {
+                      "content": null
+                    },
+                    "images_media": {
+                      "image_url": "",
+                      "background_image_url": ""
+                    },
+                    "availability_visibility": {
+                      "available": true,
+                      "visible": true,
+                      "available_for": "everyone",
+                      "selected_customers": {
+                        "customers": [],
+                        "groups": []
+                      },
+                      "available_on_date_range": false,
+                      "available_from_date": null,
+                      "available_to_date": null,
+                      "password_protected": false,
+                      "custom_sorting": false,
+                      "default_sorting": null,
+                      "disable_tracking": false
+                    },
+                    "tax_shipping": {
+                      "tax_exempt": false,
+                      "tax_profile": null,
+                      "tax_message": "Prices include GST",
+                      "show_price_with_tax": true,
+                      "prices_entered_with_tax": false,
+                      "base_price_rounding": "nearest",
+                      "enable_shipping": false,
+                      "shipping_profile": null
+                    },
+                    "assign_products": {
+                      "products": []
+                    },
+                    "id": 4321,
+                    "disposable": false,
+                    "in_trash": false,
+                    "parent_in_trash": false,
+                    "created_by": "admin@example.com",
+                    "created_on": "2026-10-05T03:12:44Z",
+                    "last_updated_by": "",
+                    "last_updated_on": "2026-10-07T09:15:02Z"
+                  },
+                  "group_meta": {
+                    "general": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/general"
+                    },
+                    "description": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/description"
+                    },
+                    "images_media": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/images_media"
+                    },
+                    "availability_visibility": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/availability_visibility"
+                    },
+                    "tax_shipping": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/tax_shipping"
+                    },
+                    "assign_products": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/assign_products"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `category` (`category is required`); a section has a key it does not accept, such as `images_media.image_url` (`<section>.<key>: is not a recognised category field`, and `details[0].code` is `unknown_field`); `category` has an unknown key beside the sections (`<key>: is not a recognised category field`); `available_for` or `default_sorting` is not one of its values, `null` included (`details[0].code` is `invalid_enum`); `general.title` is longer than 200 characters (`general.title: must be at most 200 characters`, and `details[0].code` is `too_long`); or `general.filter_profile` names a filter profile `id` on a store without the filter plugin (`general.filter_profile.id: not found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An image is a `data:` URI string instead of a `{filename, base64}` object. The body has no `error` object: it is `{\"status\": \"error\", \"code\": 500, \"message\": \"Unexpected Error Occurred\"}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryServerError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 500,
+                  "message": "Unexpected Error Occurred"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/categories/4321\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"category\": {\n      \"general\": {\n        \"name\": \"Seasonal Produce\",\n        \"heading\": \"New heading\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.update_category(4321, {\n    \"category\": {\"general\": {\"name\": \"Seasonal Produce\", \"heading\": \"New heading\"}},\n})\ngeneral = response.map[\"category\"][\"general\"]\nprint(general[\"name\"], general[\"heading\"], general[\"summary\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.updateCategory(4321, {\n    category: {general: {name: 'Seasonal Produce', heading: 'New heading'}},\n});\nconst category = response.map.category;\nconsole.log(category.general.heading, category.general.url, category.assign_products.products.length);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::updateCategory($client, 4321, [\n    'category' => ['general' => ['name' => 'Seasonal Produce', 'heading' => 'New heading']],\n]);\n\necho $response->map['category']['general']['heading'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().updateCategory(4321, Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"name\", \"Seasonal Produce\", \"heading\", \"New heading\"))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(general.get(\"name\") + \" \" + general.get(\"heading\") + \" \" + general.get(\"summary\"));\nSystem.out.println(category.get(\"last_updated_on\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.UpdateCategoryAsync(4321, new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?> { [\"name\"] = \"Seasonal Produce\", [\"heading\"] = \"New heading\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\nConsole.WriteLine($\"{general[\"name\"]} {general[\"heading\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.updateCategory(4321, {\n  'category': {\n    'general': {'name': 'Seasonal Produce', 'heading': 'New heading'},\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${general['name']} ${general['heading']} ${general['summary']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().UpdateCategory(ctx, 4321, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\": map[string]any{\"name\": \"Seasonal Produce\", \"heading\": \"New heading\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngeneral := resp.Map().(map[string]any)[\"category\"].(map[string]any)[\"general\"].(map[string]any)\nfmt.Println(general[\"name\"], general[\"heading\"], general[\"parent_category\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryWriteBody"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Update a category",
+        "operationId": "patch_category",
+        "description": "Send the fields to change inside `category`, grouped by section; one body can change several sections. Every field you leave out keeps its value. The exception is `assign_products.products`: the list you send replaces the category's products. A body that is not wrapped in `category` is rejected with `400` and the message `category is required`.",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "description": "The category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole category after the change, with `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "$ref": "#/components/schemas/Category"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CategoryGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "category": {
+                    "general": {
+                      "name": "Seasonal Produce",
+                      "title": "Seasonal Produce",
+                      "sku": "CATEGORY-5e0c7a91d2f",
+                      "url": "seasonal-produce",
+                      "heading": "Fresh this season",
+                      "parent_category": {
+                        "id": 4310,
+                        "name": "Fresh Food"
+                      },
+                      "filter_profile": null,
+                      "layout": null,
+                      "summary": "Updated summary"
+                    },
+                    "description": {
+                      "content": "<p>What is in season right now.</p>"
+                    },
+                    "images_media": {
+                      "image_url": "",
+                      "background_image_url": ""
+                    },
+                    "availability_visibility": {
+                      "available": true,
+                      "visible": false,
+                      "available_for": "everyone",
+                      "selected_customers": {
+                        "customers": [],
+                        "groups": []
+                      },
+                      "available_on_date_range": false,
+                      "available_from_date": null,
+                      "available_to_date": null,
+                      "password_protected": false,
+                      "custom_sorting": true,
+                      "default_sorting": "alpha_asc",
+                      "disable_tracking": false
+                    },
+                    "tax_shipping": {
+                      "tax_exempt": false,
+                      "tax_profile": {
+                        "id": 3,
+                        "name": "GST"
+                      },
+                      "tax_message": "Prices include GST",
+                      "show_price_with_tax": true,
+                      "prices_entered_with_tax": false,
+                      "base_price_rounding": "nearest",
+                      "enable_shipping": true,
+                      "shipping_profile": {
+                        "id": 12,
+                        "name": "Standard Shipping"
+                      }
+                    },
+                    "assign_products": {
+                      "products": [
+                        {
+                          "id": 101,
+                          "name": "Royal Gala Apples 1kg",
+                          "sku": "APPLE-GALA-1KG"
+                        },
+                        {
+                          "id": 102,
+                          "name": "Navel Oranges 1kg",
+                          "sku": "ORANGE-NAVEL-1KG"
+                        }
+                      ]
+                    },
+                    "id": 4321,
+                    "disposable": false,
+                    "in_trash": false,
+                    "parent_in_trash": false,
+                    "created_by": "admin@example.com",
+                    "created_on": "2026-10-05T03:12:44Z",
+                    "last_updated_by": "",
+                    "last_updated_on": "2026-10-07T09:15:02Z"
+                  },
+                  "group_meta": {
+                    "general": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/general"
+                    },
+                    "description": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/description"
+                    },
+                    "images_media": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/images_media"
+                    },
+                    "availability_visibility": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/availability_visibility"
+                    },
+                    "tax_shipping": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/tax_shipping"
+                    },
+                    "assign_products": {
+                      "kind": "section",
+                      "writable": true,
+                      "href": "/api/v4/admin/categories/{id}/assign_products"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `category` (`category is required`); a section has a key it does not accept, such as `images_media.image_url` (`<section>.<key>: is not a recognised category field`, and `details[0].code` is `unknown_field`); `category` has an unknown key beside the sections (`<key>: is not a recognised category field`); `available_for` or `default_sorting` is not one of its values, `null` included (`details[0].code` is `invalid_enum`); `general.title` is longer than 200 characters (`general.title: must be at most 200 characters`, and `details[0].code` is `too_long`); or `general.filter_profile` names a filter profile `id` on a store without the filter plugin (`general.filter_profile.id: not found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An image is a `data:` URI string instead of a `{filename, base64}` object. The body has no `error` object: it is `{\"status\": \"error\", \"code\": 500, \"message\": \"Unexpected Error Occurred\"}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryServerError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 500,
+                  "message": "Unexpected Error Occurred"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/categories/4321\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"category\": {\n      \"general\": {\n        \"summary\": \"Updated summary\"\n      },\n      \"availability_visibility\": {\n        \"visible\": false\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.patch_category(4321, {\n    \"category\": {\n        \"general\": {\"summary\": \"Updated summary\"},\n        \"availability_visibility\": {\"visible\": False},\n    },\n})\ncategory = response.map[\"category\"]\nprint(category[\"general\"][\"summary\"], category[\"availability_visibility\"][\"visible\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.patchCategory(4321, {\n    category: {general: {summary: 'Updated summary'}, availability_visibility: {visible: false}},\n});\nconst category = response.map.category;\nconsole.log(category.general.summary, category.availability_visibility.visible);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::patchCategory($client, 4321, [\n    'category' => [\n        'general' => ['summary' => 'Updated summary'],\n        'availability_visibility' => ['visible' => false],\n    ],\n]);\n\n$category = $response->map['category'];\necho $category['general']['summary'], ', visible: ', $category['availability_visibility']['visible'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().patchCategory(4321, Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"summary\", \"Updated summary\"),\n        \"availability_visibility\", Map.of(\"visible\", false))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nSystem.out.println(((Map<?, ?>) category.get(\"general\")).get(\"summary\"));\nSystem.out.println(((Map<?, ?>) category.get(\"availability_visibility\")).get(\"visible\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.PatchCategoryAsync(4321, new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?> { [\"summary\"] = \"Updated summary\" },\n        [\"availability_visibility\"] = new Dictionary<string, object?> { [\"visible\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\nvar availability = (IReadOnlyDictionary<string, object?>)category[\"availability_visibility\"]!;\nConsole.WriteLine($\"{general[\"summary\"]} {availability[\"visible\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.patchCategory(4321, {\n  'category': {\n    'general': {'summary': 'Updated summary'},\n    'availability_visibility': {'visible': false},\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nfinal visibility = category['availability_visibility'] as Map;\nprint('${general['summary']} ${visibility['visible']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().PatchCategory(ctx, 4321, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\":                 map[string]any{\"summary\": \"Updated summary\"},\n\t\t\"availability_visibility\": map[string]any{\"visible\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\nfmt.Println(category[\"general\"].(map[string]any)[\"summary\"], category[\"availability_visibility\"].(map[string]any)[\"visible\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryWriteBody"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Delete a category",
+        "operationId": "delete_category",
+        "description": "Moves the category to the trash and returns `204` with no body. The category leaves the listing and the count, but [Retrieve a category](/api-reference/categories/retrieve-a-category) still returns it with `in_trash` set to `true`, and [Check a category name](/api-reference/categories/check-a-category-name) still reports its name as taken. Its child categories stay in the listing, with `parent_category` still naming it and `parent_in_trash` still `false`. No call restores a category from the trash or deletes it permanently.",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "description": "The category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Moved to the trash. No body."
+          },
+          "404": {
+            "description": "The category is already in the trash: the `code` is `not_found` and the message is `Category already in trash`. You also get `404`, with the message `Category not found`, when no category has that `category_id`. After any `404`, the next delete sent with the same `JSESSIONID` cookie returns that `404` and leaves its category in place.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/categories/4321\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.delete_category(4321)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.deleteCategory(4321);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::deleteCategory($client, 4321);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().deleteCategory(4321);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.DeleteCategoryAsync(4321);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.deleteCategory(4321);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().DeleteCategory(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/categories/{category_id}/{section}": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Retrieve a category section",
+        "operationId": "get_category_section",
+        "description": "Returns the section named in the path inside `category`, such as `{\"category\": {\"tax_shipping\": {...}}}`, with the same values as [Retrieve a category](/api-reference/categories/retrieve-a-category). The response has no `group_meta`, and query parameters, `field_metadata` included, add nothing. A category in the trash still returns its sections. An unknown section returns `404` with the message `Section not found`.",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "description": "The category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `general`, `description`, `images_media`, `availability_visibility`, `tax_shipping` or `assign_products`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "general",
+                "description",
+                "images_media",
+                "availability_visibility",
+                "tax_shipping",
+                "assign_products"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The section inside `category`, without `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "$ref": "#/components/schemas/CategorySection"
+                    }
+                  }
+                },
+                "example": {
+                  "category": {
+                    "tax_shipping": {
+                      "tax_exempt": false,
+                      "tax_profile": {
+                        "id": 3,
+                        "name": "GST"
+                      },
+                      "tax_message": "Prices include GST",
+                      "show_price_with_tax": true,
+                      "prices_entered_with_tax": false,
+                      "base_price_rounding": "nearest",
+                      "enable_shipping": true,
+                      "shipping_profile": {
+                        "id": 12,
+                        "name": "Standard Shipping"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`category_id` is not a number, such as `abc`. The message is `id: id must be numeric` and `details[0].code` is `invalid_type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No category has that `category_id`, with the message `Category not found`, or no section has that name, with the message `Section not found`. The `code` is `not_found` in both cases.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/categories/4321/tax_shipping\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.get_category_section(4321, \"tax_shipping\")\ntax_shipping = response.map[\"category\"][\"tax_shipping\"]\nprint(tax_shipping[\"tax_message\"], tax_shipping[\"enable_shipping\"])\nprint(tax_shipping[\"shipping_profile\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.getCategorySection(4321, 'tax_shipping');\nconst taxShipping = response.map.category.tax_shipping;\nconsole.log(taxShipping.tax_profile.name, taxShipping.enable_shipping, taxShipping.shipping_profile.name);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::getCategorySection($client, 4321, 'tax_shipping');\n\n$taxShipping = $response->map['category']['tax_shipping'];\necho $taxShipping['tax_message'], ', shipping: ', $taxShipping['enable_shipping'] ? 'on' : 'off', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().getCategorySection(4321, \"tax_shipping\");\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> taxShipping = (Map<?, ?>) category.get(\"tax_shipping\");\nSystem.out.println(taxShipping.get(\"tax_message\") + \" \" + taxShipping.get(\"show_price_with_tax\"));\nSystem.out.println(taxShipping.get(\"tax_exempt\") + \" \" + taxShipping.get(\"enable_shipping\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.GetCategorySectionAsync(4321, \"tax_shipping\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar taxShipping = (IReadOnlyDictionary<string, object?>)category[\"tax_shipping\"]!;\nConsole.WriteLine($\"{taxShipping[\"tax_message\"]} {taxShipping[\"show_price_with_tax\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.categories.getCategorySection(4321, 'tax_shipping');\nfinal category = (response.map as Map)['category'] as Map;\nfinal taxShipping = category['tax_shipping'] as Map;\nprint('${taxShipping['tax_message']} ${taxShipping['enable_shipping']}');\nprint(taxShipping['shipping_profile']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().GetCategorySection(ctx, 4321, \"tax_shipping\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxShipping := resp.Map().(map[string]any)[\"category\"].(map[string]any)[\"tax_shipping\"].(map[string]any)\nfmt.Println(taxShipping[\"tax_exempt\"], taxShipping[\"tax_message\"], taxShipping[\"enable_shipping\"])\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Update a category section",
+        "operationId": "patch_category_section",
+        "description": "Wrap the fields in `category` and then in the section's name, such as `{\"category\": {\"assign_products\": {\"products\": [101, 102, 103]}}}`. A body with only the section's name, or no wrapper at all, is rejected with `400` and the message `<section> is required`. Fields you leave out keep their values, except `assign_products.products`, which the list you send replaces. Anything else inside `category`, such as another section, is ignored.",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "description": "The category's `id`, from a listing or from the response to creating the category.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "section",
+            "in": "path",
+            "required": true,
+            "description": "The section to read or write: `general`, `description`, `images_media`, `availability_visibility`, `tax_shipping` or `assign_products`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "general",
+                "description",
+                "images_media",
+                "availability_visibility",
+                "tax_shipping",
+                "assign_products"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The whole section after the change, inside `category`, without `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "$ref": "#/components/schemas/CategorySection"
+                    }
+                  }
+                },
+                "example": {
+                  "category": {
+                    "assign_products": {
+                      "products": [
+                        {
+                          "id": 101,
+                          "name": "Royal Gala Apples 1kg",
+                          "sku": "APPLE-GALA-1KG"
+                        },
+                        {
+                          "id": 102,
+                          "name": "Navel Oranges 1kg",
+                          "sku": "ORANGE-NAVEL-1KG"
+                        },
+                        {
+                          "id": 103,
+                          "name": "Butternut Pumpkin",
+                          "sku": "PUMPKIN-BUTTERNUT"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is `{\"<section>\": {...}}` or the bare fields, without `category` around them (`<section> is required`, such as `assign_products is required`); a section has a key it does not accept, such as `images_media.image_url` (`<section>.<key>: is not a recognised category field`, and `details[0].code` is `unknown_field`); `available_for` or `default_sorting` is not one of its values, `null` included (`details[0].code` is `invalid_enum`); `general.title` is longer than 200 characters (`general.title: must be at most 200 characters`, and `details[0].code` is `too_long`); or `general.filter_profile` names a filter profile `id` on a store without the filter plugin (`general.filter_profile.id: not found`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No section has that name: the `code` is `not_found` and the message is `Section not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An image is a `data:` URI string instead of a `{filename, base64}` object. The body has no `error` object: it is `{\"status\": \"error\", \"code\": 500, \"message\": \"Unexpected Error Occurred\"}`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryServerError"
+                },
+                "example": {
+                  "status": "error",
+                  "code": 500,
+                  "message": "Unexpected Error Occurred"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/categories/4321/assign_products\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"category\": {\n      \"assign_products\": {\n        \"products\": [\n          101,\n          102,\n          103\n        ]\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.patch_category_section(\n    4321, \"assign_products\", {\"category\": {\"assign_products\": {\"products\": [101, 102, 103]}}}\n)\nfor product in response.map[\"category\"][\"assign_products\"][\"products\"]:\n    print(product[\"id\"], product[\"sku\"], product[\"name\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.patchCategorySection(4321, 'assign_products', {\n    category: {assign_products: {products: [101, 102, 103]}},\n});\nfor (const product of response.map.category.assign_products.products) {\n    console.log(product.id, product.name, product.sku);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::patchCategorySection($client, 4321, 'assign_products', [\n    'category' => ['assign_products' => ['products' => [101, 102, 103]]],\n]);\n\nforeach ($response->map['category']['assign_products']['products'] as $product) {\n    echo $product['id'], ' ', $product['sku'], ' ', $product['name'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().patchCategorySection(4321, \"assign_products\",\n        Map.of(\"category\", Map.of(\"assign_products\", Map.of(\"products\", List.of(101, 102, 103)))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nfor (Object row : (List<?>) ((Map<?, ?>) category.get(\"assign_products\")).get(\"products\")) {\n    Map<?, ?> product = (Map<?, ?>) row;\n    System.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"sku\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.PatchCategorySectionAsync(4321, \"assign_products\", new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"assign_products\"] = new Dictionary<string, object?> { [\"products\"] = new List<object?> { 101, 102, 103 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar assignProducts = (IReadOnlyDictionary<string, object?>)category[\"assign_products\"]!;\nforeach (var product in ((IReadOnlyList<object?>)assignProducts[\"products\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{product[\"id\"]} {product[\"sku\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.categories.patchCategorySection(4321, 'assign_products', {\n  'category': {\n    'assign_products': {\n      'products': [101, 102, 103],\n    },\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal products = (category['assign_products'] as Map)['products'] as List;\nfor (final product in products) {\n  print('${(product as Map)['id']} ${product['sku']} ${product['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().PatchCategorySection(ctx, 4321, \"assign_products\", map[string]any{\n\t\"category\": map[string]any{\"assign_products\": map[string]any{\"products\": []any{101, 102, 103}}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nassigned := resp.Map().(map[string]any)[\"category\"].(map[string]any)[\"assign_products\"].(map[string]any)\nfor _, row := range assigned[\"products\"].([]any) {\n\tproduct := row.(map[string]any)\n\tfmt.Println(product[\"id\"], product[\"name\"], product[\"sku\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryWriteBody"
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -34156,6 +36030,829 @@
                 "description": "Identifies this request."
               }
             }
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "description": "A category: six sections and eight read-only fields. A listing entry, a category read and the response to a create, replace or update have the same fields.",
+        "properties": {
+          "general": {
+            "$ref": "#/components/schemas/CategoryGeneral"
+          },
+          "description": {
+            "$ref": "#/components/schemas/CategoryDescription"
+          },
+          "images_media": {
+            "$ref": "#/components/schemas/CategoryImagesMedia"
+          },
+          "availability_visibility": {
+            "$ref": "#/components/schemas/CategoryAvailabilityVisibility"
+          },
+          "tax_shipping": {
+            "$ref": "#/components/schemas/CategoryTaxShipping"
+          },
+          "assign_products": {
+            "$ref": "#/components/schemas/CategoryAssignProducts"
+          },
+          "id": {
+            "type": "integer",
+            "description": "The category's `id`, assigned by the store. Pass it as `category_id` in a path."
+          },
+          "disposable": {
+            "type": "boolean",
+            "description": "A flag the store sets. You cannot write it."
+          },
+          "in_trash": {
+            "type": "boolean",
+            "description": "`true` after you delete the category, which moves it to the trash."
+          },
+          "parent_in_trash": {
+            "type": "boolean",
+            "description": "`false` even when the parent category is in the trash. To check the parent, retrieve it and read its `in_trash`."
+          },
+          "created_by": {
+            "type": "string",
+            "description": "Identifies who created the category, such as an email address. It can be `\"\"`."
+          },
+          "created_on": {
+            "type": "string",
+            "description": "When the category was created."
+          },
+          "last_updated_by": {
+            "type": "string",
+            "description": "Always `\"\"`."
+          },
+          "last_updated_on": {
+            "type": "string",
+            "description": "When the category last changed. On a new category it equals `created_on`. The listing puts the most recent first unless you send `sort`."
+          }
+        }
+      },
+      "CategorySection": {
+        "type": "object",
+        "description": "Holds only the section named in the path.",
+        "properties": {
+          "general": {
+            "$ref": "#/components/schemas/CategoryGeneral"
+          },
+          "description": {
+            "$ref": "#/components/schemas/CategoryDescription"
+          },
+          "images_media": {
+            "$ref": "#/components/schemas/CategoryImagesMedia"
+          },
+          "availability_visibility": {
+            "$ref": "#/components/schemas/CategoryAvailabilityVisibility"
+          },
+          "tax_shipping": {
+            "$ref": "#/components/schemas/CategoryTaxShipping"
+          },
+          "assign_products": {
+            "$ref": "#/components/schemas/CategoryAssignProducts"
+          }
+        }
+      },
+      "CategoryReference": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "A record the category links to, such as its parent category, as `{id, name}`, or `null` when none is set. In a write, send only the record's `id`.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The linked record's `id`, such as the parent category's `id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The linked record's name. Returned in responses."
+          }
+        }
+      },
+      "CategoryGeneral": {
+        "type": "object",
+        "description": "The category's name, title, `sku`, `url`, heading, parent, filter profile, layout and summary.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The category's name. A create rejects a name that a top-level category has, in any letter case."
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The category's title, or `null`."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The category's SKU. When you create the category without one, the store generates `CATEGORY-` followed by 11 hexadecimal characters."
+          },
+          "url": {
+            "type": "string",
+            "description": "The category's `url`, such as `seasonal-produce`. When you create the category without one, the store makes it from the name, adding a suffix such as `-1` when another category has the same name. A `PUT` that renames the category leaves it as it was."
+          },
+          "heading": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The category's heading, or `null`."
+          },
+          "parent_category": {
+            "$ref": "#/components/schemas/CategoryReference",
+            "description": "The parent category as `{id, name}`, or `null` for a top-level category."
+          },
+          "filter_profile": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "The category's filter profile, which comes from the filter plugin. `null` on a store without the plugin."
+          },
+          "layout": {
+            "$ref": "#/components/schemas/CategoryReference",
+            "description": "The layout as `{id, name}`, or `null`."
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The category's summary, or `null`."
+          }
+        }
+      },
+      "CategoryDescription": {
+        "type": "object",
+        "description": "The category's description. Responses and writes use the same field.",
+        "properties": {
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The description, or `null`."
+          }
+        }
+      },
+      "CategoryImagesMedia": {
+        "type": "object",
+        "description": "The URLs of the category's two images. To upload an image, send `images_media.image` or `images_media.background_image` in a write.",
+        "properties": {
+          "image_url": {
+            "type": "string",
+            "description": "The category image's URL, ending in the file name you uploaded, or `\"\"` when no image is set."
+          },
+          "background_image_url": {
+            "type": "string",
+            "description": "The background image's URL, in a `background/` folder and ending in the file name you uploaded, or `\"\"` when no background image is set."
+          }
+        }
+      },
+      "CategorySelectedCustomers": {
+        "type": "object",
+        "description": "The customers and groups the category is available to when `available_for` is `selected`.",
+        "properties": {
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryReference"
+            },
+            "description": "Each customer as `{id, name}`. Empty on a new category."
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryReference"
+            },
+            "description": "Each group as `{id, name}`. Empty on a new category."
+          }
+        }
+      },
+      "CategoryAvailabilityVisibility": {
+        "type": "object",
+        "description": "Whether the category is available and visible, to whom and when, with its password and sorting settings.",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Whether the category is available. `true` on a new category."
+          },
+          "visible": {
+            "type": "boolean",
+            "description": "Whether the category is visible. `true` on a new category."
+          },
+          "available_for": {
+            "type": "string",
+            "enum": [
+              "everyone",
+              "customer",
+              "selected"
+            ],
+            "description": "Who the category is available to: `everyone`, `customer` or `selected`. With `selected`, it is available to the customers and groups in `selected_customers`. `everyone` on a new category."
+          },
+          "selected_customers": {
+            "$ref": "#/components/schemas/CategorySelectedCustomers"
+          },
+          "available_on_date_range": {
+            "type": "boolean",
+            "description": "Turns on the date range set by `available_from_date` and `available_to_date`. `false` on a new category."
+          },
+          "available_from_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The start of the date range, such as `2026-11-02T00:00:00Z`, or `null`."
+          },
+          "available_to_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the date range, such as `2026-11-20T00:00:00Z`, or `null`."
+          },
+          "password_protected": {
+            "type": "boolean",
+            "description": "Whether the category is password protected. `false` on a new category. The password itself is never returned."
+          },
+          "custom_sorting": {
+            "type": "boolean",
+            "description": "Turns custom sorting on for the category. `false` on a new category."
+          },
+          "default_sorting": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "alpha_asc",
+              "alpha_desc",
+              "price_desc",
+              "price_asc",
+              "created_asc",
+              "created_desc",
+              null
+            ],
+            "description": "The category's default sort order: `alpha_asc`, `alpha_desc`, `price_desc`, `price_asc`, `created_asc` or `created_desc`. `null` on a new category."
+          },
+          "disable_tracking": {
+            "type": "boolean",
+            "description": "Turns tracking off for the category. `false` on a new category."
+          }
+        }
+      },
+      "CategoryTaxShipping": {
+        "type": "object",
+        "description": "The category's tax and shipping settings. Responses and writes use the same fields. A `PUT` sets a `tax_profile` or `shipping_profile` it leaves out to `null`, whether or not it sends this section; clearing the shipping profile sets `enable_shipping` to `false`.",
+        "properties": {
+          "tax_exempt": {
+            "type": "boolean",
+            "description": "Whether the category is tax exempt. `false` on a new category."
+          },
+          "tax_profile": {
+            "$ref": "#/components/schemas/CategoryReference",
+            "description": "The tax profile as `{id, name}`, or `null`. Send `{\"id\": ...}` to set it; a `name` beside the `id` is ignored."
+          },
+          "tax_message": {
+            "type": "string",
+            "description": "A message about tax, such as `Prices include GST`. `\"\"` on a new category."
+          },
+          "show_price_with_tax": {
+            "type": "boolean",
+            "description": "Whether prices show with tax. `true` on a new category."
+          },
+          "prices_entered_with_tax": {
+            "type": "boolean",
+            "description": "Whether prices are entered with tax. `false` on a new category."
+          },
+          "base_price_rounding": {
+            "type": "string",
+            "description": "How the base price is rounded. `nearest` on a new category."
+          },
+          "enable_shipping": {
+            "type": "boolean",
+            "description": "Whether shipping is on. `false` on a new category. Setting a `shipping_profile` sets it to `true`, and setting it to `false` clears `shipping_profile`, even a profile sent in the same body."
+          },
+          "shipping_profile": {
+            "$ref": "#/components/schemas/CategoryReference",
+            "description": "The shipping profile as `{id, name}`, or `null`. Send `{\"id\": ...}` to set it, which also sets `enable_shipping` to `true`."
+          }
+        }
+      },
+      "CategoryProduct": {
+        "type": "object",
+        "description": "A product assigned to the category.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The product's `id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The product's name."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The product's SKU."
+          }
+        }
+      },
+      "CategoryAssignProducts": {
+        "type": "object",
+        "description": "The products assigned to the category.",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryProduct"
+            },
+            "description": "Each product as `{id, name, sku}`. Empty on a new category unless you assign products. A product can be in several categories."
+          }
+        }
+      },
+      "CategoryGroupMeta": {
+        "type": "object",
+        "description": "One entry per section. The listing, a category read, and the responses to create, replace and update return it; a section read or update does not.",
+        "properties": {
+          "general": {
+            "$ref": "#/components/schemas/CategorySectionMeta"
+          },
+          "description": {
+            "$ref": "#/components/schemas/CategorySectionMeta"
+          },
+          "images_media": {
+            "$ref": "#/components/schemas/CategorySectionMeta"
+          },
+          "availability_visibility": {
+            "$ref": "#/components/schemas/CategorySectionMeta"
+          },
+          "tax_shipping": {
+            "$ref": "#/components/schemas/CategorySectionMeta"
+          },
+          "assign_products": {
+            "$ref": "#/components/schemas/CategorySectionMeta"
+          }
+        }
+      },
+      "CategorySectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`section` for every entry."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "`true` for every entry."
+          },
+          "href": {
+            "type": "string",
+            "description": "The section's path, such as `/api/v4/admin/categories/{id}/general`. `{id}` is literal text: put the category's `id` in its place before you call the path."
+          }
+        }
+      },
+      "CategoryPagination": {
+        "type": "object",
+        "description": "Paging details for the listing. With an `offset` at or past `total`, `count` is `0` and `current_page` shows the last page, while `has_previous` shows `false` and `previous_page` is `null`.",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of categories outside the trash that match your filters."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, capped at `20`, or `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of categories skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of categories on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The page number: `offset` divided by `limit`, rounded down, plus `1`, but never more than `total_pages`. It shows `1` when no category matches."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "`total` divided by `limit`, rounded up."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when `offset` plus `count` is less than `total`."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when `offset` is above `0`, except that it shows `false` when `offset` is at or past `total`."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the previous page, or `null` when there is none. It sets `limit` and an `offset` that never goes below `0`, and repeats every other query parameter you sent except `page`, even `field_metadata` and parameters the listing ignores."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the next page, or `null` on the last page. It sets `limit` and the next `offset`, and repeats every other query parameter you sent except `page`, even `field_metadata` and parameters the listing ignores."
+          }
+        }
+      },
+      "CategoryFieldMetadata": {
+        "type": "object",
+        "description": "Describes every field of a category. Returned only when you send `field_metadata=true`. Each of the eight read-only fields has one entry, and each section is an object of entries keyed by field name; `availability_visibility.selected_customers` nests one level further, with `customers` and `groups`. The `images_media.image` and `images_media.background_image` entries describe a base64 `data:` URI string, but a write must send a `{filename, base64}` object: a `data:` URI string returns `500`. The `general.url` entry says a replace without `url` makes it from the name, but a `PUT` that renames a category without `url` leaves the `url` as it was.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "disposable": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "in_trash": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "parent_in_trash": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "created_on": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "last_updated_by": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "last_updated_on": {
+            "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+          },
+          "general": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+            },
+            "description": "One entry per field of `general`, keyed by field name."
+          },
+          "description": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+            },
+            "description": "One entry per field of `description`, keyed by field name."
+          },
+          "images_media": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+            },
+            "description": "One entry per field of `images_media`, keyed by field name."
+          },
+          "availability_visibility": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+            },
+            "description": "One entry per field of `availability_visibility`, keyed by field name."
+          },
+          "tax_shipping": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+            },
+            "description": "One entry per field of `tax_shipping`, keyed by field name."
+          },
+          "assign_products": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryFieldMetadataEntry"
+            },
+            "description": "One entry per field of `assign_products`, keyed by field name."
+          }
+        }
+      },
+      "CategoryFieldMetadataEntry": {
+        "type": "object",
+        "description": "Describes one field. Every entry has `type`, `read_only` and `key_path`; the other keys appear on some entries only.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The field's value type."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "`true` when you cannot write the field: the eight read-only fields, `general.filter_profile`, `images_media.image_url` and `images_media.background_image_url`."
+          },
+          "key_path": {
+            "type": "string",
+            "description": "Where the field sits in a category."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "On a field you can write, whether a write must send it."
+          },
+          "min_length": {
+            "type": "integer",
+            "description": "The shortest value accepted, such as `2` for `general.name`."
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "The longest value accepted: `255` for `general.name` and `general.url`, `200` for `general.title` and `general.heading`, and `500` for `general.summary`."
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The values the field accepts, on a field that takes only a fixed list."
+          },
+          "note": {
+            "type": "string",
+            "description": "A remark about the field, such as the one on `last_updated_by`."
+          },
+          "write_only": {
+            "type": "boolean",
+            "description": "`true` on the three fields a write accepts but no response returns: `images_media.image`, `images_media.background_image` and `availability_visibility.password`."
+          }
+        }
+      },
+      "CategoryWriteBody": {
+        "type": "object",
+        "required": [
+          "category"
+        ],
+        "description": "Every write wraps its sections in `category`.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/CategoryInput"
+          }
+        }
+      },
+      "CategoryInput": {
+        "type": "object",
+        "description": "Group the fields by section. An unknown key beside the sections is rejected with `400` (`<key>: is not a recognised category field`), except in a section update, which reads only the section named in its path and ignores the rest. You cannot change the category's `id`: an `id` beside the sections is ignored, and so is a key beside `category`.",
+        "properties": {
+          "general": {
+            "$ref": "#/components/schemas/CategoryGeneralInput"
+          },
+          "description": {
+            "$ref": "#/components/schemas/CategoryDescription"
+          },
+          "images_media": {
+            "$ref": "#/components/schemas/CategoryImagesMediaInput"
+          },
+          "availability_visibility": {
+            "$ref": "#/components/schemas/CategoryAvailabilityVisibilityInput"
+          },
+          "tax_shipping": {
+            "$ref": "#/components/schemas/CategoryTaxShipping"
+          },
+          "assign_products": {
+            "$ref": "#/components/schemas/CategoryAssignProductsInput"
+          }
+        }
+      },
+      "CategoryGeneralInput": {
+        "type": "object",
+        "description": "The `general` fields you can write. Leave `filter_profile` out or send `null`: on a store without the filter plugin, a filter profile `id` there is rejected with `400`. Any other key is rejected with `400`, and `details[0].code` is `unknown_field`.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 255,
+            "description": "Required when you create a category. 2 to 255 characters. A create rejects a name that a top-level category has, in any letter case, even one in the trash. A `PUT` without it keeps the current name."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "At most 200 characters."
+          },
+          "sku": {
+            "type": "string",
+            "description": "Generated when you create the category without it."
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "At most 255 characters. Made from the name when you create the category without it."
+          },
+          "heading": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "At most 200 characters."
+          },
+          "parent_category": {
+            "$ref": "#/components/schemas/CategoryReference",
+            "description": "Send `{\"id\": ...}` with the parent category's `id`; a `name` beside the `id` is ignored. A `PUT` without it moves the category to the top level."
+          },
+          "layout": {
+            "$ref": "#/components/schemas/CategoryReference",
+            "description": "Send `{\"id\": ...}` with the layout's `id`; a `name` beside the `id` is ignored."
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "At most 500 characters."
+          }
+        }
+      },
+      "CategoryImagesMediaInput": {
+        "type": "object",
+        "description": "The images you can upload. Each returns as a URL in `image_url` or `background_image_url`. Sending `null` or `\"\"` does not remove a stored image, and sending `image_url` is rejected with `400`.",
+        "properties": {
+          "image": {
+            "$ref": "#/components/schemas/CategoryImage",
+            "description": "The category image."
+          },
+          "background_image": {
+            "$ref": "#/components/schemas/CategoryImage",
+            "description": "The background image, stored in a `background/` folder."
+          }
+        }
+      },
+      "CategoryImage": {
+        "type": "object",
+        "description": "One image upload. A `data:` URI string in place of this object returns `500`.",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "The file name, such as `banner.png`. The image's URL ends in it."
+          },
+          "base64": {
+            "type": "string",
+            "description": "The file's contents, base64-encoded."
+          }
+        }
+      },
+      "CategoryAvailabilityVisibilityInput": {
+        "type": "object",
+        "description": "The `availability_visibility` fields you can write: the fields a response returns, plus `password`. Send booleans as `true` or `false`: a string such as `\"false\"`, or `null`, returns `200` and leaves the stored value unchanged. A `PUT` that leaves this section out resets it to the defaults of a new category.",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Whether the category is available."
+          },
+          "visible": {
+            "type": "boolean",
+            "description": "Whether the category is visible."
+          },
+          "available_for": {
+            "type": "string",
+            "enum": [
+              "everyone",
+              "customer",
+              "selected"
+            ],
+            "description": "Who the category is available to: `everyone`, `customer` or `selected`. Any other value, `null` included, is rejected with `400`."
+          },
+          "selected_customers": {
+            "$ref": "#/components/schemas/CategorySelectedCustomersInput"
+          },
+          "available_on_date_range": {
+            "type": "boolean",
+            "description": "Turns on the date range."
+          },
+          "available_from_date": {
+            "type": "string",
+            "description": "The start of the date range, such as `2026-11-02T00:00:00Z`. A date without a time, such as `2026-11-02`, returns as `2026-11-02T00:00:00Z`."
+          },
+          "available_to_date": {
+            "type": "string",
+            "description": "The end of the date range. A date without a time returns at midnight UTC."
+          },
+          "password_protected": {
+            "type": "boolean",
+            "description": "Whether the category is password protected."
+          },
+          "password": {
+            "type": "string",
+            "description": "The category's password. It is never returned: responses show only `password_protected`."
+          },
+          "custom_sorting": {
+            "type": "boolean",
+            "description": "Turns custom sorting on for the category."
+          },
+          "default_sorting": {
+            "type": "string",
+            "enum": [
+              "alpha_asc",
+              "alpha_desc",
+              "price_desc",
+              "price_asc",
+              "created_asc",
+              "created_desc"
+            ],
+            "description": "The category's default sort order: `alpha_asc`, `alpha_desc`, `price_desc`, `price_asc`, `created_asc` or `created_desc`. Any other value, `null` included, is rejected with `400`, so a write cannot set it back to `null`."
+          },
+          "disable_tracking": {
+            "type": "boolean",
+            "description": "Turns tracking off for the category."
+          }
+        }
+      },
+      "CategorySelectedCustomersInput": {
+        "type": "object",
+        "description": "The customers and groups the category is available to when `available_for` is `selected`. A customer `id` or group `id` that does not exist is dropped without an error.",
+        "properties": {
+          "customers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The `id` of each customer."
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The `id` of each group."
+          }
+        }
+      },
+      "CategoryAssignProductsInput": {
+        "type": "object",
+        "description": "The products to assign.",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The `id` of each product. The list replaces the category's products, and each product stays in any other category it is in."
+          }
+        }
+      },
+      "CategoryError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Category name already exists`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or query parameter.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `required`, `unknown_field`, `already_exists`, `invalid_enum`, `too_long`, `invalid_sort_field` or `out_of_range`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "What was wrong with it."
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "CategoryServerError": {
+        "type": "object",
+        "description": "The body of a `500`. It has no `error` object.",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Always `error`."
+          },
+          "code": {
+            "type": "integer",
+            "description": "Always `500`."
+          },
+          "message": {
+            "type": "string",
+            "description": "Always `Unexpected Error Occurred`."
           }
         }
       },

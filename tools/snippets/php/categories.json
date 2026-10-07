@@ -1,0 +1,46 @@
+{
+  "sdk": "php",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "listCategories",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::listCategories($client, ['limit' => 10, 'offset' => 10, 'sort' => 'name', 'dir' => 'asc']);\n\nforeach ($response->map['categories'] as $category) {\n    echo $category['id'], ' ', $category['general']['name'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' categories in total', PHP_EOL;"
+    },
+    "count_categories": {
+      "function": "countCategories",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::countCategories($client, ['searchText' => 'seasonal']);\n\necho $response->map['categories']['count'], PHP_EOL;"
+    },
+    "check_category_name": {
+      "function": "checkCategoryName",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::checkCategoryName($client, 'Seasonal Produce');\n\necho $response->map['available'] ? 'available' : 'taken', PHP_EOL;"
+    },
+    "create_category": {
+      "function": "createCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::createCategory($client, ['category' => [\n    'general' => ['name' => 'Seasonal Produce', 'title' => 'Seasonal Produce', 'heading' => 'Fresh this season',\n        'summary' => 'Fruit and vegetables picked this week', 'parent_category' => ['id' => 4310]],\n    'description' => ['content' => '<p>What is in season right now.</p>'],\n    'availability_visibility' => ['visible' => true, 'custom_sorting' => true, 'default_sorting' => 'alpha_asc'],\n    'tax_shipping' => ['tax_message' => 'Prices include GST'],\n    'assign_products' => ['products' => [101, 102]],\n]]);\n\necho $response->map['category']['id'], ' ', $response->map['category']['general']['url'], PHP_EOL;"
+    },
+    "get_category": {
+      "function": "getCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::getCategory($client, 4321);\n\n$category = $response->map['category'];\necho $category['general']['name'], $category['in_trash'] ? ' (in trash)' : '', PHP_EOL;"
+    },
+    "update_category": {
+      "function": "updateCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::updateCategory($client, 4321, [\n    'category' => ['general' => ['name' => 'Seasonal Produce', 'heading' => 'New heading']],\n]);\n\necho $response->map['category']['general']['heading'], PHP_EOL;"
+    },
+    "patch_category": {
+      "function": "patchCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::patchCategory($client, 4321, [\n    'category' => [\n        'general' => ['summary' => 'Updated summary'],\n        'availability_visibility' => ['visible' => false],\n    ],\n]);\n\n$category = $response->map['category'];\necho $category['general']['summary'], ', visible: ', $category['availability_visibility']['visible'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "delete_category": {
+      "function": "deleteCategory",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::deleteCategory($client, 4321);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_category_section": {
+      "function": "getCategorySection",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::getCategorySection($client, 4321, 'tax_shipping');\n\n$taxShipping = $response->map['category']['tax_shipping'];\necho $taxShipping['tax_message'], ', shipping: ', $taxShipping['enable_shipping'] ? 'on' : 'off', PHP_EOL;"
+    },
+    "patch_category_section": {
+      "function": "patchCategorySection",
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::patchCategorySection($client, 4321, 'assign_products', [\n    'category' => ['assign_products' => ['products' => [101, 102, 103]]],\n]);\n\nforeach ($response->map['category']['assign_products']['products'] as $product) {\n    echo $product['id'], ' ', $product['sku'], ' ', $product['name'], PHP_EOL;\n}"
+    }
+  }
+}
