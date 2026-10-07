@@ -1,0 +1,9 @@
+---
+title: "Retrieve a discount profile"
+description: "Returns the discount profile whose `id` you pass as `discount_profile_id`, with its coupon codes."
+openapi: "GET /admin/discount_profiles/{discount_profile_id}"
+---
+
+Returns the profile whose `id` you pass as `discount_profile_id` under the `discount_profile` key, with the same fields the listing returns for it, including its coupon codes in `customer_coupons`. Send `field_metadata=true` to add a description of every field beside the profile. After a `400` or `404`, the next read of an existing profile on the same client can return the same error; send it again on a new client. The response has no `ETag` or `Last-Modified` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

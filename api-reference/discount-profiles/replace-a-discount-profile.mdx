@@ -1,0 +1,9 @@
+---
+title: "Replace a discount profile"
+description: "Replaces a discount profile and returns it, resetting any flag, date or limit you leave out."
+openapi: "PUT /admin/discount_profiles/{discount_profile_id}"
+---
+
+Replaces the profile whose `id` you pass as `discount_profile_id` with the fields you send at the top level of the body, and returns it; `PATCH` on this path is rejected with `405`. Every `is_*` flag you leave out becomes `false`, `start_date` becomes `null`, `end_date` becomes `""`, and `maximum_use_count`, `maximum_use_customer_count` and `maximum_discount_allowed_amount` become `null`, while `name`, `type`, `default_coupon_code`, the three display texts, `invoice_note` and `exclude_products` keep their values. Always send the details block of the profile's `discount_details_type`: without it the call returns `500` and changes nothing. This call skips most checks a create makes: a `type` outside the four profile types, a `single_amount_type` outside `FLAT` and `PERCENT`, a negative `single_amount`, a `PERCENT` amount above `100` and an `end_date` before `start_date` are stored as sent, and a `start_date` that is not a date is stored as `null`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

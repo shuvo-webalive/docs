@@ -1,0 +1,9 @@
+---
+title: "Generate coupon codes"
+description: "Generates new coupon codes for a discount profile and returns them in `codes`."
+openapi: "POST /admin/discount_profiles/{discount_profile_id}/create-coupons"
+---
+
+Generates the number of codes you send as `requested_codes` for the profile whose `id` you pass as `discount_profile_id`, and returns them in `codes`. The profile must have `is_apply_coupon_code` set to `true`, and the number goes at the top level of the body, such as `{"requested_codes": 3}`. The codes are added to the end of the profile's `customer_coupons` with an empty `customer_email`, and the profile's `last_updated_on` does not change. To give a code to a customer, use [Assign a coupon code to a customer](/api-reference/discount-profiles/assign-a-coupon-code-to-a-customer).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

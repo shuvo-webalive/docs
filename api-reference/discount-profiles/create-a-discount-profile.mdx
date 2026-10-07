@@ -1,0 +1,9 @@
+---
+title: "Create a discount profile"
+description: "Creates a discount profile and returns it with its `id`, which other calls take as `discount_profile_id`."
+openapi: "POST /admin/discount_profiles"
+---
+
+Creates a discount profile from the fields you send at the top level of the body, not wrapped in `discount_profile`, and returns the new profile. `name`, `discount_details_type` and the details block it names are required: `amount_details` for `amount`, `shipping_details` for `shipping`, or `product_details` for `product`. Dates go in as `yyyy-MM-dd HH:mm:ss` and come back converted to UTC as `yyyy-MM-ddTHH:mm:ss`. A `product_details` with keys the store does not recognise can return `500` and still store the profile, so after a `500`, list profiles by `name` before you send the create again.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

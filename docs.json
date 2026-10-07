@@ -434,6 +434,27 @@
             ]
           },
           {
+            "group": "Discounts",
+            "icon": "tags",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Discount profiles",
+                "expanded": false,
+                "pages": [
+                  "discount-profiles",
+                  "api-reference/discount-profiles/list-discount-profiles",
+                  "api-reference/discount-profiles/create-a-discount-profile",
+                  "api-reference/discount-profiles/retrieve-a-discount-profile",
+                  "api-reference/discount-profiles/replace-a-discount-profile",
+                  "api-reference/discount-profiles/delete-a-discount-profile",
+                  "api-reference/discount-profiles/generate-coupon-codes",
+                  "api-reference/discount-profiles/assign-a-coupon-code-to-a-customer"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
