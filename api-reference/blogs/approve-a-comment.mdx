@@ -1,0 +1,9 @@
+---
+title: "Approve a comment"
+description: "Sets a comment's `status` to `approved` and returns the comment."
+openapi: "POST /admin/blogs/{blog_id}/comments/{blog_comment_id}/approve"
+---
+
+Sets the comment's `status` to `approved` and returns `201` with the comment; nothing else changes but `last_updated_on`. It does not reset `spam`: a comment marked as spam and then approved has `status` `approved` and `spam` `true`. Send no body; one you send is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

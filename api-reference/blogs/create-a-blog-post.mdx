@@ -1,0 +1,9 @@
+---
+title: "Create a blog post"
+description: "Creates a blog post and returns it with its `id`, which other calls take as `blog_id`."
+openapi: "POST /admin/blogs"
+---
+
+Creates a blog post from the fields you wrap in `blog` and returns it with `201`; only `title` is required. The store makes `url` from `title` and ignores a `url` you send, files a post without `categories` under the store's default category, and sets `visibility` to `open`, `is_published` to `false` and `date` to the current time when you leave them out. Send `base64` inside `image` to upload a cover image. Do not send an `id` field: the store assigns the post's `id`, and a create that sends one returns `500` and stores nothing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

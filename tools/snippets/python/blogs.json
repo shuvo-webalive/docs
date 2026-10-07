@@ -1,0 +1,54 @@
+{
+  "sdk": "python",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "list_blogs",
+      "code": "response = client.blogs.list_blogs({\"visibility\": \"open\", \"limit\": 20})\nfor blog in response.map[\"blogs\"]:\n    print(blog[\"id\"], blog[\"title\"], blog[\"date\"], blog[\"is_published\"])\npagination = response.map[\"pagination\"]\nprint(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "count_blogs": {
+      "function": "count_blogs",
+      "code": "response = client.blogs.count_blogs({\"visibility\": \"open\"})\nprint(response.map[\"blogs\"][\"count\"])\n"
+    },
+    "create_blog": {
+      "function": "create_blog",
+      "code": "response = client.blogs.create_blog({\"blog\": {\n    \"title\": \"Spring Sale Announcement\",\n    \"content\": \"<p>Save up to 40% on selected products until the end of the month.</p>\",\n    \"date\": \"2026-09-28\", \"is_published\": True, \"visibility\": \"open\", \"categories\": [{\"id\": 31}],\n    \"image\": {\n        \"file_name\": \"spring-cover.png\",\n        \"base64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n        \"title\": \"Spring sale cover\", \"alternative_text\": \"Spring sale banner\",\n    },\n    \"seo_configs\": {\"meta_tag\": [{\"name\": \"description\", \"value\": \"Spring sale: up to 40% off\"}]},\n}})\nprint(response.map[\"blog\"][\"id\"], response.map[\"blog\"][\"url\"])\n"
+    },
+    "get_blog": {
+      "function": "get_blog",
+      "code": "response = client.blogs.get_blog(1201)\nblog = response.map[\"blog\"]\nprint(blog[\"title\"], blog[\"url\"], blog[\"date\"], blog[\"visibility\"], blog[\"is_published\"])\nfor category in blog[\"categories\"]:\n    print(category[\"id\"], category[\"name\"])\n"
+    },
+    "update_blog": {
+      "function": "update_blog",
+      "code": "response = client.blogs.update_blog(1201, {\"blog\": {\n    \"title\": \"Spring Sale Extended\",\n    \"content\": \"<p>The spring sale now runs one more week.</p>\",\n    \"date\": \"2026-09-28\", \"is_published\": True,\n    \"visibility\": \"restricted\", \"visible_to\": \"selected\",\n    \"categories\": [{\"id\": 31}],\n    \"seo_configs\": {\"meta_tag\": [{\"name\": \"description\", \"value\": \"Spring sale: up to 40% off\"}]},\n    \"selected_customers\": {\"customers\": [5501], \"groups\": []},\n}})\nblog = response.map[\"blog\"]\nprint(blog[\"title\"], blog[\"visibility\"], blog[\"visible_to\"])\nprint(blog[\"selected_customers\"])\n"
+    },
+    "patch_blog": {
+      "function": "patch_blog",
+      "code": "response = client.blogs.patch_blog(1201, {\"blog\": {\"title\": \"Spring Sale: Final Week\"}})\nblog = response.map[\"blog\"]\nprint(blog[\"title\"], blog[\"url\"], blog[\"last_updated_on\"])\n"
+    },
+    "delete_blog": {
+      "function": "delete_blog",
+      "code": "response = client.blogs.delete_blog(1201)\nprint(response.status_code)\n"
+    },
+    "list_blog_comments": {
+      "function": "list_blog_comments",
+      "code": "response = client.blogs.list_blog_comments(1201)\nfor comment in response.map[\"comments\"]:\n    print(comment[\"id\"], comment[\"status\"], comment[\"name\"], comment[\"content\"])\n"
+    },
+    "create_blog_comment": {
+      "function": "create_blog_comment",
+      "code": "response = client.blogs.create_blog_comment(1201, {\"blog\": {\"comment\": {\n    \"content\": \"Great article, thanks for the sale details!\",\n    \"name\": \"Ada Reader\",\n    \"email\": \"ada@example.com\",\n}}})\ncomment = response.map[\"comment\"]\nprint(comment[\"id\"], comment[\"status\"])\n"
+    },
+    "get_blog_comment": {
+      "function": "get_blog_comment",
+      "code": "response = client.blogs.get_blog_comment(1201, 77)\ncomment = response.map[\"comment\"]\nprint(comment[\"status\"], comment[\"name\"], comment[\"content\"])\n"
+    },
+    "approve_blog_comment": {
+      "function": "approve_blog_comment",
+      "code": "response = client.blogs.approve_blog_comment(1201, 77)\ncomment = response.map[\"comment\"]\nprint(comment[\"status\"], comment[\"spam\"])\n"
+    },
+    "mark_blog_comment_spam": {
+      "function": "mark_blog_comment_spam",
+      "code": "response = client.blogs.mark_blog_comment_spam(1201, 77)\ncomment = response.map[\"comment\"]\nprint(comment[\"status\"], comment[\"spam\"])\n"
+    }
+  }
+}

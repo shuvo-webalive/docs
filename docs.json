@@ -434,6 +434,26 @@
             ]
           },
           {
+            "group": "Blogs",
+            "icon": "newspaper",
+            "expanded": false,
+            "pages": [
+              "blogs",
+              "api-reference/blogs/list-blog-posts",
+              "api-reference/blogs/count-blog-posts",
+              "api-reference/blogs/create-a-blog-post",
+              "api-reference/blogs/retrieve-a-blog-post",
+              "api-reference/blogs/replace-a-blog-post",
+              "api-reference/blogs/update-a-blog-post",
+              "api-reference/blogs/delete-a-blog-post",
+              "api-reference/blogs/list-comments-on-a-blog-post",
+              "api-reference/blogs/add-a-comment-to-a-blog-post",
+              "api-reference/blogs/retrieve-a-comment",
+              "api-reference/blogs/approve-a-comment",
+              "api-reference/blogs/mark-a-comment-as-spam"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

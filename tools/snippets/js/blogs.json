@@ -1,0 +1,54 @@
+{
+  "sdk": "js",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "listBlogs",
+      "code": "const response = await client.blogs.listBlogs({visibility: 'open', limit: 20});\nfor (const blog of response.map.blogs) {\n    console.log(blog.id, blog.title, blog.date);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "count_blogs": {
+      "function": "countBlogs",
+      "code": "const response = await client.blogs.countBlogs({visibility: 'open'});\nconsole.log(response.map.blogs.count);\n"
+    },
+    "create_blog": {
+      "function": "createBlog",
+      "code": "const response = await client.blogs.createBlog({blog: {\n    title: 'Spring Sale Announcement',\n    content: '<p>Save up to 40% on selected products until the end of the month.</p>',\n    date: '2026-09-28', is_published: true, visibility: 'open', categories: [{id: 31}],\n    image: {\n        file_name: 'spring-cover.png',\n        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',\n        title: 'Spring sale cover', alternative_text: 'Spring sale banner',\n    },\n    seo_configs: {meta_tag: [{name: 'description', value: 'Spring sale: up to 40% off'}]},\n}});\nconsole.log(response.map.blog.id, response.map.blog.url);\n"
+    },
+    "get_blog": {
+      "function": "getBlog",
+      "code": "const response = await client.blogs.getBlog(1201);\nconst blog = response.map.blog;\nconsole.log(blog.title, blog.url, blog.is_published, blog.visibility);\n"
+    },
+    "update_blog": {
+      "function": "updateBlog",
+      "code": "const response = await client.blogs.updateBlog(1201, {blog: {\n    title: 'Spring Sale Extended',\n    content: '<p>The spring sale now runs one more week.</p>',\n    date: '2026-09-28',\n    is_published: true,\n    visibility: 'restricted', visible_to: 'selected',\n    categories: [{id: 31}],\n    seo_configs: {meta_tag: [{name: 'description', value: 'Spring sale: up to 40% off'}]},\n    selected_customers: {customers: [5501], groups: []},\n}});\nconst blog = response.map.blog;\nconsole.log(blog.title, blog.visibility, blog.selected_customers.customers);\n"
+    },
+    "patch_blog": {
+      "function": "patchBlog",
+      "code": "const response = await client.blogs.patchBlog(1201, {blog: {title: 'Spring Sale: Final Week'}});\nconst blog = response.map.blog;\nconsole.log(blog.title, blog.url, blog.last_updated_on);\n"
+    },
+    "delete_blog": {
+      "function": "deleteBlog",
+      "code": "const response = await client.blogs.deleteBlog(1201);\nconsole.log(response.statusCode);\n"
+    },
+    "list_blog_comments": {
+      "function": "listBlogComments",
+      "code": "const response = await client.blogs.listBlogComments(1201);\nfor (const comment of response.map.comments) {\n    console.log(comment.id, comment.status, comment.content);\n}\n"
+    },
+    "create_blog_comment": {
+      "function": "createBlogComment",
+      "code": "const response = await client.blogs.createBlogComment(1201, {blog: {comment: {\n    content: 'Great article, thanks for the sale details!',\n    name: 'Ada Reader',\n    email: 'ada@example.com',\n}}});\nconsole.log(response.map.comment.id, response.map.comment.status);\n"
+    },
+    "get_blog_comment": {
+      "function": "getBlogComment",
+      "code": "const response = await client.blogs.getBlogComment(1201, 77);\nconst comment = response.map.comment;\nconsole.log(comment.name, comment.status, comment.content);\n"
+    },
+    "approve_blog_comment": {
+      "function": "approveBlogComment",
+      "code": "const response = await client.blogs.approveBlogComment(1201, 77);\nconsole.log(response.map.comment.status, response.map.comment.spam);\n"
+    },
+    "mark_blog_comment_spam": {
+      "function": "markBlogCommentSpam",
+      "code": "const response = await client.blogs.markBlogCommentSpam(1201, 77);\nconsole.log(response.map.comment.status, response.map.comment.spam);\n"
+    }
+  }
+}

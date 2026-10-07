@@ -1,0 +1,54 @@
+{
+  "sdk": "java",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "listBlogs",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.blogs().listBlogs(Map.of(\"visibility\", \"open\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"blogs\")) {\n    Map<?, ?> blog = (Map<?, ?>) row;\n    System.out.println(blog.get(\"id\") + \" \" + blog.get(\"title\") + \" \" + blog.get(\"date\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));"
+    },
+    "count_blogs": {
+      "function": "countBlogs",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().countBlogs(Map.of(\"visibility\", \"open\"));\nMap<?, ?> blogs = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blogs\");\nSystem.out.println(blogs.get(\"count\"));"
+    },
+    "create_blog": {
+      "function": "createBlog",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.blogs().createBlog(Map.of(\"blog\", Map.of(\n        \"title\", \"Spring Sale Announcement\",\n        \"content\", \"<p>Save up to 40% on selected products until the end of the month.</p>\",\n        \"date\", \"2026-09-28\", \"is_published\", true, \"visibility\", \"open\",\n        \"categories\", List.of(Map.of(\"id\", 31)),\n        \"image\", Map.of(\"file_name\", \"spring-cover.png\",\n                \"base64\", \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n                \"title\", \"Spring sale cover\", \"alternative_text\", \"Spring sale banner\"),\n        \"seo_configs\", Map.of(\"meta_tag\", List.of(Map.of(\"name\", \"description\", \"value\", \"Spring sale: up to 40% off\"))))));\nMap<?, ?> blog = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog\");\nSystem.out.println(blog.get(\"id\") + \" \" + blog.get(\"title\") + \" \" + blog.get(\"url\"));\nSystem.out.println(((Map<?, ?>) blog.get(\"image\")).get(\"link\"));"
+    },
+    "get_blog": {
+      "function": "getBlog",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().getBlog(1201);\nMap<?, ?> blog = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog\");\nSystem.out.println(blog.get(\"title\") + \" \" + blog.get(\"url\") + \" \" + blog.get(\"date\"));\nSystem.out.println(blog.get(\"is_published\") + \" \" + blog.get(\"visibility\") + \" \" + blog.get(\"categories\"));"
+    },
+    "update_blog": {
+      "function": "updateBlog",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.blogs().updateBlog(1201, Map.of(\"blog\", Map.of(\n        \"title\", \"Spring Sale Extended\",\n        \"content\", \"<p>The spring sale now runs one more week.</p>\",\n        \"date\", \"2026-09-28\", \"is_published\", true,\n        \"visibility\", \"restricted\", \"visible_to\", \"selected\",\n        \"categories\", List.of(Map.of(\"id\", 31)),\n        \"seo_configs\", Map.of(\"meta_tag\", List.of(Map.of(\"name\", \"description\", \"value\", \"Spring sale: up to 40% off\"))),\n        \"selected_customers\", Map.of(\"customers\", List.of(5501), \"groups\", List.of()))));\nMap<?, ?> blog = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog\");\nSystem.out.println(blog.get(\"title\") + \" \" + blog.get(\"visibility\") + \" \" + blog.get(\"visible_to\"));\nSystem.out.println(blog.get(\"selected_customers\"));"
+    },
+    "patch_blog": {
+      "function": "patchBlog",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().patchBlog(1201, Map.of(\"blog\", Map.of(\"title\", \"Spring Sale: Final Week\")));\nMap<?, ?> blog = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog\");\nSystem.out.println(blog.get(\"title\") + \" \" + blog.get(\"url\") + \" \" + blog.get(\"last_updated_on\"));"
+    },
+    "delete_blog": {
+      "function": "deleteBlog",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.blogs().deleteBlog(1201);\nSystem.out.println(response.getStatusCode());"
+    },
+    "list_blog_comments": {
+      "function": "listBlogComments",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.blogs().listBlogComments(1201);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"comments\")) {\n    Map<?, ?> comment = (Map<?, ?>) row;\n    System.out.println(comment.get(\"id\") + \" \" + comment.get(\"status\") + \" \" + comment.get(\"content\"));\n}"
+    },
+    "create_blog_comment": {
+      "function": "createBlogComment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().createBlogComment(1201, Map.of(\"blog\", Map.of(\"comment\", Map.of(\n        \"content\", \"Great article, thanks for the sale details!\",\n        \"name\", \"Ada Reader\", \"email\", \"ada@example.com\"))));\nMap<?, ?> comment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"comment\");\nSystem.out.println(comment.get(\"id\") + \" \" + comment.get(\"status\") + \" \" + comment.get(\"post_title\"));"
+    },
+    "get_blog_comment": {
+      "function": "getBlogComment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().getBlogComment(1201, 77);\nMap<?, ?> comment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"comment\");\nSystem.out.println(comment.get(\"name\") + \" \" + comment.get(\"email\") + \" \" + comment.get(\"status\"));\nSystem.out.println(comment.get(\"content\"));"
+    },
+    "approve_blog_comment": {
+      "function": "approveBlogComment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().approveBlogComment(1201, 77);\nMap<?, ?> comment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"comment\");\nSystem.out.println(comment.get(\"id\") + \" \" + comment.get(\"status\") + \" \" + comment.get(\"spam\"));"
+    },
+    "mark_blog_comment_spam": {
+      "function": "markBlogCommentSpam",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogs().markBlogCommentSpam(1201, 77);\nMap<?, ?> comment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"comment\");\nSystem.out.println(comment.get(\"id\") + \" \" + comment.get(\"status\") + \" \" + comment.get(\"spam\"));"
+    }
+  }
+}

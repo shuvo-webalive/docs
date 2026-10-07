@@ -1,0 +1,9 @@
+---
+title: "Retrieve a blog post"
+description: "Returns the blog post whose `id` you pass as `blog_id`."
+openapi: "GET /admin/blogs/{blog_id}"
+---
+
+Returns the blog post under `blog`, with the same seventeen fields as its listing entry, and `group_meta`. Send `field_metadata=true` to add a `field_metadata` key that describes each field; other query parameters are ignored. A post in the trash returns `404`. `HEAD` on this path returns `404` even for a post that exists, so use this call to check that a post exists.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
