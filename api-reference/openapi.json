@@ -24369,6 +24369,7 @@
                       "currency_code": "AUD",
                       "transaction_no": "TXN-ORDER-0001",
                       "ip_address": "203.0.113.10",
+                      "order_channel": "",
                       "created_on": "2026-10-07T09:15:02Z",
                       "last_updated_on": "2026-10-07T09:15:02Z",
                       "customer": {
@@ -24478,6 +24479,7 @@
                       "currency_code": "AUD",
                       "transaction_no": "TXN-ORDER-0000",
                       "ip_address": "203.0.113.10",
+                      "order_channel": "",
                       "created_on": "2026-10-06T16:40:11Z",
                       "last_updated_on": "2026-10-06T16:40:11Z",
                       "customer": {
@@ -24726,6 +24728,7 @@
                     "due": 40.0,
                     "items_total": 2,
                     "ip_address": "203.0.113.10",
+                    "order_channel": null,
                     "created_at": "2026-10-07T09:15:02Z",
                     "updated_at": "2026-10-07T09:15:02Z",
                     "customer_summary": {
@@ -25279,6 +25282,7 @@
                     "due": 20.0,
                     "items_total": 2,
                     "ip_address": "203.0.113.10",
+                    "order_channel": null,
                     "created_at": "2026-10-07T09:15:02Z",
                     "updated_at": "2026-10-07T09:15:02Z",
                     "customer_summary": {
@@ -25497,7 +25501,7 @@
         ],
         "summary": "Retrieve an order",
         "operationId": "get_order",
-        "description": "Returns the order under `order` in sections: `customer`, `billing_address`, `shipping_address`, `items`, `shipping`, `discounts`, `charges_totals`, `payments` and `fulfillment`, beside eleven top-level fields. A `group_meta` block beside it has an entry for each of the nine sections. Send `field_metadata=true` or `1` to add a description of every field; any other query parameter is ignored. The response has no `ETag` header.",
+        "description": "Returns the order under `order` in sections: `customer`, `billing_address`, `shipping_address`, `items`, `shipping`, `discounts`, `charges_totals`, `payments` and `fulfillment`, beside twelve top-level fields. A `group_meta` block beside it has an entry for each of the nine sections. Send `field_metadata=true` or `1` to add a description of every field; any other query parameter is ignored. The response has no `ETag` header.",
         "parameters": [
           {
             "name": "order_id",
@@ -25548,6 +25552,7 @@
                     "currency_code": "AUD",
                     "transaction_no": "TXN-ORDER-0001",
                     "ip_address": "203.0.113.10",
+                    "order_channel": "",
                     "created_on": "2026-10-07T09:15:02Z",
                     "last_updated_on": "2026-10-07T09:15:02Z",
                     "customer": {
@@ -25856,6 +25861,7 @@
                     "currency_code": "AUD",
                     "transaction_no": "TXN-ORDER-0001",
                     "ip_address": "203.0.113.10",
+                    "order_channel": "",
                     "created_on": "2026-10-07T09:15:02Z",
                     "last_updated_on": "2026-10-07T10:02:44Z",
                     "customer": {
@@ -26157,6 +26163,7 @@
                     "currency_code": "AUD",
                     "transaction_no": "TXN-ORDER-0001",
                     "ip_address": "203.0.113.10",
+                    "order_channel": "",
                     "created_on": "2026-10-07T09:15:02Z",
                     "last_updated_on": "2026-10-07T10:05:18Z",
                     "customer": {
@@ -26732,6 +26739,7 @@
                     "due": 40.0,
                     "items_total": 2,
                     "ip_address": "203.0.113.10",
+                    "order_channel": null,
                     "created_at": "2026-10-07T09:15:02Z",
                     "updated_at": "2026-10-07T11:20:31Z",
                     "customer_summary": {
@@ -28395,6 +28403,7 @@
                     "due": 40.0,
                     "items_total": 2,
                     "ip_address": "203.0.113.10",
+                    "order_channel": null,
                     "created_at": "2026-10-07T09:15:02Z",
                     "updated_at": "2026-10-07T11:22:05Z",
                     "customer_summary": {
@@ -28772,6 +28781,7 @@
                       "due": 40.0,
                       "items_total": 2,
                       "ip_address": "203.0.113.10",
+                      "order_channel": null,
                       "created_at": "2026-10-07T09:15:02Z",
                       "updated_at": "2026-10-07T09:15:02Z",
                       "customer_summary": {
@@ -39124,6 +39134,13 @@
             "type": "string",
             "description": "The IP address the order was placed from."
           },
+          "order_channel": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The channel the order came through: an empty string or `null`."
+          },
           "created_on": {
             "type": "string",
             "description": "When the order was created."
@@ -39270,6 +39287,13 @@
           "ip_address": {
             "type": "string",
             "description": "The IP address the order was placed from."
+          },
+          "order_channel": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The channel the order came through: an empty string or `null`."
           },
           "created_at": {
             "type": "string",

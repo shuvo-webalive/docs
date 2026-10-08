@@ -4,6 +4,6 @@ description: "Returns the order whose `order_id` you pass, with its addresses, l
 openapi: "GET /admin/orders/{order_id}"
 ---
 
-Returns the order under `order` in sections: `customer`, `billing_address`, `shipping_address`, `items`, `shipping`, `discounts`, `charges_totals`, `payments` and `fulfillment`, beside eleven top-level fields. A `group_meta` block beside it has an entry for each of the nine sections. Send `field_metadata=true` or `1` to add a description of every field; any other query parameter is ignored. The response has no `ETag` header.
+Returns the order under `order` in sections: `customer`, `billing_address`, `shipping_address`, `items`, `shipping`, `discounts`, `charges_totals`, `payments` and `fulfillment`, beside twelve top-level fields. A `group_meta` block beside it has an entry for each of the nine sections. Send `field_metadata=true` or `1` to add a description of every field; any other query parameter is ignored. The response has no `ETag` header.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

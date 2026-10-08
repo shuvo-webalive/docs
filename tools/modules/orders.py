@@ -238,7 +238,7 @@ FULFILLMENT = {
 ORDER = {
     "order_id": 1043, "order_no": 1043, "internal_id": 2187, "order_status": "in_progress",
     "payment_status": "unpaid", "shipping_status": "not_shipped", "currency_code": "AUD",
-    "transaction_no": "TXN-ORDER-0001", "ip_address": "203.0.113.10",
+    "transaction_no": "TXN-ORDER-0001", "ip_address": "203.0.113.10", "order_channel": "",
     "created_on": "2026-10-07T09:15:02Z", "last_updated_on": "2026-10-07T09:15:02Z",
     "customer": CUSTOMER,
     "billing_address": BILLING,
@@ -272,7 +272,7 @@ FLAT_ORDER = {
     "currency_code": "AUD", "order_status": "in_progress", "payment_status": "unpaid", "shipping_status": "unshipped",
     "sub_total": 40.0, "shipping_cost": 0.0, "shipping_tax": 0.0, "handling_cost": 0.0, "total_surcharge": 0.0,
     "total_discount": 0.0, "total_tax": 0.0, "grand_total": 40.0, "paid": 0.0, "due": 40.0, "items_total": 2,
-    "ip_address": "203.0.113.10", "created_at": "2026-10-07T09:15:02Z", "updated_at": "2026-10-07T09:15:02Z",
+    "ip_address": "203.0.113.10", "order_channel": None, "created_at": "2026-10-07T09:15:02Z", "updated_at": "2026-10-07T09:15:02Z",
     "customer_summary": CUSTOMER,
     "order_line_details": CREATED_ITEMS,
     "payments": [FLAT_PIS_PAYMENT],
@@ -446,7 +446,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{order_id}",
         "summary": "Returns the order whose `order_id` you pass, with its addresses, lines, totals and payments.",
-        "description": "Returns the order under `order` in sections: `customer`, `billing_address`, `shipping_address`, `items`, `shipping`, `discounts`, `charges_totals`, `payments` and `fulfillment`, beside eleven top-level fields. A `group_meta` block beside it has an entry for each of the nine sections. Send `field_metadata=true` or `1` to add a description of every field; any other query parameter is ignored. The response has no `ETag` header.",
+        "description": "Returns the order under `order` in sections: `customer`, `billing_address`, `shipping_address`, `items`, `shipping`, `discounts`, `charges_totals`, `payments` and `fulfillment`, beside twelve top-level fields. A `group_meta` block beside it has an entry for each of the nine sections. Send `field_metadata=true` or `1` to add a description of every field; any other query parameter is ignored. The response has no `ETag` header.",
         "parameters": [ORDER_ID, FIELD_METADATA],
         "responses": {
             "200": {
@@ -970,6 +970,7 @@ SCHEMAS = {
         "currency_code": text("The order's currency code."),
         "transaction_no": nullable_text("The `transaction_no` sent when the order was created."),
         "ip_address": text("The IP address the order was placed from."),
+        "order_channel": nullable_text("The channel the order came through: an empty string or `null`."),
         "created_on": text("When the order was created."),
         "last_updated_on": text("When the order last changed."),
         "customer": ref("OrderCustomer"),
@@ -1003,6 +1004,7 @@ SCHEMAS = {
         "due": number("The amount still due."),
         "items_total": whole("The `items_total` of `charges_totals` in the sectioned shape."),
         "ip_address": text("The IP address the order was placed from."),
+        "order_channel": nullable_text("The channel the order came through: an empty string or `null`."),
         "created_at": text("When the order was created."),
         "updated_at": text("When the order last changed."),
         "customer_summary": ref("OrderCustomer"),
