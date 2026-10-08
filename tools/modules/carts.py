@@ -165,6 +165,7 @@ SAMPLE_ORDER = {
     "due": 38.5,
     "items_total": 1,
     "ip_address": "203.0.113.10",
+    "order_channel": None,
     "created_at": "2026-10-07T09:15:02",
     "updated_at": "2026-10-07T09:15:02",
     "customer_summary": {
@@ -520,6 +521,7 @@ SCHEMAS = {
         "due": number(),
         "items_total": {"type": "integer"},
         "ip_address": text(),
+        "order_channel": {"description": "`null` on an order made from a cart."},
         "created_at": text(),
         "updated_at": text(),
         "customer_summary": dict(ref("CartOrderCustomer"), description="The customer the order belongs to, with both the customer's `customer_id` and `internal_id`."),

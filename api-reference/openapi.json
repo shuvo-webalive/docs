@@ -24919,6 +24919,7 @@
                     "due": 38.5,
                     "items_total": 1,
                     "ip_address": "203.0.113.10",
+                    "order_channel": null,
                     "created_at": "2026-10-07T09:15:02",
                     "updated_at": "2026-10-07T09:15:02",
                     "customer_summary": {
@@ -35689,6 +35690,9 @@
           },
           "ip_address": {
             "type": "string"
+          },
+          "order_channel": {
+            "description": "`null` on an order made from a cart."
           },
           "created_at": {
             "type": "string"
