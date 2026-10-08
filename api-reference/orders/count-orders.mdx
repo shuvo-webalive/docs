@@ -1,0 +1,9 @@
+---
+title: "Count orders"
+description: "Returns the number of orders that match the listing's filters, leaving out cancelled orders."
+openapi: "GET /admin/orders/count"
+---
+
+Returns the number of orders as `count`, inside an `orders` object. It takes the same filters as [List orders](/api-reference/orders/list-orders), and for the same filters it equals that listing's `pagination.total`. Cancelled orders are left out. `limit`, `page`, `sort`, `dir` and `field_metadata` are accepted and change nothing, and any other query parameter is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

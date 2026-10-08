@@ -1,0 +1,9 @@
+---
+title: "Delete an order"
+description: "Deletes an order permanently. An unknown `order_id` also returns `200`, with `status` `not_found`."
+openapi: "DELETE /admin/orders/{order_id}"
+---
+
+Deletes the order permanently and returns `"status": "deleted"` with the order's `order_id` and `internal_id`. Retrieving the order afterwards returns `404`, and [Count orders](/api-reference/orders/count-orders) goes down by one. When no order has that `order_id`, for example because you already deleted it, the call still returns `200`, with `"status": "not_found"`, so read `status` rather than the HTTP status. Stock that the order's shipments took is not given back.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

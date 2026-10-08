@@ -1,0 +1,9 @@
+---
+title: "Create an order with a payment"
+description: "Creates an order and records one payment on it, returning the order with `paid` and `due`."
+openapi: "POST /admin/orders/with-payment"
+---
+
+Send the same fields as [Create an order](/api-reference/orders/create-an-order) plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `""`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

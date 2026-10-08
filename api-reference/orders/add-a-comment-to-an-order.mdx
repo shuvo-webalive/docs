@@ -1,0 +1,9 @@
+---
+title: "Add a comment to an order"
+description: "Adds a comment to an order and returns it."
+openapi: "POST /admin/orders/{order_id}/comments"
+---
+
+Send `content` at the top level of the body; a body wrapped in `comment` is rejected with `400` and the message `content: must not be empty`. `"save_and_send": true` sets the comment's `visible_to_customer` to `true`, and `false` leaves it `false`. The comment is returned under `comment` with `admin` set to `true`, and its `created` time is written `M/D/YYYY`, two spaces and a time, not ISO 8601.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

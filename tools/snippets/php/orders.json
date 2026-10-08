@@ -1,0 +1,102 @@
+{
+  "sdk": "php",
+  "module": "orders",
+  "endpoints": {
+    "list_orders": {
+      "function": "listOrders",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::listOrders($client, ['order_status' => 'in_progress', 'payment_status' => 'unpaid', 'limit' => 10]);\n\nforeach ($response->map['orders'] as $order) {\n    echo $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], ' ', $order['charges_totals']['grand_total'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' orders in total', PHP_EOL;"
+    },
+    "count_orders": {
+      "function": "countOrders",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::countOrders($client, ['customerId' => 88, 'payment_status' => 'unpaid']);\n\necho $response->map['orders']['count'], ' unpaid orders', PHP_EOL;"
+    },
+    "create_order": {
+      "function": "createOrder",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n$address = [\n    'first_name' => 'Jane', 'last_name' => 'Doe', 'email' => 'jane.doe@example.com', 'address_line_1' => '1 Example Street',\n    'address_line_2' => 'Level 2', 'city' => 'Melbourne', 'post_code' => '3000', 'phone' => '0300000000', 'mobile' => '0400000000',\n    'country_code' => 'AU', 'state_code' => 'VIC',\n];\n$response = Orders::createOrder($client, [\n    'customer_id' => 512, 'payment_gateway' => 'PIS', 'delivery_type' => 'shipping', 'is_send_email' => false,\n    'transaction_no' => 'TXN-ORDER-0001', 'billing_address' => $address, 'shipping_address' => $address,\n    'products' => [['product_id' => 101, 'quantity' => 1], ['product_id' => 102, 'quantity' => 1]],\n]);\necho $response->map['order']['order_id'], ' ', $response->map['order']['internal_id'], PHP_EOL;"
+    },
+    "create_order_with_payment": {
+      "function": "createOrderWithPayment",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n$address = [\n    'first_name' => 'Jane', 'last_name' => 'Doe', 'email' => 'jane.doe@example.com', 'address_line_1' => '1 Example Street',\n    'address_line_2' => 'Level 2', 'city' => 'Melbourne', 'post_code' => '3000', 'phone' => '0300000000', 'mobile' => '0400000000',\n    'country_code' => 'AU', 'state_code' => 'VIC',\n];\n$response = Orders::createOrderWithPayment($client, [\n    'customer_id' => 512, 'payment_gateway' => 'PIS', 'delivery_type' => 'shipping', 'billing_address' => $address,\n    'shipping_address' => $address, 'products' => [['product_id' => 101, 'quantity' => 1], ['product_id' => 102, 'quantity' => 1]],\n    'payment' => ['amount' => 20.0, 'status' => 'success', 'payment_method' => 'manual', 'track_info' => 'Paid at the counter'],\n]);\necho $response->map['order']['order_id'], ' paid ', $response->map['order']['paid'], ', due ', $response->map['order']['due'], PHP_EOL;"
+    },
+    "get_order": {
+      "function": "getOrder",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::getOrder($client, 1043);\n\n$order = $response->map['order'];\necho $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], ' ', $order['shipping_status'], PHP_EOL;\nforeach ($order['items'] as $item) {\n    echo $item['item_id'], ' ', $item['product_name'], ' x', $item['quantity'], ' ', $item['total_amount'], PHP_EOL;\n}\necho $order['charges_totals']['grand_total'], ' total, ', $order['charges_totals']['due'], ' due', PHP_EOL;"
+    },
+    "update_order": {
+      "function": "updateOrder",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::updateOrder($client, 1043, ['order' => ['billing_address' => [\n    'first_name' => 'Jane', 'last_name' => 'Doe', 'email' => 'jane.doe@example.com', 'address_line_1' => '10 Example Street',\n    'address_line_2' => 'Level 2', 'city' => 'Melbourne', 'post_code' => '3000', 'phone' => '0300000000', 'mobile' => '0400000000',\n    'country_code' => 'AU', 'state_code' => 'VIC',\n]]]);\n\n$address = $response->map['order']['billing_address'];\necho $address['address_line_1'], ', ', $address['city'], ' ', $address['state']['code'], ' ', $address['country']['code'], PHP_EOL;"
+    },
+    "patch_order": {
+      "function": "patchOrder",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::patchOrder($client, 1043, ['order' => ['customer_po_number' => 'PO-0001', 'payment_term' => 'NET30']]);\n\n$fulfillment = $response->map['order']['fulfillment'];\necho $fulfillment['customer_po_number'], ' ', $fulfillment['payment_term'], PHP_EOL;"
+    },
+    "delete_order": {
+      "function": "deleteOrder",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::deleteOrder($client, 1043);\n\necho $response->map['status'], ' ', $response->map['order_id'], PHP_EOL;"
+    },
+    "update_order_addresses": {
+      "function": "updateOrderAddresses",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::updateOrderAddresses($client, 1043, ['transaction_no' => 'TXN-ADDR-0001', 'shipping_address' => [\n    'first_name' => 'Jane', 'last_name' => 'Doe', 'email' => 'jane.doe@example.com', 'address_line_1' => '10 Example Street',\n    'address_line_2' => 'Level 2', 'city' => 'Melbourne', 'post_code' => '3000', 'phone' => '0300000000', 'mobile' => '0400000000',\n    'country_code' => 'AU', 'state_code' => 'VIC',\n]]);\n\necho 'Shipping: ', $response->map['shipping_address']['address_line_1'], PHP_EOL;\necho 'Billing: ', $response->map['billing_address']['address_line_1'], PHP_EOL;"
+    },
+    "cancel_order": {
+      "function": "cancelOrder",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::cancelOrder($client, 1043, [\n    'reason' => 'Customer asked to cancel',\n    'refund_automatically' => false,\n    'is_gateway_refund' => false,\n]);\n\n$order = $response->map['order'];\necho $order['order_id'], ' ', $order['order_status'], ' ', $order['updated_at'], PHP_EOL;"
+    },
+    "list_order_comments": {
+      "function": "listOrderComments",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::listOrderComments($client, 1043);\n\nforeach ($response->map['comments'] as $comment) {\n    echo $comment['id'], ' ', $comment['created'], ' ', $comment['admin_name'], ': ', $comment['content'], PHP_EOL;\n}"
+    },
+    "create_order_comment": {
+      "function": "createOrderComment",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::createOrderComment($client, 1043, ['content' => 'Called to confirm the address.', 'save_and_send' => false]);\n\n$comment = $response->map['comment'];\necho $comment['id'], ' ', $comment['created'], $comment['visible_to_customer'] ? ' (visible to customer)' : '', PHP_EOL;"
+    },
+    "get_order_custom_fields": {
+      "function": "getOrderCustomFields",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::getOrderCustomFields($client, 2187);\n\necho $response->map['order_id'], ' ', json_encode($response->map['custom_fields']), PHP_EOL;"
+    },
+    "create_order_payment": {
+      "function": "createOrderPayment",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::createOrderPayment($client, 1043, [\n    'transaction_no' => 'TXN-PAY-0001',\n    'payment' => [\n        'amount' => 20.0, 'payment_method' => 'manual', 'payment_status' => 'success', 'track_info' => 'Bank transfer',\n        'payer_info' => 'Jane Doe', 'transaction_date' => '2026-10-07T09:30:00Z', 'transaction_reference' => 'BT-0001', 'surcharge' => 0.0,\n    ],\n]);\n\n$payment = $response->map['payment'];\necho $payment['id'], ' applied ', $payment['payment_applied'], ', paid ', $payment['paid_amount'], ', due ', $payment['due_amount'], PHP_EOL;"
+    },
+    "create_order_refund": {
+      "function": "createOrderRefund",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::createOrderRefund($client, 1043, ['refund' => [\n    'amount' => '3.00',\n    'refund_date' => '2026-10-07T14:00:00Z',\n    'reason' => 'One item returned',\n    'line_items' => [['order_item_id' => 3302, 'quantity' => 1, 'amount' => 3.0]],\n]]);\n\necho $response->map['status'], ' ', $response->map['refund_id'], ' ', $response->map['amount'], PHP_EOL;"
+    },
+    "create_payment_refund": {
+      "function": "createPaymentRefund",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::createPaymentRefund($client, 7712, [\n    'transaction_no' => 'TXN-PREF-0001',\n    'refund' => [\n        'amount' => '5.00', 'reason' => 'Damaged item',\n        'is_gateway_refund' => false, 'send_refund_email' => false, 'adjust_with_order' => false,\n    ],\n], idempotencyKey: 'refund-0001');\n\necho $response->map['refund_id'], ' ', $response->map['amount'], ' ', $response->map['payment_status'], PHP_EOL;\necho $response->map['order_refund_status'], ' ', $response->map['order_refunded_total'], ' ', $response->map['available_for_refund'], PHP_EOL;"
+    },
+    "send_order_invoice": {
+      "function": "sendOrderInvoice",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::sendOrderInvoice($client, 2187);\n\necho $response->map['status'], ': sent to ', $response->map['sent_to'], ' at ', $response->map['sent_at'], PHP_EOL;"
+    },
+    "get_order_shipment_status": {
+      "function": "getOrderShipmentStatus",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::getOrderShipmentStatus($client, 1043);\n\necho $response->map['shipment_status'], PHP_EOL;\nforeach ($response->map['shipments_info'] as $shipment) {\n    echo $shipment['shipping_provider'], ' ', $shipment['tracking_number'], ' ', $shipment['last_updated'], PHP_EOL;\n}"
+    },
+    "list_order_shipments": {
+      "function": "listOrderShipments",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::listOrderShipments($client, 1043);\n\nforeach ($response->map['shipments'] as $shipment) {\n    echo $shipment['shipping_id'], ' ', $shipment['shipping_method'], ' ', $shipment['tracking_number'], ' ', $shipment['date_created'], PHP_EOL;\n}"
+    },
+    "create_order_shipment": {
+      "function": "createOrderShipment",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::createOrderShipment($client, 1043, [\n    'transaction_no' => 'TXN-SHIP-0001', 'method' => 'Example Courier', 'tracking_info' => 'TRACK-0001',\n    'shipping_date' => '2026-10-08T08:00:00', 'shipment_items' => [['order_item_id' => 3301, 'quantity' => 1]],\n]);\n\n$shipment = $response->map['shipment'];\necho $shipment['shipping_id'], ' ', $shipment['shipping_method'], ' ', $shipment['tracking_number'], PHP_EOL;\nforeach ($shipment['items'] as $item) {\n    echo $item['product_name'], ': ', $item['shipped_quantity'], ' of ', $item['order_quantity'], ' shipped', PHP_EOL;\n}"
+    },
+    "update_order_shipment": {
+      "function": "updateOrderShipment",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::updateOrderShipment($client, 1043, 905, ['tracking_info' => 'TRACK-0002']);\n\n$shipment = $response->map['shipment'];\necho $shipment['shipping_id'], ' ', $shipment['shipping_method'], ' ', $shipment['tracking_number'], PHP_EOL;"
+    },
+    "update_order_status": {
+      "function": "updateOrderStatus",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::updateOrderStatus($client, 1043, ['status' => 'paused', 'refund_automatically' => false]);\n\n$order = $response->map['order'];\necho $order['order_id'], ' ', $order['order_status'], ' ', $order['updated_at'], PHP_EOL;"
+    },
+    "create_order_status": {
+      "function": "createOrderStatus",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::createOrderStatus($client, [\n    'order_id' => 1043,\n    'order_status_value' => 'ready_for_pickup',\n    'order_status_label' => 'Ready For Pickup',\n    'order_type' => 'Order',\n    'status_type' => 'custom',\n]);\n\necho $response->map['success'], PHP_EOL;"
+    },
+    "list_customer_orders": {
+      "function": "listCustomerOrders",
+      "code": "use WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$response = Orders::listCustomerOrders($client, 512);\n\necho $response->map['customer_id'], ' ', $response->map['internal_id'], PHP_EOL;\nforeach ($response->map['orders'] as $order) {\n    echo $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], ' ', $order['grand_total'], PHP_EOL;\n}"
+    }
+  }
+}
