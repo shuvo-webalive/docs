@@ -1,0 +1,63 @@
+---
+title: "Carts"
+sidebarTitle: "Overview"
+description: "Add products to a customer's cart, read it, change or remove its items, empty it, and turn it into an order."
+---
+
+The Carts API has seven endpoints, and you can call every one from all seven SDKs. Six of them have paths that start with `/api/v4/carts` and use the same access token as every other endpoint; [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) uses `/api/v4/admin/orders/carts/{session_id}`.
+
+<Warning>
+  **Adding a product and creating an order take different numbers for the same customer.**
+  [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes the customer's `internal_id` in its `customer_id`
+  field, and rejects the customer's `customer_id` with `400` and the message `No Customer Found`.
+  [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) takes the customer's `customer_id`.
+  [Create a customer](/api-reference/customers/create-a-customer) returns both values.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/carts` | Adds a product to a cart, creating the cart if needed, and returns the cart. |
+| [Retrieve a cart](/api-reference/carts/retrieve-a-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/carts/{session_id}` | Returns the cart for a `session_id`, with its items, totals and shipping taxes. |
+| [Resolve a cart session](/api-reference/carts/resolve-a-cart-session) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/carts/{session_id}` | Returns the `session_id` to use, as `sessionId`, and changes no cart. |
+| [Update a cart item](/api-reference/carts/update-a-cart-item) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/carts/{session_id}` | Changes the `quantity` of one item in the cart and returns the updated cart. |
+| [Empty a cart](/api-reference/carts/empty-a-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/carts/{session_id}` | Removes every item from the cart and returns `204` with no body. |
+| [Remove an item from a cart](/api-reference/carts/remove-an-item-from-a-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/carts/{session_id}/cart_items/{cart_item_id}` | Removes one item from the cart and returns `204` with no body. |
+| [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/admin/orders…/carts/{session_id}` | Turns the cart into an order, empties the cart and returns the new order. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **You name each cart with a `session_id` you choose.** Send it in the body each time you add a product,
+  and pass the same value as the `session_id` path parameter in every other cart call. If you add a
+  product without it, the store names the cart with your HTTP session's 32-character `JSESSIONID` cookie
+  value, and only `cart.session_id` in the response tells you that name.
+- **A cart exists only while it has items.** Reading a cart with no items returns `400` with the message
+  `Your shopping cart is empty`, not `404`. That happens after you empty the cart, remove its last item
+  or turn it into an order, and for a `session_id` you never used. Emptying a cart that is already empty
+  returns the same `400`.
+- **Only the response to adding a product shows the customer.** Its `cart.customer_id` is the customer's
+  `internal_id` you sent. [Retrieve a cart](/api-reference/carts/retrieve-a-cart) and [Update a cart item](/api-reference/carts/update-a-cart-item)
+  return `cart.customer_id` as `null`, even when your client sends back the `JSESSIONID` cookie the store set.
+  A cart never holds the customer's `customer_id`, so keep it yourself:
+  [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) needs it.
+- **The shipping address sets the cart's shipping taxes, but no cart response returns an address.** The
+  `shipping_address.country_code` you send when you add a product or update an item decides
+  `shipping.shipping_tax` and `shipping.handling_tax`, and every later read of the cart shows the result.
+  Without a shipping address, both are `0.0`. The store does not check any address field, and accepts `{}`.
+- **An order gets the customer's saved addresses by default.** When you send `shipping_address` and
+  `billing_address` to [Update a cart item](/api-reference/carts/update-a-cart-item) and then call
+  [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) with the same `JSESSIONID` cookie, the order gets those
+  two addresses instead. Addresses you send when you add a product never reach the order. The order's
+  `shipping_tax` follows the order's addresses, so it can differ from the cart's `shipping.shipping_tax`.
+  No cart call changes the customer's saved addresses.
+- **A `200` does not always mean the call worked.** The store does not handle `GET` on `/carts`, `POST` on
+  `/carts/{session_id}`, or `GET` and `PATCH` on `/carts/{session_id}/cart_items/{cart_item_id}`: each
+  returns `200` with `{"isSuccess": false, "message": "Invalid API Request"}`. Add products with `POST`
+  on `/carts`, and change an item's quantity with `PATCH` on `/carts/{session_id}`.

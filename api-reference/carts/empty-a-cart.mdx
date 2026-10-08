@@ -1,0 +1,9 @@
+---
+title: "Empty a cart"
+description: "Removes every item from the cart and returns `204` with no body."
+openapi: "DELETE /carts/{session_id}"
+---
+
+Removes every item from the cart and returns `204` with no body. Reading the cart afterwards, or emptying it again, returns `400` with the message `Your shopping cart is empty`. To remove one item and keep the rest, use [Remove an item from a cart](/api-reference/carts/remove-an-item-from-a-cart).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -103,6 +103,9 @@
       "name": "Order flags"
     },
     {
+      "name": "Carts"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -24064,6 +24067,1060 @@
         ]
       }
     },
+    "/carts": {
+      "post": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Add a product to a cart",
+        "operationId": "add_cart_item",
+        "description": "Adds a product to the cart named by `session_id`, creating the cart if needed, and returns the whole cart under `cart`. Send the product's `id` as `product_id`, a `quantity`, and the customer's `internal_id` as `customer_id`, at the top level of the body. If you leave out `session_id`, the store names the cart with your HTTP session's `JSESSIONID` cookie value, and `cart.session_id` in the response shows that name. Adding a product that is already in the cart raises that cart item's `quantity` and keeps its `id`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The cart under `cart`, with the `customer_id` you sent. The response has no `group_meta`. When your request sends no `JSESSIONID` cookie, the response sets one in a `Set-Cookie` header. If the product needs options and you send none, the call also returns `201`, but the body is not valid JSON: it has `\"status\": \"incomplete-info\"` instead of `cart`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cart": {
+                      "$ref": "#/components/schemas/Cart"
+                    }
+                  }
+                },
+                "example": {
+                  "cart": {
+                    "customer_id": 45,
+                    "session_id": "cart-7f3a9c2e1b",
+                    "currency_code": "AUD",
+                    "currency_symbol": "$",
+                    "delivery_type": "shipping",
+                    "totals": {
+                      "subtotal": 25.0,
+                      "discount": 0.0,
+                      "shipping_discount": 0.0,
+                      "tax": 2.5,
+                      "total": 27.5,
+                      "grand_total": 27.5,
+                      "paid": 0.0
+                    },
+                    "shipping": {
+                      "cost": 10.0,
+                      "handling_fee": 0.0,
+                      "handling_tax": 0.0,
+                      "shipping_tax": 1.0,
+                      "total_tax": 0.0
+                    },
+                    "items": [
+                      {
+                        "id": 42,
+                        "quantity": 1,
+                        "variations": null,
+                        "taxable": true,
+                        "shippable": true,
+                        "pricing": {
+                          "unit_price": 25.0,
+                          "display_unit_price": 27.5,
+                          "total": 27.5,
+                          "discount": 0.0,
+                          "discount_tax": 0.0,
+                          "tax": 2.5
+                        },
+                        "product": {
+                          "id": 101,
+                          "sku": "TSHIRT-001",
+                          "base_price": 25.0,
+                          "available_stock": 25,
+                          "on_sale": false,
+                          "cost_price": 0.0,
+                          "sale_price": 0.0,
+                          "url": "cotton-t-shirt",
+                          "name": "Cotton T-Shirt",
+                          "product_type": "simple",
+                          "image_link": "https://your-store.example.com/resources/product/product-101/150-cotton-t-shirt.webp"
+                        }
+                      }
+                    ],
+                    "discount": {
+                      "discount": 0.0,
+                      "order_discount": 0.0,
+                      "shipping_discount": 0.0,
+                      "discount_on_tax": 0.0,
+                      "discount_on_shipping_tax": 0.0
+                    },
+                    "messages": {
+                      "discount": {
+                        "message": "",
+                        "status": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`customer_id` or `quantity` is missing: the message is `customer_id not found` or `quantity not found`. You sent the customer's `customer_id` instead of the customer's `internal_id`: the message is `No Customer Found`. No product has that `product_id`, or the product was deleted: the message is `No product found`. A deleted product can still appear in [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location). The cart would hold more of the product than its stock: the message is `f:<n> quantity of this product is not available`. Carts do not reserve stock, so this limit applies to each cart on its own.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "No Customer Found",
+                    "details": [],
+                    "request_id": "8d2f6c1a-4b7e-4f3a-9c5d-2e1b0a7f6c34"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/carts\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_id\": 101,\n    \"quantity\": 1,\n    \"customer_id\": 45,\n    \"session_id\": \"cart-7f3a9c2e1b\",\n    \"shipping_address\": {\n      \"first_name\": \"Alex\",\n      \"last_name\": \"Taylor\",\n      \"address_line1\": \"1 Example Street\",\n      \"address_line2\": \"\",\n      \"city\": \"Sydney\",\n      \"post_code\": \"2000\",\n      \"phone\": \"\",\n      \"mobile\": \"\",\n      \"fax\": \"\",\n      \"email\": \"alex.taylor@example.com\",\n      \"country_code\": \"AU\",\n      \"state_code\": \"NSW\"\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.add_cart_item({\n    \"product_id\": 101, \"quantity\": 1, \"customer_id\": 45, \"session_id\": \"cart-7f3a9c2e1b\",\n    \"shipping_address\": {\n        \"first_name\": \"Alex\", \"last_name\": \"Taylor\", \"address_line1\": \"1 Example Street\",\n        \"address_line2\": \"\", \"city\": \"Sydney\", \"post_code\": \"2000\",\n        \"phone\": \"\", \"mobile\": \"\", \"fax\": \"\", \"email\": \"alex.taylor@example.com\",\n        \"country_code\": \"AU\", \"state_code\": \"NSW\",\n    },\n})\ncart = response.map[\"cart\"]\nprint(cart[\"session_id\"], cart[\"customer_id\"], cart[\"shipping\"][\"shipping_tax\"])\nprint(cart[\"items\"][0][\"id\"], cart[\"items\"][0][\"quantity\"], cart[\"totals\"][\"grand_total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.addCartItem({\n    product_id: 101,\n    quantity: 1,\n    customer_id: 45,\n    session_id: 'cart-7f3a9c2e1b',\n    shipping_address: {\n        first_name: 'Alex', last_name: 'Taylor', address_line1: '1 Example Street', address_line2: '',\n        city: 'Sydney', post_code: '2000', phone: '', mobile: '', fax: '', email: 'alex.taylor@example.com',\n        country_code: 'AU', state_code: 'NSW',\n    },\n});\nconsole.log(response.map.cart.session_id, response.map.cart.items[0].id, response.map.cart.shipping.shipping_tax);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::addCartItem($client, [\n    'product_id' => 101, 'quantity' => 1, 'customer_id' => 45, 'session_id' => 'cart-7f3a9c2e1b',\n    'shipping_address' => [\n        'first_name' => 'Alex', 'last_name' => 'Taylor', 'address_line1' => '1 Example Street', 'address_line2' => '',\n        'city' => 'Sydney', 'post_code' => '2000', 'phone' => '', 'mobile' => '', 'fax' => '',\n        'email' => 'alex.taylor@example.com', 'country_code' => 'AU', 'state_code' => 'NSW',\n    ],\n]);\n\necho $response->map['cart']['session_id'], ' ', $response->map['cart']['items'][0]['id'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Alex\"), entry(\"last_name\", \"Taylor\"),\n        entry(\"address_line1\", \"1 Example Street\"), entry(\"address_line2\", \"\"), entry(\"city\", \"Sydney\"),\n        entry(\"post_code\", \"2000\"), entry(\"phone\", \"\"), entry(\"mobile\", \"\"), entry(\"fax\", \"\"),\n        entry(\"email\", \"alex.taylor@example.com\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"NSW\"));\nApiResponse response = client.carts().addCartItem(Map.of(\"product_id\", 101, \"quantity\", 1, \"customer_id\", 45,\n        \"session_id\", \"cart-7f3a9c2e1b\", \"shipping_address\", address));\nMap<?, ?> cart = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart\");\nMap<?, ?> item = (Map<?, ?>) ((List<?>) cart.get(\"items\")).get(0);\nSystem.out.println(cart.get(\"session_id\") + \" \" + cart.get(\"customer_id\") + \" \" + item.get(\"id\"));\nSystem.out.println(item.get(\"quantity\") + \" \" + ((Map<?, ?>) cart.get(\"shipping\")).get(\"shipping_tax\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.AddCartItemAsync(new Dictionary<string, object?>\n{\n    [\"product_id\"] = 101, [\"quantity\"] = 1, [\"customer_id\"] = 45, [\"session_id\"] = \"cart-7f3a9c2e1b\",\n    [\"shipping_address\"] = new Dictionary<string, object?> { [\"first_name\"] = \"Alex\", [\"last_name\"] = \"Taylor\",\n        [\"address_line1\"] = \"1 Example Street\", [\"address_line2\"] = \"\", [\"city\"] = \"Sydney\", [\"post_code\"] = \"2000\",\n        [\"phone\"] = \"\", [\"mobile\"] = \"\", [\"fax\"] = \"\", [\"email\"] = \"alex.taylor@example.com\", [\"country_code\"] = \"AU\", [\"state_code\"] = \"NSW\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{cart[\"session_id\"]} {cart[\"customer_id\"]}\");\nforeach (var item in ((IReadOnlyList<object?>)cart[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"quantity\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.addCartItem({\n  'product_id': 101,\n  'quantity': 1,\n  'customer_id': 45,\n  'session_id': 'cart-7f3a9c2e1b',\n  'shipping_address': {\n    'first_name': 'Alex',\n    'last_name': 'Taylor',\n    'address_line1': '1 Example Street',\n    'address_line2': '',\n    'city': 'Sydney',\n    'post_code': '2000',\n    'phone': '',\n    'mobile': '',\n    'fax': '',\n    'email': 'alex.taylor@example.com',\n    'country_code': 'AU',\n    'state_code': 'NSW',\n  },\n});\nfinal cart = (response.map as Map)['cart'] as Map;\nfinal item = (cart['items'] as List).first as Map;\nprint('${cart['session_id']} ${cart['customer_id']} ${item['id']}');\nprint((cart['shipping'] as Map)['shipping_tax']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().AddCartItem(ctx, map[string]any{\n\t\"product_id\": 101, \"quantity\": 1, \"customer_id\": 45, \"session_id\": \"cart-7f3a9c2e1b\",\n\t\"shipping_address\": map[string]any{\n\t\t\"first_name\": \"Alex\", \"last_name\": \"Taylor\", \"address_line1\": \"1 Example Street\", \"address_line2\": \"\", \"city\": \"Sydney\",\n\t\t\"post_code\": \"2000\", \"phone\": \"\", \"mobile\": \"\", \"fax\": \"\", \"email\": \"alex.taylor@example.com\", \"country_code\": \"AU\", \"state_code\": \"NSW\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"session_id\"], cart[\"customer_id\"], cart[\"items\"].([]any)[0].(map[string]any)[\"id\"], cart[\"shipping\"].(map[string]any)[\"shipping_tax\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/carts/{session_id}": {
+      "get": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Retrieve a cart",
+        "operationId": "get_cart",
+        "description": "Returns the cart under `cart`, with `group_meta` beside it; no other cart call returns `group_meta`. `cart.customer_id` is `null` here, even when your client sends back the `JSESSIONID` cookie the store set when you added the product. A cart with no items returns `400` with the message `Your shopping cart is empty`, not `404`. Query parameters are ignored, `field_metadata` included.",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cart under `cart`, with `customer_id` set to `null`, and `group_meta`. The response has the header `Cache-Control: no-cache, no-store`, and no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cart": {
+                      "$ref": "#/components/schemas/Cart"
+                    },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CartGroupMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "cart": {
+                    "customer_id": null,
+                    "session_id": "cart-7f3a9c2e1b",
+                    "currency_code": "AUD",
+                    "currency_symbol": "$",
+                    "delivery_type": "shipping",
+                    "totals": {
+                      "subtotal": 25.0,
+                      "discount": 0.0,
+                      "shipping_discount": 0.0,
+                      "tax": 2.5,
+                      "total": 27.5,
+                      "grand_total": 27.5,
+                      "paid": 0.0
+                    },
+                    "shipping": {
+                      "cost": 10.0,
+                      "handling_fee": 0.0,
+                      "handling_tax": 0.0,
+                      "shipping_tax": 1.0,
+                      "total_tax": 0.0
+                    },
+                    "items": [
+                      {
+                        "id": 42,
+                        "quantity": 1,
+                        "variations": null,
+                        "taxable": true,
+                        "shippable": true,
+                        "pricing": {
+                          "unit_price": 25.0,
+                          "display_unit_price": 27.5,
+                          "total": 27.5,
+                          "discount": 0.0,
+                          "discount_tax": 0.0,
+                          "tax": 2.5
+                        },
+                        "product": {
+                          "id": 101,
+                          "sku": "TSHIRT-001",
+                          "base_price": 25.0,
+                          "available_stock": 25,
+                          "on_sale": false,
+                          "cost_price": 0.0,
+                          "sale_price": 0.0,
+                          "url": "cotton-t-shirt",
+                          "name": "Cotton T-Shirt",
+                          "product_type": "simple",
+                          "image_link": "https://your-store.example.com/resources/product/product-101/150-cotton-t-shirt.webp"
+                        }
+                      }
+                    ],
+                    "discount": {
+                      "discount": 0.0,
+                      "order_discount": 0.0,
+                      "shipping_discount": 0.0,
+                      "discount_on_tax": 0.0,
+                      "discount_on_shipping_tax": 0.0
+                    },
+                    "messages": {
+                      "discount": {
+                        "message": "",
+                        "status": null
+                      }
+                    }
+                  },
+                  "group_meta": {
+                    "cart": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/carts/{sessionId}"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The cart has no items: you emptied it, removed its last item or turned it into an order, or no product was ever added under that `session_id`. The message is `Your shopping cart is empty`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "Your shopping cart is empty",
+                    "details": [],
+                    "request_id": "8d2f6c1a-4b7e-4f3a-9c5d-2e1b0a7f6c34"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/carts/cart-7f3a9c2e1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.get_cart(\"cart-7f3a9c2e1b\")\ncart = response.map[\"cart\"]\nfor item in cart[\"items\"]:\n    print(item[\"id\"], item[\"product\"][\"sku\"], item[\"quantity\"], item[\"pricing\"][\"total\"])\ntotals = cart[\"totals\"]\nprint(totals[\"subtotal\"], totals[\"tax\"], totals[\"grand_total\"])\nprint(cart[\"shipping\"][\"shipping_tax\"], cart[\"shipping\"][\"handling_tax\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.getCart('cart-7f3a9c2e1b');\nconst cart = response.map.cart;\nfor (const item of cart.items) {\n    console.log(item.id, item.product.name, item.quantity, item.pricing.total);\n}\nconsole.log(cart.totals.subtotal, cart.shipping.shipping_tax, cart.totals.grand_total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::getCart($client, 'cart-7f3a9c2e1b');\n\n$cart = $response->map['cart'];\nforeach ($cart['items'] as $item) {\n    echo $item['id'], ' ', $item['product']['sku'], ' x', $item['quantity'], ': ', $item['pricing']['total'], PHP_EOL;\n}\necho 'Shipping tax: ', $cart['shipping']['shipping_tax'], PHP_EOL;\necho 'Grand total: ', $cart['totals']['grand_total'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().getCart(\"cart-7f3a9c2e1b\");\nMap<?, ?> cart = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart\");\nfor (Object row : (List<?>) cart.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    Map<?, ?> product = (Map<?, ?>) item.get(\"product\");\n    System.out.println(item.get(\"id\") + \" \" + product.get(\"name\") + \" \" + item.get(\"quantity\"));\n}\nMap<?, ?> totals = (Map<?, ?>) cart.get(\"totals\");\nSystem.out.println(totals.get(\"subtotal\") + \" \" + ((Map<?, ?>) cart.get(\"shipping\")).get(\"shipping_tax\")\n        + \" \" + totals.get(\"grand_total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.GetCartAsync(\"cart-7f3a9c2e1b\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nforeach (var item in ((IReadOnlyList<object?>)cart[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    var product = (IReadOnlyDictionary<string, object?>)item[\"product\"]!;\n    Console.WriteLine($\"{item[\"id\"]} {product[\"sku\"]} {item[\"quantity\"]}\");\n}\nvar totals = (IReadOnlyDictionary<string, object?>)cart[\"totals\"]!;\nvar shipping = (IReadOnlyDictionary<string, object?>)cart[\"shipping\"]!;\nConsole.WriteLine($\"{totals[\"subtotal\"]} {totals[\"tax\"]} {totals[\"grand_total\"]} {shipping[\"shipping_tax\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.getCart('cart-7f3a9c2e1b');\nfinal cart = (response.map as Map)['cart'] as Map;\nfor (final item in cart['items'] as List) {\n  final product = (item as Map)['product'] as Map;\n  print('${item['id']} ${product['name']} ${item['quantity']}');\n}\nfinal totals = cart['totals'] as Map;\nprint('${totals['subtotal']} ${totals['grand_total']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().GetCart(ctx, \"cart-7f3a9c2e1b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfor _, row := range cart[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"product\"].(map[string]any)[\"name\"], item[\"quantity\"], item[\"pricing\"].(map[string]any)[\"total\"])\n}\ntotals := cart[\"totals\"].(map[string]any)\nfmt.Println(totals[\"subtotal\"], cart[\"shipping\"].(map[string]any)[\"shipping_tax\"], totals[\"grand_total\"])\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Resolve a cart session",
+        "operationId": "resolve_cart_session",
+        "description": "Returns `sessionId` and changes nothing: no cart moves or merges, even when `sessionId` names another cart. Send `{}` to get back the `session_id` from the path, or send a `sessionId` to get that value back. Send `\"sessionId\": null` or `\"\"` to get your HTTP session's `JSESSIONID`: the cookie your client sends, or a new value when it sends none. A `session_id` key in the body is ignored.",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`sessionId`: the body's `sessionId` when you send one, your HTTP session's `JSESSIONID` when it is `null` or `\"\"`, and otherwise the `session_id` from the path.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartSession"
+                },
+                "example": {
+                  "sessionId": "cart-7f3a9c2e1b"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/carts/cart-7f3a9c2e1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.resolve_cart_session(\"cart-7f3a9c2e1b\", {})\nprint(response.map[\"sessionId\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.resolveCartSession('cart-7f3a9c2e1b', {});\nconsole.log(response.map.sessionId);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::resolveCartSession($client, 'cart-7f3a9c2e1b', '{}');\n\necho $response->map['sessionId'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().resolveCartSession(\"cart-7f3a9c2e1b\", Map.of());\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"sessionId\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.ResolveCartSessionAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>());\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"sessionId\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.resolveCartSession('cart-7f3a9c2e1b', {});\nprint((response.map as Map)['sessionId']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().ResolveCartSession(ctx, \"cart-7f3a9c2e1b\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"sessionId\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartSessionInput"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Update a cart item",
+        "operationId": "update_cart_item",
+        "description": "Sets the `quantity` of the cart item whose `id` you send as `cart_item_id`, and returns the whole cart; other items do not change. A `shipping_address` sets the cart's shipping taxes, and an order you create with the same `JSESSIONID` cookie gets this call's `shipping_address` and `billing_address`. Always send `quantity`: without it the call returns `500`. Do not send `customer_id`: the call returns `500` with a body that is not valid JSON, and still saves the new `quantity`.",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cart under `cart`, with the item's new `quantity` and `totals.subtotal` recalculated. `customer_id` is `null`, and the response has no `group_meta`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cart": {
+                      "$ref": "#/components/schemas/Cart"
+                    }
+                  }
+                },
+                "example": {
+                  "cart": {
+                    "customer_id": null,
+                    "session_id": "cart-7f3a9c2e1b",
+                    "currency_code": "AUD",
+                    "currency_symbol": "$",
+                    "delivery_type": "shipping",
+                    "totals": {
+                      "subtotal": 50.0,
+                      "discount": 0.0,
+                      "shipping_discount": 0.0,
+                      "tax": 5.0,
+                      "total": 55.0,
+                      "grand_total": 55.0,
+                      "paid": 0.0
+                    },
+                    "shipping": {
+                      "cost": 10.0,
+                      "handling_fee": 0.0,
+                      "handling_tax": 0.0,
+                      "shipping_tax": 1.0,
+                      "total_tax": 0.0
+                    },
+                    "items": [
+                      {
+                        "id": 42,
+                        "quantity": 2,
+                        "variations": null,
+                        "taxable": true,
+                        "shippable": true,
+                        "pricing": {
+                          "unit_price": 25.0,
+                          "display_unit_price": 27.5,
+                          "total": 55.0,
+                          "discount": 0.0,
+                          "discount_tax": 0.0,
+                          "tax": 5.0
+                        },
+                        "product": {
+                          "id": 101,
+                          "sku": "TSHIRT-001",
+                          "base_price": 25.0,
+                          "available_stock": 25,
+                          "on_sale": false,
+                          "cost_price": 0.0,
+                          "sale_price": 0.0,
+                          "url": "cotton-t-shirt",
+                          "name": "Cotton T-Shirt",
+                          "product_type": "simple",
+                          "image_link": "https://your-store.example.com/resources/product/product-101/150-cotton-t-shirt.webp"
+                        }
+                      }
+                    ],
+                    "discount": {
+                      "discount": 0.0,
+                      "order_discount": 0.0,
+                      "shipping_discount": 0.0,
+                      "discount_on_tax": 0.0,
+                      "discount_on_shipping_tax": 0.0
+                    },
+                    "messages": {
+                      "discount": {
+                        "message": "",
+                        "status": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`cart_item_id` is missing: the message is `f:cart_item_id not found`. Or `quantity` is `0`: the message is `f:Minimum required quantity is 1`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No cart item has that `cart_item_id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The body has no `quantity`: the message is `Cannot invoke method toBigInteger() on null object`. Or the body has `customer_id`: the code is `internal_error`, the response body is not valid JSON, and the new `quantity` is saved anyway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/carts/cart-7f3a9c2e1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"cart_item_id\": 42,\n    \"quantity\": 2\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.update_cart_item(\n    \"cart-7f3a9c2e1b\", {\"cart_item_id\": 42, \"quantity\": 2}\n)\ncart = response.map[\"cart\"]\nfor item in cart[\"items\"]:\n    print(item[\"id\"], item[\"quantity\"], item[\"pricing\"][\"total\"])\nprint(cart[\"totals\"][\"subtotal\"], cart[\"totals\"][\"grand_total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.updateCartItem('cart-7f3a9c2e1b', {cart_item_id: 42, quantity: 2});\nconst cart = response.map.cart;\nfor (const item of cart.items) {\n    console.log(item.id, item.quantity, item.pricing.total);\n}\nconsole.log(cart.totals.subtotal, cart.totals.grand_total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::updateCartItem($client, 'cart-7f3a9c2e1b', ['cart_item_id' => 42, 'quantity' => 2]);\n\n$cart = $response->map['cart'];\nforeach ($cart['items'] as $item) {\n    echo $item['id'], ' x', $item['quantity'], ': ', $item['pricing']['total'], PHP_EOL;\n}\necho 'Subtotal: ', $cart['totals']['subtotal'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().updateCartItem(\"cart-7f3a9c2e1b\",\n        Map.of(\"cart_item_id\", 42, \"quantity\", 2));\nMap<?, ?> cart = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart\");\nfor (Object row : (List<?>) cart.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"quantity\") + \" \"\n            + ((Map<?, ?>) item.get(\"pricing\")).get(\"total\"));\n}\nMap<?, ?> totals = (Map<?, ?>) cart.get(\"totals\");\nSystem.out.println(totals.get(\"subtotal\") + \" \" + totals.get(\"grand_total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.UpdateCartItemAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>\n{\n    [\"cart_item_id\"] = 42, [\"quantity\"] = 2,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nforeach (var item in ((IReadOnlyList<object?>)cart[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"quantity\"]}\");\nvar totals = (IReadOnlyDictionary<string, object?>)cart[\"totals\"]!;\nConsole.WriteLine($\"{totals[\"subtotal\"]} {totals[\"grand_total\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts\n    .updateCartItem('cart-7f3a9c2e1b', {'cart_item_id': 42, 'quantity': 2});\nfinal cart = (response.map as Map)['cart'] as Map;\nfor (final item in cart['items'] as List) {\n  print('${(item as Map)['id']} ${item['quantity']}');\n}\nprint((cart['totals'] as Map)['subtotal']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().UpdateCartItem(ctx, \"cart-7f3a9c2e1b\", map[string]any{\"cart_item_id\": 42, \"quantity\": 2}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfor _, row := range cart[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"quantity\"], item[\"pricing\"].(map[string]any)[\"total\"])\n}\ntotals := cart[\"totals\"].(map[string]any)\nfmt.Println(totals[\"subtotal\"], totals[\"grand_total\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemUpdateInput"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Empty a cart",
+        "operationId": "delete_cart",
+        "description": "Removes every item from the cart and returns `204` with no body. Reading the cart afterwards, or emptying it again, returns `400` with the message `Your shopping cart is empty`. To remove one item and keep the rest, use [Remove an item from a cart](/api-reference/carts/remove-an-item-from-a-cart).",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The cart is empty. No body."
+          },
+          "400": {
+            "description": "The cart has no items, for example because you already emptied it. The message is `Your shopping cart is empty`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "Your shopping cart is empty",
+                    "details": [],
+                    "request_id": "8d2f6c1a-4b7e-4f3a-9c5d-2e1b0a7f6c34"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/carts/cart-7f3a9c2e1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.delete_cart(\"cart-7f3a9c2e1b\")\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.deleteCart('cart-7f3a9c2e1b');\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::deleteCart($client, 'cart-7f3a9c2e1b');\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().deleteCart(\"cart-7f3a9c2e1b\");\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.DeleteCartAsync(\"cart-7f3a9c2e1b\");\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.deleteCart('cart-7f3a9c2e1b');\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().DeleteCart(ctx, \"cart-7f3a9c2e1b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/carts/{session_id}/cart_items/{cart_item_id}": {
+      "delete": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Remove an item from a cart",
+        "operationId": "delete_cart_item",
+        "description": "Removes the cart item whose `id` you pass as `cart_item_id`, and returns `204` with no body. Take `cart_item_id` from `items[].id` in a cart response: the store numbers cart items across all carts, so do not count from `1`. Removing the last item empties the cart, so reading it afterwards returns `400` with the message `Your shopping cart is empty`.",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cart_item_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart item's `id`, from `items[].id` in a cart response. The store numbers cart items across all carts, so take the value from a response and do not count from `1`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The item is removed. No body."
+          },
+          "404": {
+            "description": "The cart holds no item with that `cart_item_id`. The message is `f:cart item not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "f:cart item not found",
+                    "details": [],
+                    "request_id": "8d2f6c1a-4b7e-4f3a-9c5d-2e1b0a7f6c34"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/carts/cart-7f3a9c2e1b/cart_items/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.delete_cart_item(\"cart-7f3a9c2e1b\", 42)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.deleteCartItem('cart-7f3a9c2e1b', 42);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::deleteCartItem($client, 'cart-7f3a9c2e1b', 42);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().deleteCartItem(\"cart-7f3a9c2e1b\", 42);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.DeleteCartItemAsync(\"cart-7f3a9c2e1b\", 42);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.deleteCartItem('cart-7f3a9c2e1b', 42);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().DeleteCartItem(ctx, \"cart-7f3a9c2e1b\", 42, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/orders/carts/{session_id}": {
+      "post": {
+        "tags": [
+          "Carts"
+        ],
+        "summary": "Create an order from a cart",
+        "operationId": "create_order_from_cart",
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call.",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the value you sent. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and while it is unpaid it does not lower the product's stock.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "`success`."
+                    },
+                    "order": {
+                      "$ref": "#/components/schemas/CartOrder"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "success",
+                  "order": {
+                    "order_id": 1052,
+                    "internal_id": 2310,
+                    "order_no": 1052,
+                    "transaction_no": null,
+                    "currency_code": "AUD",
+                    "order_status": "in_progress",
+                    "payment_status": "unpaid",
+                    "shipping_status": "unshipped",
+                    "sub_total": 25.0,
+                    "shipping_cost": 10.0,
+                    "shipping_tax": 1.0,
+                    "handling_cost": 0.0,
+                    "total_surcharge": 0.0,
+                    "total_discount": 0.0,
+                    "total_tax": 2.5,
+                    "grand_total": 38.5,
+                    "paid": 0.0,
+                    "due": 38.5,
+                    "items_total": 1,
+                    "ip_address": "203.0.113.10",
+                    "order_channel": null,
+                    "created_at": "2026-10-07T09:15:02",
+                    "updated_at": "2026-10-07T09:15:02",
+                    "customer_summary": {
+                      "first_name": "Alex",
+                      "last_name": "Taylor",
+                      "customer_group": "",
+                      "gender": null,
+                      "customer_id": 123,
+                      "internal_id": 45,
+                      "email": "alex.taylor@example.com",
+                      "address_line_1": "1 Example Street",
+                      "address_line_2": "",
+                      "city": "Sydney",
+                      "country": {
+                        "id": 12,
+                        "name": "Australia",
+                        "code": "AU"
+                      },
+                      "state": {
+                        "id": 71,
+                        "name": "New South Wales",
+                        "code": "NSW"
+                      },
+                      "post_code": "2000",
+                      "phone": "",
+                      "mobile": "",
+                      "fax": "",
+                      "company_name": ""
+                    },
+                    "order_line_details": [
+                      {
+                        "item_id": 3307,
+                        "product_name": "Cotton T-Shirt",
+                        "product_id": 101,
+                        "sku": "TSHIRT-001",
+                        "quantity": 1,
+                        "price": 25.0,
+                        "total_amount": 25.0,
+                        "tax": 2.5,
+                        "discount": 0.0,
+                        "tax_discount": 0.0,
+                        "is_taxable": true,
+                        "is_shippable": true,
+                        "image_url": "https://your-store.example.com/resources/product/product-101/150-cotton-t-shirt.webp",
+                        "variations": [],
+                        "serial_batch_number": ""
+                      }
+                    ],
+                    "payments": [
+                      {
+                        "id": 5530,
+                        "status": "awaiting",
+                        "amount": 38.5,
+                        "payment_method": "PIS",
+                        "track_info": "",
+                        "gateway_name": "",
+                        "gateway_code": "PIS",
+                        "gateway_response": "",
+                        "payer_info": "",
+                        "paying_date": "2026-10-07T09:15:02Z",
+                        "transaction_date": "2026-10-07T09:15:02Z",
+                        "transaction_reference": ""
+                      }
+                    ],
+                    "external_reference_order_id": null,
+                    "external_reference_store_id": null,
+                    "external_reference_order_no": null,
+                    "external_reference_status": null,
+                    "external_reference_url": null,
+                    "customer_po_number": "",
+                    "payment_term": "",
+                    "fulfillment_mode": "MANUAL",
+                    "fulfillment_term": "IMMEDIATELY",
+                    "invoice_mode": "",
+                    "billing_address": {
+                      "id": 8801,
+                      "first_name": "Alex",
+                      "last_name": "Taylor",
+                      "email": "alex.taylor@example.com",
+                      "company_name": "",
+                      "address_line_1": "1 Example Street",
+                      "address_line_2": "",
+                      "country": {
+                        "id": 12,
+                        "name": "Australia",
+                        "code": "AU"
+                      },
+                      "state": {
+                        "id": 71,
+                        "name": "New South Wales",
+                        "code": "NSW"
+                      },
+                      "city": "Sydney",
+                      "post_code": "2000",
+                      "mobile": "",
+                      "phone": "",
+                      "fax": ""
+                    },
+                    "shipping_address": {
+                      "id": 8802,
+                      "first_name": "Alex",
+                      "last_name": "Taylor",
+                      "email": "alex.taylor@example.com",
+                      "company_name": "",
+                      "address_line_1": "1 Example Street",
+                      "address_line_2": "",
+                      "country": {
+                        "id": 12,
+                        "name": "Australia",
+                        "code": "AU"
+                      },
+                      "state": {
+                        "id": 71,
+                        "name": "New South Wales",
+                        "code": "NSW"
+                      },
+                      "city": "Sydney",
+                      "post_code": "2000",
+                      "mobile": "",
+                      "phone": "",
+                      "fax": ""
+                    },
+                    "custom_fields": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body has no `customer_id`. The message is `No Customer Found`, and the cart stays as it was.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "No Customer Found",
+                    "details": [],
+                    "request_id": "8d2f6c1a-4b7e-4f3a-9c5d-2e1b0a7f6c34"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/orders/carts/cart-7f3a9c2e1b\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"customer_id\": 123,\n    \"payment_gateway\": \"PIS\",\n    \"delivery_type\": \"shipping\",\n    \"transaction_no\": \"web-order-0001\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.create_order_from_cart(\"cart-7f3a9c2e1b\", {\n    \"customer_id\": 123,\n    \"payment_gateway\": \"PIS\",\n    \"delivery_type\": \"shipping\",\n    \"transaction_no\": \"web-order-0001\",\n})\norder = response.map[\"order\"]\nprint(response.map[\"status\"], order[\"order_id\"], order[\"order_no\"])\nprint(order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"], order[\"due\"])\nfor line in order[\"order_line_details\"]:\n    print(line[\"sku\"], line[\"quantity\"], line[\"total_amount\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n    customer_id: 123,\n    payment_gateway: 'PIS',\n    delivery_type: 'shipping',\n    transaction_no: 'web-order-0001',\n});\nconst order = response.map.order;\nconsole.log(response.map.status, order.order_id, order.order_status, order.payment_status, order.grand_total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::createOrderFromCart($client, 'cart-7f3a9c2e1b', [\n    'customer_id' => 123,\n    'payment_gateway' => 'PIS',\n    'delivery_type' => 'shipping',\n    'transaction_no' => 'web-order-0001',\n]);\n\n$order = $response->map['order'];\necho $response->map['status'], ' ', $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], PHP_EOL;\necho 'Due: ', $order['due'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().createOrderFromCart(\"cart-7f3a9c2e1b\", Map.of(\"customer_id\", 123,\n        \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"transaction_no\", \"web-order-0001\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> order = (Map<?, ?>) body.get(\"order\");\nSystem.out.println(body.get(\"status\") + \" \" + order.get(\"order_id\") + \" \" + order.get(\"order_status\"));\nSystem.out.println(order.get(\"payment_status\") + \" \" + order.get(\"grand_total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.CreateOrderFromCartAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 123, [\"payment_gateway\"] = \"PIS\",\n    [\"delivery_type\"] = \"shipping\", [\"transaction_no\"] = \"web-order-0001\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{body[\"status\"]} {order[\"order_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]} {order[\"grand_total\"]}\");\nforeach (var orderLine in ((IReadOnlyList<object?>)order[\"order_line_details\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderLine[\"sku\"]} {orderLine[\"quantity\"]} {orderLine[\"total_amount\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n  'customer_id': 123,\n  'payment_gateway': 'PIS',\n  'delivery_type': 'shipping',\n  'transaction_no': 'web-order-0001',\n});\nfinal result = response.map as Map;\nfinal order = result['order'] as Map;\nprint('${result['status']} ${order['order_id']} ${order['order_status']}');\nprint('${order['payment_status']} ${order['due']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().CreateOrderFromCart(ctx, \"cart-7f3a9c2e1b\", map[string]any{\n\t\"customer_id\":     123,\n\t\"payment_gateway\": \"PIS\",\n\t\"delivery_type\":   \"shipping\",\n\t\"transaction_no\":  \"web-order-0001\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\norder := body[\"order\"].(map[string]any)\nfmt.Println(body[\"status\"], order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartOrderInput"
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -34150,6 +35207,803 @@
                     }
                   }
                 }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The customer's `internal_id`, as you sent it to [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart). Only that call's response shows it: [Retrieve a cart](/api-reference/carts/retrieve-a-cart) and [Update a cart item](/api-reference/carts/update-a-cart-item) return `null`."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "The cart's `session_id`. Pass it as the `session_id` path parameter in the other cart calls."
+          },
+          "currency_code": {
+            "type": "string",
+            "description": "The currency of the cart's amounts, such as `AUD`."
+          },
+          "currency_symbol": {
+            "type": "string",
+            "description": "The currency symbol, such as `$`."
+          },
+          "delivery_type": {
+            "type": "string",
+            "description": "The cart's delivery type, such as `shipping`."
+          },
+          "totals": {
+            "$ref": "#/components/schemas/CartTotals"
+          },
+          "shipping": {
+            "$ref": "#/components/schemas/CartShipping"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItem"
+            },
+            "description": "The cart's items. Adding a product that is already in the cart raises that item's `quantity` instead of adding an entry."
+          },
+          "discount": {
+            "$ref": "#/components/schemas/CartDiscount"
+          },
+          "messages": {
+            "$ref": "#/components/schemas/CartMessages"
+          }
+        }
+      },
+      "CartTotals": {
+        "type": "object",
+        "properties": {
+          "subtotal": {
+            "type": "number",
+            "description": "The sum of each item's `quantity` times its `pricing.unit_price`. A discount shows in `discount`, not here."
+          },
+          "discount": {
+            "type": "number",
+            "description": "The discount on the cart."
+          },
+          "shipping_discount": {
+            "type": "number"
+          },
+          "tax": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "grand_total": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          }
+        }
+      },
+      "CartShipping": {
+        "type": "object",
+        "properties": {
+          "cost": {
+            "type": "number",
+            "description": "The shipping cost."
+          },
+          "handling_fee": {
+            "type": "number",
+            "description": "The handling fee."
+          },
+          "handling_tax": {
+            "type": "number",
+            "description": "Tax on the handling fee. It depends on `shipping_address.country_code`, and is `0.0` when you sent no shipping address."
+          },
+          "shipping_tax": {
+            "type": "number",
+            "description": "Tax on shipping. It depends on `shipping_address.country_code`, and is `0.0` when you sent no shipping address."
+          },
+          "total_tax": {
+            "type": "number"
+          }
+        }
+      },
+      "CartItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The cart item's `id`. Pass it as `cart_item_id` to update or remove the item. The store numbers cart items across all carts, so a cart's first item can have any `id`."
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "How many of the product the cart holds."
+          },
+          "variations": {},
+          "taxable": {
+            "type": "boolean"
+          },
+          "shippable": {
+            "type": "boolean"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/CartItemPricing"
+          },
+          "product": {
+            "$ref": "#/components/schemas/CartItemProduct"
+          }
+        }
+      },
+      "CartItemPricing": {
+        "type": "object",
+        "properties": {
+          "unit_price": {
+            "type": "number",
+            "description": "The price of one unit. `totals.subtotal` adds up `quantity` times this for every item."
+          },
+          "display_unit_price": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "discount_tax": {
+            "type": "number"
+          },
+          "tax": {
+            "type": "number"
+          }
+        }
+      },
+      "CartItemProduct": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The product's `id`, which you sent as `product_id`."
+          },
+          "sku": {
+            "type": "string"
+          },
+          "base_price": {
+            "type": "number"
+          },
+          "available_stock": {
+            "type": "integer",
+            "description": "The product's stock, not the item's `quantity`."
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "cost_price": {
+            "type": "number"
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "image_link": {
+            "type": "string"
+          }
+        }
+      },
+      "CartDiscount": {
+        "type": "object",
+        "properties": {
+          "discount": {
+            "type": "number"
+          },
+          "order_discount": {
+            "type": "number"
+          },
+          "shipping_discount": {
+            "type": "number"
+          },
+          "discount_on_tax": {
+            "type": "number"
+          },
+          "discount_on_shipping_tax": {
+            "type": "number"
+          }
+        }
+      },
+      "CartMessages": {
+        "type": "object",
+        "properties": {
+          "discount": {
+            "$ref": "#/components/schemas/CartDiscountMessage"
+          }
+        }
+      },
+      "CartDiscountMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {}
+        }
+      },
+      "CartGroupMeta": {
+        "type": "object",
+        "properties": {
+          "cart": {
+            "$ref": "#/components/schemas/CartSectionMeta"
+          }
+        },
+        "description": "Returned only by [Retrieve a cart](/api-reference/carts/retrieve-a-cart)."
+      },
+      "CartSectionMeta": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`resource`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "`true`."
+          },
+          "href": {
+            "type": "string",
+            "description": "`/api/v4/carts/{sessionId}`, with `{sessionId}` left as written rather than your cart's `session_id`."
+          }
+        }
+      },
+      "CartSession": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "The value to use as the cart's `session_id`. Only this call spells the field `sessionId`, in both the request body and the response."
+          }
+        }
+      },
+      "CartItemInput": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "integer",
+            "description": "Required. The product's `id`."
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Required. How many to add. If the product is already in the cart, this raises that item's `quantity`."
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "Required. The customer's `internal_id`. The customer's `customer_id` is rejected with `400` and the message `No Customer Found`."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "The name you choose for the cart. Without it, the store uses your HTTP session's `JSESSIONID`, and `cart.session_id` in the response shows it."
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/CartAddressInput",
+            "description": "Sets the cart's shipping taxes. It never reaches an order made from the cart."
+          }
+        },
+        "required": [
+          "product_id",
+          "quantity",
+          "customer_id"
+        ],
+        "description": "Send these fields at the top level of the body."
+      },
+      "CartItemUpdateInput": {
+        "type": "object",
+        "properties": {
+          "cart_item_id": {
+            "type": "integer",
+            "description": "Required. The cart item's `id`, from `items[].id`. Without it the call is rejected with `400` and the message `f:cart_item_id not found`."
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Required. The item's new quantity. `0` is rejected with `400`, and a body without `quantity` returns `500`."
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/CartAddressInput",
+            "description": "Sets the cart's shipping taxes. An order you create with the same `JSESSIONID` cookie gets this address."
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/CartAddressInput",
+            "description": "An order you create with the same `JSESSIONID` cookie gets this address."
+          }
+        },
+        "required": [
+          "cart_item_id",
+          "quantity"
+        ],
+        "description": "Send these fields at the top level of the body. Do not send `customer_id`: it returns `500`, although the new `quantity` is saved."
+      },
+      "CartAddressInput": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "address_line1": {
+            "type": "string",
+            "description": "The first address line. Spelled without an underscore before the `1`, unlike `address_line_1` in an order's address."
+          },
+          "address_line2": {
+            "type": "string",
+            "description": "The second address line."
+          },
+          "city": {
+            "type": "string"
+          },
+          "post_code": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "fax": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string",
+            "description": "A country code, such as `AU`. In `shipping_address`, it decides the cart's `shipping.shipping_tax` and `shipping.handling_tax`."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "A state code, such as `NSW`."
+          }
+        },
+        "description": "The store does not check any field, and accepts `{}`. No cart response returns the address."
+      },
+      "CartSessionInput": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "A value to get back as `sessionId`. `null` or `\"\"` returns your HTTP session's `JSESSIONID` instead: the cookie your client sends, or a new value when it sends none."
+          }
+        },
+        "description": "Send `{}` to get back the `session_id` from the path. A `session_id` key is ignored."
+      },
+      "CartOrderInput": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "integer",
+            "description": "Required. The customer's `customer_id`, not the `internal_id` that [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes."
+          },
+          "payment_gateway": {
+            "type": "string",
+            "description": "The payment gateway. Defaults to `PIS`."
+          },
+          "delivery_type": {
+            "type": "string",
+            "description": "The delivery type, such as `shipping`."
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "A transaction number to store on the order. The response shows `transaction_no` as `null`."
+          }
+        },
+        "required": [
+          "customer_id"
+        ],
+        "description": "Send these fields at the top level of the body."
+      },
+      "CartOrder": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "integer",
+            "description": "The new order's `order_id`, assigned by the store."
+          },
+          "internal_id": {
+            "type": "integer",
+            "description": "The order's `internal_id`. The customer's `internal_id` is in `customer_summary.internal_id`."
+          },
+          "order_no": {
+            "type": "integer"
+          },
+          "transaction_no": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` in this response, even when you sent `transaction_no`. The order stores the value you sent."
+          },
+          "currency_code": {
+            "type": "string"
+          },
+          "order_status": {
+            "type": "string",
+            "description": "`in_progress` on an order made from a cart."
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "`unpaid` on an order made from a cart."
+          },
+          "shipping_status": {
+            "type": "string"
+          },
+          "sub_total": {
+            "type": "number"
+          },
+          "shipping_cost": {
+            "type": "number"
+          },
+          "shipping_tax": {
+            "type": "number",
+            "description": "Tax on shipping. It follows the order's addresses, not the cart's `shipping.shipping_tax`."
+          },
+          "handling_cost": {
+            "type": "number"
+          },
+          "total_surcharge": {
+            "type": "number"
+          },
+          "total_discount": {
+            "type": "number"
+          },
+          "total_tax": {
+            "type": "number"
+          },
+          "grand_total": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "due": {
+            "type": "number"
+          },
+          "items_total": {
+            "type": "integer"
+          },
+          "ip_address": {
+            "type": "string"
+          },
+          "order_channel": {
+            "description": "`null` on an order made from a cart."
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "customer_summary": {
+            "$ref": "#/components/schemas/CartOrderCustomer",
+            "description": "The customer the order belongs to, with both the customer's `customer_id` and `internal_id`."
+          },
+          "order_line_details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartOrderLine"
+            },
+            "description": "One entry per cart item."
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartOrderPayment"
+            },
+            "description": "The order's payments. When you send `\"payment_gateway\": \"PIS\"` or leave `payment_gateway` out, this holds one `PIS` payment with `status` `awaiting`."
+          },
+          "external_reference_order_id": {
+            "description": "`null` on an order made from a cart."
+          },
+          "external_reference_store_id": {
+            "description": "`null` on an order made from a cart."
+          },
+          "external_reference_order_no": {
+            "description": "`null` on an order made from a cart."
+          },
+          "external_reference_status": {
+            "description": "`null` on an order made from a cart."
+          },
+          "external_reference_url": {
+            "description": "`null` on an order made from a cart."
+          },
+          "customer_po_number": {
+            "type": "string"
+          },
+          "payment_term": {
+            "type": "string"
+          },
+          "fulfillment_mode": {
+            "type": "string"
+          },
+          "fulfillment_term": {
+            "type": "string"
+          },
+          "invoice_mode": {
+            "type": "string"
+          },
+          "billing_address": {
+            "$ref": "#/components/schemas/CartOrderAddress"
+          },
+          "shipping_address": {
+            "$ref": "#/components/schemas/CartOrderAddress"
+          },
+          "custom_fields": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "CartOrderCustomer": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "customer_group": {
+            "type": "string"
+          },
+          "gender": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "The customer's `customer_id`: the number [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) takes."
+          },
+          "internal_id": {
+            "type": "integer",
+            "description": "The customer's `internal_id`: the number [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes."
+          },
+          "email": {
+            "type": "string"
+          },
+          "address_line_1": {
+            "type": "string"
+          },
+          "address_line_2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CartReference"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CartReference"
+          },
+          "post_code": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "fax": {
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          }
+        }
+      },
+      "CartOrderLine": {
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "integer"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "The product's `id`, as in the cart item's `product.id`."
+          },
+          "sku": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "The cart item's `quantity`."
+          },
+          "price": {
+            "type": "number"
+          },
+          "total_amount": {
+            "type": "number"
+          },
+          "tax": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "tax_discount": {
+            "type": "number"
+          },
+          "is_taxable": {
+            "type": "boolean"
+          },
+          "is_shippable": {
+            "type": "boolean"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "variations": {
+            "type": "array",
+            "items": {}
+          },
+          "serial_batch_number": {
+            "type": "string"
+          }
+        }
+      },
+      "CartOrderPayment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The payment's `id`."
+          },
+          "status": {
+            "type": "string",
+            "description": "`awaiting` on a new `PIS` payment."
+          },
+          "amount": {
+            "type": "number"
+          },
+          "payment_method": {
+            "type": "string",
+            "description": "`PIS` when you send `\"payment_gateway\": \"PIS\"` or leave `payment_gateway` out."
+          },
+          "track_info": {
+            "type": "string"
+          },
+          "gateway_name": {
+            "type": "string"
+          },
+          "gateway_code": {
+            "type": "string",
+            "description": "`PIS` when you send `\"payment_gateway\": \"PIS\"` or leave `payment_gateway` out."
+          },
+          "gateway_response": {
+            "type": "string"
+          },
+          "payer_info": {
+            "type": "string"
+          },
+          "paying_date": {
+            "type": "string"
+          },
+          "transaction_date": {
+            "type": "string"
+          },
+          "transaction_reference": {
+            "type": "string"
+          }
+        }
+      },
+      "CartOrderAddress": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The address's `id`."
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "address_line_1": {
+            "type": "string"
+          },
+          "address_line_2": {
+            "type": "string"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CartReference"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CartReference"
+          },
+          "city": {
+            "type": "string"
+          },
+          "post_code": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "fax": {
+            "type": "string"
+          }
+        },
+        "description": "The customer's saved address, unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart): then the address that update sent. Addresses you send to [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) never appear here."
+      },
+      "CartReference": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's or state's `id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Such as `Australia`."
+          },
+          "code": {
+            "type": "string",
+            "description": "Such as `AU`."
+          }
+        },
+        "description": "A country or a state. A state is `{}` when the address has none."
+      },
+      "CartError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `internal_error`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Your shopping cart is empty`. Some messages start with `f:`, such as `f:cart item not found`."
+              },
+              "details": {
+                "type": "array",
+                "items": {},
+                "description": "An empty list."
               },
               "request_id": {
                 "type": "string",

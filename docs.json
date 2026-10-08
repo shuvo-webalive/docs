@@ -434,6 +434,21 @@
             ]
           },
           {
+            "group": "Carts",
+            "icon": "cart-shopping",
+            "expanded": false,
+            "pages": [
+              "carts",
+              "api-reference/carts/add-a-product-to-a-cart",
+              "api-reference/carts/retrieve-a-cart",
+              "api-reference/carts/resolve-a-cart-session",
+              "api-reference/carts/update-a-cart-item",
+              "api-reference/carts/empty-a-cart",
+              "api-reference/carts/remove-an-item-from-a-cart",
+              "api-reference/carts/create-an-order-from-a-cart"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
