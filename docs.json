@@ -434,6 +434,38 @@
             ]
           },
           {
+            "group": "Orders",
+            "icon": "receipt",
+            "expanded": false,
+            "pages": [
+              "orders",
+              "api-reference/orders/list-orders",
+              "api-reference/orders/count-orders",
+              "api-reference/orders/create-an-order",
+              "api-reference/orders/create-an-order-with-a-payment",
+              "api-reference/orders/retrieve-an-order",
+              "api-reference/orders/update-an-order",
+              "api-reference/orders/update-selected-order-fields",
+              "api-reference/orders/delete-an-order",
+              "api-reference/orders/update-an-orders-addresses",
+              "api-reference/orders/cancel-an-order",
+              "api-reference/orders/list-an-orders-comments",
+              "api-reference/orders/add-a-comment-to-an-order",
+              "api-reference/orders/retrieve-an-orders-custom-fields",
+              "api-reference/orders/record-a-payment-on-an-order",
+              "api-reference/orders/refund-an-order",
+              "api-reference/orders/refund-a-payment",
+              "api-reference/orders/send-an-orders-invoice",
+              "api-reference/orders/retrieve-an-orders-shipment-status",
+              "api-reference/orders/list-an-orders-shipments",
+              "api-reference/orders/create-a-shipment",
+              "api-reference/orders/update-a-shipment",
+              "api-reference/orders/change-an-orders-status",
+              "api-reference/orders/add-a-custom-order-status",
+              "api-reference/orders/list-a-customers-orders"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

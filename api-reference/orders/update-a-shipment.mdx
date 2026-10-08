@@ -1,0 +1,9 @@
+---
+title: "Update a shipment"
+description: "Changes the shipment fields you send and returns the shipment."
+openapi: "PATCH /admin/orders/{order_id}/shipments/{shipment_id}"
+---
+
+Send any of `method`, `tracking_info`, `shipping_date` and `shipment_items`; only those fields change. `shipment_items` needs a `change_note`, or the call is rejected with `400`, and the note is not saved as an order comment. Changing `shipment_items` changes `shipped_quantity`, and the order's `shipping_status` becomes `shipped` once every unit has shipped.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

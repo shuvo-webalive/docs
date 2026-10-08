@@ -1,0 +1,102 @@
+{
+  "sdk": "dart",
+  "module": "orders",
+  "endpoints": {
+    "list_orders": {
+      "function": "listOrders",
+      "code": "final response = await client.orders.listOrders(queryParams: {\n  'order_status': 'in_progress',\n  'payment_status': 'unpaid',\n  'limit': 10,\n});\nfinal result = response.map as Map;\nfor (final order in result['orders'] as List) {\n  final totals = (order as Map)['charges_totals'] as Map;\n  print('${order['order_id']} ${totals['grand_total']} ${totals['due']}');\n}\nfinal pagination = result['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
+    "count_orders": {
+      "function": "countOrders",
+      "code": "final response = await client.orders\n    .countOrders(queryParams: {'customerId': 88, 'payment_status': 'unpaid'});\nfinal orders = (response.map as Map)['orders'] as Map;\nprint(orders['count']);"
+    },
+    "create_order": {
+      "function": "createOrder",
+      "code": "final address = {\n  'first_name': 'Jane',\n  'last_name': 'Doe',\n  'email': 'jane.doe@example.com',\n  'address_line_1': '1 Example Street',\n  'address_line_2': 'Level 2',\n  'city': 'Melbourne',\n  'post_code': '3000',\n  'phone': '0300000000',\n  'mobile': '0400000000',\n  'country_code': 'AU',\n  'state_code': 'VIC',\n};\nfinal response = await client.orders.createOrder({\n  'customer_id': 512,\n  'payment_gateway': 'PIS',\n  'delivery_type': 'shipping',\n  'is_send_email': false,\n  'transaction_no': 'TXN-ORDER-0001',\n  'billing_address': address,\n  'shipping_address': address,\n  'products': [\n    {'product_id': 101, 'quantity': 1},\n    {'product_id': 102, 'quantity': 1},\n  ],\n});\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['internal_id']}');\nprint('${order['order_status']} ${order['grand_total']}');"
+    },
+    "create_order_with_payment": {
+      "function": "createOrderWithPayment",
+      "code": "final address = {\n  'first_name': 'Jane',\n  'last_name': 'Doe',\n  'email': 'jane.doe@example.com',\n  'address_line_1': '1 Example Street',\n  'address_line_2': 'Level 2',\n  'city': 'Melbourne',\n  'post_code': '3000',\n  'phone': '0300000000',\n  'mobile': '0400000000',\n  'country_code': 'AU',\n  'state_code': 'VIC',\n};\nfinal response = await client.orders.createOrderWithPayment({\n  'customer_id': 512,\n  'payment_gateway': 'PIS',\n  'delivery_type': 'shipping',\n  'billing_address': address,\n  'shipping_address': address,\n  'products': [\n    {'product_id': 101, 'quantity': 1},\n    {'product_id': 102, 'quantity': 1},\n  ],\n  'payment': {\n    'amount': 20.0,\n    'status': 'success',\n    'payment_method': 'manual',\n    'track_info': 'Paid at the counter',\n  },\n});\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['payment_status']}');\nprint('${order['paid']} ${order['due']}');"
+    },
+    "get_order": {
+      "function": "getOrder",
+      "code": "final response = await client.orders.getOrder(1043);\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['internal_id']}');\nprint('${order['order_status']} ${order['payment_status']}');\nfinal totals = order['charges_totals'] as Map;\nprint('${totals['grand_total']} ${totals['paid']} ${totals['due']}');"
+    },
+    "update_order": {
+      "function": "updateOrder",
+      "code": "final response = await client.orders.updateOrder(1043, {\n  'order': {\n    'billing_address': {\n      'first_name': 'Jane',\n      'last_name': 'Doe',\n      'email': 'jane.doe@example.com',\n      'address_line_1': '10 Example Street',\n      'address_line_2': 'Level 2',\n      'city': 'Melbourne',\n      'post_code': '3000',\n      'phone': '0300000000',\n      'mobile': '0400000000',\n      'country_code': 'AU',\n      'state_code': 'VIC',\n    },\n  },\n});\nfinal order = (response.map as Map)['order'] as Map;\nfinal billing = order['billing_address'] as Map;\nprint('${billing['address_line_1']} ${billing['city']}');"
+    },
+    "patch_order": {
+      "function": "patchOrder",
+      "code": "final response = await client.orders.patchOrder(1043, {\n  'order': {'customer_po_number': 'PO-0001', 'payment_term': 'NET30'},\n});\nfinal order = (response.map as Map)['order'] as Map;\nfinal fulfillment = order['fulfillment'] as Map;\nprint('${fulfillment['customer_po_number']} ${fulfillment['payment_term']}');"
+    },
+    "delete_order": {
+      "function": "deleteOrder",
+      "code": "final response = await client.orders.deleteOrder(1043);\nfinal result = response.map as Map;\nprint('${result['status']} ${result['order_id']}');"
+    },
+    "update_order_addresses": {
+      "function": "updateOrderAddresses",
+      "code": "final response = await client.orders.updateOrderAddresses(1043, {\n  'transaction_no': 'TXN-ADDR-0001',\n  'shipping_address': {\n    'first_name': 'Jane',\n    'last_name': 'Doe',\n    'email': 'jane.doe@example.com',\n    'address_line_1': '10 Example Street',\n    'address_line_2': 'Level 2',\n    'city': 'Melbourne',\n    'post_code': '3000',\n    'phone': '0300000000',\n    'mobile': '0400000000',\n    'country_code': 'AU',\n    'state_code': 'VIC',\n  },\n});\nfinal shipping = (response.map as Map)['shipping_address'] as Map;\nprint('${shipping['address_line_1']} ${shipping['city']}');"
+    },
+    "cancel_order": {
+      "function": "cancelOrder",
+      "code": "final response = await client.orders.cancelOrder(1043, payload: {\n  'reason': 'Customer asked to cancel',\n  'refund_automatically': false,\n  'is_gateway_refund': false,\n});\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['order_status']}');"
+    },
+    "list_order_comments": {
+      "function": "listOrderComments",
+      "code": "final response = await client.orders.listOrderComments(1043);\nfinal comments = (response.map as Map)['comments'] as List;\nfor (final comment in comments) {\n  print('${(comment as Map)['id']} ${comment['content']}');\n}"
+    },
+    "create_order_comment": {
+      "function": "createOrderComment",
+      "code": "final response = await client.orders.createOrderComment(1043, {\n  'content': 'Called to confirm the address.',\n  'save_and_send': false,\n});\nfinal comment = (response.map as Map)['comment'] as Map;\nprint('${comment['id']} ${comment['created']}');"
+    },
+    "get_order_custom_fields": {
+      "function": "getOrderCustomFields",
+      "code": "final response = await client.orders.getOrderCustomFields(2187);\nfinal result = response.map as Map;\nprint('${result['order_id']} ${result['custom_fields']}');"
+    },
+    "create_order_payment": {
+      "function": "createOrderPayment",
+      "code": "final response = await client.orders.createOrderPayment(1043, {\n  'transaction_no': 'TXN-PAY-0001',\n  'payment': {\n    'amount': 20.0,\n    'payment_method': 'manual',\n    'payment_status': 'success',\n    'track_info': 'Bank transfer',\n    'payer_info': 'Jane Doe',\n    'transaction_date': '2026-10-07T09:30:00Z',\n    'transaction_reference': 'BT-0001',\n    'surcharge': 0.0,\n  },\n});\nfinal payment = (response.map as Map)['payment'] as Map;\nprint('${payment['id']} ${payment['paid_amount']} ${payment['due_amount']}');"
+    },
+    "create_order_refund": {
+      "function": "createOrderRefund",
+      "code": "final response = await client.orders.createOrderRefund(1043, {\n  'refund': {\n    'amount': '3.00',\n    'refund_date': '2026-10-07T14:00:00Z',\n    'reason': 'One item returned',\n    'line_items': [\n      {'order_item_id': 3302, 'quantity': 1, 'amount': 3.0},\n    ],\n  },\n});\nfinal result = response.map as Map;\nprint('${result['status']} ${result['refund_id']} ${result['amount']}');"
+    },
+    "create_payment_refund": {
+      "function": "createPaymentRefund",
+      "code": "final response = await client.orders.createPaymentRefund(\n  7712,\n  {\n    'transaction_no': 'TXN-PREF-0001',\n    'refund': {\n      'amount': '5.00',\n      'reason': 'Damaged item',\n      'is_gateway_refund': false,\n      'send_refund_email': false,\n      'adjust_with_order': false,\n    },\n  },\n  'refund-0001',\n);\nfinal result = response.map as Map;\nprint('${result['refund_id']} ${result['amount']}');\nprint(result['available_for_refund']);"
+    },
+    "send_order_invoice": {
+      "function": "sendOrderInvoice",
+      "code": "final response = await client.orders.sendOrderInvoice(2187);\nfinal result = response.map as Map;\nprint('${result['status']} ${result['sent_to']} ${result['sent_at']}');"
+    },
+    "get_order_shipment_status": {
+      "function": "getOrderShipmentStatus",
+      "code": "final response = await client.orders.getOrderShipmentStatus(1043);\nfinal result = response.map as Map;\nprint(result['shipment_status']);\nfor (final shipment in result['shipments_info'] as List) {\n  final info = shipment as Map;\n  print('${info['shipping_provider']} ${info['tracking_number']}');\n}"
+    },
+    "list_order_shipments": {
+      "function": "listOrderShipments",
+      "code": "final response = await client.orders.listOrderShipments(1043);\nfor (final shipment in (response.map as Map)['shipments'] as List) {\n  print('${(shipment as Map)['shipping_id']} ${shipment['tracking_number']}');\n  for (final item in shipment['items'] as List) {\n    print('${(item as Map)['product_sku']} ${item['shipped_quantity']}');\n  }\n}"
+    },
+    "create_order_shipment": {
+      "function": "createOrderShipment",
+      "code": "final response = await client.orders.createOrderShipment(1043, {\n  'transaction_no': 'TXN-SHIP-0001',\n  'method': 'Example Courier',\n  'tracking_info': 'TRACK-0001',\n  'shipping_date': '2026-10-08T08:00:00',\n  'shipment_items': [\n    {'order_item_id': 3301, 'quantity': 1},\n  ],\n});\nfinal shipment = (response.map as Map)['shipment'] as Map;\nprint('${shipment['shipping_id']} ${shipment['tracking_number']}');"
+    },
+    "update_order_shipment": {
+      "function": "updateOrderShipment",
+      "code": "final response = await client.orders\n    .updateOrderShipment(1043, 905, {'tracking_info': 'TRACK-0002'});\nfinal shipment = (response.map as Map)['shipment'] as Map;\nprint('${shipment['shipping_id']} ${shipment['tracking_number']}');"
+    },
+    "update_order_status": {
+      "function": "updateOrderStatus",
+      "code": "final response = await client.orders.updateOrderStatus(1043, {\n  'status': 'paused',\n  'refund_automatically': false,\n});\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['order_status']}');"
+    },
+    "create_order_status": {
+      "function": "createOrderStatus",
+      "code": "final response = await client.orders.createOrderStatus({\n  'order_id': 1043,\n  'order_status_value': 'ready_for_pickup',\n  'order_status_label': 'Ready For Pickup',\n  'order_type': 'Order',\n  'status_type': 'custom',\n});\nprint((response.map as Map)['success']);"
+    },
+    "list_customer_orders": {
+      "function": "listCustomerOrders",
+      "code": "final response = await client.orders.listCustomerOrders(512);\nfinal result = response.map as Map;\nprint('${result['customer_id']} ${result['internal_id']}');\nfor (final order in result['orders'] as List) {\n  print('${(order as Map)['order_id']} ${order['order_status']}');\n}"
+    }
+  }
+}

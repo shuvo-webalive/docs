@@ -1,0 +1,9 @@
+---
+title: "Record a payment on an order"
+description: "Records a payment on an order and returns a receipt whose `id` is the payment's `payment_id`."
+openapi: "POST /admin/orders/{order_id}/payments"
+---
+
+Wrap the payment in `payment`, with `transaction_no` beside the wrapper if you send it; `payment_method` is required. The receipt's `id` is the `payment_id` that [Refund a payment](/api-reference/orders/refund-a-payment) takes. The order's `paid` rises by the amount, a payment for part of the total sets `payment_status` to `partial`, and the `awaiting` payment an order created with `PIS` starts with stays in the order's `payments` beside the new payment. `transaction_date` and `transaction_reference` are returned as you sent them.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

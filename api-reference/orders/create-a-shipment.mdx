@@ -1,0 +1,9 @@
+---
+title: "Create a shipment"
+description: "Ships units of an order's lines and returns the new shipment with its `shipping_id`."
+openapi: "POST /admin/orders/{order_id}/shipments"
+---
+
+Send `method`, `shipping_date` and `shipment_items` at the top level of the body; `tracking_info` is optional. The response returns `method` as `shipping_method`, `shipping_date` as `date_created` and `tracking_info` as `tracking_number`, which is `null` when you leave `tracking_info` out, and each line shows `shipped_quantity` beside `order_quantity`. The order's `shipping_status` moves to `partial`, and to `shipped` once every unit has shipped, and the first shipment's method becomes `shipping.shipping_type`. Shipping a product that tracks its stock lowers that stock by the units shipped.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

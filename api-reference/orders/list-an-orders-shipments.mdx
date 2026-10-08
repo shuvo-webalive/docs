@@ -1,0 +1,9 @@
+---
+title: "List an order's shipments"
+description: "Returns all of an order's shipments in one list."
+openapi: "GET /admin/orders/{order_id}/shipments"
+---
+
+Returns every shipment of the order under `shipments`, without paging; an order with none returns `"shipments": []`. Each shipment matches the response to [Create a shipment](/api-reference/orders/create-a-shipment), and its `shipping_id` is the `shipment_id` that [Update a shipment](/api-reference/orders/update-a-shipment) takes.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

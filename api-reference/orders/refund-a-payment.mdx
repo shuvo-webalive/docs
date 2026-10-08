@@ -1,0 +1,9 @@
+---
+title: "Refund a payment"
+description: "Refunds an amount from a payment, lowering the order's `paid`. Needs an `Idempotency-Key` header."
+openapi: "POST /admin/payment/{payment_id}/refunds"
+---
+
+Send an `Idempotency-Key` header with a value you choose, and the refund wrapped in `refund`, with `transaction_no` beside the wrapper if you send it. The refund lowers the order's `paid` and raises `refunded`; after a partial refund, the order's `refund_status` and the payment's `status` in the order's `payments` show `partial`. Sending the same key again returns the first refund again, with `idempotent_replay` set to `true`, and refunds nothing more. In the response, `order_id` holds the order's `internal_id` and `order_no` holds its `order_id`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
