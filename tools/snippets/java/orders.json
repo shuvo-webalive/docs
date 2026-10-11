@@ -1,0 +1,102 @@
+{
+  "sdk": "java",
+  "module": "orders",
+  "endpoints": {
+    "list_orders": {
+      "function": "listOrders",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().listOrders(\n        Map.of(\"order_status\", \"in_progress\", \"payment_status\", \"unpaid\", \"limit\", 10));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"orders\")) {\n    Map<?, ?> order = (Map<?, ?>) row;\n    Map<?, ?> totals = (Map<?, ?>) order.get(\"charges_totals\");\n    System.out.println(order.get(\"order_id\") + \" \" + order.get(\"internal_id\") + \" \"\n            + order.get(\"order_status\") + \" \" + totals.get(\"grand_total\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));"
+    },
+    "count_orders": {
+      "function": "countOrders",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().countOrders(Map.of(\"customerId\", 88, \"payment_status\", \"unpaid\"));\nMap<?, ?> orders = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"orders\");\nSystem.out.println(orders.get(\"count\"));"
+    },
+    "create_order": {
+      "function": "createOrder",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Jane\"), entry(\"last_name\", \"Doe\"),\n        entry(\"email\", \"jane.doe@example.com\"), entry(\"phone\", \"0300000000\"), entry(\"mobile\", \"0400000000\"),\n        entry(\"address_line_1\", \"1 Example Street\"), entry(\"address_line_2\", \"Level 2\"), entry(\"city\", \"Melbourne\"),\n        entry(\"post_code\", \"3000\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"VIC\"));\nApiResponse response = client.orders().createOrder(Map.of(\n        \"customer_id\", 512, \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"is_send_email\", false,\n        \"transaction_no\", \"TXN-ORDER-0001\", \"billing_address\", address, \"shipping_address\", address,\n        \"products\", List.of(Map.of(\"product_id\", 101, \"quantity\", 1), Map.of(\"product_id\", 102, \"quantity\", 1))));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"internal_id\") + \" \"\n        + order.get(\"order_status\") + \" \" + order.get(\"grand_total\"));"
+    },
+    "create_order_with_payment": {
+      "function": "createOrderWithPayment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Jane\"), entry(\"last_name\", \"Doe\"),\n        entry(\"email\", \"jane.doe@example.com\"), entry(\"phone\", \"0300000000\"), entry(\"mobile\", \"0400000000\"),\n        entry(\"address_line_1\", \"1 Example Street\"), entry(\"address_line_2\", \"Level 2\"), entry(\"city\", \"Melbourne\"),\n        entry(\"post_code\", \"3000\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"VIC\"));\nApiResponse response = client.orders().createOrderWithPayment(Map.of(\"customer_id\", 512, \"payment_gateway\", \"PIS\",\n        \"delivery_type\", \"shipping\", \"billing_address\", address, \"shipping_address\", address,\n        \"products\", List.of(Map.of(\"product_id\", 101, \"quantity\", 1), Map.of(\"product_id\", 102, \"quantity\", 1)),\n        \"payment\", Map.of(\"amount\", 20.0, \"status\", \"success\", \"payment_method\", \"manual\",\n                \"track_info\", \"Paid at the counter\")));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"payment_status\") + \" \"\n        + order.get(\"paid\") + \" \" + order.get(\"due\"));"
+    },
+    "get_order": {
+      "function": "getOrder",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().getOrder(1043);\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"internal_id\") + \" \"\n        + order.get(\"order_status\") + \" \" + order.get(\"payment_status\"));\nMap<?, ?> totals = (Map<?, ?>) order.get(\"charges_totals\");\nSystem.out.println(totals.get(\"grand_total\") + \" \" + totals.get(\"paid\") + \" \" + totals.get(\"due\"));"
+    },
+    "update_order": {
+      "function": "updateOrder",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Jane\"), entry(\"last_name\", \"Doe\"),\n        entry(\"email\", \"jane.doe@example.com\"), entry(\"phone\", \"0300000000\"), entry(\"mobile\", \"0400000000\"),\n        entry(\"address_line_1\", \"10 Example Street\"), entry(\"address_line_2\", \"Level 2\"), entry(\"city\", \"Melbourne\"),\n        entry(\"post_code\", \"3000\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"VIC\"));\nApiResponse response = client.orders().updateOrder(1043, Map.of(\"order\", Map.of(\"billing_address\", address)));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nMap<?, ?> billing = (Map<?, ?>) order.get(\"billing_address\");\nSystem.out.println(billing.get(\"address_line_1\") + \" \" + billing.get(\"city\") + \" \"\n        + ((Map<?, ?>) billing.get(\"country\")).get(\"code\") + \" \" + ((Map<?, ?>) billing.get(\"state\")).get(\"code\"));"
+    },
+    "patch_order": {
+      "function": "patchOrder",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().patchOrder(1043,\n        Map.of(\"order\", Map.of(\"customer_po_number\", \"PO-0001\", \"payment_term\", \"NET30\")));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nMap<?, ?> fulfillment = (Map<?, ?>) order.get(\"fulfillment\");\nSystem.out.println(fulfillment.get(\"customer_po_number\") + \" \" + fulfillment.get(\"payment_term\"));"
+    },
+    "delete_order": {
+      "function": "deleteOrder",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().deleteOrder(1043);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"order_id\"));"
+    },
+    "update_order_addresses": {
+      "function": "updateOrderAddresses",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Jane\"), entry(\"last_name\", \"Doe\"),\n        entry(\"email\", \"jane.doe@example.com\"), entry(\"phone\", \"0300000000\"), entry(\"mobile\", \"0400000000\"),\n        entry(\"address_line_1\", \"10 Example Street\"), entry(\"address_line_2\", \"Level 2\"), entry(\"city\", \"Melbourne\"),\n        entry(\"post_code\", \"3000\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"VIC\"));\nApiResponse response = client.orders().updateOrderAddresses(1043,\n        Map.of(\"transaction_no\", \"TXN-ADDR-0001\", \"shipping_address\", address));\nMap<?, ?> shipping = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_address\");\nSystem.out.println(shipping.get(\"address_line_1\") + \" \" + shipping.get(\"city\") + \" \" + shipping.get(\"post_code\"));"
+    },
+    "cancel_order": {
+      "function": "cancelOrder",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().cancelOrder(1043, Map.of(\n        \"reason\", \"Customer asked to cancel\", \"refund_automatically\", false, \"is_gateway_refund\", false));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"order_status\"));"
+    },
+    "list_order_comments": {
+      "function": "listOrderComments",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().listOrderComments(1043);\nfor (Object row : (List<?>) ((Map<?, ?>) response.getMap()).get(\"comments\")) {\n    Map<?, ?> comment = (Map<?, ?>) row;\n    System.out.println(comment.get(\"id\") + \" \" + comment.get(\"created\") + \" \" + comment.get(\"content\"));\n}"
+    },
+    "create_order_comment": {
+      "function": "createOrderComment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderComment(1043,\n        Map.of(\"content\", \"Called to confirm the address.\", \"save_and_send\", false));\nMap<?, ?> comment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"comment\");\nSystem.out.println(comment.get(\"id\") + \" \" + comment.get(\"visible_to_customer\") + \" \" + comment.get(\"created\"));"
+    },
+    "get_order_custom_fields": {
+      "function": "getOrderCustomFields",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().getOrderCustomFields(2187);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"order_id\") + \" \" + body.get(\"custom_fields\"));"
+    },
+    "create_order_payment": {
+      "function": "createOrderPayment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderPayment(1043, Map.of(\n        \"transaction_no\", \"TXN-PAY-0001\",\n        \"payment\", Map.of(\"amount\", 20.0, \"payment_method\", \"manual\", \"payment_status\", \"success\",\n                \"track_info\", \"Bank transfer\", \"payer_info\", \"Jane Doe\", \"transaction_date\", \"2026-10-07T09:30:00Z\",\n                \"transaction_reference\", \"BT-0001\", \"surcharge\", 0.0)));\nMap<?, ?> payment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment\");\nSystem.out.println(payment.get(\"id\") + \" \" + payment.get(\"paid_amount\") + \" \" + payment.get(\"due_amount\"));"
+    },
+    "create_order_refund": {
+      "function": "createOrderRefund",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderRefund(1043, Map.of(\"refund\", Map.of(\n        \"amount\", \"3.00\", \"refund_date\", \"2026-10-07T14:00:00Z\", \"reason\", \"One item returned\",\n        \"line_items\", List.of(Map.of(\"order_item_id\", 3302, \"quantity\", 1, \"amount\", 3.0)))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"refund_id\") + \" \" + body.get(\"amount\"));"
+    },
+    "create_payment_refund": {
+      "function": "createPaymentRefund",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().createPaymentRefund(7712, Map.of(\n        \"transaction_no\", \"TXN-PREF-0001\",\n        \"refund\", Map.of(\"amount\", \"5.00\", \"reason\", \"Damaged item\", \"is_gateway_refund\", false,\n                \"send_refund_email\", false, \"adjust_with_order\", false)), \"refund-0001\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"refund_id\") + \" \" + body.get(\"amount\") + \" \" + body.get(\"available_for_refund\"));"
+    },
+    "send_order_invoice": {
+      "function": "sendOrderInvoice",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().sendOrderInvoice(2187);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"sent_to\") + \" \" + body.get(\"sent_at\"));"
+    },
+    "get_order_shipment_status": {
+      "function": "getOrderShipmentStatus",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().getOrderShipmentStatus(1043);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"shipment_status\"));\nfor (Object row : (List<?>) body.get(\"shipments_info\")) {\n    Map<?, ?> shipment = (Map<?, ?>) row;\n    System.out.println(shipment.get(\"shipping_provider\") + \" \" + shipment.get(\"tracking_number\") + \" \"\n            + shipment.get(\"last_updated\"));\n}"
+    },
+    "list_order_shipments": {
+      "function": "listOrderShipments",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().listOrderShipments(1043);\nfor (Object row : (List<?>) ((Map<?, ?>) response.getMap()).get(\"shipments\")) {\n    Map<?, ?> shipment = (Map<?, ?>) row;\n    System.out.println(shipment.get(\"shipping_id\") + \" \" + shipment.get(\"shipping_method\") + \" \"\n            + shipment.get(\"tracking_number\"));\n    for (Object line : (List<?>) shipment.get(\"items\")) {\n        Map<?, ?> item = (Map<?, ?>) line;\n        System.out.println(item.get(\"product_sku\") + \" \" + item.get(\"shipped_quantity\") + \" \"\n                + item.get(\"order_quantity\"));\n    }\n}"
+    },
+    "create_order_shipment": {
+      "function": "createOrderShipment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderShipment(1043, Map.of(\n        \"transaction_no\", \"TXN-SHIP-0001\", \"method\", \"Example Courier\", \"tracking_info\", \"TRACK-0001\",\n        \"shipping_date\", \"2026-10-08T08:00:00\",\n        \"shipment_items\", List.of(Map.of(\"order_item_id\", 3301, \"quantity\", 1))));\nMap<?, ?> shipment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipment\");\nSystem.out.println(shipment.get(\"shipping_id\") + \" \" + shipment.get(\"shipping_method\") + \" \"\n        + shipment.get(\"tracking_number\"));"
+    },
+    "update_order_shipment": {
+      "function": "updateOrderShipment",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().updateOrderShipment(1043, 905, Map.of(\"tracking_info\", \"TRACK-0002\"));\nMap<?, ?> shipment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipment\");\nSystem.out.println(shipment.get(\"shipping_id\") + \" \" + shipment.get(\"tracking_number\"));"
+    },
+    "update_order_status": {
+      "function": "updateOrderStatus",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().updateOrderStatus(1043,\n        Map.of(\"status\", \"paused\", \"refund_automatically\", false));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"order_status\"));"
+    },
+    "create_order_status": {
+      "function": "createOrderStatus",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderStatus(Map.of(\n        \"order_id\", 1043, \"order_status_value\", \"ready_for_pickup\", \"order_status_label\", \"Ready For Pickup\",\n        \"order_type\", \"Order\", \"status_type\", \"custom\"));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"success\"));"
+    },
+    "list_customer_orders": {
+      "function": "listCustomerOrders",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().listCustomerOrders(512);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"customer_id\") + \" \" + body.get(\"internal_id\"));\nfor (Object row : (List<?>) body.get(\"orders\")) {\n    Map<?, ?> order = (Map<?, ?>) row;\n    System.out.println(order.get(\"order_id\") + \" \" + order.get(\"order_status\") + \" \"\n            + order.get(\"grand_total\") + \" \" + order.get(\"due\"));\n}"
+    }
+  }
+}

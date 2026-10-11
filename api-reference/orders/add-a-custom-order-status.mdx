@@ -1,0 +1,9 @@
+---
+title: "Add a custom order status"
+description: "Adds a custom order status value. No endpoint applies, lists or deletes it."
+openapi: "POST /admin/order/add-order-status"
+---
+
+Send the fields at the top level of the body; the call returns `201` with `{"success": "true"}`, where `true` is text, for a new value and for one you already added. The order keeps its status, and the new value is rejected by [Change an order's status](/api-reference/orders/change-an-orders-status), [Update selected order fields](/api-reference/orders/update-selected-order-fields) and the `order_status` filter of [List orders](/api-reference/orders/list-orders). [Get ecommerce settings](/api-reference/ecommerce-settings/get-ecommerce-settings) does not offer it in `order_filters.default_order_status`, and no endpoint lists or deletes a custom status, so each one stays in the store. A body without `order_id` returns `500`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

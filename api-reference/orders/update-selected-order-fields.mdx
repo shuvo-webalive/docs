@@ -1,0 +1,9 @@
+---
+title: "Update selected order fields"
+description: "Changes the order fields you send: status, addresses, purchase order number or payment term."
+openapi: "PATCH /admin/orders/{order_id}"
+---
+
+Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number` and `payment_term`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number` and `payment_term` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `""`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

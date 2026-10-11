@@ -1,0 +1,9 @@
+---
+title: "Change an order's status"
+description: "Moves an order to another status and returns the order."
+openapi: "PATCH /admin/orders/{order_id}/update-status"
+---
+
+Send `status` with `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`; this call does not read the key `order_status`. Any move is allowed, including out of `completed` or `cancelled`. A custom status from [Add a custom order status](/api-reference/orders/add-a-custom-order-status) is rejected. Returns the order in the flat shape with the new `order_status`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

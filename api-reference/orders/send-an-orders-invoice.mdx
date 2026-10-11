@@ -1,0 +1,9 @@
+---
+title: "Send an order's invoice"
+description: "Emails the invoice of the order whose `internal_id` you pass to its billing email address."
+openapi: "POST /admin/orders/{order_internal_id}/send-invoice"
+---
+
+Pass the order's `internal_id`, not its `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or emails the invoice of the order whose `internal_id` has that number. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,9 @@
+---
+title: "Create an order"
+description: "Creates an order for the products you send and returns it with its `order_id`."
+openapi: "POST /admin/orders"
+---
+
+Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

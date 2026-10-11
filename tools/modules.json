@@ -66,6 +66,7 @@
       "name": "Orders",
       "icon": "receipt",
       "modules": [
+        "orders",
         "order_custom_fields"
       ]
     },

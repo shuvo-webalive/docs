@@ -1,0 +1,9 @@
+---
+title: "Refund an order"
+description: "Records a refund against an order, raising `refunded` and leaving `paid` unchanged."
+openapi: "POST /admin/orders/{order_id}/refunds"
+---
+
+Wrap the refund in `refund`; `refund_date` is required, `line_items` is optional, and you send `amount` as text, such as `"3.00"`. The order's `charges_totals.refunded` rises by the amount and `paid` does not change. An `amount` greater than what was paid less earlier refunds is rejected with `400` and the reason `exceeds_paid`. To lower `paid` as well, use [Refund a payment](/api-reference/orders/refund-a-payment).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

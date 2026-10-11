@@ -1,0 +1,9 @@
+---
+title: "Retrieve an order's shipment status"
+description: "Returns how far an order has shipped, with tracking details for each shipment."
+openapi: "GET /admin/orders/{order_id}/shipment-status"
+---
+
+Returns the order's `shipment_status` and, in `shipments_info`, one entry per shipment with its `shipping_provider`, `tracking_number` and `last_updated`. `shipment_status` is `unshipped` before the first shipment, `partial` while some units are still to ship, and `shipped` once every unit has shipped. Before the first shipment, [Retrieve an order](/api-reference/orders/retrieve-an-order) shows `shipping_status` as `not_shipped`, while this call returns `unshipped`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

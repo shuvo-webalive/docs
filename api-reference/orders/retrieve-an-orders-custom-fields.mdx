@@ -1,0 +1,9 @@
+---
+title: "Retrieve an order's custom fields"
+description: "Returns the custom field values of the order whose `internal_id` you pass."
+openapi: "GET /admin/orders/{order_internal_id}/custom_fields"
+---
+
+Pass the order's `internal_id`, not its `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or the custom fields of the order whose `internal_id` has that number. The response's `order_id` field holds the `internal_id` you passed, and `custom_fields` lists the order's custom field values. An order with `delivery_type` `delivery` also returns `delivery_cost`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

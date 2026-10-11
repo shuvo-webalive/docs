@@ -1,0 +1,9 @@
+---
+title: "Cancel an order"
+description: "Cancels an order and returns it with `order_status` set to `cancelled`."
+openapi: "POST /admin/orders/{order_id}/cancel"
+---
+
+Cancels the order and returns it in the flat shape with `order_status` set to `cancelled`; the body is optional, and a request with no body or `{}` cancels too. A cancelled order no longer appears in [Count orders](/api-reference/orders/count-orders) or [List a customer's orders](/api-reference/orders/list-a-customers-orders), or in [List orders](/api-reference/orders/list-orders) unless you send `order_status=cancelled`. You can cancel a completed order, and [Change an order's status](/api-reference/orders/change-an-orders-status) can move a cancelled order back. Cancelling an order that is already cancelled is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

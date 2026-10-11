@@ -1,0 +1,102 @@
+{
+  "sdk": "python",
+  "module": "orders",
+  "endpoints": {
+    "list_orders": {
+      "function": "list_orders",
+      "code": "response = client.orders.list_orders(\n    {\"order_status\": \"in_progress\", \"payment_status\": \"unpaid\", \"limit\": 10}\n)\nfor order in response.map[\"orders\"]:\n    print(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"charges_totals\"][\"grand_total\"])\npagination = response.map[\"pagination\"]\nprint(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "count_orders": {
+      "function": "count_orders",
+      "code": "response = client.orders.count_orders({\"customerId\": 88, \"payment_status\": \"unpaid\"})\nprint(response.map[\"orders\"][\"count\"])\n"
+    },
+    "create_order": {
+      "function": "create_order",
+      "code": "address = {\n    \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n    \"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n    \"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresponse = client.orders.create_order({\n    \"customer_id\": 512, \"payment_gateway\": \"PIS\", \"delivery_type\": \"shipping\", \"is_send_email\": False,\n    \"transaction_no\": \"TXN-ORDER-0001\", \"billing_address\": address, \"shipping_address\": address,\n    \"products\": [{\"product_id\": 101, \"quantity\": 1}, {\"product_id\": 102, \"quantity\": 1}],\n})\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"grand_total\"])\n"
+    },
+    "create_order_with_payment": {
+      "function": "create_order_with_payment",
+      "code": "address = {\n    \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n    \"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n    \"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresponse = client.orders.create_order_with_payment({\n    \"customer_id\": 512, \"payment_gateway\": \"PIS\", \"delivery_type\": \"shipping\", \"billing_address\": address,\n    \"shipping_address\": address, \"products\": [{\"product_id\": 101, \"quantity\": 1}, {\"product_id\": 102, \"quantity\": 1}],\n    \"payment\": {\"amount\": 20.0, \"status\": \"success\", \"payment_method\": \"manual\", \"track_info\": \"Paid at the counter\"},\n})\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"payment_status\"], order[\"paid\"], order[\"due\"])\n"
+    },
+    "get_order": {
+      "function": "get_order",
+      "code": "response = client.orders.get_order(1043)\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"payment_status\"])\ntotals = order[\"charges_totals\"]\nprint(totals[\"grand_total\"], totals[\"paid\"], totals[\"due\"])\n"
+    },
+    "update_order": {
+      "function": "update_order",
+      "code": "response = client.orders.update_order(1043, {\"order\": {\"billing_address\": {\n    \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"10 Example Street\",\n    \"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n    \"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}}})\nbilling = response.map[\"order\"][\"billing_address\"]\nprint(billing[\"address_line_1\"], billing[\"city\"], billing[\"country\"][\"code\"], billing[\"state\"][\"code\"])\n"
+    },
+    "patch_order": {
+      "function": "patch_order",
+      "code": "response = client.orders.patch_order(\n    1043, {\"order\": {\"customer_po_number\": \"PO-0001\", \"payment_term\": \"NET30\"}}\n)\nfulfillment = response.map[\"order\"][\"fulfillment\"]\nprint(fulfillment[\"customer_po_number\"], fulfillment[\"payment_term\"])\n"
+    },
+    "delete_order": {
+      "function": "delete_order",
+      "code": "response = client.orders.delete_order(1043)\nprint(response.map[\"status\"], response.map[\"order_id\"])\n"
+    },
+    "update_order_addresses": {
+      "function": "update_order_addresses",
+      "code": "response = client.orders.update_order_addresses(1043, {\n    \"transaction_no\": \"TXN-ADDR-0001\",\n    \"shipping_address\": {\n        \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"10 Example Street\",\n        \"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n        \"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n    },\n})\nshipping = response.map[\"shipping_address\"]\nprint(shipping[\"address_line_1\"], shipping[\"city\"], shipping[\"post_code\"])\n"
+    },
+    "cancel_order": {
+      "function": "cancel_order",
+      "code": "response = client.orders.cancel_order(1043, {\n    \"reason\": \"Customer asked to cancel\",\n    \"refund_automatically\": False,\n    \"is_gateway_refund\": False,\n})\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"order_status\"])\n"
+    },
+    "list_order_comments": {
+      "function": "list_order_comments",
+      "code": "response = client.orders.list_order_comments(1043)\nfor comment in response.map[\"comments\"]:\n    print(comment[\"id\"], comment[\"created\"], comment[\"content\"])\n"
+    },
+    "create_order_comment": {
+      "function": "create_order_comment",
+      "code": "response = client.orders.create_order_comment(1043, {\n    \"content\": \"Called to confirm the address.\",\n    \"save_and_send\": False,\n})\ncomment = response.map[\"comment\"]\nprint(comment[\"id\"], comment[\"visible_to_customer\"], comment[\"created\"])\n"
+    },
+    "get_order_custom_fields": {
+      "function": "get_order_custom_fields",
+      "code": "response = client.orders.get_order_custom_fields(2187)\nprint(response.map[\"order_id\"], response.map[\"custom_fields\"])\n"
+    },
+    "create_order_payment": {
+      "function": "create_order_payment",
+      "code": "response = client.orders.create_order_payment(1043, {\n    \"transaction_no\": \"TXN-PAY-0001\",\n    \"payment\": {\n        \"amount\": 20.0, \"payment_method\": \"manual\", \"payment_status\": \"success\", \"track_info\": \"Bank transfer\",\n        \"payer_info\": \"Jane Doe\", \"transaction_date\": \"2026-10-07T09:30:00Z\", \"transaction_reference\": \"BT-0001\",\n        \"surcharge\": 0.0,\n    },\n})\npayment = response.map[\"payment\"]\nprint(payment[\"id\"], payment[\"paid_amount\"], payment[\"due_amount\"])\n"
+    },
+    "create_order_refund": {
+      "function": "create_order_refund",
+      "code": "response = client.orders.create_order_refund(1043, {\"refund\": {\n    \"amount\": \"3.00\",\n    \"refund_date\": \"2026-10-07T14:00:00Z\",\n    \"reason\": \"One item returned\",\n    \"line_items\": [{\"order_item_id\": 3302, \"quantity\": 1, \"amount\": 3.0}],\n}})\nprint(response.map[\"status\"], response.map[\"refund_id\"], response.map[\"amount\"])\n"
+    },
+    "create_payment_refund": {
+      "function": "create_payment_refund",
+      "code": "response = client.orders.create_payment_refund(7712, {\n    \"transaction_no\": \"TXN-PREF-0001\",\n    \"refund\": {\n        \"amount\": \"5.00\", \"reason\": \"Damaged item\",\n        \"is_gateway_refund\": False, \"send_refund_email\": False, \"adjust_with_order\": False,\n    },\n}, idempotency_key=\"refund-0001\")\nprint(response.map[\"refund_id\"], response.map[\"amount\"], response.map[\"available_for_refund\"])\n"
+    },
+    "send_order_invoice": {
+      "function": "send_order_invoice",
+      "code": "response = client.orders.send_order_invoice(2187)\nprint(response.map[\"status\"], response.map[\"sent_to\"], response.map[\"sent_at\"])\n"
+    },
+    "get_order_shipment_status": {
+      "function": "get_order_shipment_status",
+      "code": "response = client.orders.get_order_shipment_status(1043)\nprint(response.map[\"shipment_status\"])\nfor shipment in response.map[\"shipments_info\"]:\n    print(shipment[\"shipping_provider\"], shipment[\"tracking_number\"], shipment[\"last_updated\"])\n"
+    },
+    "list_order_shipments": {
+      "function": "list_order_shipments",
+      "code": "response = client.orders.list_order_shipments(1043)\nfor shipment in response.map[\"shipments\"]:\n    print(shipment[\"shipping_id\"], shipment[\"shipping_method\"], shipment[\"tracking_number\"])\n    for item in shipment[\"items\"]:\n        print(item[\"product_sku\"], item[\"shipped_quantity\"], item[\"order_quantity\"])\n"
+    },
+    "create_order_shipment": {
+      "function": "create_order_shipment",
+      "code": "response = client.orders.create_order_shipment(1043, {\n    \"transaction_no\": \"TXN-SHIP-0001\",\n    \"method\": \"Example Courier\",\n    \"tracking_info\": \"TRACK-0001\",\n    \"shipping_date\": \"2026-10-08T08:00:00\",\n    \"shipment_items\": [{\"order_item_id\": 3301, \"quantity\": 1}],\n})\nshipment = response.map[\"shipment\"]\nprint(shipment[\"shipping_id\"], shipment[\"shipping_method\"], shipment[\"tracking_number\"])\n"
+    },
+    "update_order_shipment": {
+      "function": "update_order_shipment",
+      "code": "response = client.orders.update_order_shipment(1043, 905, {\"tracking_info\": \"TRACK-0002\"})\nshipment = response.map[\"shipment\"]\nprint(shipment[\"shipping_id\"], shipment[\"tracking_number\"])\n"
+    },
+    "update_order_status": {
+      "function": "update_order_status",
+      "code": "response = client.orders.update_order_status(\n    1043, {\"status\": \"paused\", \"refund_automatically\": False}\n)\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"order_status\"])\n"
+    },
+    "create_order_status": {
+      "function": "create_order_status",
+      "code": "response = client.orders.create_order_status({\n    \"order_id\": 1043,\n    \"order_status_value\": \"ready_for_pickup\",\n    \"order_status_label\": \"Ready For Pickup\",\n    \"order_type\": \"Order\",\n    \"status_type\": \"custom\",\n})\nprint(response.map[\"success\"])\n"
+    },
+    "list_customer_orders": {
+      "function": "list_customer_orders",
+      "code": "response = client.orders.list_customer_orders(512)\nprint(response.map[\"customer_id\"], response.map[\"internal_id\"])\nfor order in response.map[\"orders\"]:\n    print(order[\"order_id\"], order[\"order_status\"], order[\"grand_total\"], order[\"due\"])\n"
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "sdk": "go",
+  "module": "orders",
+  "endpoints": {
+    "list_orders": {
+      "function": "ListOrders",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().ListOrders(ctx, map[string]any{\"order_status\": \"in_progress\", \"payment_status\": \"unpaid\", \"limit\": 10}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"orders\"].([]any) {\n\torder := row.(map[string]any)\n\tfmt.Println(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"charges_totals\"].(map[string]any)[\"grand_total\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "count_orders": {
+      "function": "CountOrders",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CountOrders(ctx, map[string]any{\"customerId\": 88, \"payment_status\": \"unpaid\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"orders\"].(map[string]any)[\"count\"])"
+    },
+    "create_order": {
+      "function": "CreateOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\naddress := map[string]any{\n\t\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n\t\"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n\t\"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresp, err := client.Orders().CreateOrder(ctx, map[string]any{\n\t\"customer_id\":      512,\n\t\"payment_gateway\":  \"PIS\",\n\t\"delivery_type\":    \"shipping\",\n\t\"is_send_email\":    false,\n\t\"transaction_no\":   \"TXN-ORDER-0001\",\n\t\"billing_address\":  address,\n\t\"shipping_address\": address,\n\t\"products\":         []any{map[string]any{\"product_id\": 101, \"quantity\": 1}, map[string]any{\"product_id\": 102, \"quantity\": 1}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"grand_total\"])"
+    },
+    "create_order_with_payment": {
+      "function": "CreateOrderWithPayment",
+      "code": "import (\n\t\"fmt\"\n)\n\naddress := map[string]any{\n\t\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n\t\"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n\t\"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresp, err := client.Orders().CreateOrderWithPayment(ctx, map[string]any{\n\t\"customer_id\":      512,\n\t\"payment_gateway\":  \"PIS\",\n\t\"delivery_type\":    \"shipping\",\n\t\"billing_address\":  address,\n\t\"shipping_address\": address,\n\t\"products\":         []any{map[string]any{\"product_id\": 101, \"quantity\": 1}, map[string]any{\"product_id\": 102, \"quantity\": 1}},\n\t\"payment\":          map[string]any{\"amount\": 20.0, \"status\": \"success\", \"payment_method\": \"manual\", \"track_info\": \"Paid at the counter\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"payment_status\"], order[\"paid\"], order[\"due\"])"
+    },
+    "get_order": {
+      "function": "GetOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().GetOrder(ctx, 1043, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"payment_status\"])\ntotals := order[\"charges_totals\"].(map[string]any)\nfmt.Println(totals[\"grand_total\"], totals[\"paid\"], totals[\"due\"])"
+    },
+    "update_order": {
+      "function": "UpdateOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().UpdateOrder(ctx, 1043, map[string]any{\n\t\"order\": map[string]any{\"billing_address\": map[string]any{\n\t\t\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"10 Example Street\",\n\t\t\"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n\t\t\"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n\t}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbilling := resp.Map().(map[string]any)[\"order\"].(map[string]any)[\"billing_address\"].(map[string]any)\nfmt.Println(billing[\"address_line_1\"], billing[\"city\"], billing[\"country\"].(map[string]any)[\"code\"], billing[\"state\"].(map[string]any)[\"code\"])"
+    },
+    "patch_order": {
+      "function": "PatchOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().PatchOrder(ctx, 1043, map[string]any{\n\t\"order\": map[string]any{\"customer_po_number\": \"PO-0001\", \"payment_term\": \"NET30\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfulfillment := resp.Map().(map[string]any)[\"order\"].(map[string]any)[\"fulfillment\"].(map[string]any)\nfmt.Println(fulfillment[\"customer_po_number\"], fulfillment[\"payment_term\"])"
+    },
+    "delete_order": {
+      "function": "DeleteOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().DeleteOrder(ctx, 1043, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"order_id\"])"
+    },
+    "update_order_addresses": {
+      "function": "UpdateOrderAddresses",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().UpdateOrderAddresses(ctx, 1043, map[string]any{\n\t\"transaction_no\": \"TXN-ADDR-0001\",\n\t\"shipping_address\": map[string]any{\n\t\t\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"10 Example Street\",\n\t\t\"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n\t\t\"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshipping := resp.Map().(map[string]any)[\"shipping_address\"].(map[string]any)\nfmt.Println(shipping[\"address_line_1\"], shipping[\"city\"], shipping[\"post_code\"])"
+    },
+    "cancel_order": {
+      "function": "CancelOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CancelOrder(ctx, 1043, map[string]any{\n\t\"reason\":               \"Customer asked to cancel\",\n\t\"refund_automatically\": false,\n\t\"is_gateway_refund\":    false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"order_status\"])"
+    },
+    "list_order_comments": {
+      "function": "ListOrderComments",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().ListOrderComments(ctx, 1043, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"comments\"].([]any) {\n\tcomment := row.(map[string]any)\n\tfmt.Println(comment[\"id\"], comment[\"created\"], comment[\"content\"])\n}"
+    },
+    "create_order_comment": {
+      "function": "CreateOrderComment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderComment(ctx, 1043, map[string]any{\n\t\"content\":       \"Called to confirm the address.\",\n\t\"save_and_send\": false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncomment := resp.Map().(map[string]any)[\"comment\"].(map[string]any)\nfmt.Println(comment[\"id\"], comment[\"visible_to_customer\"], comment[\"created\"])"
+    },
+    "get_order_custom_fields": {
+      "function": "GetOrderCustomFields",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().GetOrderCustomFields(ctx, 2187, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"order_id\"], body[\"custom_fields\"])"
+    },
+    "create_order_payment": {
+      "function": "CreateOrderPayment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderPayment(ctx, 1043, map[string]any{\n\t\"transaction_no\": \"TXN-PAY-0001\",\n\t\"payment\": map[string]any{\n\t\t\"amount\":                20.0,\n\t\t\"payment_method\":        \"manual\",\n\t\t\"payment_status\":        \"success\",\n\t\t\"track_info\":            \"Bank transfer\",\n\t\t\"payer_info\":            \"Jane Doe\",\n\t\t\"transaction_date\":      \"2026-10-07T09:30:00Z\",\n\t\t\"transaction_reference\": \"BT-0001\",\n\t\t\"surcharge\":             0.0,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npayment := resp.Map().(map[string]any)[\"payment\"].(map[string]any)\nfmt.Println(payment[\"id\"], payment[\"paid_amount\"], payment[\"due_amount\"])"
+    },
+    "create_order_refund": {
+      "function": "CreateOrderRefund",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderRefund(ctx, 1043, map[string]any{\n\t\"refund\": map[string]any{\n\t\t\"amount\":      \"3.00\",\n\t\t\"refund_date\": \"2026-10-07T14:00:00Z\",\n\t\t\"reason\":      \"One item returned\",\n\t\t\"line_items\":  []any{map[string]any{\"order_item_id\": 3302, \"quantity\": 1, \"amount\": 3.0}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"refund_id\"], body[\"amount\"])"
+    },
+    "create_payment_refund": {
+      "function": "CreatePaymentRefund",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreatePaymentRefund(ctx, 7712, map[string]any{\n\t\"transaction_no\": \"TXN-PREF-0001\",\n\t\"refund\": map[string]any{\n\t\t\"amount\":            \"5.00\",\n\t\t\"reason\":            \"Damaged item\",\n\t\t\"is_gateway_refund\": false,\n\t\t\"send_refund_email\": false,\n\t\t\"adjust_with_order\": false,\n\t},\n}, \"refund-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"refund_id\"], body[\"amount\"], body[\"available_for_refund\"])"
+    },
+    "send_order_invoice": {
+      "function": "SendOrderInvoice",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().SendOrderInvoice(ctx, 2187, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"sent_to\"], body[\"sent_at\"])"
+    },
+    "get_order_shipment_status": {
+      "function": "GetOrderShipmentStatus",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().GetOrderShipmentStatus(ctx, 1043, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"shipment_status\"])\nfor _, row := range body[\"shipments_info\"].([]any) {\n\tshipment := row.(map[string]any)\n\tfmt.Println(shipment[\"shipping_provider\"], shipment[\"tracking_number\"], shipment[\"last_updated\"])\n}"
+    },
+    "list_order_shipments": {
+      "function": "ListOrderShipments",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().ListOrderShipments(ctx, 1043, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"shipments\"].([]any) {\n\tshipment := row.(map[string]any)\n\tfmt.Println(shipment[\"shipping_id\"], shipment[\"shipping_method\"], shipment[\"tracking_number\"])\n\tfor _, line := range shipment[\"items\"].([]any) {\n\t\titem := line.(map[string]any)\n\t\tfmt.Println(item[\"product_sku\"], item[\"shipped_quantity\"], item[\"order_quantity\"])\n\t}\n}"
+    },
+    "create_order_shipment": {
+      "function": "CreateOrderShipment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderShipment(ctx, 1043, map[string]any{\n\t\"transaction_no\": \"TXN-SHIP-0001\",\n\t\"method\":         \"Example Courier\",\n\t\"tracking_info\":  \"TRACK-0001\",\n\t\"shipping_date\":  \"2026-10-08T08:00:00\",\n\t\"shipment_items\": []any{map[string]any{\"order_item_id\": 3301, \"quantity\": 1}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshipment := resp.Map().(map[string]any)[\"shipment\"].(map[string]any)\nfmt.Println(shipment[\"shipping_id\"], shipment[\"shipping_method\"], shipment[\"tracking_number\"])"
+    },
+    "update_order_shipment": {
+      "function": "UpdateOrderShipment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().UpdateOrderShipment(ctx, 1043, 905, map[string]any{\"tracking_info\": \"TRACK-0002\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshipment := resp.Map().(map[string]any)[\"shipment\"].(map[string]any)\nfmt.Println(shipment[\"shipping_id\"], shipment[\"tracking_number\"])"
+    },
+    "update_order_status": {
+      "function": "UpdateOrderStatus",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().UpdateOrderStatus(ctx, 1043, map[string]any{\"status\": \"paused\", \"refund_automatically\": false}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"order_status\"])"
+    },
+    "create_order_status": {
+      "function": "CreateOrderStatus",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderStatus(ctx, map[string]any{\n\t\"order_id\":           1043,\n\t\"order_status_value\": \"ready_for_pickup\",\n\t\"order_status_label\": \"Ready For Pickup\",\n\t\"order_type\":         \"Order\",\n\t\"status_type\":        \"custom\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"success\"])"
+    },
+    "list_customer_orders": {
+      "function": "ListCustomerOrders",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().ListCustomerOrders(ctx, 512, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"customer_id\"], body[\"internal_id\"])\nfor _, row := range body[\"orders\"].([]any) {\n\torder := row.(map[string]any)\n\tfmt.Println(order[\"order_id\"], order[\"order_status\"], order[\"grand_total\"], order[\"due\"])\n}"
+    }
+  }
+}

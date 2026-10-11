@@ -1,0 +1,9 @@
+---
+title: "Update an order"
+description: "Changes an order's customer or addresses and keeps everything you leave out."
+openapi: "PUT /admin/orders/{order_id}"
+---
+
+Send `customer_id`, or a `customer` record with a `customer_id`, to move the order to that customer, and `billing_address` or `shipping_address` to replace that address. Sections you leave out keep their values, so this call merges rather than replaces. Wrap the fields in `order` or send them at the top level; `items` is rejected with `400` and the reason `not_implemented`, and any other field with the reason `unknown_field`. An address you send replaces the stored one, so a field you leave out becomes `""`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

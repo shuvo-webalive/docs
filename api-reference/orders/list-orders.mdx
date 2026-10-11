@@ -1,0 +1,9 @@
+---
+title: "List orders"
+description: "Returns up to 20 orders per call, newest first, leaving out cancelled orders."
+openapi: "GET /admin/orders"
+---
+
+Returns the orders newest first, up to 20 per call, with a `pagination` block and a `group_meta` block. Cancelled orders are left out unless you send `order_status=cancelled`. Each filter narrows the list to the orders that match it, and any query parameter not listed here, `q` included, is rejected with `400`. A row has every section except `billing_address` and `shipping_address`, and its `customer` has only `customer_id`, `internal_id`, `first_name`, `last_name` and `customer_group`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,102 @@
+{
+  "sdk": "dotnet",
+  "module": "orders",
+  "endpoints": {
+    "list_orders": {
+      "function": "ListOrdersAsync",
+      "code": "var response = await client.Orders.ListOrdersAsync(\n    new Dictionary<string, object?> { [\"order_status\"] = \"in_progress\", [\"payment_status\"] = \"unpaid\", [\"limit\"] = 10 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var order in ((IReadOnlyList<object?>)body[\"orders\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    var totals = (IReadOnlyDictionary<string, object?>)order[\"charges_totals\"]!;\n    Console.WriteLine($\"{order[\"order_id\"]} {order[\"internal_id\"]} {order[\"order_status\"]} {totals[\"grand_total\"]}\");\n}\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "count_orders": {
+      "function": "CountOrdersAsync",
+      "code": "var response = await client.Orders.CountOrdersAsync(\n    new Dictionary<string, object?> { [\"customerId\"] = 88, [\"payment_status\"] = \"unpaid\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar orders = (IReadOnlyDictionary<string, object?>)body[\"orders\"]!;\nConsole.WriteLine(orders[\"count\"]);"
+    },
+    "create_order": {
+      "function": "CreateOrderAsync",
+      "code": "var address = new Dictionary<string, object?>\n{\n    [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane.doe@example.com\",\n    [\"address_line_1\"] = \"1 Example Street\", [\"address_line_2\"] = \"Level 2\", [\"city\"] = \"Melbourne\",\n    [\"post_code\"] = \"3000\", [\"phone\"] = \"0300000000\", [\"mobile\"] = \"0400000000\",\n    [\"country_code\"] = \"AU\", [\"state_code\"] = \"VIC\",\n};\nvar response = await client.Orders.CreateOrderAsync(new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512, [\"payment_gateway\"] = \"PIS\", [\"delivery_type\"] = \"shipping\", [\"is_send_email\"] = false,\n    [\"transaction_no\"] = \"TXN-ORDER-0001\", [\"billing_address\"] = address, [\"shipping_address\"] = address,\n    [\"products\"] = new List<object?>\n    {\n        new Dictionary<string, object?> { [\"product_id\"] = 101, [\"quantity\"] = 1 },\n        new Dictionary<string, object?> { [\"product_id\"] = 102, [\"quantity\"] = 1 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"internal_id\"]} {order[\"order_status\"]} {order[\"grand_total\"]}\");"
+    },
+    "create_order_with_payment": {
+      "function": "CreateOrderWithPaymentAsync",
+      "code": "var address = new Dictionary<string, object?>\n{\n    [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane.doe@example.com\",\n    [\"address_line_1\"] = \"1 Example Street\", [\"address_line_2\"] = \"Level 2\", [\"city\"] = \"Melbourne\",\n    [\"post_code\"] = \"3000\", [\"phone\"] = \"0300000000\", [\"mobile\"] = \"0400000000\",\n    [\"country_code\"] = \"AU\", [\"state_code\"] = \"VIC\",\n};\nvar response = await client.Orders.CreateOrderWithPaymentAsync(new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512, [\"payment_gateway\"] = \"PIS\", [\"delivery_type\"] = \"shipping\",\n    [\"billing_address\"] = address, [\"shipping_address\"] = address,\n    [\"products\"] = new List<object?>\n    {\n        new Dictionary<string, object?> { [\"product_id\"] = 101, [\"quantity\"] = 1 },\n        new Dictionary<string, object?> { [\"product_id\"] = 102, [\"quantity\"] = 1 },\n    },\n    [\"payment\"] = new Dictionary<string, object?>\n    {\n        [\"amount\"] = 20.0, [\"status\"] = \"success\", [\"payment_method\"] = \"manual\", [\"track_info\"] = \"Paid at the counter\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"payment_status\"]} {order[\"paid\"]} {order[\"due\"]}\");"
+    },
+    "get_order": {
+      "function": "GetOrderAsync",
+      "code": "var response = await client.Orders.GetOrderAsync(1043);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"internal_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]}\");\nvar totals = (IReadOnlyDictionary<string, object?>)order[\"charges_totals\"]!;\nConsole.WriteLine($\"{totals[\"grand_total\"]} {totals[\"paid\"]} {totals[\"due\"]}\");"
+    },
+    "update_order": {
+      "function": "UpdateOrderAsync",
+      "code": "var billingAddress = new Dictionary<string, object?>\n{\n    [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane.doe@example.com\",\n    [\"address_line_1\"] = \"10 Example Street\", [\"address_line_2\"] = \"Level 2\", [\"city\"] = \"Melbourne\",\n    [\"post_code\"] = \"3000\", [\"phone\"] = \"0300000000\", [\"mobile\"] = \"0400000000\",\n    [\"country_code\"] = \"AU\", [\"state_code\"] = \"VIC\",\n};\nvar response = await client.Orders.UpdateOrderAsync(1043, new Dictionary<string, object?>\n{\n    [\"order\"] = new Dictionary<string, object?> { [\"billing_address\"] = billingAddress },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nvar billing = (IReadOnlyDictionary<string, object?>)order[\"billing_address\"]!;\nConsole.WriteLine($\"{billing[\"address_line_1\"]} {billing[\"city\"]} {billing[\"post_code\"]}\");"
+    },
+    "patch_order": {
+      "function": "PatchOrderAsync",
+      "code": "var response = await client.Orders.PatchOrderAsync(1043, new Dictionary<string, object?>\n{\n    [\"order\"] = new Dictionary<string, object?> { [\"customer_po_number\"] = \"PO-0001\", [\"payment_term\"] = \"NET30\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nvar fulfillment = (IReadOnlyDictionary<string, object?>)order[\"fulfillment\"]!;\nConsole.WriteLine($\"{fulfillment[\"customer_po_number\"]} {fulfillment[\"payment_term\"]}\");"
+    },
+    "delete_order": {
+      "function": "DeleteOrderAsync",
+      "code": "var response = await client.Orders.DeleteOrderAsync(1043);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"order_id\"]}\");"
+    },
+    "update_order_addresses": {
+      "function": "UpdateOrderAddressesAsync",
+      "code": "var shippingAddress = new Dictionary<string, object?>\n{\n    [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane.doe@example.com\",\n    [\"address_line_1\"] = \"10 Example Street\", [\"address_line_2\"] = \"Level 2\", [\"city\"] = \"Melbourne\",\n    [\"post_code\"] = \"3000\", [\"phone\"] = \"0300000000\", [\"mobile\"] = \"0400000000\",\n    [\"country_code\"] = \"AU\", [\"state_code\"] = \"VIC\",\n};\nvar response = await client.Orders.UpdateOrderAddressesAsync(1043, new Dictionary<string, object?>\n{\n    [\"transaction_no\"] = \"TXN-ADDR-0001\", [\"shipping_address\"] = shippingAddress,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shipping = (IReadOnlyDictionary<string, object?>)body[\"shipping_address\"]!;\nConsole.WriteLine($\"{shipping[\"address_line_1\"]} {shipping[\"city\"]} {shipping[\"post_code\"]}\");"
+    },
+    "cancel_order": {
+      "function": "CancelOrderAsync",
+      "code": "var response = await client.Orders.CancelOrderAsync(1043, new Dictionary<string, object?>\n{\n    [\"reason\"] = \"Customer asked to cancel\", [\"refund_automatically\"] = false, [\"is_gateway_refund\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"order_status\"]}\");"
+    },
+    "list_order_comments": {
+      "function": "ListOrderCommentsAsync",
+      "code": "var response = await client.Orders.ListOrderCommentsAsync(1043);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var comment in ((IReadOnlyList<object?>)body[\"comments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{comment[\"id\"]} {comment[\"created\"]} {comment[\"content\"]}\");"
+    },
+    "create_order_comment": {
+      "function": "CreateOrderCommentAsync",
+      "code": "var response = await client.Orders.CreateOrderCommentAsync(1043, new Dictionary<string, object?>\n{\n    [\"content\"] = \"Called to confirm the address.\", [\"save_and_send\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar comment = (IReadOnlyDictionary<string, object?>)body[\"comment\"]!;\nConsole.WriteLine($\"{comment[\"id\"]} {comment[\"visible_to_customer\"]} {comment[\"created\"]}\");"
+    },
+    "get_order_custom_fields": {
+      "function": "GetOrderCustomFieldsAsync",
+      "code": "var response = await client.Orders.GetOrderCustomFieldsAsync(2187);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customFields = (IReadOnlyList<object?>)body[\"custom_fields\"]!;\nConsole.WriteLine($\"{body[\"order_id\"]} {customFields.Count}\");"
+    },
+    "create_order_payment": {
+      "function": "CreateOrderPaymentAsync",
+      "code": "var response = await client.Orders.CreateOrderPaymentAsync(1043, new Dictionary<string, object?>\n{\n    [\"transaction_no\"] = \"TXN-PAY-0001\",\n    [\"payment\"] = new Dictionary<string, object?>\n    {\n        [\"amount\"] = 20.0, [\"payment_method\"] = \"manual\", [\"payment_status\"] = \"success\", [\"track_info\"] = \"Bank transfer\",\n        [\"payer_info\"] = \"Jane Doe\", [\"transaction_date\"] = \"2026-10-07T09:30:00Z\", [\"transaction_reference\"] = \"BT-0001\",\n        [\"surcharge\"] = 0.0,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar payment = (IReadOnlyDictionary<string, object?>)body[\"payment\"]!;\nConsole.WriteLine($\"{payment[\"id\"]} {payment[\"paid_amount\"]} {payment[\"due_amount\"]}\");"
+    },
+    "create_order_refund": {
+      "function": "CreateOrderRefundAsync",
+      "code": "var response = await client.Orders.CreateOrderRefundAsync(1043, new Dictionary<string, object?>\n{\n    [\"refund\"] = new Dictionary<string, object?>\n    {\n        [\"amount\"] = \"3.00\", [\"refund_date\"] = \"2026-10-07T14:00:00Z\", [\"reason\"] = \"One item returned\",\n        [\"line_items\"] = new List<object?>\n        {\n            new Dictionary<string, object?> { [\"order_item_id\"] = 3302, [\"quantity\"] = 1, [\"amount\"] = 3.0 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"refund_id\"]} {body[\"amount\"]}\");"
+    },
+    "create_payment_refund": {
+      "function": "CreatePaymentRefundAsync",
+      "code": "var response = await client.Orders.CreatePaymentRefundAsync(7712, new Dictionary<string, object?>\n{\n    [\"transaction_no\"] = \"TXN-PREF-0001\",\n    [\"refund\"] = new Dictionary<string, object?>\n    {\n        [\"amount\"] = \"5.00\", [\"reason\"] = \"Damaged item\",\n        [\"is_gateway_refund\"] = false, [\"send_refund_email\"] = false, [\"adjust_with_order\"] = false,\n    },\n}, idempotencyKey: \"refund-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"refund_id\"]} {body[\"amount\"]} {body[\"available_for_refund\"]}\");"
+    },
+    "send_order_invoice": {
+      "function": "SendOrderInvoiceAsync",
+      "code": "var response = await client.Orders.SendOrderInvoiceAsync(2187);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"sent_to\"]} {body[\"sent_at\"]}\");"
+    },
+    "get_order_shipment_status": {
+      "function": "GetOrderShipmentStatusAsync",
+      "code": "var response = await client.Orders.GetOrderShipmentStatusAsync(1043);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"shipment_status\"]);\nforeach (var shipment in ((IReadOnlyList<object?>)body[\"shipments_info\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{shipment[\"shipping_provider\"]} {shipment[\"tracking_number\"]} {shipment[\"last_updated\"]}\");"
+    },
+    "list_order_shipments": {
+      "function": "ListOrderShipmentsAsync",
+      "code": "var response = await client.Orders.ListOrderShipmentsAsync(1043);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var shipment in ((IReadOnlyList<object?>)body[\"shipments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    Console.WriteLine($\"{shipment[\"shipping_id\"]} {shipment[\"shipping_method\"]} {shipment[\"tracking_number\"]}\");\n    foreach (var item in ((IReadOnlyList<object?>)shipment[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n        Console.WriteLine($\"{item[\"product_sku\"]} {item[\"shipped_quantity\"]} {item[\"order_quantity\"]}\");\n}"
+    },
+    "create_order_shipment": {
+      "function": "CreateOrderShipmentAsync",
+      "code": "var response = await client.Orders.CreateOrderShipmentAsync(1043, new Dictionary<string, object?>\n{\n    [\"transaction_no\"] = \"TXN-SHIP-0001\", [\"method\"] = \"Example Courier\", [\"tracking_info\"] = \"TRACK-0001\",\n    [\"shipping_date\"] = \"2026-10-08T08:00:00\",\n    [\"shipment_items\"] = new List<object?>\n    {\n        new Dictionary<string, object?> { [\"order_item_id\"] = 3301, [\"quantity\"] = 1 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shipment = (IReadOnlyDictionary<string, object?>)body[\"shipment\"]!;\nConsole.WriteLine($\"{shipment[\"shipping_id\"]} {shipment[\"shipping_method\"]} {shipment[\"tracking_number\"]}\");"
+    },
+    "update_order_shipment": {
+      "function": "UpdateOrderShipmentAsync",
+      "code": "var response = await client.Orders.UpdateOrderShipmentAsync(1043, 905, new Dictionary<string, object?>\n{\n    [\"tracking_info\"] = \"TRACK-0002\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shipment = (IReadOnlyDictionary<string, object?>)body[\"shipment\"]!;\nConsole.WriteLine($\"{shipment[\"shipping_id\"]} {shipment[\"tracking_number\"]}\");"
+    },
+    "update_order_status": {
+      "function": "UpdateOrderStatusAsync",
+      "code": "var response = await client.Orders.UpdateOrderStatusAsync(1043, new Dictionary<string, object?>\n{\n    [\"status\"] = \"paused\", [\"refund_automatically\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"order_status\"]}\");"
+    },
+    "create_order_status": {
+      "function": "CreateOrderStatusAsync",
+      "code": "var response = await client.Orders.CreateOrderStatusAsync(new Dictionary<string, object?>\n{\n    [\"order_id\"] = 1043, [\"order_status_value\"] = \"ready_for_pickup\", [\"order_status_label\"] = \"Ready For Pickup\",\n    [\"order_type\"] = \"Order\", [\"status_type\"] = \"custom\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"success\"]);"
+    },
+    "list_customer_orders": {
+      "function": "ListCustomerOrdersAsync",
+      "code": "var response = await client.Orders.ListCustomerOrdersAsync(512);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"customer_id\"]} {body[\"internal_id\"]}\");\nforeach (var order in ((IReadOnlyList<object?>)body[\"orders\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{order[\"order_id\"]} {order[\"order_status\"]} {order[\"grand_total\"]} {order[\"due\"]}\");"
+    }
+  }
+}
