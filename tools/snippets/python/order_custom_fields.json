@@ -1,0 +1,22 @@
+{
+  "sdk": "python",
+  "module": "order_custom_fields",
+  "endpoints": {
+    "list_order_custom_fields": {
+      "function": "list_order_custom_fields",
+      "code": "response = client.order_custom_fields.list_order_custom_fields(\n    {\"sort\": \"label\", \"dir\": \"asc\"}\n)\nfor field in response.map[\"order_custom_fields\"]:\n    print(field[\"id\"], field[\"label\"], field[\"field_type\"])\npagination = response.map[\"pagination\"]\nprint(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "count_order_custom_fields": {
+      "function": "count_order_custom_fields",
+      "code": "response = client.order_custom_fields.count_order_custom_fields({\"filterBy\": \"date\"})\nprint(response.map[\"count\"])\n"
+    },
+    "get_order_custom_field": {
+      "function": "get_order_custom_field",
+      "code": "response = client.order_custom_fields.get_order_custom_field(42)\nfield = response.map[\"order_custom_field\"]\nprint(field[\"label\"], field[\"field_type\"], field[\"is_required\"])\nprint(field[\"placeholder\"], field[\"hover_text\"])\n"
+    },
+    "validate_order_custom_field_timeslot": {
+      "function": "validate_order_custom_field_timeslot",
+      "code": "response = client.order_custom_fields.validate_order_custom_field_timeslot(42, {\n    \"selected_date\": \"25/10/2026\",\n    \"weekday_id\": 1,\n    \"start_hour\": 9,\n    \"end_hour\": 12,\n    \"order_limit\": 10,\n})\nprint(response.map[\"valid\"], response.map[\"message\"])\n"
+    }
+  }
+}

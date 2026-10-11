@@ -434,6 +434,24 @@
             ]
           },
           {
+            "group": "Orders",
+            "icon": "receipt",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Order custom fields",
+                "expanded": false,
+                "pages": [
+                  "order-custom-fields",
+                  "api-reference/order-custom-fields/list-order-custom-fields",
+                  "api-reference/order-custom-fields/count-order-custom-fields",
+                  "api-reference/order-custom-fields/retrieve-an-order-custom-field",
+                  "api-reference/order-custom-fields/validate-a-timeslot"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Categories",
             "icon": "folder-tree",
             "expanded": false,
@@ -449,6 +467,25 @@
               "api-reference/categories/delete-a-category",
               "api-reference/categories/retrieve-a-category-section",
               "api-reference/categories/update-a-category-section"
+            ]
+          },
+          {
+            "group": "Blogs",
+            "icon": "newspaper",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Blog categories",
+                "expanded": false,
+                "pages": [
+                  "blog-categories",
+                  "api-reference/blog-categories/list-blog-categories",
+                  "api-reference/blog-categories/create-a-blog-category",
+                  "api-reference/blog-categories/retrieve-a-blog-category",
+                  "api-reference/blog-categories/update-a-blog-category",
+                  "api-reference/blog-categories/delete-a-blog-category"
+                ]
+              }
             ]
           },
           {

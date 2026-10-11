@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "listBlogCategories",
+      "code": "const response = await client.blogCategories.listBlogCategories({limit: 20, offset: 0});\nfor (const blogCategory of response.map.blog_categories) {\n    console.log(blogCategory.id, blogCategory.name, blogCategory.url);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "create_blog_category": {
+      "function": "createBlogCategory",
+      "code": "const response = await client.blogCategories.createBlogCategory({blog_category: {\n    name: 'Seasonal Promotions',\n    url: 'seasonal-promotions',\n    description: 'Sale announcements and limited-time offers.',\n    image: {\n        file_name: 'seasonal-promotions.png',\n        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',\n        title: 'Seasonal promotions',\n        alternative_text: 'Seasonal promotions banner',\n    },\n}});\nconsole.log(response.map.blog_category.id, response.map.blog_category.image.link);\n"
+    },
+    "get_blog_category": {
+      "function": "getBlogCategory",
+      "code": "const response = await client.blogCategories.getBlogCategory(15);\nconst blogCategory = response.map.blog_category;\nconsole.log(blogCategory.name, blogCategory.url, blogCategory.description);\n"
+    },
+    "update_blog_category": {
+      "function": "updateBlogCategory",
+      "code": "const response = await client.blogCategories.updateBlogCategory(15, {\n    blog_category: {\n        name: 'Seasonal Offers',\n        url: 'seasonal-offers',\n        description: 'Offers and clearance announcements.',\n    },\n});\nconst blogCategory = response.map.blog_category;\nconsole.log(blogCategory.name, blogCategory.url, blogCategory.description);\n"
+    },
+    "delete_blog_category": {
+      "function": "deleteBlogCategory",
+      "code": "const response = await client.blogCategories.deleteBlogCategory(15);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

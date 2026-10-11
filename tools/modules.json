@@ -63,10 +63,24 @@
       ]
     },
     {
+      "name": "Orders",
+      "icon": "receipt",
+      "modules": [
+        "order_custom_fields"
+      ]
+    },
+    {
       "name": "Categories",
       "icon": "folder-tree",
       "modules": [
         "categories"
+      ]
+    },
+    {
+      "name": "Blogs",
+      "icon": "newspaper",
+      "modules": [
+        "blog_categories"
       ]
     },
     {

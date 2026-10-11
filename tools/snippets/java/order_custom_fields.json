@@ -1,0 +1,22 @@
+{
+  "sdk": "java",
+  "module": "order_custom_fields",
+  "endpoints": {
+    "list_order_custom_fields": {
+      "function": "listOrderCustomFields",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orderCustomFields().listOrderCustomFields(\n        Map.of(\"sort\", \"label\", \"dir\", \"asc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"order_custom_fields\")) {\n    Map<?, ?> field = (Map<?, ?>) row;\n    System.out.println(field.get(\"id\") + \" \" + field.get(\"label\") + \" \" + field.get(\"field_type\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "count_order_custom_fields": {
+      "function": "countOrderCustomFields",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderCustomFields().countOrderCustomFields(Map.of(\"filterBy\", \"date\"));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"count\"));"
+    },
+    "get_order_custom_field": {
+      "function": "getOrderCustomField",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderCustomFields().getOrderCustomField(42);\nMap<?, ?> field = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order_custom_field\");\nSystem.out.println(field.get(\"label\") + \" \" + field.get(\"field_type\") + \" \" + field.get(\"is_required\"));\nSystem.out.println(field.get(\"hover_text\") + \" \" + field.get(\"placeholder\"));"
+    },
+    "validate_order_custom_field_timeslot": {
+      "function": "validateOrderCustomFieldTimeslot",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderCustomFields().validateOrderCustomFieldTimeslot(42, Map.of(\n        \"selected_date\", \"25/10/2026\", \"weekday_id\", 1,\n        \"start_hour\", 9, \"end_hour\", 12, \"order_limit\", 10));\nMap<?, ?> result = (Map<?, ?>) response.getMap();\nSystem.out.println(result.get(\"valid\") + \" \" + result.get(\"message\"));"
+    }
+  }
+}
