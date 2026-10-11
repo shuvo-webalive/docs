@@ -26145,7 +26145,7 @@
         ],
         "summary": "Update selected order fields",
         "operationId": "patch_order",
-        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number` and `payment_term`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number` and `payment_term` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
+        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term` and `order_channel` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
         "parameters": [
           {
             "name": "order_id",
@@ -46435,7 +46435,7 @@
               "string",
               "null"
             ],
-            "description": "The channel the order came through: an empty string or `null`."
+            "description": "The sales channel the order came from, as sent on create or PATCH; `\"\"` when none was set."
           },
           "created_on": {
             "type": "string",
@@ -46589,7 +46589,7 @@
               "string",
               "null"
             ],
-            "description": "The channel the order came through: an empty string or `null`."
+            "description": "The sales channel the order came from, as sent on create or PATCH; `null` when none was set."
           },
           "created_at": {
             "type": "string",
@@ -47877,6 +47877,10 @@
             "type": "string",
             "description": "An order number from another system. The listing's `externalReferenceOrderId` filter matches it."
           },
+          "order_channel": {
+            "type": "string",
+            "description": "The sales channel the order came from, up to 255 characters; 256 is rejected with `400`. Left out, `\"\"` or `null` stores none."
+          },
           "billing_address": {
             "$ref": "#/components/schemas/OrderAddressInput"
           },
@@ -47961,6 +47965,10 @@
             "description": "Accepted and not stored."
           },
           "external_reference_order_id": {
+            "type": "string",
+            "description": "Accepted and not stored."
+          },
+          "order_channel": {
             "type": "string",
             "description": "Accepted and not stored."
           },
@@ -48146,6 +48154,17 @@
             "type": "string",
             "description": "The payment term, such as `NET30`."
           },
+          "order_channel": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The sales channel, up to 255 characters. `\"\"` or `null` clears it; a number or 256 characters is rejected with `400`."
+          },
+          "ip_address": {
+            "type": "string",
+            "description": "The IP address the order was placed from."
+          },
           "billing_address": {
             "$ref": "#/components/schemas/OrderAddressInput"
           },
@@ -48163,6 +48182,10 @@
               "payment_term": {
                 "type": "string",
                 "description": "The payment term."
+              },
+              "order_channel": {
+                "type": "string",
+                "description": "The sales channel."
               }
             }
           }
