@@ -1,0 +1,9 @@
+---
+title: "Assign a coupon code to a customer"
+description: "Assigns a coupon code to an existing customer by email and returns `status` set to `success`."
+openapi: "POST /admin/discount_coupons/assign-customer"
+---
+
+Assigns a coupon code to the customer whose email address you send, and returns `status` set to `success`. Send `code` and `email` at the top level of the body: `code` is a code from [Generate coupon codes](/api-reference/discount-profiles/generate-coupon-codes), and `email` belongs to an existing customer, matched in any letter case, including a customer awaiting verification. The coupon's `customer_email` on the profile then shows that customer's email as their customer record spells it; the same pair sent again returns `201` again, and a code that is already assigned moves to the customer you name. Errors come as a flat body with `status`, `message` and `detailsMessage`, not the `error` object the other discount profile calls return.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

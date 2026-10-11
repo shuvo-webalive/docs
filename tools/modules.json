@@ -77,6 +77,13 @@
       ]
     },
     {
+      "name": "Discounts",
+      "icon": "tags",
+      "modules": [
+        "discount_profiles"
+      ]
+    },
+    {
       "name": "Blogs",
       "icon": "newspaper",
       "modules": [

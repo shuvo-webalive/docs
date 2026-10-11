@@ -1,0 +1,34 @@
+{
+  "sdk": "php",
+  "module": "discount_profiles",
+  "endpoints": {
+    "list_discount_profiles": {
+      "function": "listDiscountProfiles",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n\n$response = DiscountProfiles::listDiscountProfiles($client, ['sort' => 'name', 'dir' => 'asc']);\n\nforeach ($response->map['discount_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], ' ', $profile['type'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' discount profiles in total', PHP_EOL;"
+    },
+    "create_discount_profile": {
+      "function": "createDiscountProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n$response = DiscountProfiles::createDiscountProfile($client, [\n    'name' => 'Spring 40 Off', 'type' => 'offer_coupon', 'discount_details_type' => 'amount',\n    'amount_details' => ['type' => 'single', 'apply_to' => 'total_order', 'single_amount' => 40, 'single_amount_type' => 'PERCENT'],\n    'is_active' => true, 'start_date' => '2026-11-06 09:30:00', 'is_specify_end_date' => true,\n    'end_date' => '2026-11-16 18:00:00', 'is_apply_coupon_code' => true, 'default_coupon_code' => 'SPRING40', 'is_maximum_use_total' => true,\n    'maximum_use_count' => 100, 'is_maximum_use_customer' => true, 'maximum_use_customer_count' => 1, 'is_maximum_discount_allowed' => true,\n    'maximum_discount_allowed_amount' => 200, 'is_display_text_coupon' => true, 'display_text_coupon' => 'Use code SPRING40 at checkout',\n    'is_display_text_cart' => true, 'display_text_cart' => 'Spring sale discount applied', 'is_display_text_partial_discount_condition' => true,\n    'display_text_partial_discount_condition' => 'Add one more item to get the spring discount',\n]);\necho $response->map['discount_profile']['id'], ' ', $response->map['discount_profile']['default_coupon_code'], PHP_EOL;"
+    },
+    "get_discount_profile": {
+      "function": "getDiscountProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n\n$response = DiscountProfiles::getDiscountProfile($client, 1001);\n\n$profile = $response->map['discount_profile'];\necho $profile['name'], ' ', $profile['default_coupon_code'], PHP_EOL;\nforeach ($profile['customer_coupons'] as $coupon) {\n    echo $coupon['code'], ' ', $coupon['customer_email'] ?: 'unassigned', PHP_EOL;\n}"
+    },
+    "update_discount_profile": {
+      "function": "updateDiscountProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n$response = DiscountProfiles::updateDiscountProfile($client, 1001, [\n    'name' => 'Spring 50 Off', 'type' => 'offer_coupon', 'discount_details_type' => 'amount',\n    'amount_details' => ['type' => 'single', 'apply_to' => 'total_order', 'single_amount' => 50,\n        'single_amount_type' => 'PERCENT', 'minimum_amount_on' => 'each_item'],\n    'is_active' => true, 'start_date' => '2026-11-06 09:30:00', 'is_specify_end_date' => true, 'end_date' => '2026-11-20 18:00:00',\n    'is_apply_coupon_code' => true, 'is_maximum_use_total' => true, 'maximum_use_count' => 150, 'is_maximum_use_customer' => true,\n    'maximum_use_customer_count' => 1, 'is_maximum_discount_allowed' => true, 'maximum_discount_allowed_amount' => 200,\n    'is_display_text_coupon' => true, 'is_display_text_cart' => true,\n]);\n\necho $response->map['discount_profile']['name'], ' ', $response->map['discount_profile']['amount_details']['single_amount'], PHP_EOL;"
+    },
+    "delete_discount_profile": {
+      "function": "deleteDiscountProfile",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n\n$response = DiscountProfiles::deleteDiscountProfile($client, 1001);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_discount_profile_coupons": {
+      "function": "createDiscountProfileCoupons",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n\n$response = DiscountProfiles::createDiscountProfileCoupons($client, 1001, ['requested_codes' => 3]);\n\necho $response->map['message'], PHP_EOL;\nforeach ($response->map['codes'] as $code) {\n    echo $code, PHP_EOL;\n}"
+    },
+    "assign_discount_coupon_customer": {
+      "function": "assignDiscountCouponCustomer",
+      "code": "use WebCommander\\Sdk\\Resources\\DiscountProfiles\\DiscountProfiles;\n\n$response = DiscountProfiles::assignDiscountCouponCustomer($client, [\n    'code' => 'A1B2C3D4E5',\n    'email' => 'jane.citizen@example.com',\n]);\n\necho $response->map['status'], ': ', $response->map['message'], PHP_EOL;"
+    }
+  }
+}
