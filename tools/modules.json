@@ -70,6 +70,13 @@
       ]
     },
     {
+      "name": "Categories",
+      "icon": "folder-tree",
+      "modules": [
+        "categories"
+      ]
+    },
+    {
       "name": "Blogs",
       "icon": "newspaper",
       "modules": [

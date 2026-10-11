@@ -1,0 +1,46 @@
+{
+  "sdk": "dotnet",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "ListCategoriesAsync",
+      "code": "var response = await client.Categories.ListCategoriesAsync(new Dictionary<string, object?>\n{\n    [\"limit\"] = 10, [\"offset\"] = 10, [\"sort\"] = \"name\", [\"dir\"] = \"asc\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var category in ((IReadOnlyList<object?>)body[\"categories\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    var general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\n    Console.WriteLine($\"{category[\"id\"]} {general[\"name\"]}\");\n}"
+    },
+    "count_categories": {
+      "function": "CountCategoriesAsync",
+      "code": "var response = await client.Categories.CountCategoriesAsync(\n    new Dictionary<string, object?> { [\"searchText\"] = \"seasonal\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar categories = (IReadOnlyDictionary<string, object?>)body[\"categories\"]!;\nConsole.WriteLine(categories[\"count\"]);"
+    },
+    "check_category_name": {
+      "function": "CheckCategoryNameAsync",
+      "code": "var response = await client.Categories.CheckCategoryNameAsync(\"Seasonal Produce\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"available\"]);"
+    },
+    "create_category": {
+      "function": "CreateCategoryAsync",
+      "code": "var response = await client.Categories.CreateCategoryAsync(new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Seasonal Produce\", [\"title\"] = \"Seasonal Produce\", [\"heading\"] = \"Fresh this season\",\n            [\"summary\"] = \"Fruit and vegetables picked this week\",\n            [\"parent_category\"] = new Dictionary<string, object?> { [\"id\"] = 4310 },\n        },\n        [\"description\"] = new Dictionary<string, object?> { [\"content\"] = \"<p>What is in season right now.</p>\" },\n        [\"availability_visibility\"] = new Dictionary<string, object?>\n        {\n            [\"visible\"] = true, [\"custom_sorting\"] = true, [\"default_sorting\"] = \"alpha_asc\",\n        },\n        [\"tax_shipping\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"Prices include GST\" },\n        [\"assign_products\"] = new Dictionary<string, object?> { [\"products\"] = new List<object?> { 101, 102 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nConsole.WriteLine(category[\"id\"]);"
+    },
+    "get_category": {
+      "function": "GetCategoryAsync",
+      "code": "var response = await client.Categories.GetCategoryAsync(4321);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\nConsole.WriteLine($\"{general[\"name\"]} {category[\"in_trash\"]}\");"
+    },
+    "update_category": {
+      "function": "UpdateCategoryAsync",
+      "code": "var response = await client.Categories.UpdateCategoryAsync(4321, new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?> { [\"name\"] = \"Seasonal Produce\", [\"heading\"] = \"New heading\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\nConsole.WriteLine($\"{general[\"name\"]} {general[\"heading\"]}\");"
+    },
+    "patch_category": {
+      "function": "PatchCategoryAsync",
+      "code": "var response = await client.Categories.PatchCategoryAsync(4321, new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?> { [\"summary\"] = \"Updated summary\" },\n        [\"availability_visibility\"] = new Dictionary<string, object?> { [\"visible\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar general = (IReadOnlyDictionary<string, object?>)category[\"general\"]!;\nvar availability = (IReadOnlyDictionary<string, object?>)category[\"availability_visibility\"]!;\nConsole.WriteLine($\"{general[\"summary\"]} {availability[\"visible\"]}\");"
+    },
+    "delete_category": {
+      "function": "DeleteCategoryAsync",
+      "code": "var response = await client.Categories.DeleteCategoryAsync(4321);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_category_section": {
+      "function": "GetCategorySectionAsync",
+      "code": "var response = await client.Categories.GetCategorySectionAsync(4321, \"tax_shipping\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar taxShipping = (IReadOnlyDictionary<string, object?>)category[\"tax_shipping\"]!;\nConsole.WriteLine($\"{taxShipping[\"tax_message\"]} {taxShipping[\"show_price_with_tax\"]}\");"
+    },
+    "patch_category_section": {
+      "function": "PatchCategorySectionAsync",
+      "code": "var response = await client.Categories.PatchCategorySectionAsync(4321, \"assign_products\", new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"assign_products\"] = new Dictionary<string, object?> { [\"products\"] = new List<object?> { 101, 102, 103 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nvar assignProducts = (IReadOnlyDictionary<string, object?>)category[\"assign_products\"]!;\nforeach (var product in ((IReadOnlyList<object?>)assignProducts[\"products\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{product[\"id\"]} {product[\"sku\"]}\");"
+    }
+  }
+}

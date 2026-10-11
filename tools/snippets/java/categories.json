@@ -1,0 +1,46 @@
+{
+  "sdk": "java",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "listCategories",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.categories().listCategories(\n        Map.of(\"limit\", 10, \"offset\", 10, \"sort\", \"name\", \"dir\", \"asc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"categories\")) {\n    Map<?, ?> category = (Map<?, ?>) row;\n    Map<?, ?> general = (Map<?, ?>) category.get(\"general\");\n    System.out.println(category.get(\"id\") + \" \" + general.get(\"name\") + \" \" + general.get(\"url\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "count_categories": {
+      "function": "countCategories",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categories().countCategories(Map.of(\"searchText\", \"seasonal\"));\nMap<?, ?> categories = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"categories\");\nSystem.out.println(categories.get(\"count\"));"
+    },
+    "check_category_name": {
+      "function": "checkCategoryName",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categories().checkCategoryName(\"Seasonal Produce\");\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"available\"));"
+    },
+    "create_category": {
+      "function": "createCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.categories().createCategory(Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"name\", \"Seasonal Produce\", \"title\", \"Seasonal Produce\",\n                \"heading\", \"Fresh this season\", \"summary\", \"Fruit and vegetables picked this week\",\n                \"parent_category\", Map.of(\"id\", 4310)),\n        \"description\", Map.of(\"content\", \"<p>What is in season right now.</p>\"),\n        \"availability_visibility\", Map.of(\"visible\", true, \"custom_sorting\", true, \"default_sorting\", \"alpha_asc\"),\n        \"tax_shipping\", Map.of(\"tax_message\", \"Prices include GST\"),\n        \"assign_products\", Map.of(\"products\", List.of(101, 102)))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(category.get(\"id\") + \" \" + general.get(\"sku\") + \" \" + general.get(\"url\"));"
+    },
+    "get_category": {
+      "function": "getCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categories().getCategory(4321);\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(general.get(\"name\") + \" \" + general.get(\"sku\") + \" \" + general.get(\"url\"));\nSystem.out.println(((Map<?, ?>) category.get(\"availability_visibility\")).get(\"visible\") + \" \" + category.get(\"in_trash\"));"
+    },
+    "update_category": {
+      "function": "updateCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categories().updateCategory(4321, Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"name\", \"Seasonal Produce\", \"heading\", \"New heading\"))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(general.get(\"name\") + \" \" + general.get(\"heading\") + \" \" + general.get(\"summary\"));\nSystem.out.println(category.get(\"last_updated_on\"));"
+    },
+    "patch_category": {
+      "function": "patchCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categories().patchCategory(4321, Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"summary\", \"Updated summary\"),\n        \"availability_visibility\", Map.of(\"visible\", false))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nSystem.out.println(((Map<?, ?>) category.get(\"general\")).get(\"summary\"));\nSystem.out.println(((Map<?, ?>) category.get(\"availability_visibility\")).get(\"visible\"));"
+    },
+    "delete_category": {
+      "function": "deleteCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.categories().deleteCategory(4321);\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_category_section": {
+      "function": "getCategorySection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.categories().getCategorySection(4321, \"tax_shipping\");\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> taxShipping = (Map<?, ?>) category.get(\"tax_shipping\");\nSystem.out.println(taxShipping.get(\"tax_message\") + \" \" + taxShipping.get(\"show_price_with_tax\"));\nSystem.out.println(taxShipping.get(\"tax_exempt\") + \" \" + taxShipping.get(\"enable_shipping\"));"
+    },
+    "patch_category_section": {
+      "function": "patchCategorySection",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.categories().patchCategorySection(4321, \"assign_products\",\n        Map.of(\"category\", Map.of(\"assign_products\", Map.of(\"products\", List.of(101, 102, 103)))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nfor (Object row : (List<?>) ((Map<?, ?>) category.get(\"assign_products\")).get(\"products\")) {\n    Map<?, ?> product = (Map<?, ?>) row;\n    System.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"sku\"));\n}"
+    }
+  }
+}

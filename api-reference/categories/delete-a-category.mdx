@@ -1,0 +1,9 @@
+---
+title: "Delete a category"
+description: "Moves a category to the trash. You can still retrieve it, but it leaves the listing."
+openapi: "DELETE /admin/categories/{category_id}"
+---
+
+Moves the category to the trash and returns `204` with no body. The category leaves the listing and the count, but [Retrieve a category](/api-reference/categories/retrieve-a-category) still returns it with `in_trash` set to `true`, and [Check a category name](/api-reference/categories/check-a-category-name) still reports its name as taken. Its child categories stay in the listing, with `parent_category` still naming it and `parent_in_trash` still `false`. No call restores a category from the trash or deletes it permanently.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
