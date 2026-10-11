@@ -1,0 +1,9 @@
+---
+title: "Count order custom fields"
+description: "Returns the number of order custom fields, or of one field type with `filterBy`."
+openapi: "GET /admin/order_custom_fields/count"
+---
+
+Returns the number of order custom fields as `count`, the only key in the body. The number matches `pagination.total` from [List order custom fields](/api-reference/order-custom-fields/list-order-custom-fields). Send `filterBy` to count only the fields of one type. `limit`, `sort`, `field_metadata` and unknown parameters are ignored, even a `sort` the listing rejects.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,9 @@
+---
+title: "Delete a discount profile"
+description: "Deletes a discount profile and its coupon codes permanently, and returns no body."
+openapi: "DELETE /admin/discount_profiles/{discount_profile_id}"
+---
+
+Deletes the profile whose `id` you pass as `discount_profile_id`, with all its coupon codes, and returns `204` with no body. The profile leaves the listing, and `pagination.total` falls by one. Retrieving, replacing or deleting it again returns `404`, and assigning one of its codes to a customer is rejected with `coupon.not.found.by.code`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "discount_profiles",
+  "endpoints": {
+    "list_discount_profiles": {
+      "function": "ListDiscountProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().ListDiscountProfiles(ctx, map[string]any{\"sort\": \"name\", \"dir\": \"asc\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"discount_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"type\"], profile[\"is_active\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "create_discount_profile": {
+      "function": "CreateDiscountProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().CreateDiscountProfile(ctx, map[string]any{\n\t\"name\": \"Spring 40 Off\", \"type\": \"offer_coupon\", \"discount_details_type\": \"amount\",\n\t\"amount_details\": map[string]any{\n\t\t\"type\": \"single\", \"apply_to\": \"total_order\", \"single_amount\": 40, \"single_amount_type\": \"PERCENT\",\n\t},\n\t\"is_active\": true, \"start_date\": \"2026-11-06 09:30:00\", \"is_specify_end_date\": true, \"end_date\": \"2026-11-16 18:00:00\",\n\t\"is_apply_coupon_code\": true, \"default_coupon_code\": \"SPRING40\", \"is_maximum_use_total\": true, \"maximum_use_count\": 100,\n\t\"is_maximum_use_customer\": true, \"maximum_use_customer_count\": 1, \"is_maximum_discount_allowed\": true,\n\t\"maximum_discount_allowed_amount\": 200, \"is_display_text_coupon\": true,\n\t\"display_text_coupon\": \"Use code SPRING40 at checkout\", \"is_display_text_cart\": true,\n\t\"display_text_cart\": \"Spring sale discount applied\", \"is_display_text_partial_discount_condition\": true,\n\t\"display_text_partial_discount_condition\": \"Add one more item to get the spring discount\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"discount_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"default_coupon_code\"])"
+    },
+    "get_discount_profile": {
+      "function": "GetDiscountProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().GetDiscountProfile(ctx, 1001, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"discount_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"is_active\"], profile[\"default_coupon_code\"])\nfor _, row := range profile[\"customer_coupons\"].([]any) {\n\tcoupon := row.(map[string]any)\n\tfmt.Println(coupon[\"code\"], coupon[\"customer_email\"])\n}"
+    },
+    "update_discount_profile": {
+      "function": "UpdateDiscountProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().UpdateDiscountProfile(ctx, 1001, map[string]any{\n\t\"name\": \"Spring 50 Off\", \"type\": \"offer_coupon\", \"discount_details_type\": \"amount\",\n\t\"amount_details\": map[string]any{\n\t\t\"type\": \"single\", \"apply_to\": \"total_order\", \"single_amount\": 50, \"single_amount_type\": \"PERCENT\",\n\t\t\"minimum_amount_on\": \"each_item\",\n\t},\n\t\"is_active\": true, \"start_date\": \"2026-11-06 09:30:00\", \"is_specify_end_date\": true, \"end_date\": \"2026-11-20 18:00:00\",\n\t\"is_apply_coupon_code\": true, \"is_maximum_use_total\": true, \"maximum_use_count\": 150, \"is_maximum_use_customer\": true,\n\t\"maximum_use_customer_count\": 1, \"is_maximum_discount_allowed\": true, \"maximum_discount_allowed_amount\": 200,\n\t\"is_display_text_coupon\": true, \"is_display_text_cart\": true,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"discount_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"amount_details\"].(map[string]any)[\"single_amount\"], profile[\"end_date\"])"
+    },
+    "delete_discount_profile": {
+      "function": "DeleteDiscountProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().DeleteDiscountProfile(ctx, 1001, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_discount_profile_coupons": {
+      "function": "CreateDiscountProfileCoupons",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().CreateDiscountProfileCoupons(ctx, 1001, map[string]any{\"requested_codes\": 3}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"message\"])\nfor _, code := range body[\"codes\"].([]any) {\n\tfmt.Println(code)\n}"
+    },
+    "assign_discount_coupon_customer": {
+      "function": "AssignDiscountCouponCustomer",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DiscountProfiles().AssignDiscountCouponCustomer(ctx, map[string]any{\n\t\"code\":  \"A1B2C3D4E5\",\n\t\"email\": \"jane.citizen@example.com\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nresult := resp.Map().(map[string]any)\nfmt.Println(result[\"status\"], result[\"message\"])"
+    }
+  }
+}

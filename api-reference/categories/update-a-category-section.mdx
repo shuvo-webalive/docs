@@ -1,0 +1,9 @@
+---
+title: "Update a category section"
+description: "Changes only the fields you send in one section and returns the whole section."
+openapi: "PATCH /admin/categories/{category_id}/{section}"
+---
+
+Wrap the fields in `category` and then in the section's name, such as `{"category": {"assign_products": {"products": [101, 102, 103]}}}`. A body with only the section's name, or no wrapper at all, is rejected with `400` and the message `<section> is required`. Fields you leave out keep their values, except `assign_products.products`, which the list you send replaces. Anything else inside `category`, such as another section, is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

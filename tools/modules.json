@@ -63,10 +63,32 @@
       ]
     },
     {
+      "name": "Orders",
+      "icon": "receipt",
+      "modules": [
+        "order_custom_fields"
+      ]
+    },
+    {
+      "name": "Categories",
+      "icon": "folder-tree",
+      "modules": [
+        "categories"
+      ]
+    },
+    {
+      "name": "Discounts",
+      "icon": "tags",
+      "modules": [
+        "discount_profiles"
+      ]
+    },
+    {
       "name": "Blogs",
       "icon": "newspaper",
       "modules": [
-        "blogs"
+        "blogs",
+        "blog_categories"
       ]
     },
     {

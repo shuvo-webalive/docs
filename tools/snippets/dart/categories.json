@@ -1,0 +1,46 @@
+{
+  "sdk": "dart",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "listCategories",
+      "code": "final response = await client.categories.listCategories(\n  queryParams: {'limit': 10, 'offset': 10, 'sort': 'name', 'dir': 'asc'},\n);\nfinal categories = (response.map as Map)['categories'] as List;\nfor (final category in categories) {\n  final general = (category as Map)['general'] as Map;\n  print('${category['id']} ${general['name']} ${general['url']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
+    "count_categories": {
+      "function": "countCategories",
+      "code": "final response = await client.categories\n    .countCategories(queryParams: {'searchText': 'seasonal'});\nfinal categories = (response.map as Map)['categories'] as Map;\nprint(categories['count']);"
+    },
+    "check_category_name": {
+      "function": "checkCategoryName",
+      "code": "final response =\n    await client.categories.checkCategoryName('Seasonal Produce');\nprint((response.map as Map)['available']);"
+    },
+    "create_category": {
+      "function": "createCategory",
+      "code": "final response = await client.categories.createCategory({\n  'category': {\n    'general': {\n      'name': 'Seasonal Produce',\n      'title': 'Seasonal Produce',\n      'heading': 'Fresh this season',\n      'summary': 'Fruit and vegetables picked this week',\n      'parent_category': {'id': 4310},\n    },\n    'description': {'content': '<p>What is in season right now.</p>'},\n    'availability_visibility': {\n      'visible': true,\n      'custom_sorting': true,\n      'default_sorting': 'alpha_asc',\n    },\n    'tax_shipping': {'tax_message': 'Prices include GST'},\n    'assign_products': {\n      'products': [101, 102],\n    },\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${category['id']} ${general['sku']} ${general['url']}');"
+    },
+    "get_category": {
+      "function": "getCategory",
+      "code": "final response = await client.categories.getCategory(4321);\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${category['id']} ${general['name']} ${general['url']}');\nprint('${category['in_trash']} ${general['parent_category']}');"
+    },
+    "update_category": {
+      "function": "updateCategory",
+      "code": "final response = await client.categories.updateCategory(4321, {\n  'category': {\n    'general': {'name': 'Seasonal Produce', 'heading': 'New heading'},\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${general['name']} ${general['heading']} ${general['summary']}');"
+    },
+    "patch_category": {
+      "function": "patchCategory",
+      "code": "final response = await client.categories.patchCategory(4321, {\n  'category': {\n    'general': {'summary': 'Updated summary'},\n    'availability_visibility': {'visible': false},\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nfinal visibility = category['availability_visibility'] as Map;\nprint('${general['summary']} ${visibility['visible']}');"
+    },
+    "delete_category": {
+      "function": "deleteCategory",
+      "code": "final response = await client.categories.deleteCategory(4321);\nprint(response.statusCode);"
+    },
+    "get_category_section": {
+      "function": "getCategorySection",
+      "code": "final response =\n    await client.categories.getCategorySection(4321, 'tax_shipping');\nfinal category = (response.map as Map)['category'] as Map;\nfinal taxShipping = category['tax_shipping'] as Map;\nprint('${taxShipping['tax_message']} ${taxShipping['enable_shipping']}');\nprint(taxShipping['shipping_profile']);"
+    },
+    "patch_category_section": {
+      "function": "patchCategorySection",
+      "code": "final response =\n    await client.categories.patchCategorySection(4321, 'assign_products', {\n  'category': {\n    'assign_products': {\n      'products': [101, 102, 103],\n    },\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal products = (category['assign_products'] as Map)['products'] as List;\nfor (final product in products) {\n  print('${(product as Map)['id']} ${product['sku']} ${product['name']}');\n}"
+    }
+  }
+}

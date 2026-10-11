@@ -1,0 +1,22 @@
+{
+  "sdk": "php",
+  "module": "order_custom_fields",
+  "endpoints": {
+    "list_order_custom_fields": {
+      "function": "listOrderCustomFields",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderCustomFields\\OrderCustomFields;\n\n$response = OrderCustomFields::listOrderCustomFields($client, ['sort' => 'label', 'dir' => 'asc']);\n\nforeach ($response->map['order_custom_fields'] as $field) {\n    echo $field['id'], ' ', $field['label'], ' (', $field['field_type'], ')', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' fields in total', PHP_EOL;"
+    },
+    "count_order_custom_fields": {
+      "function": "countOrderCustomFields",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderCustomFields\\OrderCustomFields;\n\n$response = OrderCustomFields::countOrderCustomFields($client, ['filterBy' => 'date']);\n\necho $response->map['count'], ' date fields', PHP_EOL;"
+    },
+    "get_order_custom_field": {
+      "function": "getOrderCustomField",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderCustomFields\\OrderCustomFields;\n\n$response = OrderCustomFields::getOrderCustomField($client, 42);\n\n$field = $response->map['order_custom_field'];\necho $field['label'], ' (', $field['field_type'], ')', $field['is_required'] ? ' required' : '', PHP_EOL;\necho $field['hover_text'], PHP_EOL;\necho $field['placeholder'], PHP_EOL;"
+    },
+    "validate_order_custom_field_timeslot": {
+      "function": "validateOrderCustomFieldTimeslot",
+      "code": "use WebCommander\\Sdk\\Resources\\OrderCustomFields\\OrderCustomFields;\n\n$response = OrderCustomFields::validateOrderCustomFieldTimeslot($client, 42, [\n    'selected_date' => '25/10/2026',\n    'weekday_id' => 1,\n    'start_hour' => 9,\n    'end_hour' => 12,\n    'order_limit' => 10,\n]);\n\necho $response->map['valid'] ? 'true' : 'false', ' ', $response->map['message'], PHP_EOL;"
+    }
+  }
+}
