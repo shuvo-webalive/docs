@@ -1,0 +1,9 @@
+---
+title: "Retrieve an order custom field"
+description: "Returns the order custom field whose `id` you pass as `order_custom_field_id`, with all 21 keys."
+openapi: "GET /admin/order_custom_fields/{order_custom_field_id}"
+---
+
+Returns one order custom field under the `order_custom_field` key, with 21 keys. These are the 12 keys a listing returns, with the same values, plus `hover_text`, `placeholder`, `default_value`, `html_class`, `options` and the four `is_allowed_for_*` keys. Send `field_metadata=true` to add a description of the field's keys beside it; it leaves out the four `is_allowed_for_*` keys. Unknown query parameters are ignored, and the response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

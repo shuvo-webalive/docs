@@ -1,0 +1,22 @@
+{
+  "sdk": "go",
+  "module": "order_custom_fields",
+  "endpoints": {
+    "list_order_custom_fields": {
+      "function": "ListOrderCustomFields",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderCustomFields().ListOrderCustomFields(ctx, map[string]any{\"sort\": \"label\", \"dir\": \"asc\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"order_custom_fields\"].([]any) {\n\tfield := row.(map[string]any)\n\tfmt.Println(field[\"id\"], field[\"label\"], field[\"field_type\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "count_order_custom_fields": {
+      "function": "CountOrderCustomFields",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderCustomFields().CountOrderCustomFields(ctx, map[string]any{\"filterBy\": \"date\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"count\"])"
+    },
+    "get_order_custom_field": {
+      "function": "GetOrderCustomField",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderCustomFields().GetOrderCustomField(ctx, 42, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfield := resp.Map().(map[string]any)[\"order_custom_field\"].(map[string]any)\nfmt.Println(field[\"label\"], field[\"field_type\"], field[\"is_required\"])\nfmt.Println(field[\"placeholder\"], field[\"hover_text\"])"
+    },
+    "validate_order_custom_field_timeslot": {
+      "function": "ValidateOrderCustomFieldTimeslot",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderCustomFields().ValidateOrderCustomFieldTimeslot(ctx, 42, map[string]any{\n\t\"selected_date\": \"25/10/2026\",\n\t\"weekday_id\":    1,\n\t\"start_hour\":    9,\n\t\"end_hour\":      12,\n\t\"order_limit\":   10,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nresult := resp.Map().(map[string]any)\nfmt.Println(result[\"valid\"], result[\"message\"])"
+    }
+  }
+}
