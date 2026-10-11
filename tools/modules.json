@@ -70,6 +70,13 @@
       ]
     },
     {
+      "name": "Blogs",
+      "icon": "newspaper",
+      "modules": [
+        "blog_categories"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [
