@@ -1,0 +1,46 @@
+{
+  "sdk": "js",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "listCategories",
+      "code": "const response = await client.categories.listCategories({limit: 10, offset: 10, sort: 'name', dir: 'asc'});\nfor (const category of response.map.categories) {\n    console.log(category.id, category.general.name, category.general.url);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "count_categories": {
+      "function": "countCategories",
+      "code": "const response = await client.categories.countCategories({searchText: 'seasonal'});\nconsole.log(response.map.categories.count);\n"
+    },
+    "check_category_name": {
+      "function": "checkCategoryName",
+      "code": "const response = await client.categories.checkCategoryName('Seasonal Produce');\nconsole.log(response.map.available);\n"
+    },
+    "create_category": {
+      "function": "createCategory",
+      "code": "const response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
+    },
+    "get_category": {
+      "function": "getCategory",
+      "code": "const response = await client.categories.getCategory(4321);\nconst category = response.map.category;\nconsole.log(category.general.name, category.general.parent_category.name, category.in_trash);\n"
+    },
+    "update_category": {
+      "function": "updateCategory",
+      "code": "const response = await client.categories.updateCategory(4321, {\n    category: {general: {name: 'Seasonal Produce', heading: 'New heading'}},\n});\nconst category = response.map.category;\nconsole.log(category.general.heading, category.general.url, category.assign_products.products.length);\n"
+    },
+    "patch_category": {
+      "function": "patchCategory",
+      "code": "const response = await client.categories.patchCategory(4321, {\n    category: {general: {summary: 'Updated summary'}, availability_visibility: {visible: false}},\n});\nconst category = response.map.category;\nconsole.log(category.general.summary, category.availability_visibility.visible);\n"
+    },
+    "delete_category": {
+      "function": "deleteCategory",
+      "code": "const response = await client.categories.deleteCategory(4321);\nconsole.log(response.statusCode);\n"
+    },
+    "get_category_section": {
+      "function": "getCategorySection",
+      "code": "const response = await client.categories.getCategorySection(4321, 'tax_shipping');\nconst taxShipping = response.map.category.tax_shipping;\nconsole.log(taxShipping.tax_profile.name, taxShipping.enable_shipping, taxShipping.shipping_profile.name);\n"
+    },
+    "patch_category_section": {
+      "function": "patchCategorySection",
+      "code": "const response = await client.categories.patchCategorySection(4321, 'assign_products', {\n    category: {assign_products: {products: [101, 102, 103]}},\n});\nfor (const product of response.map.category.assign_products.products) {\n    console.log(product.id, product.name, product.sku);\n}\n"
+    }
+  }
+}

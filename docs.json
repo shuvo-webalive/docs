@@ -434,6 +434,24 @@
             ]
           },
           {
+            "group": "Orders",
+            "icon": "receipt",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Order custom fields",
+                "expanded": false,
+                "pages": [
+                  "order-custom-fields",
+                  "api-reference/order-custom-fields/list-order-custom-fields",
+                  "api-reference/order-custom-fields/count-order-custom-fields",
+                  "api-reference/order-custom-fields/retrieve-an-order-custom-field",
+                  "api-reference/order-custom-fields/validate-a-timeslot"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Carts",
             "icon": "cart-shopping",
             "expanded": false,
@@ -446,6 +464,83 @@
               "api-reference/carts/empty-a-cart",
               "api-reference/carts/remove-an-item-from-a-cart",
               "api-reference/carts/create-an-order-from-a-cart"
+            ]
+          },
+          {
+            "group": "Categories",
+            "icon": "folder-tree",
+            "expanded": false,
+            "pages": [
+              "categories",
+              "api-reference/categories/list-categories",
+              "api-reference/categories/count-categories",
+              "api-reference/categories/check-a-category-name",
+              "api-reference/categories/create-a-category",
+              "api-reference/categories/retrieve-a-category",
+              "api-reference/categories/replace-a-category",
+              "api-reference/categories/update-a-category",
+              "api-reference/categories/delete-a-category",
+              "api-reference/categories/retrieve-a-category-section",
+              "api-reference/categories/update-a-category-section"
+            ]
+          },
+          {
+            "group": "Discounts",
+            "icon": "tags",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Discount profiles",
+                "expanded": false,
+                "pages": [
+                  "discount-profiles",
+                  "api-reference/discount-profiles/list-discount-profiles",
+                  "api-reference/discount-profiles/create-a-discount-profile",
+                  "api-reference/discount-profiles/retrieve-a-discount-profile",
+                  "api-reference/discount-profiles/replace-a-discount-profile",
+                  "api-reference/discount-profiles/delete-a-discount-profile",
+                  "api-reference/discount-profiles/generate-coupon-codes",
+                  "api-reference/discount-profiles/assign-a-coupon-code-to-a-customer"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Blogs",
+            "icon": "newspaper",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Blogs",
+                "expanded": false,
+                "pages": [
+                  "blogs",
+                  "api-reference/blogs/list-blog-posts",
+                  "api-reference/blogs/count-blog-posts",
+                  "api-reference/blogs/create-a-blog-post",
+                  "api-reference/blogs/retrieve-a-blog-post",
+                  "api-reference/blogs/replace-a-blog-post",
+                  "api-reference/blogs/update-a-blog-post",
+                  "api-reference/blogs/delete-a-blog-post",
+                  "api-reference/blogs/list-comments-on-a-blog-post",
+                  "api-reference/blogs/add-a-comment-to-a-blog-post",
+                  "api-reference/blogs/retrieve-a-comment",
+                  "api-reference/blogs/approve-a-comment",
+                  "api-reference/blogs/mark-a-comment-as-spam"
+                ]
+              },
+              {
+                "group": "Blog categories",
+                "expanded": false,
+                "pages": [
+                  "blog-categories",
+                  "api-reference/blog-categories/list-blog-categories",
+                  "api-reference/blog-categories/create-a-blog-category",
+                  "api-reference/blog-categories/retrieve-a-blog-category",
+                  "api-reference/blog-categories/update-a-blog-category",
+                  "api-reference/blog-categories/delete-a-blog-category"
+                ]
+              }
             ]
           },
           {

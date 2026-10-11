@@ -1,0 +1,9 @@
+---
+title: "Delete a blog post"
+description: "Moves a blog post to the trash and returns `204`; nothing on this API restores it."
+openapi: "DELETE /admin/blogs/{blog_id}"
+---
+
+Moves the blog post to the trash and returns `204` with no body. The post leaves the listing and the count, and retrieving, replacing, updating or deleting it again returns `404`. Its `title` stays taken, so no create or replace can use that title again, and no call on this API restores the post or empties the trash. Its comments stay readable and you can still approve them, but adding a comment to the post returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

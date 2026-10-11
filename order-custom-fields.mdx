@@ -1,0 +1,62 @@
+---
+title: "Order custom fields"
+sidebarTitle: "Overview"
+description: "List, count and retrieve the custom fields your store's orders can have, and check a timeslot against an order limit."
+---
+
+The Order custom fields API has four endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/order_custom_fields`.
+
+<Warning>
+  **Validating a timeslot stores nothing, even though it returns `201`.**
+  [Validate a timeslot](/api-reference/order-custom-fields/validate-a-timeslot) does not reserve the timeslot or change the field: the
+  field's `last_updated_on` and the number of order custom fields stay the same, and the same check
+  sent again returns the same result. The status is `201` whether the timeslot is available or not,
+  so read `valid` in the response.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List order custom fields](/api-reference/order-custom-fields/list-order-custom-fields) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/order_custom_fields` | Returns up to 20 order custom fields per call, with the total and paging details. |
+| [Count order custom fields](/api-reference/order-custom-fields/count-order-custom-fields) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/order_custom_fields/count` | Returns the number of order custom fields, or of one field type with `filterBy`. |
+| [Retrieve an order custom field](/api-reference/order-custom-fields/retrieve-an-order-custom-field) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/order_custom_fields/{order_custom_field_id}` | Returns the order custom field whose `id` you pass as `order_custom_field_id`, with all 21 keys. |
+| [Validate a timeslot](/api-reference/order-custom-fields/validate-a-timeslot) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/order_custom_fields/{order_custom_field_id}/validate_timeslot` | Checks a timeslot against an order limit and returns whether it is available. Stores nothing. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **You can read order custom fields, but not create, change or delete them.** `POST` on
+  `/admin/order_custom_fields`, and `PUT`, `PATCH` and `DELETE` on
+  `/admin/order_custom_fields/{order_custom_field_id}`, are rejected with `405 method_not_allowed` and
+  the message `HTTP method not allowed for this endpoint.` The listing's `group_meta` shows
+  `writable: false`. `OPTIONS` lists `HEAD` in its `Allow` header, but `HEAD` returns `404` on the
+  listing and on a field's path, and `405` on `/count`.
+- **Send the timeslot keys at the top level of the body.** [Validate a timeslot](/api-reference/order-custom-fields/validate-a-timeslot)
+  takes `selected_date`, `weekday_id`, `start_hour`, `end_hour` and `order_limit` unwrapped. A body
+  wrapped in a key, such as `{"validate_timeslot": {...}}` or `{"order_custom_field": {...}}`, is
+  read as a body without `selected_date` and rejected with `400`. `selected_date` is required,
+  written `dd/MM/yyyy`, such as `25/10/2026`.
+- **A listing returns at most 20 fields per call.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get every field, raise `offset` by the number of fields each page
+  returned until you reach `pagination.total`. `filterBy` keeps one field type, in the listing and in
+  the count. The query parameters `q`, `search`, `name`, `label` and `is_active` are accepted and
+  ignored: no parameter searches the fields.
+- **`sort` takes its own names for five keys, not the names the response uses.** To sort by
+  `field_type`, `order_no`, `is_active`, `created_on` or `last_updated_on`, send `type`, `orderNo`,
+  `isActive`, `created` or `updated`. Those five response names are rejected with `400`, and so is a
+  leading `-`: set `dir` to `asc` or `desc` instead. `id`, `label` and `name` sort by the field's key
+  of the same name.
+- **After a rejected query parameter, your next call can be rejected too.** When a query parameter is
+  rejected with `400`, your next call on the same client returns the same `400` if its endpoint reads
+  that parameter, even when that call's own parameters are valid. The listing reads all seven of its
+  parameters: `limit`, `offset`, `page`, `sort`, `dir`, `filterBy` and `field_metadata`.
+  [Retrieve an order custom field](/api-reference/order-custom-fields/retrieve-an-order-custom-field) reads `field_metadata`, and
+  [Count order custom fields](/api-reference/order-custom-fields/count-order-custom-fields) reads `filterBy`. Send that call again: the call
+  after it runs normally, and so does every call on a new client. A rejected timeslot body does not
+  affect the next call.

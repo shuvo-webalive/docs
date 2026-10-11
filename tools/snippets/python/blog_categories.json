@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "list_blog_categories",
+      "code": "response = client.blog_categories.list_blog_categories({\"limit\": 20, \"offset\": 0})\nfor category in response.map[\"blog_categories\"]:\n    print(category[\"id\"], category[\"name\"], category[\"url\"])\npagination = response.map[\"pagination\"]\nprint(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "create_blog_category": {
+      "function": "create_blog_category",
+      "code": "response = client.blog_categories.create_blog_category({\"blog_category\": {\n    \"name\": \"Seasonal Promotions\",\n    \"url\": \"seasonal-promotions\",\n    \"description\": \"Sale announcements and limited-time offers.\",\n    \"image\": {\n        \"file_name\": \"seasonal-promotions.png\",\n        \"base64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n        \"title\": \"Seasonal promotions\",\n        \"alternative_text\": \"Seasonal promotions banner\",\n    },\n}})\nprint(response.map[\"blog_category\"][\"id\"])\n"
+    },
+    "get_blog_category": {
+      "function": "get_blog_category",
+      "code": "response = client.blog_categories.get_blog_category(15)\ncategory = response.map[\"blog_category\"]\nprint(category[\"name\"], category[\"url\"], category[\"description\"])\nprint(category[\"created_on\"], category[\"last_updated_on\"])\n"
+    },
+    "update_blog_category": {
+      "function": "update_blog_category",
+      "code": "response = client.blog_categories.update_blog_category(15, {\"blog_category\": {\n    \"name\": \"Seasonal Offers\",\n    \"url\": \"seasonal-offers\",\n    \"description\": \"Offers and clearance announcements.\",\n}})\ncategory = response.map[\"blog_category\"]\nprint(category[\"name\"], category[\"url\"], category[\"description\"])\n"
+    },
+    "delete_blog_category": {
+      "function": "delete_blog_category",
+      "code": "response = client.blog_categories.delete_blog_category(15)\nprint(response.status_code)\n"
+    }
+  }
+}

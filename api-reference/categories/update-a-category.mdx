@@ -1,0 +1,9 @@
+---
+title: "Update a category"
+description: "Changes only the fields you send, in any number of sections, and returns the category."
+openapi: "PATCH /admin/categories/{category_id}"
+---
+
+Send the fields to change inside `category`, grouped by section; one body can change several sections. Every field you leave out keeps its value. The exception is `assign_products.products`: the list you send replaces the category's products. A body that is not wrapped in `category` is rejected with `400` and the message `category is required`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
