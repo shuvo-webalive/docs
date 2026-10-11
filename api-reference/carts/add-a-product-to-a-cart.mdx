@@ -1,0 +1,9 @@
+---
+title: "Add a product to a cart"
+description: "Adds a product to a cart, creating the cart if needed, and returns the cart."
+openapi: "POST /carts"
+---
+
+Adds a product to the cart named by `session_id`, creating the cart if needed, and returns the whole cart under `cart`. Send the product's `id` as `product_id`, a `quantity`, and the customer's `internal_id` as `customer_id`, at the top level of the body. If you leave out `session_id`, the store names the cart with your HTTP session's `JSESSIONID` cookie value, and `cart.session_id` in the response shows that name. Adding a product that is already in the cart raises that cart item's `quantity` and keeps its `id`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

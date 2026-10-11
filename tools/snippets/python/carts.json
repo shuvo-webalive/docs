@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "carts",
+  "endpoints": {
+    "add_cart_item": {
+      "function": "add_cart_item",
+      "code": "response = client.carts.add_cart_item({\n    \"product_id\": 101, \"quantity\": 1, \"customer_id\": 45, \"session_id\": \"cart-7f3a9c2e1b\",\n    \"shipping_address\": {\n        \"first_name\": \"Alex\", \"last_name\": \"Taylor\", \"address_line1\": \"1 Example Street\",\n        \"address_line2\": \"\", \"city\": \"Sydney\", \"post_code\": \"2000\",\n        \"phone\": \"\", \"mobile\": \"\", \"fax\": \"\", \"email\": \"alex.taylor@example.com\",\n        \"country_code\": \"AU\", \"state_code\": \"NSW\",\n    },\n})\ncart = response.map[\"cart\"]\nprint(cart[\"session_id\"], cart[\"customer_id\"], cart[\"shipping\"][\"shipping_tax\"])\nprint(cart[\"items\"][0][\"id\"], cart[\"items\"][0][\"quantity\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "get_cart": {
+      "function": "get_cart",
+      "code": "response = client.carts.get_cart(\"cart-7f3a9c2e1b\")\ncart = response.map[\"cart\"]\nfor item in cart[\"items\"]:\n    print(item[\"id\"], item[\"product\"][\"sku\"], item[\"quantity\"], item[\"pricing\"][\"total\"])\ntotals = cart[\"totals\"]\nprint(totals[\"subtotal\"], totals[\"tax\"], totals[\"grand_total\"])\nprint(cart[\"shipping\"][\"shipping_tax\"], cart[\"shipping\"][\"handling_tax\"])\n"
+    },
+    "resolve_cart_session": {
+      "function": "resolve_cart_session",
+      "code": "response = client.carts.resolve_cart_session(\"cart-7f3a9c2e1b\", {})\nprint(response.map[\"sessionId\"])\n"
+    },
+    "update_cart_item": {
+      "function": "update_cart_item",
+      "code": "response = client.carts.update_cart_item(\n    \"cart-7f3a9c2e1b\", {\"cart_item_id\": 42, \"quantity\": 2}\n)\ncart = response.map[\"cart\"]\nfor item in cart[\"items\"]:\n    print(item[\"id\"], item[\"quantity\"], item[\"pricing\"][\"total\"])\nprint(cart[\"totals\"][\"subtotal\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "delete_cart": {
+      "function": "delete_cart",
+      "code": "response = client.carts.delete_cart(\"cart-7f3a9c2e1b\")\nprint(response.status_code)\n"
+    },
+    "delete_cart_item": {
+      "function": "delete_cart_item",
+      "code": "response = client.carts.delete_cart_item(\"cart-7f3a9c2e1b\", 42)\nprint(response.status_code)\n"
+    },
+    "create_order_from_cart": {
+      "function": "create_order_from_cart",
+      "code": "response = client.carts.create_order_from_cart(\"cart-7f3a9c2e1b\", {\n    \"customer_id\": 123,\n    \"payment_gateway\": \"PIS\",\n    \"delivery_type\": \"shipping\",\n    \"transaction_no\": \"web-order-0001\",\n})\norder = response.map[\"order\"]\nprint(response.map[\"status\"], order[\"order_id\"], order[\"order_no\"])\nprint(order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"], order[\"due\"])\nfor line in order[\"order_line_details\"]:\n    print(line[\"sku\"], line[\"quantity\"], line[\"total_amount\"])\n"
+    }
+  }
+}

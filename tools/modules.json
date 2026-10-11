@@ -70,6 +70,13 @@
       ]
     },
     {
+      "name": "Carts",
+      "icon": "cart-shopping",
+      "modules": [
+        "carts"
+      ]
+    },
+    {
       "name": "Categories",
       "icon": "folder-tree",
       "modules": [

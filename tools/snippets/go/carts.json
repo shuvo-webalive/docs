@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "carts",
+  "endpoints": {
+    "add_cart_item": {
+      "function": "AddCartItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().AddCartItem(ctx, map[string]any{\n\t\"product_id\": 101, \"quantity\": 1, \"customer_id\": 45, \"session_id\": \"cart-7f3a9c2e1b\",\n\t\"shipping_address\": map[string]any{\n\t\t\"first_name\": \"Alex\", \"last_name\": \"Taylor\", \"address_line1\": \"1 Example Street\", \"address_line2\": \"\", \"city\": \"Sydney\",\n\t\t\"post_code\": \"2000\", \"phone\": \"\", \"mobile\": \"\", \"fax\": \"\", \"email\": \"alex.taylor@example.com\", \"country_code\": \"AU\", \"state_code\": \"NSW\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"session_id\"], cart[\"customer_id\"], cart[\"items\"].([]any)[0].(map[string]any)[\"id\"], cart[\"shipping\"].(map[string]any)[\"shipping_tax\"])"
+    },
+    "get_cart": {
+      "function": "GetCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().GetCart(ctx, \"cart-7f3a9c2e1b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfor _, row := range cart[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"product\"].(map[string]any)[\"name\"], item[\"quantity\"], item[\"pricing\"].(map[string]any)[\"total\"])\n}\ntotals := cart[\"totals\"].(map[string]any)\nfmt.Println(totals[\"subtotal\"], cart[\"shipping\"].(map[string]any)[\"shipping_tax\"], totals[\"grand_total\"])"
+    },
+    "resolve_cart_session": {
+      "function": "ResolveCartSession",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().ResolveCartSession(ctx, \"cart-7f3a9c2e1b\", map[string]any{}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"sessionId\"])"
+    },
+    "update_cart_item": {
+      "function": "UpdateCartItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().UpdateCartItem(ctx, \"cart-7f3a9c2e1b\", map[string]any{\"cart_item_id\": 42, \"quantity\": 2}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfor _, row := range cart[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"quantity\"], item[\"pricing\"].(map[string]any)[\"total\"])\n}\ntotals := cart[\"totals\"].(map[string]any)\nfmt.Println(totals[\"subtotal\"], totals[\"grand_total\"])"
+    },
+    "delete_cart": {
+      "function": "DeleteCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().DeleteCart(ctx, \"cart-7f3a9c2e1b\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "delete_cart_item": {
+      "function": "DeleteCartItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().DeleteCartItem(ctx, \"cart-7f3a9c2e1b\", 42, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_order_from_cart": {
+      "function": "CreateOrderFromCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().CreateOrderFromCart(ctx, \"cart-7f3a9c2e1b\", map[string]any{\n\t\"customer_id\":     123,\n\t\"payment_gateway\": \"PIS\",\n\t\"delivery_type\":   \"shipping\",\n\t\"transaction_no\":  \"web-order-0001\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\norder := body[\"order\"].(map[string]any)\nfmt.Println(body[\"status\"], order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"])"
+    }
+  }
+}
