@@ -493,7 +493,7 @@ ENDPOINTS = [
         "method": "PATCH",
         "path": BASE + "/{order_id}",
         "summary": "Changes the order fields you send: status, addresses, purchase order number, payment term, sales channel or IP address.",
-        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term` and `order_channel` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
+        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term`, `order_channel` and `ip_address` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
         "parameters": [ORDER_ID],
         "body": {"schema": wrapped("OrderPatchInput", "Wrap the fields in `order`, or send them at the top level. `fulfillment` is accepted only inside the `order` wrapper."), "example": {"order": {"customer_po_number": "PO-0001", "payment_term": "NET30"}}},
         "responses": {
@@ -945,6 +945,7 @@ ORDER_INPUT_PROPERTIES = {
     "transaction_no": text("Your reference for the order. The store does not check it for duplicates."),
     "external_reference_order_id": text("An order number from another system. The listing's `externalReferenceOrderId` filter matches it."),
     "order_channel": text("The sales channel the order came from, up to 255 characters; 256 is rejected with `400`. Left out, `\"\"` or `null` stores none."),
+    "ip_address": text("The IP address the order was placed from, IPv4 or IPv6; any other text is rejected with `400` and the reason `invalid_format`. Left out, the store sets `127.0.0.1`; `\"\"` or `null` stores none."),
     "billing_address": ref("OrderAddressInput"),
     "shipping_address": ref("OrderAddressInput"),
     "products": {"type": "array", "minItems": 1, "items": ref("OrderProductInput"), "description": "Required. One line per product."},
@@ -958,6 +959,7 @@ WITH_PAYMENT_PROPERTIES = dict(
     transaction_no=text("Accepted and not stored."),
     external_reference_order_id=text("Accepted and not stored."),
     order_channel=text("Accepted and not stored."),
+    ip_address=text("Accepted and not checked or stored; the order reads `127.0.0.1`."),
     payment=ref("OrderInitialPaymentInput"),
 )
 
@@ -971,7 +973,7 @@ SCHEMAS = {
         "shipping_status": text("`not_shipped` before the first shipment, then `partial`, and `shipped` once every unit has shipped."),
         "currency_code": text("The order's currency code."),
         "transaction_no": nullable_text("The `transaction_no` sent when the order was created."),
-        "ip_address": text("The IP address the order was placed from."),
+        "ip_address": text("The IP address the order was placed from; `127.0.0.1` on an order created without one."),
         "order_channel": nullable_text("The sales channel the order came from, as sent on create or PATCH; `\"\"` when none was set."),
         "created_on": text("When the order was created."),
         "last_updated_on": text("When the order last changed."),
@@ -1005,7 +1007,7 @@ SCHEMAS = {
         "paid": number("The amount paid."),
         "due": number("The amount still due."),
         "items_total": whole("The `items_total` of `charges_totals` in the sectioned shape."),
-        "ip_address": text("The IP address the order was placed from."),
+        "ip_address": text("The IP address the order was placed from; `127.0.0.1` on an order created without one."),
         "order_channel": nullable_text("The sales channel the order came from, as sent on create or PATCH; `null` when none was set."),
         "created_at": text("When the order was created."),
         "updated_at": text("When the order last changed."),
@@ -1311,13 +1313,14 @@ SCHEMAS = {
         "customer_po_number": text("The customer's purchase order number."),
         "payment_term": text("The payment term, such as `NET30`."),
         "order_channel": nullable_text("The sales channel, up to 255 characters. `\"\"` or `null` clears it; a number or 256 characters is rejected with `400`."),
-        "ip_address": text("The IP address the order was placed from."),
+        "ip_address": nullable_text("The IP address, IPv4 or IPv6. Any other text is rejected with `400` (`invalid_format`) and a number with `400` (`invalid_type`), and the stored value does not change. `\"\"` or `null` clears it."),
         "billing_address": ref("OrderAddressInput"),
         "shipping_address": ref("OrderAddressInput"),
         "fulfillment": {"type": "object", "description": "Accepted only inside the `order` wrapper. A top-level `fulfillment` key is rejected with `400`.", "properties": {
             "customer_po_number": text("The customer's purchase order number."),
             "payment_term": text("The payment term."),
             "order_channel": text("The sales channel."),
+            "ip_address": text("The IP address, IPv4 or IPv6."),
         }},
     }},
     "OrderAddressesInput": {"type": "object", "description": "Send at least one address, at the top level of the body. An address you leave out does not change. Each address may name its country and state with `country` and `state` records holding their `id` instead of `country_code` and `state_code`.", "properties": {

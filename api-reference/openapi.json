@@ -26145,7 +26145,7 @@
         ],
         "summary": "Update selected order fields",
         "operationId": "patch_order",
-        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term` and `order_channel` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
+        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term`, `order_channel` and `ip_address` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
         "parameters": [
           {
             "name": "order_id",
@@ -46428,7 +46428,7 @@
           },
           "ip_address": {
             "type": "string",
-            "description": "The IP address the order was placed from."
+            "description": "The IP address the order was placed from; `127.0.0.1` on an order created without one."
           },
           "order_channel": {
             "type": [
@@ -46582,7 +46582,7 @@
           },
           "ip_address": {
             "type": "string",
-            "description": "The IP address the order was placed from."
+            "description": "The IP address the order was placed from; `127.0.0.1` on an order created without one."
           },
           "order_channel": {
             "type": [
@@ -47881,6 +47881,10 @@
             "type": "string",
             "description": "The sales channel the order came from, up to 255 characters; 256 is rejected with `400`. Left out, `\"\"` or `null` stores none."
           },
+          "ip_address": {
+            "type": "string",
+            "description": "The IP address the order was placed from, IPv4 or IPv6; any other text is rejected with `400` and the reason `invalid_format`. Left out, the store sets `127.0.0.1`; `\"\"` or `null` stores none."
+          },
           "billing_address": {
             "$ref": "#/components/schemas/OrderAddressInput"
           },
@@ -47971,6 +47975,10 @@
           "order_channel": {
             "type": "string",
             "description": "Accepted and not stored."
+          },
+          "ip_address": {
+            "type": "string",
+            "description": "Accepted and not checked or stored; the order reads `127.0.0.1`."
           },
           "billing_address": {
             "$ref": "#/components/schemas/OrderAddressInput"
@@ -48162,8 +48170,11 @@
             "description": "The sales channel, up to 255 characters. `\"\"` or `null` clears it; a number or 256 characters is rejected with `400`."
           },
           "ip_address": {
-            "type": "string",
-            "description": "The IP address the order was placed from."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The IP address, IPv4 or IPv6. Any other text is rejected with `400` (`invalid_format`) and a number with `400` (`invalid_type`), and the stored value does not change. `\"\"` or `null` clears it."
           },
           "billing_address": {
             "$ref": "#/components/schemas/OrderAddressInput"
@@ -48186,6 +48197,10 @@
               "order_channel": {
                 "type": "string",
                 "description": "The sales channel."
+              },
+              "ip_address": {
+                "type": "string",
+                "description": "The IP address, IPv4 or IPv6."
               }
             }
           }
