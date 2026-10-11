@@ -87,6 +87,7 @@
       "name": "Blogs",
       "icon": "newspaper",
       "modules": [
+        "blogs",
         "blog_categories"
       ]
     },

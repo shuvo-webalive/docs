@@ -1,0 +1,72 @@
+---
+title: "Blogs"
+sidebarTitle: "Overview"
+description: "List, count, create, change and delete blog posts, and add, read, approve and mark as spam the comments on each post."
+---
+
+The Blogs API has twelve endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/blogs`.
+
+<Warning>
+  **Replacing a blog post resets the fields you leave out of the body.** `PUT` sets `content` to
+  `null`, `is_published` to `false`, `date` to the current time, `categories` to the store's default
+  category, `seo_configs` to `{"meta_tag": []}`, `visible_to` to `null` and `selected_customers` to
+  `[]`. It keeps the image and `created_by`, and keeps `url` unless you send a new one. To change
+  only some fields, use
+  [Update a blog post](/api-reference/blogs/update-a-blog-post), which sends `PATCH`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List blog posts](/api-reference/blogs/list-blog-posts) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blogs` | Returns up to 20 blog posts, latest `date` first, with the total and page links. |
+| [Count blog posts](/api-reference/blogs/count-blog-posts) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blogs/count` | Returns the number of blog posts, narrowed by `ids`, `category` or `visibility` if you send them. |
+| [Create a blog post](/api-reference/blogs/create-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/blogs` | Creates a blog post and returns it with its `id`, which other calls take as `blog_id`. |
+| [Retrieve a blog post](/api-reference/blogs/retrieve-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blogs/{blog_id}` | Returns the blog post whose `id` you pass as `blog_id`. |
+| [Replace a blog post](/api-reference/blogs/replace-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/blogs/{blog_id}` | Replaces a blog post and returns it. Most fields you leave out are reset. |
+| [Update a blog post](/api-reference/blogs/update-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/blogs/{blog_id}` | Changes only the fields you send and returns the blog post. |
+| [Delete a blog post](/api-reference/blogs/delete-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/blogs/{blog_id}` | Moves a blog post to the trash and returns `204`; nothing on this API restores it. |
+| [List comments on a blog post](/api-reference/blogs/list-comments-on-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blogs/{blog_id}/comments` | Returns every comment on a blog post, oldest first, in one response. |
+| [Add a comment to a blog post](/api-reference/blogs/add-a-comment-to-a-blog-post) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/blogs/{blog_id}/comments` | Adds a comment to a blog post and returns it with `status` set to `pending`. |
+| [Retrieve a comment](/api-reference/blogs/retrieve-a-comment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/blogs/{blog_id}/comments/{blog_comment_id}` | Returns the comment whose `id` you pass as `blog_comment_id`. |
+| [Approve a comment](/api-reference/blogs/approve-a-comment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/blogs/{blog_id}/comments/{blog_comment_id}/approve` | Sets a comment's `status` to `approved` and returns the comment. |
+| [Mark a comment as spam](/api-reference/blogs/mark-a-comment-as-spam) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/blogs/{blog_id}/comments/{blog_comment_id}/mark-spam` | Sets a comment's `status` to `spam` and `spam` to `true`, and returns the comment. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap every request body in `blog`, comments included.** Send `{"blog": {...}}` to
+  create, replace or update a blog post, and `{"blog": {"comment": {...}}}` to add a comment. A blog
+  post write without the wrapper, or with an empty one, is rejected with `400` and the message
+  `blog info missing`, and a field it does not recognise is rejected with `400` and the reason
+  `unknown_field`. A comment that is not wrapped in both returns `404` with the message
+  `comment is required`.
+- **Deleting a blog post moves it to the trash, and no call on this API restores it or empties the trash.**
+  The post leaves the listing and the count, and retrieving, replacing or updating it returns `404`.
+  Its `title` stays taken: a create or replace with that title, in any letter case, is rejected with
+  `400`, and the message says the title `is already used by a blog in the trash; restore or rename it`.
+  Its comments stay readable and you can still approve them, but adding a comment to the post
+  returns `404`.
+- **In every comment response, the top-level `id` is the blog post's `id`, not the comment's.** One
+  comment is returned as `{"id": <blog_id>, "comment": {...}}`, and the comment listing as
+  `{"id": <blog_id>, "comments": [...]}`. Read the comment's own `id` inside `comment` and pass it
+  as `blog_comment_id`. No call updates or deletes a comment.
+- **A listing returns at most 20 blog posts per call, latest `date` first.** A larger `limit` is capped
+  at `20`. To get more, send the next `page` or a higher `offset` while `pagination.has_next` is
+  `true`. Only `limit`, `offset`, `page`, `sort`, `dir`, `ids`, `category`, `visibility`, `search`
+  and `field_metadata` are accepted: any other parameter is rejected with `400`. To filter by several
+  blog post `id` values, repeat `ids`, as in `ids=1201&ids=1202`: a comma list returns `500`.
+- **After the listing rejects `limit=0`, a `sort` or a `dir`, your next request on the same client returns the same `400`.**
+  It does so even when its own parameters are valid. The request after that runs normally, and so
+  does every request on a new client: send the request that got the repeated `400` again.
+- **A restricted blog post names its audience by each customer's `internal_id`.** Set `visibility` to
+  `restricted` and `visible_to` to `selected`, and send `selected_customers` as
+  `{"customers": [...], "groups": [...]}`, with each customer's `internal_id` from
+  [List customers](/api-reference/customers/list-customers) and each customer group's `id`. A customer's `customer_id`
+  there is dropped without an error, which leaves the audience empty. A post returns `selected_customers` as
+  an object once it names anyone, and as `[]`, a list, while it names no one.

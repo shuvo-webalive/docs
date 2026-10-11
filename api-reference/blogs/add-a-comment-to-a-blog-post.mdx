@@ -1,0 +1,9 @@
+---
+title: "Add a comment to a blog post"
+description: "Adds a comment to a blog post and returns it with `status` set to `pending`."
+openapi: "POST /admin/blogs/{blog_id}/comments"
+---
+
+Adds a comment to the blog post and returns it with `201` and `status` set to `pending`. Wrap the comment in `blog` and then `comment`, with `content` required and `name` and `email` optional: any other shape returns `404` with the message `comment is required`. The store drops fields it does not recognise and the `id`, `spam`, `likes`, `total_reply` and `post_title` fields, but stores any `status` you send without checking it, so leave `status` out. A comment on a blog post in the trash returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
