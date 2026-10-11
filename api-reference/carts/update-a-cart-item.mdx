@@ -1,0 +1,9 @@
+---
+title: "Update a cart item"
+description: "Changes the `quantity` of one item in the cart and returns the updated cart."
+openapi: "PATCH /carts/{session_id}"
+---
+
+Sets the `quantity` of the cart item whose `id` you send as `cart_item_id`, and returns the whole cart; other items do not change. A `shipping_address` sets the cart's shipping taxes, and an order you create with the same `JSESSIONID` cookie gets this call's `shipping_address` and `billing_address`. Always send `quantity`: without it the call returns `500`. Do not send `customer_id`: the call returns `500` with a body that is not valid JSON, and still saves the new `quantity`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

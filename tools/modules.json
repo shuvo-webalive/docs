@@ -66,7 +66,37 @@
       "name": "Orders",
       "icon": "receipt",
       "modules": [
-        "orders"
+        "orders",
+        "order_custom_fields"
+      ]
+    },
+    {
+      "name": "Carts",
+      "icon": "cart-shopping",
+      "modules": [
+        "carts"
+      ]
+    },
+    {
+      "name": "Categories",
+      "icon": "folder-tree",
+      "modules": [
+        "categories"
+      ]
+    },
+    {
+      "name": "Discounts",
+      "icon": "tags",
+      "modules": [
+        "discount_profiles"
+      ]
+    },
+    {
+      "name": "Blogs",
+      "icon": "newspaper",
+      "modules": [
+        "blogs",
+        "blog_categories"
       ]
     },
     {

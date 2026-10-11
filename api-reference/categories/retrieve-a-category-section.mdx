@@ -1,0 +1,9 @@
+---
+title: "Retrieve a category section"
+description: "Returns one section of a category, inside `category`, such as its `tax_shipping` settings."
+openapi: "GET /admin/categories/{category_id}/{section}"
+---
+
+Returns the section named in the path inside `category`, such as `{"category": {"tax_shipping": {...}}}`, with the same values as [Retrieve a category](/api-reference/categories/retrieve-a-category). The response has no `group_meta`, and query parameters, `field_metadata` included, add nothing. A category in the trash still returns its sections. An unknown section returns `404` with the message `Section not found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

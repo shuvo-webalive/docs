@@ -1,0 +1,9 @@
+---
+title: "Retrieve a cart"
+description: "Returns the cart for a `session_id`, with its items, totals and shipping taxes."
+openapi: "GET /carts/{session_id}"
+---
+
+Returns the cart under `cart`, with `group_meta` beside it; no other cart call returns `group_meta`. `cart.customer_id` is `null` here, even when your client sends back the `JSESSIONID` cookie the store set when you added the product. A cart with no items returns `400` with the message `Your shopping cart is empty`, not `404`. Query parameters are ignored, `field_metadata` included.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

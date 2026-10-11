@@ -1,0 +1,9 @@
+---
+title: "Check a category name"
+description: "Returns `available`: `false` when any category, even one in the trash, has the name."
+openapi: "GET /admin/categories/check-name"
+---
+
+Send the name as `name`; other query parameters, such as `parent`, are ignored. You get `"available": false` when any category has exactly that name, in any letter case, wherever it sits in the tree and even when it is in the trash. A leading space counts as part of the name and trailing spaces do not, so a name with a leading space can be reported as available while the name without it is taken. A create rejects only a name that a top-level category has, so [Create a category](/api-reference/categories/create-a-category) can accept a name this call reports as taken.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

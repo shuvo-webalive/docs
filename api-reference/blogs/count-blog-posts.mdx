@@ -1,0 +1,9 @@
+---
+title: "Count blog posts"
+description: "Returns the number of blog posts, narrowed by `ids`, `category` or `visibility` if you send them."
+openapi: "GET /admin/blogs/count"
+---
+
+Returns the number of blog posts as `count`, inside a `blogs` object. `ids`, `category` and `visibility` narrow the number as they narrow [List blog posts](/api-reference/blogs/list-blog-posts), so it matches that listing's `pagination.total` for the same filters. The listing's other parameters are accepted and change nothing, and any other parameter is rejected with `400`. Posts in the trash are not counted.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

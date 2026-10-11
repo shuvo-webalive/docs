@@ -1,0 +1,34 @@
+{
+  "sdk": "java",
+  "module": "carts",
+  "endpoints": {
+    "add_cart_item": {
+      "function": "addCartItem",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Alex\"), entry(\"last_name\", \"Taylor\"),\n        entry(\"address_line1\", \"1 Example Street\"), entry(\"address_line2\", \"\"), entry(\"city\", \"Sydney\"),\n        entry(\"post_code\", \"2000\"), entry(\"phone\", \"\"), entry(\"mobile\", \"\"), entry(\"fax\", \"\"),\n        entry(\"email\", \"alex.taylor@example.com\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"NSW\"));\nApiResponse response = client.carts().addCartItem(Map.of(\"product_id\", 101, \"quantity\", 1, \"customer_id\", 45,\n        \"session_id\", \"cart-7f3a9c2e1b\", \"shipping_address\", address));\nMap<?, ?> cart = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart\");\nMap<?, ?> item = (Map<?, ?>) ((List<?>) cart.get(\"items\")).get(0);\nSystem.out.println(cart.get(\"session_id\") + \" \" + cart.get(\"customer_id\") + \" \" + item.get(\"id\"));\nSystem.out.println(item.get(\"quantity\") + \" \" + ((Map<?, ?>) cart.get(\"shipping\")).get(\"shipping_tax\"));"
+    },
+    "get_cart": {
+      "function": "getCart",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.carts().getCart(\"cart-7f3a9c2e1b\");\nMap<?, ?> cart = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart\");\nfor (Object row : (List<?>) cart.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    Map<?, ?> product = (Map<?, ?>) item.get(\"product\");\n    System.out.println(item.get(\"id\") + \" \" + product.get(\"name\") + \" \" + item.get(\"quantity\"));\n}\nMap<?, ?> totals = (Map<?, ?>) cart.get(\"totals\");\nSystem.out.println(totals.get(\"subtotal\") + \" \" + ((Map<?, ?>) cart.get(\"shipping\")).get(\"shipping_tax\")\n        + \" \" + totals.get(\"grand_total\"));"
+    },
+    "resolve_cart_session": {
+      "function": "resolveCartSession",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.carts().resolveCartSession(\"cart-7f3a9c2e1b\", Map.of());\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"sessionId\"));"
+    },
+    "update_cart_item": {
+      "function": "updateCartItem",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.carts().updateCartItem(\"cart-7f3a9c2e1b\",\n        Map.of(\"cart_item_id\", 42, \"quantity\", 2));\nMap<?, ?> cart = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"cart\");\nfor (Object row : (List<?>) cart.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"quantity\") + \" \"\n            + ((Map<?, ?>) item.get(\"pricing\")).get(\"total\"));\n}\nMap<?, ?> totals = (Map<?, ?>) cart.get(\"totals\");\nSystem.out.println(totals.get(\"subtotal\") + \" \" + totals.get(\"grand_total\"));"
+    },
+    "delete_cart": {
+      "function": "deleteCart",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.carts().deleteCart(\"cart-7f3a9c2e1b\");\nSystem.out.println(response.getStatusCode());"
+    },
+    "delete_cart_item": {
+      "function": "deleteCartItem",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.carts().deleteCartItem(\"cart-7f3a9c2e1b\", 42);\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_order_from_cart": {
+      "function": "createOrderFromCart",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.carts().createOrderFromCart(\"cart-7f3a9c2e1b\", Map.of(\"customer_id\", 123,\n        \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"transaction_no\", \"web-order-0001\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> order = (Map<?, ?>) body.get(\"order\");\nSystem.out.println(body.get(\"status\") + \" \" + order.get(\"order_id\") + \" \" + order.get(\"order_status\"));\nSystem.out.println(order.get(\"payment_status\") + \" \" + order.get(\"grand_total\"));"
+    }
+  }
+}

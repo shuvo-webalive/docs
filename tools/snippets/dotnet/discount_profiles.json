@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "discount_profiles",
+  "endpoints": {
+    "list_discount_profiles": {
+      "function": "ListDiscountProfilesAsync",
+      "code": "var response = await client.DiscountProfiles.ListDiscountProfilesAsync(\n    new Dictionary<string, object?> { [\"sort\"] = \"name\", [\"dir\"] = \"asc\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var discountProfile in ((IReadOnlyList<object?>)body[\"discount_profiles\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{discountProfile[\"id\"]} {discountProfile[\"name\"]} {discountProfile[\"type\"]} {discountProfile[\"is_active\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "create_discount_profile": {
+      "function": "CreateDiscountProfileAsync",
+      "code": "var response = await client.DiscountProfiles.CreateDiscountProfileAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Spring 40 Off\", [\"type\"] = \"offer_coupon\", [\"discount_details_type\"] = \"amount\",\n    [\"amount_details\"] = new Dictionary<string, object?>\n    {\n        [\"type\"] = \"single\", [\"apply_to\"] = \"total_order\", [\"single_amount\"] = 40, [\"single_amount_type\"] = \"PERCENT\",\n    },\n    [\"is_active\"] = true, [\"start_date\"] = \"2026-11-06 09:30:00\", [\"is_specify_end_date\"] = true,\n    [\"end_date\"] = \"2026-11-16 18:00:00\", [\"is_apply_coupon_code\"] = true, [\"default_coupon_code\"] = \"SPRING40\",\n    [\"is_maximum_use_total\"] = true, [\"maximum_use_count\"] = 100, [\"is_maximum_use_customer\"] = true,\n    [\"maximum_use_customer_count\"] = 1, [\"is_maximum_discount_allowed\"] = true, [\"maximum_discount_allowed_amount\"] = 200,\n    [\"is_display_text_coupon\"] = true, [\"display_text_coupon\"] = \"Use code SPRING40 at checkout\",\n    [\"is_display_text_cart\"] = true, [\"display_text_cart\"] = \"Spring sale discount applied\",\n    [\"is_display_text_partial_discount_condition\"] = true,\n    [\"display_text_partial_discount_condition\"] = \"Add one more item to get the spring discount\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar discountProfile = (IReadOnlyDictionary<string, object?>)body[\"discount_profile\"]!;\nConsole.WriteLine($\"{discountProfile[\"id\"]} {discountProfile[\"default_coupon_code\"]}\");"
+    },
+    "get_discount_profile": {
+      "function": "GetDiscountProfileAsync",
+      "code": "var response = await client.DiscountProfiles.GetDiscountProfileAsync(1001);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar discountProfile = (IReadOnlyDictionary<string, object?>)body[\"discount_profile\"]!;\nConsole.WriteLine($\"{discountProfile[\"name\"]} {discountProfile[\"is_active\"]} {discountProfile[\"default_coupon_code\"]}\");\nforeach (var coupon in ((IReadOnlyList<object?>)discountProfile[\"customer_coupons\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{coupon[\"code\"]} {coupon[\"customer_email\"]}\");"
+    },
+    "update_discount_profile": {
+      "function": "UpdateDiscountProfileAsync",
+      "code": "var response = await client.DiscountProfiles.UpdateDiscountProfileAsync(1001, new Dictionary<string, object?>\n{\n    [\"name\"] = \"Spring 50 Off\", [\"type\"] = \"offer_coupon\", [\"discount_details_type\"] = \"amount\",\n    [\"amount_details\"] = new Dictionary<string, object?>\n    {\n        [\"type\"] = \"single\", [\"apply_to\"] = \"total_order\", [\"single_amount\"] = 50,\n        [\"single_amount_type\"] = \"PERCENT\", [\"minimum_amount_on\"] = \"each_item\",\n    },\n    [\"is_active\"] = true, [\"start_date\"] = \"2026-11-06 09:30:00\", [\"is_specify_end_date\"] = true,\n    [\"end_date\"] = \"2026-11-20 18:00:00\", [\"is_apply_coupon_code\"] = true, [\"is_maximum_use_total\"] = true,\n    [\"maximum_use_count\"] = 150, [\"is_maximum_use_customer\"] = true, [\"maximum_use_customer_count\"] = 1,\n    [\"is_maximum_discount_allowed\"] = true, [\"maximum_discount_allowed_amount\"] = 200,\n    [\"is_display_text_coupon\"] = true, [\"is_display_text_cart\"] = true,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar discountProfile = (IReadOnlyDictionary<string, object?>)body[\"discount_profile\"]!;\nvar amountDetails = (IReadOnlyDictionary<string, object?>)discountProfile[\"amount_details\"]!;\nConsole.WriteLine($\"{discountProfile[\"name\"]} {amountDetails[\"single_amount\"]} {discountProfile[\"end_date\"]}\");"
+    },
+    "delete_discount_profile": {
+      "function": "DeleteDiscountProfileAsync",
+      "code": "var response = await client.DiscountProfiles.DeleteDiscountProfileAsync(1001);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_discount_profile_coupons": {
+      "function": "CreateDiscountProfileCouponsAsync",
+      "code": "var response = await client.DiscountProfiles.CreateDiscountProfileCouponsAsync(1001, new Dictionary<string, object?>\n{\n    [\"requested_codes\"] = 3,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"message\"]);\nforeach (var code in (IReadOnlyList<object?>)body[\"codes\"]!)\n    Console.WriteLine(code);"
+    },
+    "assign_discount_coupon_customer": {
+      "function": "AssignDiscountCouponCustomerAsync",
+      "code": "var response = await client.DiscountProfiles.AssignDiscountCouponCustomerAsync(new Dictionary<string, object?>\n{\n    [\"code\"] = \"A1B2C3D4E5\", [\"email\"] = \"jane.citizen@example.com\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"message\"]}\");"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "sdk": "go",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "ListBlogs",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().ListBlogs(ctx, map[string]any{\"visibility\": \"open\", \"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"blogs\"].([]any) {\n\tblog := row.(map[string]any)\n\tfmt.Println(blog[\"id\"], blog[\"title\"], blog[\"date\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "count_blogs": {
+      "function": "CountBlogs",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().CountBlogs(ctx, map[string]any{\"visibility\": \"open\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"blogs\"].(map[string]any)[\"count\"])"
+    },
+    "create_blog": {
+      "function": "CreateBlog",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().CreateBlog(ctx, map[string]any{\n\t\"blog\": map[string]any{\n\t\t\"title\":        \"Spring Sale Announcement\",\n\t\t\"content\":      \"<p>Save up to 40% on selected products until the end of the month.</p>\",\n\t\t\"date\":         \"2026-09-28\",\n\t\t\"is_published\": true,\n\t\t\"visibility\":   \"open\",\n\t\t\"categories\":   []any{map[string]any{\"id\": 31}},\n\t\t\"image\": map[string]any{\n\t\t\t\"file_name\":        \"spring-cover.png\",\n\t\t\t\"base64\":           \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n\t\t\t\"title\":            \"Spring sale cover\",\n\t\t\t\"alternative_text\": \"Spring sale banner\",\n\t\t},\n\t\t\"seo_configs\": map[string]any{\"meta_tag\": []any{map[string]any{\"name\": \"description\", \"value\": \"Spring sale: up to 40% off\"}}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nblog := resp.Map().(map[string]any)[\"blog\"].(map[string]any)\nfmt.Println(blog[\"id\"], blog[\"url\"], blog[\"image\"].(map[string]any)[\"link\"])"
+    },
+    "get_blog": {
+      "function": "GetBlog",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().GetBlog(ctx, 1201, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nblog := resp.Map().(map[string]any)[\"blog\"].(map[string]any)\nfmt.Println(blog[\"title\"], blog[\"url\"], blog[\"visibility\"], blog[\"is_published\"])"
+    },
+    "update_blog": {
+      "function": "UpdateBlog",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().UpdateBlog(ctx, 1201, map[string]any{\n\t\"blog\": map[string]any{\n\t\t\"title\":              \"Spring Sale Extended\",\n\t\t\"content\":            \"<p>The spring sale now runs one more week.</p>\",\n\t\t\"date\":               \"2026-09-28\",\n\t\t\"is_published\":       true,\n\t\t\"visibility\":         \"restricted\",\n\t\t\"visible_to\":         \"selected\",\n\t\t\"categories\":         []any{map[string]any{\"id\": 31}},\n\t\t\"seo_configs\":        map[string]any{\"meta_tag\": []any{map[string]any{\"name\": \"description\", \"value\": \"Spring sale: up to 40% off\"}}},\n\t\t\"selected_customers\": map[string]any{\"customers\": []any{5501}, \"groups\": []any{}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nblog := resp.Map().(map[string]any)[\"blog\"].(map[string]any)\nfmt.Println(blog[\"title\"], blog[\"visibility\"], blog[\"visible_to\"], blog[\"selected_customers\"])"
+    },
+    "patch_blog": {
+      "function": "PatchBlog",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().PatchBlog(ctx, 1201, map[string]any{\n\t\"blog\": map[string]any{\"title\": \"Spring Sale: Final Week\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nblog := resp.Map().(map[string]any)[\"blog\"].(map[string]any)\nfmt.Println(blog[\"title\"], blog[\"last_updated_on\"])"
+    },
+    "delete_blog": {
+      "function": "DeleteBlog",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().DeleteBlog(ctx, 1201, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "list_blog_comments": {
+      "function": "ListBlogComments",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().ListBlogComments(ctx, 1201, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"comments\"].([]any) {\n\tcomment := row.(map[string]any)\n\tfmt.Println(comment[\"id\"], comment[\"status\"], comment[\"name\"], comment[\"content\"])\n}"
+    },
+    "create_blog_comment": {
+      "function": "CreateBlogComment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().CreateBlogComment(ctx, 1201, map[string]any{\n\t\"blog\": map[string]any{\"comment\": map[string]any{\n\t\t\"content\": \"Great article, thanks for the sale details!\",\n\t\t\"name\":    \"Ada Reader\",\n\t\t\"email\":   \"ada@example.com\",\n\t}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncomment := resp.Map().(map[string]any)[\"comment\"].(map[string]any)\nfmt.Println(comment[\"id\"], comment[\"status\"])"
+    },
+    "get_blog_comment": {
+      "function": "GetBlogComment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().GetBlogComment(ctx, 1201, 77, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncomment := resp.Map().(map[string]any)[\"comment\"].(map[string]any)\nfmt.Println(comment[\"status\"], comment[\"name\"], comment[\"content\"])"
+    },
+    "approve_blog_comment": {
+      "function": "ApproveBlogComment",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().ApproveBlogComment(ctx, 1201, 77, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncomment := resp.Map().(map[string]any)[\"comment\"].(map[string]any)\nfmt.Println(comment[\"status\"], comment[\"spam\"])"
+    },
+    "mark_blog_comment_spam": {
+      "function": "MarkBlogCommentSpam",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Blogs().MarkBlogCommentSpam(ctx, 1201, 77, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncomment := resp.Map().(map[string]any)[\"comment\"].(map[string]any)\nfmt.Println(comment[\"status\"], comment[\"spam\"])"
+    }
+  }
+}

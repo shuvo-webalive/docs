@@ -1,0 +1,54 @@
+{
+  "sdk": "php",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "listBlogs",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::listBlogs($client, ['visibility' => 'open', 'limit' => 20]);\n\nforeach ($response->map['blogs'] as $blog) {\n    echo $blog['id'], ' ', $blog['title'], ' (', $blog['date'], ')', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' blog posts in total', PHP_EOL;"
+    },
+    "count_blogs": {
+      "function": "countBlogs",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::countBlogs($client, ['visibility' => 'open']);\n\necho $response->map['blogs']['count'], PHP_EOL;"
+    },
+    "create_blog": {
+      "function": "createBlog",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::createBlog($client, [\n    'blog' => [\n        'title' => 'Spring Sale Announcement', 'content' => '<p>Save up to 40% on selected products until the end of the month.</p>',\n        'date' => '2026-09-28', 'is_published' => true, 'visibility' => 'open', 'categories' => [['id' => 31]],\n        'image' => ['file_name' => 'spring-cover.png', 'base64' => 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'title' => 'Spring sale cover', 'alternative_text' => 'Spring sale banner'],\n        'seo_configs' => ['meta_tag' => [['name' => 'description', 'value' => 'Spring sale: up to 40% off']]],\n    ],\n]);\n\necho $response->map['blog']['id'], PHP_EOL;"
+    },
+    "get_blog": {
+      "function": "getBlog",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::getBlog($client, 1201);\n\n$blog = $response->map['blog'];\necho $blog['title'], ' (', $blog['url'], ')', PHP_EOL;\necho $blog['visibility'], ', ', $blog['is_published'] ? 'published' : 'not published', PHP_EOL;"
+    },
+    "update_blog": {
+      "function": "updateBlog",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::updateBlog($client, 1201, [\n    'blog' => [\n        'title' => 'Spring Sale Extended', 'content' => '<p>The spring sale now runs one more week.</p>', 'date' => '2026-09-28',\n        'is_published' => true, 'visibility' => 'restricted', 'visible_to' => 'selected', 'categories' => [['id' => 31]],\n        'seo_configs' => ['meta_tag' => [['name' => 'description', 'value' => 'Spring sale: up to 40% off']]],\n        'selected_customers' => ['customers' => [5501], 'groups' => []],\n    ],\n]);\n\necho $response->map['blog']['title'], ' (', $response->map['blog']['visibility'], ')', PHP_EOL;"
+    },
+    "patch_blog": {
+      "function": "patchBlog",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::patchBlog($client, 1201, ['blog' => ['title' => 'Spring Sale: Final Week']]);\n\n$blog = $response->map['blog'];\necho $blog['title'], ' (', $blog['url'], ')', PHP_EOL;"
+    },
+    "delete_blog": {
+      "function": "deleteBlog",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::deleteBlog($client, 1201);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "list_blog_comments": {
+      "function": "listBlogComments",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::listBlogComments($client, 1201);\n\nforeach ($response->map['comments'] as $comment) {\n    echo $comment['id'], ' ', $comment['status'], ': ', $comment['content'], PHP_EOL;\n}"
+    },
+    "create_blog_comment": {
+      "function": "createBlogComment",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::createBlogComment($client, 1201, [\n    'blog' => [\n        'comment' => ['content' => 'Great article, thanks for the sale details!', 'name' => 'Ada Reader', 'email' => 'ada@example.com'],\n    ],\n]);\n\n$comment = $response->map['comment'];\necho $comment['id'], ' ', $comment['status'], PHP_EOL;"
+    },
+    "get_blog_comment": {
+      "function": "getBlogComment",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::getBlogComment($client, 1201, 77);\n\n$comment = $response->map['comment'];\necho $comment['name'], ' (', $comment['status'], '): ', $comment['content'], PHP_EOL;"
+    },
+    "approve_blog_comment": {
+      "function": "approveBlogComment",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::approveBlogComment($client, 1201, 77);\n\n$comment = $response->map['comment'];\necho $comment['status'], ', spam: ', $comment['spam'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "mark_blog_comment_spam": {
+      "function": "markBlogCommentSpam",
+      "code": "use WebCommander\\Sdk\\Resources\\Blogs\\Blogs;\n\n$response = Blogs::markBlogCommentSpam($client, 1201, 77);\n\n$comment = $response->map['comment'];\necho $comment['status'], ', spam: ', $comment['spam'] ? 'true' : 'false', PHP_EOL;"
+    }
+  }
+}

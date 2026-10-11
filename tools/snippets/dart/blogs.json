@@ -1,0 +1,54 @@
+{
+  "sdk": "dart",
+  "module": "blogs",
+  "endpoints": {
+    "list_blogs": {
+      "function": "listBlogs",
+      "code": "final response = await client.blogs\n    .listBlogs(queryParams: {'visibility': 'open', 'limit': 20});\nfinal blogs = (response.map as Map)['blogs'] as List;\nfor (final blog in blogs) {\n  print('${(blog as Map)['id']} ${blog['title']} ${blog['date']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
+    "count_blogs": {
+      "function": "countBlogs",
+      "code": "final response =\n    await client.blogs.countBlogs(queryParams: {'visibility': 'open'});\nfinal blogs = (response.map as Map)['blogs'] as Map;\nprint(blogs['count']);"
+    },
+    "create_blog": {
+      "function": "createBlog",
+      "code": "final response = await client.blogs.createBlog({\n  'blog': {\n    'title': 'Spring Sale Announcement',\n    'content':\n        '<p>Save up to 40% on selected products until the end of the month.</p>',\n    'date': '2026-09-28',\n    'is_published': true,\n    'visibility': 'open',\n    'categories': [\n      {'id': 31}\n    ],\n    'image': {\n      'file_name': 'spring-cover.png',\n      'base64':\n          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',\n      'title': 'Spring sale cover',\n      'alternative_text': 'Spring sale banner',\n    },\n    'seo_configs': {\n      'meta_tag': [\n        {'name': 'description', 'value': 'Spring sale: up to 40% off'}\n      ],\n    },\n  },\n});\nfinal blog = (response.map as Map)['blog'] as Map;\nprint('${blog['id']} ${blog['url']}');"
+    },
+    "get_blog": {
+      "function": "getBlog",
+      "code": "final response = await client.blogs.getBlog(1201);\nfinal blog = (response.map as Map)['blog'] as Map;\nprint('${blog['title']} ${blog['url']} ${blog['date']}');\nprint('${blog['visibility']} ${blog['is_published']}');\nfor (final category in blog['categories'] as List) {\n  print('${(category as Map)['id']} ${category['name']}');\n}"
+    },
+    "update_blog": {
+      "function": "updateBlog",
+      "code": "final response = await client.blogs.updateBlog(1201, {\n  'blog': {\n    'title': 'Spring Sale Extended',\n    'content': '<p>The spring sale now runs one more week.</p>',\n    'date': '2026-09-28',\n    'is_published': true,\n    'visibility': 'restricted',\n    'visible_to': 'selected',\n    'categories': [\n      {'id': 31}\n    ],\n    'seo_configs': {\n      'meta_tag': [\n        {'name': 'description', 'value': 'Spring sale: up to 40% off'}\n      ],\n    },\n    'selected_customers': {\n      'customers': [5501],\n      'groups': <int>[],\n    },\n  },\n});\nfinal blog = (response.map as Map)['blog'] as Map;\nprint('${blog['title']} ${blog['visibility']} ${blog['visible_to']}');\nprint(blog['selected_customers']);"
+    },
+    "patch_blog": {
+      "function": "patchBlog",
+      "code": "final response = await client.blogs.patchBlog(1201, {\n  'blog': {'title': 'Spring Sale: Final Week'},\n});\nfinal blog = (response.map as Map)['blog'] as Map;\nprint('${blog['title']} ${blog['url']} ${blog['last_updated_on']}');"
+    },
+    "delete_blog": {
+      "function": "deleteBlog",
+      "code": "final response = await client.blogs.deleteBlog(1201);\nprint(response.statusCode);"
+    },
+    "list_blog_comments": {
+      "function": "listBlogComments",
+      "code": "final response = await client.blogs.listBlogComments(1201);\nfinal comments = (response.map as Map)['comments'] as List;\nfor (final comment in comments) {\n  print('${(comment as Map)['id']} ${comment['status']} ${comment['name']}');\n  print(comment['content']);\n}"
+    },
+    "create_blog_comment": {
+      "function": "createBlogComment",
+      "code": "final response = await client.blogs.createBlogComment(1201, {\n  'blog': {\n    'comment': {\n      'content': 'Great article, thanks for the sale details!',\n      'name': 'Ada Reader',\n      'email': 'ada@example.com',\n    },\n  },\n});\nfinal comment = (response.map as Map)['comment'] as Map;\nprint('${comment['id']} ${comment['status']}');"
+    },
+    "get_blog_comment": {
+      "function": "getBlogComment",
+      "code": "final response = await client.blogs.getBlogComment(1201, 77);\nfinal comment = (response.map as Map)['comment'] as Map;\nprint('${comment['status']} ${comment['name']} ${comment['content']}');"
+    },
+    "approve_blog_comment": {
+      "function": "approveBlogComment",
+      "code": "final response = await client.blogs.approveBlogComment(1201, 77);\nfinal comment = (response.map as Map)['comment'] as Map;\nprint('${comment['status']} ${comment['spam']}');"
+    },
+    "mark_blog_comment_spam": {
+      "function": "markBlogCommentSpam",
+      "code": "final response = await client.blogs.markBlogCommentSpam(1201, 77);\nfinal comment = (response.map as Map)['comment'] as Map;\nprint('${comment['status']} ${comment['spam']}');"
+    }
+  }
+}

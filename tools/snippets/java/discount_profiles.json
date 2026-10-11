@@ -1,0 +1,34 @@
+{
+  "sdk": "java",
+  "module": "discount_profiles",
+  "endpoints": {
+    "list_discount_profiles": {
+      "function": "listDiscountProfiles",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.discountProfiles().listDiscountProfiles(Map.of(\"sort\", \"name\", \"dir\", \"asc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"discount_profiles\")) {\n    Map<?, ?> profile = (Map<?, ?>) row;\n    System.out.println(profile.get(\"id\") + \" \" + profile.get(\"name\") + \" \" + profile.get(\"type\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));"
+    },
+    "create_discount_profile": {
+      "function": "createDiscountProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nApiResponse response = client.discountProfiles().createDiscountProfile(Map.ofEntries(\n        entry(\"name\", \"Spring 40 Off\"), entry(\"type\", \"offer_coupon\"), entry(\"discount_details_type\", \"amount\"),\n        entry(\"amount_details\", Map.of(\"type\", \"single\", \"apply_to\", \"total_order\", \"single_amount\", 40,\n                \"single_amount_type\", \"PERCENT\")),\n        entry(\"is_active\", true), entry(\"start_date\", \"2026-11-06 09:30:00\"), entry(\"is_specify_end_date\", true),\n        entry(\"end_date\", \"2026-11-16 18:00:00\"), entry(\"is_apply_coupon_code\", true),\n        entry(\"default_coupon_code\", \"SPRING40\"), entry(\"is_maximum_use_total\", true), entry(\"maximum_use_count\", 100),\n        entry(\"is_maximum_use_customer\", true), entry(\"maximum_use_customer_count\", 1),\n        entry(\"is_maximum_discount_allowed\", true), entry(\"maximum_discount_allowed_amount\", 200),\n        entry(\"is_display_text_coupon\", true), entry(\"display_text_coupon\", \"Use code SPRING40 at checkout\"),\n        entry(\"is_display_text_cart\", true), entry(\"display_text_cart\", \"Spring sale discount applied\"),\n        entry(\"is_display_text_partial_discount_condition\", true),\n        entry(\"display_text_partial_discount_condition\", \"Add one more item to get the spring discount\")));\nSystem.out.println(((Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"discount_profile\")).get(\"id\"));"
+    },
+    "get_discount_profile": {
+      "function": "getDiscountProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.discountProfiles().getDiscountProfile(1001);\nMap<?, ?> profile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"discount_profile\");\nSystem.out.println(profile.get(\"name\") + \" \" + profile.get(\"is_active\") + \" \" + profile.get(\"default_coupon_code\"));\nfor (Object row : (List<?>) profile.get(\"customer_coupons\")) {\n    Map<?, ?> coupon = (Map<?, ?>) row;\n    System.out.println(coupon.get(\"code\") + \" \" + coupon.get(\"customer_email\"));\n}"
+    },
+    "update_discount_profile": {
+      "function": "updateDiscountProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nApiResponse response = client.discountProfiles().updateDiscountProfile(1001, Map.ofEntries(\n        entry(\"name\", \"Spring 50 Off\"), entry(\"type\", \"offer_coupon\"), entry(\"discount_details_type\", \"amount\"),\n        entry(\"amount_details\", Map.of(\"type\", \"single\", \"apply_to\", \"total_order\", \"single_amount\", 50,\n                \"single_amount_type\", \"PERCENT\", \"minimum_amount_on\", \"each_item\")),\n        entry(\"is_active\", true), entry(\"start_date\", \"2026-11-06 09:30:00\"), entry(\"is_specify_end_date\", true),\n        entry(\"end_date\", \"2026-11-20 18:00:00\"), entry(\"is_apply_coupon_code\", true),\n        entry(\"is_maximum_use_total\", true), entry(\"maximum_use_count\", 150), entry(\"is_maximum_use_customer\", true),\n        entry(\"maximum_use_customer_count\", 1), entry(\"is_maximum_discount_allowed\", true),\n        entry(\"maximum_discount_allowed_amount\", 200), entry(\"is_display_text_coupon\", true),\n        entry(\"is_display_text_cart\", true)));\nMap<?, ?> profile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"discount_profile\");\nSystem.out.println(profile.get(\"name\") + \" \" + profile.get(\"end_date\") + \" \" + profile.get(\"maximum_use_count\"));"
+    },
+    "delete_discount_profile": {
+      "function": "deleteDiscountProfile",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.discountProfiles().deleteDiscountProfile(1001);\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_discount_profile_coupons": {
+      "function": "createDiscountProfileCoupons",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.discountProfiles().createDiscountProfileCoupons(1001, Map.of(\"requested_codes\", 3));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"message\"));\nfor (Object code : (List<?>) body.get(\"codes\")) {\n    System.out.println(code);\n}"
+    },
+    "assign_discount_coupon_customer": {
+      "function": "assignDiscountCouponCustomer",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.discountProfiles().assignDiscountCouponCustomer(\n        Map.of(\"code\", \"A1B2C3D4E5\", \"email\", \"jane.citizen@example.com\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"message\"));"
+    }
+  }
+}

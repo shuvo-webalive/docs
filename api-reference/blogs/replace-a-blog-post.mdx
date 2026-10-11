@@ -1,0 +1,9 @@
+---
+title: "Replace a blog post"
+description: "Replaces a blog post and returns it. Most fields you leave out are reset."
+openapi: "PUT /admin/blogs/{blog_id}"
+---
+
+Replaces the blog post with the fields you wrap in `blog` and returns it; send `title` and `visibility` every time. Fields you leave out are reset: `content` to `null`, `is_published` to `false`, `date` to the current time, `categories` to the store's default category, `seo_configs` to `{"meta_tag": []}`, `visible_to` to `null` and `selected_customers` to `[]`. The image and `created_by` are kept, and so is `url` unless you send a new one, which the store turns into a slug the same way as on create. To change only some fields, use [Update a blog post](/api-reference/blogs/update-a-blog-post).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
