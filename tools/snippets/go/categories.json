@@ -1,0 +1,46 @@
+{
+  "sdk": "go",
+  "module": "categories",
+  "endpoints": {
+    "list_categories": {
+      "function": "ListCategories",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().ListCategories(ctx, map[string]any{\"limit\": 10, \"offset\": 10, \"sort\": \"name\", \"dir\": \"asc\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"categories\"].([]any) {\n\tcategory := row.(map[string]any)\n\tfmt.Println(category[\"id\"], category[\"general\"].(map[string]any)[\"name\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"has_next\"])"
+    },
+    "count_categories": {
+      "function": "CountCategories",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().CountCategories(ctx, map[string]any{\"searchText\": \"seasonal\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"categories\"].(map[string]any)[\"count\"])"
+    },
+    "check_category_name": {
+      "function": "CheckCategoryName",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().CheckCategoryName(ctx, \"Seasonal Produce\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"available\"])"
+    },
+    "create_category": {
+      "function": "CreateCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().CreateCategory(ctx, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\": map[string]any{\n\t\t\t\"name\":            \"Seasonal Produce\",\n\t\t\t\"title\":           \"Seasonal Produce\",\n\t\t\t\"heading\":         \"Fresh this season\",\n\t\t\t\"summary\":         \"Fruit and vegetables picked this week\",\n\t\t\t\"parent_category\": map[string]any{\"id\": 4310},\n\t\t},\n\t\t\"description\":             map[string]any{\"content\": \"<p>What is in season right now.</p>\"},\n\t\t\"availability_visibility\": map[string]any{\"visible\": true, \"custom_sorting\": true, \"default_sorting\": \"alpha_asc\"},\n\t\t\"tax_shipping\":            map[string]any{\"tax_message\": \"Prices include GST\"},\n\t\t\"assign_products\":         map[string]any{\"products\": []any{101, 102}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\ngeneral := category[\"general\"].(map[string]any)\nfmt.Println(category[\"id\"], general[\"sku\"], general[\"url\"])"
+    },
+    "get_category": {
+      "function": "GetCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().GetCategory(ctx, 4321, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\ngeneral := category[\"general\"].(map[string]any)\nfmt.Println(general[\"name\"], general[\"url\"], category[\"in_trash\"])"
+    },
+    "update_category": {
+      "function": "UpdateCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().UpdateCategory(ctx, 4321, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\": map[string]any{\"name\": \"Seasonal Produce\", \"heading\": \"New heading\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngeneral := resp.Map().(map[string]any)[\"category\"].(map[string]any)[\"general\"].(map[string]any)\nfmt.Println(general[\"name\"], general[\"heading\"], general[\"parent_category\"])"
+    },
+    "patch_category": {
+      "function": "PatchCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().PatchCategory(ctx, 4321, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\":                 map[string]any{\"summary\": \"Updated summary\"},\n\t\t\"availability_visibility\": map[string]any{\"visible\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\nfmt.Println(category[\"general\"].(map[string]any)[\"summary\"], category[\"availability_visibility\"].(map[string]any)[\"visible\"])"
+    },
+    "delete_category": {
+      "function": "DeleteCategory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().DeleteCategory(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_category_section": {
+      "function": "GetCategorySection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().GetCategorySection(ctx, 4321, \"tax_shipping\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntaxShipping := resp.Map().(map[string]any)[\"category\"].(map[string]any)[\"tax_shipping\"].(map[string]any)\nfmt.Println(taxShipping[\"tax_exempt\"], taxShipping[\"tax_message\"], taxShipping[\"enable_shipping\"])"
+    },
+    "patch_category_section": {
+      "function": "PatchCategorySection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Categories().PatchCategorySection(ctx, 4321, \"assign_products\", map[string]any{\n\t\"category\": map[string]any{\"assign_products\": map[string]any{\"products\": []any{101, 102, 103}}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nassigned := resp.Map().(map[string]any)[\"category\"].(map[string]any)[\"assign_products\"].(map[string]any)\nfor _, row := range assigned[\"products\"].([]any) {\n\tproduct := row.(map[string]any)\n\tfmt.Println(product[\"id\"], product[\"name\"], product[\"sku\"])\n}"
+    }
+  }
+}

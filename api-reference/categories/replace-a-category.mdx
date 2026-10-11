@@ -1,0 +1,9 @@
+---
+title: "Replace a category"
+description: "Replaces a category: most fields you leave out reset, but `name`, `sku`, `url` and images stay."
+openapi: "PUT /admin/categories/{category_id}"
+---
+
+Most fields you leave out go back to the values of a new category: `title`, `heading`, `summary`, `layout` and `description.content` become `null`, `availability_visibility` returns to its defaults, the category loses its products, and a child category without `general.parent_category` moves to the top level. `name`, `sku`, `url` and both images keep their values, so a new `name` leaves the `url` as it was. In `tax_shipping`, a `tax_profile` or `shipping_profile` you leave out becomes `null` whether or not you send that section, clearing the shipping profile sets `enable_shipping` to `false`, and the other fields keep their values. To change only the fields you send, use [Update a category](/api-reference/categories/update-a-category).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

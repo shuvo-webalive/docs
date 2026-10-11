@@ -1,0 +1,9 @@
+---
+title: "Create a blog category"
+description: "Creates a blog category and returns it with its `id`, which other calls take as `blog_category_id`."
+openapi: "POST /admin/blog_categories"
+---
+
+Creates a blog category and returns it with the `id` the store assigned, which the other calls take as `blog_category_id`. Wrap the fields in `blog_category`; only `name` is required, and a `url` you leave out is made from `name`. Send `base64` inside `image` to upload an image, and `blogs` to file existing blog posts under the new category. Do not send the category's `id`: a create with an `id` inside `blog_category` returns `500` and stores nothing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

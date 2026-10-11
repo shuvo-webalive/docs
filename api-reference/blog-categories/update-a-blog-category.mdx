@@ -1,0 +1,9 @@
+---
+title: "Update a blog category"
+description: "Changes a blog category and returns it. A `description` you leave out is cleared."
+openapi: "PUT /admin/blog_categories/{blog_category_id}"
+---
+
+Changes the blog category whose `id` you pass as `blog_category_id`, and returns the updated category. Wrap the fields in `blog_category` and send `name` every time, even when it does not change. Leaving out `description` saves it as `""`; leaving out `url`, `image` or `blogs` keeps what the category has. `PATCH` is rejected with `405 method_not_allowed`, so send every change with `PUT`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

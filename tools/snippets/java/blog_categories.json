@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "blog_categories",
+  "endpoints": {
+    "list_blog_categories": {
+      "function": "listBlogCategories",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.blogCategories().listBlogCategories(Map.of(\"limit\", 20, \"offset\", 0));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"blog_categories\")) {\n    Map<?, ?> category = (Map<?, ?>) row;\n    System.out.println(category.get(\"id\") + \" \" + category.get(\"name\") + \" \" + category.get(\"url\"));\n}\nMap<?, ?> pagination = (Map<?, ?>) body.get(\"pagination\");\nSystem.out.println(pagination.get(\"total\") + \" \" + pagination.get(\"has_next\"));"
+    },
+    "create_blog_category": {
+      "function": "createBlogCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogCategories().createBlogCategory(Map.of(\"blog_category\", Map.of(\n        \"name\", \"Seasonal Promotions\", \"url\", \"seasonal-promotions\",\n        \"description\", \"Sale announcements and limited-time offers.\",\n        \"image\", Map.of(\"file_name\", \"seasonal-promotions.png\",\n                \"base64\", \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n                \"title\", \"Seasonal promotions\", \"alternative_text\", \"Seasonal promotions banner\"))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog_category\");\nSystem.out.println(category.get(\"id\") + \" \" + category.get(\"name\") + \" \" + category.get(\"url\"));\nSystem.out.println(((Map<?, ?>) category.get(\"image\")).get(\"link\"));"
+    },
+    "get_blog_category": {
+      "function": "getBlogCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogCategories().getBlogCategory(15);\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog_category\");\nSystem.out.println(category.get(\"name\") + \" \" + category.get(\"url\") + \" \" + category.get(\"description\"));\nSystem.out.println(category.get(\"created_on\") + \" \" + category.get(\"last_updated_on\"));"
+    },
+    "update_blog_category": {
+      "function": "updateBlogCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.blogCategories().updateBlogCategory(15, Map.of(\"blog_category\", Map.of(\n        \"name\", \"Seasonal Offers\", \"url\", \"seasonal-offers\",\n        \"description\", \"Offers and clearance announcements.\")));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"blog_category\");\nSystem.out.println(category.get(\"name\") + \" \" + category.get(\"url\") + \" \" + category.get(\"description\"));\nSystem.out.println(category.get(\"last_updated_on\"));"
+    },
+    "delete_blog_category": {
+      "function": "deleteBlogCategory",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.blogCategories().deleteBlogCategory(15);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}
