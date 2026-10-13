@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "products",
+  "endpoints": {
+    "get_product": {
+      "function": "getProduct",
+      "code": "const response = await client.products.getProduct(101);\nconst product = response.map.product;\nconsole.log(product.id, product.name, product.sku, product.base_price);\nconsole.log(product.product_pricing_and_stock.available_stock);\n"
+    },
+    "update_product": {
+      "function": "updateProduct",
+      "code": "const response = await client.products.updateProduct(101, {\n    invoice_note: 'Ships in 2 business days',\n    advanced: {advance_information: {mpn: 'MPN-0001'}},\n});\nconst product = response.map.product;\nconsole.log(product.invoice_note, product.advanced.advance_information.mpn, product.version);\n"
+    },
+    "get_product_stock": {
+      "function": "getProductStock",
+      "code": "const response = await client.products.getProductStock(101);\nconsole.log(response.map.available_stock);\nfor (const location of response.map.locations) {\n    console.log(location.warehouse, location.warehouse_name, location.stock, location.is_default);\n}\n"
+    },
+    "update_product_stock": {
+      "function": "updateProductStock",
+      "code": "const response = await client.products.updateProductStock(101, {\n    note: 'Restock',\n    locations: [\n        {warehouse: 1, stock: 10, low_stock_level: 2, is_default: true},\n        {warehouse: 4, stock: 30, low_stock_level: 5, is_default: false},\n    ],\n});\nconsole.log(response.map.available_stock);\nfor (const location of response.map.locations) {\n    console.log(location.warehouse, location.stock, location.is_default);\n}\n"
+    },
+    "delete_product_stock_location": {
+      "function": "deleteProductStockLocation",
+      "code": "const response = await client.products.deleteProductStockLocation(101, 19);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

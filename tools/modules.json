@@ -104,6 +104,7 @@
       "name": "Products",
       "icon": "box",
       "modules": [
+        "products",
         "variations"
       ]
     },

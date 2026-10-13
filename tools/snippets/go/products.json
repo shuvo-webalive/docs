@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "products",
+  "endpoints": {
+    "get_product": {
+      "function": "GetProduct",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().GetProduct(ctx, 101, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nstock := product[\"product_pricing_and_stock\"].(map[string]any)\nfmt.Println(product[\"name\"], product[\"sku\"], product[\"base_price\"], stock[\"available_stock\"])"
+    },
+    "update_product": {
+      "function": "UpdateProduct",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().UpdateProduct(ctx, 101, map[string]any{\n\t\"invoice_note\": \"Ships in 2 business days\",\n\t\"advanced\":     map[string]any{\"advance_information\": map[string]any{\"mpn\": \"MPN-0001\"}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\ninformation := product[\"advanced\"].(map[string]any)[\"advance_information\"].(map[string]any)\nfmt.Println(product[\"invoice_note\"], information[\"mpn\"], product[\"version\"])"
+    },
+    "get_product_stock": {
+      "function": "GetProductStock",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().GetProductStock(ctx, 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"available_stock\"])\nfor _, row := range body[\"locations\"].([]any) {\n\tlocation := row.(map[string]any)\n\tfmt.Println(location[\"warehouse\"], location[\"warehouse_name\"], location[\"stock\"], location[\"is_default\"])\n}"
+    },
+    "update_product_stock": {
+      "function": "UpdateProductStock",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().UpdateProductStock(ctx, 101, map[string]any{\n\t\"note\": \"Restock\",\n\t\"locations\": []any{\n\t\tmap[string]any{\"warehouse\": 1, \"stock\": 10, \"low_stock_level\": 2, \"is_default\": true},\n\t\tmap[string]any{\"warehouse\": 4, \"stock\": 30, \"low_stock_level\": 5, \"is_default\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"available_stock\"], body[\"locations\"])"
+    },
+    "delete_product_stock_location": {
+      "function": "DeleteProductStockLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().DeleteProductStockLocation(ctx, 101, 19, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

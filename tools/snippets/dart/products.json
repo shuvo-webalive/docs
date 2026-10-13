@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "products",
+  "endpoints": {
+    "get_product": {
+      "function": "getProduct",
+      "code": "final response = await client.products.getProduct(101);\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['name']} ${product['sku']} ${product['base_price']}');\nfinal pricingAndStock = product['product_pricing_and_stock'] as Map;\nprint(pricingAndStock['available_stock']);"
+    },
+    "update_product": {
+      "function": "updateProduct",
+      "code": "final response = await client.products.updateProduct(101, {\n  'invoice_note': 'Ships in 2 business days',\n  'advanced': {\n    'advance_information': {'mpn': 'MPN-0001'},\n  },\n});\nfinal product = (response.map as Map)['product'] as Map;\nfinal info = (product['advanced'] as Map)['advance_information'] as Map;\nprint('${product['invoice_note']} ${info['mpn']}');\nprint(product['version']);"
+    },
+    "get_product_stock": {
+      "function": "getProductStock",
+      "code": "final response = await client.products.getProductStock(101);\nfinal stock = response.map as Map;\nprint(stock['available_stock']);\nfor (final location in stock['locations'] as List) {\n  final row = location as Map;\n  print('${row['warehouse']} ${row['warehouse_name']} ${row['stock']}');\n}"
+    },
+    "update_product_stock": {
+      "function": "updateProductStock",
+      "code": "final response = await client.products.updateProductStock(101, {\n  'note': 'Restock',\n  'locations': [\n    {'warehouse': 1, 'stock': 10, 'low_stock_level': 2, 'is_default': true},\n    {'warehouse': 4, 'stock': 30, 'low_stock_level': 5, 'is_default': false},\n  ],\n});\nfinal stock = response.map as Map;\nprint(stock['available_stock']);\nfor (final location in stock['locations'] as List) {\n  print('${(location as Map)['warehouse']} ${location['stock']}');\n}"
+    },
+    "delete_product_stock_location": {
+      "function": "deleteProductStockLocation",
+      "code": "final response = await client.products.deleteProductStockLocation(101, 19);\nprint(response.statusCode);"
+    }
+  }
+}

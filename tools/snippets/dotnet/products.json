@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "products",
+  "endpoints": {
+    "get_product": {
+      "function": "GetProductAsync",
+      "code": "var response = await client.Products.GetProductAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nvar pricingAndStock = (IReadOnlyDictionary<string, object?>)product[\"product_pricing_and_stock\"]!;\nConsole.WriteLine($\"{product[\"name\"]} {product[\"sku\"]} {product[\"base_price\"]} {pricingAndStock[\"available_stock\"]}\");"
+    },
+    "update_product": {
+      "function": "UpdateProductAsync",
+      "code": "var response = await client.Products.UpdateProductAsync(101, new Dictionary<string, object?>\n{\n    [\"invoice_note\"] = \"Ships in 2 business days\",\n    [\"advanced\"] = new Dictionary<string, object?>\n    {\n        [\"advance_information\"] = new Dictionary<string, object?> { [\"mpn\"] = \"MPN-0001\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"invoice_note\"]} {product[\"version\"]}\");"
+    },
+    "get_product_stock": {
+      "function": "GetProductStockAsync",
+      "code": "var response = await client.Products.GetProductStockAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"available_stock\"]);\nforeach (var location in ((IReadOnlyList<object?>)body[\"locations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{location[\"warehouse\"]} {location[\"warehouse_name\"]} {location[\"stock\"]} {location[\"is_default\"]}\");"
+    },
+    "update_product_stock": {
+      "function": "UpdateProductStockAsync",
+      "code": "var response = await client.Products.UpdateProductStockAsync(101, new Dictionary<string, object?>\n{\n    [\"note\"] = \"Restock\", [\"locations\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"warehouse\"] = 1, [\"stock\"] = 10, [\"low_stock_level\"] = 2, [\"is_default\"] = true },\n        new Dictionary<string, object?> { [\"warehouse\"] = 4, [\"stock\"] = 30, [\"low_stock_level\"] = 5, [\"is_default\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"available_stock\"]);\nforeach (var location in ((IReadOnlyList<object?>)body[\"locations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{location[\"warehouse\"]} {location[\"warehouse_name\"]} {location[\"stock\"]} {location[\"is_default\"]}\");"
+    },
+    "delete_product_stock_location": {
+      "function": "DeleteProductStockLocationAsync",
+      "code": "var response = await client.Products.DeleteProductStockLocationAsync(101, 19);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

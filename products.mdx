@@ -1,0 +1,59 @@
+---
+title: "Products"
+sidebarTitle: "Overview"
+description: "Read and update a product, read and set its stock at each inventory location, and unassign a location from it."
+---
+
+The Products API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`.
+
+<Warning>
+  **Setting a product's stock unassigns every location you leave out, even one that still holds stock.**
+  [Set a product's stock](/api-reference/products/set-a-products-stock) replaces the product's whole set of locations with the
+  rows you send in `locations`. Read the rows first with [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock),
+  send every row you want to keep, and change only the values you mean to change.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Retrieve a product](/api-reference/products/retrieve-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}` | Returns the product whose `id` you pass as `product_id`, with all 69 of its fields. |
+| [Update a product](/api-reference/products/update-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/products/{product_id}` | Changes the product fields you send, keeps every other field, and returns the product. |
+| [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}/stock` | Returns the product's stock at each inventory location it is assigned to, and the total. |
+| [Set a product's stock](/api-reference/products/set-a-products-stock) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/products/{product_id}/stock` | Sets the product's stock at each location you send and unassigns every location you leave out. |
+| [Unassign an inventory location from a product](/api-reference/products/unassign-an-inventory-location-from-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/products/{product_id}/stock/locations/{inventory_location_id}` | Unassigns an inventory location that holds `0` units of the product and is not its default. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send product fields at the top level of the body, not inside `product`.** Responses return the
+  product inside `product`, but a body wrapped in `product` is rejected with `400` and the message
+  `product: is not a recognised product field`. Send the stock body's `note` and `locations` at the
+  top level too.
+- **An update changes only the fields you send, at every level.** `{"advanced": {"advance_information": {"mpn": "MPN-0001"}}}`
+  changes `mpn` and keeps the other eight fields of `advance_information`. A body that changes nothing
+  returns `200` and leaves `version` and the `ETag` header as they were.
+- **Some fields you read cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,
+  `sold_out`, `sold_out_label`, `length`, `width`, `height`, `weight`, `featured`, `new`, `model`, `is_draft`,
+  `has_variations`, `urls` or `created_by` is rejected with `400` and the reason `read_only_field`; the value
+  you read is accepted. `status` and `reviews` are rejected with the reason `unknown_field`, so remove them
+  before you send back a product you read. Write the dimensions in `product_properties`, and `mpn`, `upc`,
+  `barcode` and `hs_code` in `advanced.advance_information`. `field_metadata` lists these fields as writable
+  at the top level, but they are rejected there.
+- **Setting stock changes the product too.** `available_stock` is the sum of the rows' `stock`, and
+  `product_pricing_and_stock.low_level_stock` takes the `low_stock_level` of the product's default
+  location. The product's `version`, `updated_at` and `last_updated_by` change when the stock changes.
+  `product_pricing_and_stock.locations` on [Retrieve a product](/api-reference/products/retrieve-a-product) holds the same rows as
+  [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock).
+- **The first location you assign to a product is missing from the response.** On a product with no
+  location yet, [Set a product's stock](/api-reference/products/set-a-products-stock) returns `locations: []` and stores the row.
+  Call [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) to see it. A product that already has a location
+  returns its rows at once.
+- **Find a `product_id` in an inventory location's stock.** None of these five endpoints lists
+  products. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns the
+  `id` of each product the location holds, as `items[].product.id`.

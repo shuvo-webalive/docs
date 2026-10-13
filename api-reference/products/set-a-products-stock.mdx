@@ -1,0 +1,9 @@
+---
+title: "Set a product's stock"
+description: "Sets the product's stock at each location you send and unassigns every location you leave out."
+openapi: "PUT /admin/products/{product_id}/stock"
+---
+
+Send `locations` with one row for every location the product keeps; a location you leave out is unassigned, even while it holds stock. Each row takes the location's `id` as `warehouse`, the units as `stock`, and optionally `low_stock_level` and `is_default`. When no row has `is_default: true`, the first row you send becomes the product's default. The rows [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) returns can be sent back as they are: `warehouse_name` and other extra keys are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "products",
+  "endpoints": {
+    "get_product": {
+      "function": "getProduct",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().getProduct(101);\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nSystem.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"sku\"));\nSystem.out.println(product.get(\"base_price\") + \" \" + product.get(\"available\") + \" \" + product.get(\"version\"));\nMap<?, ?> pricingAndStock = (Map<?, ?>) product.get(\"product_pricing_and_stock\");\nSystem.out.println(pricingAndStock.get(\"available_stock\"));"
+    },
+    "update_product": {
+      "function": "updateProduct",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().updateProduct(101, Map.of(\n        \"invoice_note\", \"Ships in 2 business days\",\n        \"advanced\", Map.of(\"advance_information\", Map.of(\"mpn\", \"MPN-0001\"))));\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nMap<?, ?> advanced = (Map<?, ?>) product.get(\"advanced\");\nSystem.out.println(product.get(\"invoice_note\") + \" \" + product.get(\"version\"));\nSystem.out.println(((Map<?, ?>) advanced.get(\"advance_information\")).get(\"mpn\"));"
+    },
+    "get_product_stock": {
+      "function": "getProductStock",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().getProductStock(101);\nMap<?, ?> stock = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) stock.get(\"locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"warehouse\") + \" \" + location.get(\"warehouse_name\") + \" \"\n            + location.get(\"stock\") + \" \" + location.get(\"is_default\"));\n}\nSystem.out.println(stock.get(\"available_stock\"));"
+    },
+    "update_product_stock": {
+      "function": "updateProductStock",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().updateProductStock(101, Map.of(\"note\", \"Restock\", \"locations\", List.of(\n        Map.of(\"warehouse\", 1, \"stock\", 10, \"low_stock_level\", 2, \"is_default\", true),\n        Map.of(\"warehouse\", 4, \"stock\", 30, \"low_stock_level\", 5, \"is_default\", false))));\nMap<?, ?> stock = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) stock.get(\"locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"warehouse\") + \" \" + location.get(\"stock\") + \" \" + location.get(\"is_default\"));\n}\nSystem.out.println(stock.get(\"available_stock\"));"
+    },
+    "delete_product_stock_location": {
+      "function": "deleteProductStockLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.products().deleteProductStockLocation(101, 19);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

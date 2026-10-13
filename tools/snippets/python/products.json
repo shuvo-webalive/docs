@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "products",
+  "endpoints": {
+    "get_product": {
+      "function": "get_product",
+      "code": "response = client.products.get_product(101)\nproduct = response.map[\"product\"]\nprint(product[\"name\"], product[\"sku\"], product[\"base_price\"])\nprint(product[\"product_pricing_and_stock\"][\"available_stock\"])\n"
+    },
+    "update_product": {
+      "function": "update_product",
+      "code": "response = client.products.update_product(101, {\n    \"invoice_note\": \"Ships in 2 business days\",\n    \"advanced\": {\"advance_information\": {\"mpn\": \"MPN-0001\"}},\n})\nproduct = response.map[\"product\"]\nprint(product[\"invoice_note\"], product[\"advanced\"][\"advance_information\"][\"mpn\"])\nprint(product[\"version\"])\n"
+    },
+    "get_product_stock": {
+      "function": "get_product_stock",
+      "code": "response = client.products.get_product_stock(101)\nprint(response.map[\"available_stock\"])\nfor location in response.map[\"locations\"]:\n    print(location[\"warehouse\"], location[\"warehouse_name\"], location[\"stock\"], location[\"is_default\"])\n"
+    },
+    "update_product_stock": {
+      "function": "update_product_stock",
+      "code": "response = client.products.update_product_stock(101, {\n    \"note\": \"Restock\",\n    \"locations\": [\n        {\"warehouse\": 1, \"stock\": 10, \"low_stock_level\": 2, \"is_default\": True},\n        {\"warehouse\": 4, \"stock\": 30, \"low_stock_level\": 5, \"is_default\": False},\n    ],\n})\nprint(response.map[\"available_stock\"])\nfor location in response.map[\"locations\"]:\n    print(location[\"warehouse\"], location[\"stock\"], location[\"is_default\"])\n"
+    },
+    "delete_product_stock_location": {
+      "function": "delete_product_stock_location",
+      "code": "response = client.products.delete_product_stock_location(101, 19)\nprint(response.status_code)\n"
+    }
+  }
+}
