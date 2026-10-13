@@ -1,0 +1,9 @@
+---
+title: "Retrieve a product's stock"
+description: "Returns the product's stock at each inventory location it is assigned to, and the total."
+openapi: "GET /admin/products/{product_id}/stock"
+---
+
+Returns one row in `locations` for each inventory location the product is assigned to, with the location's `id` as `warehouse`, its name as `warehouse_name`, the product's `stock` there and the `low_stock_level`, and whether it is the product's default. `available_stock` is the sum of the rows' `stock`, and exactly one row has `is_default` set to `true`. A product with no location returns `multi_location_enabled: false` and `locations: []`, and a product with variations also returns `variations`. Query parameters are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

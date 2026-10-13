@@ -127,6 +127,9 @@
       "name": "Blog categories"
     },
     {
+      "name": "Products"
+    },
+    {
       "name": "Variations"
     },
     {
@@ -37684,6 +37687,682 @@
         ]
       }
     },
+    "/admin/products/{product_id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Retrieve a product",
+        "operationId": "get_product",
+        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` or `1` to add `field_metadata` beside `product`, describing the product's fields. `false` or `0` leaves it out. Any other value is rejected with `400`. The product and the `ETag` header are the same either way.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product. With `field_metadata=true`, a `field_metadata` key is added after it. The response has an `ETag` header and `Cache-Control: no-cache, no-store`. The example shows a selection of the fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/ProductFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "product": {
+                    "id": 101,
+                    "name": "Cotton T-Shirt",
+                    "sku": "TSHIRT-001",
+                    "heading": "Cotton T-Shirt",
+                    "invoice_note": "",
+                    "available": true,
+                    "password_protected": false,
+                    "password": "",
+                    "base_price": 25.0,
+                    "cost_price": 12.0,
+                    "is_on_sale": false,
+                    "sale_price": 0.0,
+                    "version": 7,
+                    "product_pricing_and_stock": {
+                      "track_inventory": true,
+                      "available_stock": 35,
+                      "low_level_stock": 2,
+                      "warehouses": [
+                        {
+                          "warehouse": "1",
+                          "stock": 10
+                        },
+                        {
+                          "warehouse": "4",
+                          "stock": 25
+                        }
+                      ],
+                      "is_multi_location_enabled": true,
+                      "locations": [
+                        {
+                          "warehouse": 1,
+                          "warehouse_name": "Sydney Warehouse",
+                          "stock": 10,
+                          "low_stock_level": 2,
+                          "is_default": true
+                        },
+                        {
+                          "warehouse": 4,
+                          "warehouse_name": "Sydney Store Room",
+                          "stock": 25,
+                          "low_stock_level": 5,
+                          "is_default": false
+                        }
+                      ]
+                    },
+                    "advanced": {
+                      "advance_information": {
+                        "mpn": "",
+                        "barcode": "",
+                        "hs_code": ""
+                      }
+                    },
+                    "product_variation": {},
+                    "has_variations": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a query parameter other than `field_metadata`: the message is `unknown query parameter(s): <name>` and `details[0].code` is `unknown_parameter`. Or `field_metadata` is not `true`, `false`, `1` or `0`: the message is `field_metadata must be true/false or 0/1` and `details[0].code` is `invalid_boolean`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "unknown query parameter(s): limit",
+                    "details": [
+                      {
+                        "field": "limit",
+                        "code": "unknown_parameter",
+                        "message": null
+                      }
+                    ],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No product has that `product_id`. The message is `Product not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/products/101\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.get_product(101)\nproduct = response.map[\"product\"]\nprint(product[\"name\"], product[\"sku\"], product[\"base_price\"])\nprint(product[\"product_pricing_and_stock\"][\"available_stock\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.getProduct(101);\nconst product = response.map.product;\nconsole.log(product.id, product.name, product.sku, product.base_price);\nconsole.log(product.product_pricing_and_stock.available_stock);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::getProduct($client, 101);\n\n$product = $response->map['product'];\necho $product['name'], ' (', $product['sku'], '): ', $product['base_price'], PHP_EOL;\necho $product['product_pricing_and_stock']['available_stock'], ' in stock', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().getProduct(101);\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nSystem.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"sku\"));\nSystem.out.println(product.get(\"base_price\") + \" \" + product.get(\"available\") + \" \" + product.get(\"version\"));\nMap<?, ?> pricingAndStock = (Map<?, ?>) product.get(\"product_pricing_and_stock\");\nSystem.out.println(pricingAndStock.get(\"available_stock\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.GetProductAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nvar pricingAndStock = (IReadOnlyDictionary<string, object?>)product[\"product_pricing_and_stock\"]!;\nConsole.WriteLine($\"{product[\"name\"]} {product[\"sku\"]} {product[\"base_price\"]} {pricingAndStock[\"available_stock\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.getProduct(101);\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['name']} ${product['sku']} ${product['base_price']}');\nfinal pricingAndStock = product['product_pricing_and_stock'] as Map;\nprint(pricingAndStock['available_stock']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().GetProduct(ctx, 101, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nstock := product[\"product_pricing_and_stock\"].(map[string]any)\nfmt.Println(product[\"name\"], product[\"sku\"], product[\"base_price\"], stock[\"available_stock\"])\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Update a product",
+        "operationId": "update_product",
+        "description": "Send the fields to change at the top level of the body, not inside `product`. The update merges at every level: a field you leave out keeps its value, inside nested blocks too. Write the dimensions in `product_properties`, and `mpn`, `upc`, `barcode` and `hs_code` in `advanced.advance_information`. You can send back a product you read once you remove `status` and `reviews`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product after the update, with an `ETag` header. When something changed, `version`, `updated_at`, `last_updated_on` and `last_updated_by` change too. The example shows a selection of the fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                },
+                "example": {
+                  "product": {
+                    "id": 101,
+                    "name": "Cotton T-Shirt",
+                    "sku": "TSHIRT-001",
+                    "heading": "Cotton T-Shirt",
+                    "invoice_note": "Ships in 2 business days",
+                    "available": true,
+                    "password_protected": false,
+                    "password": "",
+                    "base_price": 25.0,
+                    "cost_price": 12.0,
+                    "is_on_sale": false,
+                    "sale_price": 0.0,
+                    "version": 8,
+                    "product_pricing_and_stock": {
+                      "track_inventory": true,
+                      "available_stock": 35,
+                      "low_level_stock": 2,
+                      "warehouses": [
+                        {
+                          "warehouse": "1",
+                          "stock": 10
+                        },
+                        {
+                          "warehouse": "4",
+                          "stock": 25
+                        }
+                      ],
+                      "is_multi_location_enabled": true,
+                      "locations": [
+                        {
+                          "warehouse": 1,
+                          "warehouse_name": "Sydney Warehouse",
+                          "stock": 10,
+                          "low_stock_level": 2,
+                          "is_default": true
+                        },
+                        {
+                          "warehouse": 4,
+                          "warehouse_name": "Sydney Store Room",
+                          "stock": 25,
+                          "low_stock_level": 5,
+                          "is_default": false
+                        }
+                      ]
+                    },
+                    "advanced": {
+                      "advance_information": {
+                        "mpn": "MPN-0001",
+                        "barcode": "",
+                        "hs_code": ""
+                      }
+                    },
+                    "product_variation": {},
+                    "has_variations": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `product` (message `product: is not a recognised product field`), or it has `status`, `reviews`, or a top-level `mpn`, `upc`, `barcode` or `hs_code` (reason `unknown_field`). Or it changes a read-only field such as `id`, `sold_out`, `model` or the top-level `weight` (reason `read_only_field`). Or a field that takes fixed values has another value (reason `invalid_enum`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/products/101\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice_note\": \"Ships in 2 business days\",\n    \"advanced\": {\n      \"advance_information\": {\n        \"mpn\": \"MPN-0001\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.update_product(101, {\n    \"invoice_note\": \"Ships in 2 business days\",\n    \"advanced\": {\"advance_information\": {\"mpn\": \"MPN-0001\"}},\n})\nproduct = response.map[\"product\"]\nprint(product[\"invoice_note\"], product[\"advanced\"][\"advance_information\"][\"mpn\"])\nprint(product[\"version\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.updateProduct(101, {\n    invoice_note: 'Ships in 2 business days',\n    advanced: {advance_information: {mpn: 'MPN-0001'}},\n});\nconst product = response.map.product;\nconsole.log(product.invoice_note, product.advanced.advance_information.mpn, product.version);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::updateProduct($client, 101, [\n    'invoice_note' => 'Ships in 2 business days',\n    'advanced' => ['advance_information' => ['mpn' => 'MPN-0001']],\n]);\n\n$product = $response->map['product'];\necho $product['invoice_note'], ', ', $product['advanced']['advance_information']['mpn'], ', version ', $product['version'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().updateProduct(101, Map.of(\n        \"invoice_note\", \"Ships in 2 business days\",\n        \"advanced\", Map.of(\"advance_information\", Map.of(\"mpn\", \"MPN-0001\"))));\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nMap<?, ?> advanced = (Map<?, ?>) product.get(\"advanced\");\nSystem.out.println(product.get(\"invoice_note\") + \" \" + product.get(\"version\"));\nSystem.out.println(((Map<?, ?>) advanced.get(\"advance_information\")).get(\"mpn\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.UpdateProductAsync(101, new Dictionary<string, object?>\n{\n    [\"invoice_note\"] = \"Ships in 2 business days\",\n    [\"advanced\"] = new Dictionary<string, object?>\n    {\n        [\"advance_information\"] = new Dictionary<string, object?> { [\"mpn\"] = \"MPN-0001\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"invoice_note\"]} {product[\"version\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.updateProduct(101, {\n  'invoice_note': 'Ships in 2 business days',\n  'advanced': {\n    'advance_information': {'mpn': 'MPN-0001'},\n  },\n});\nfinal product = (response.map as Map)['product'] as Map;\nfinal info = (product['advanced'] as Map)['advance_information'] as Map;\nprint('${product['invoice_note']} ${info['mpn']}');\nprint(product['version']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().UpdateProduct(ctx, 101, map[string]any{\n\t\"invoice_note\": \"Ships in 2 business days\",\n\t\"advanced\":     map[string]any{\"advance_information\": map[string]any{\"mpn\": \"MPN-0001\"}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\ninformation := product[\"advanced\"].(map[string]any)[\"advance_information\"].(map[string]any)\nfmt.Println(product[\"invoice_note\"], information[\"mpn\"], product[\"version\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/products/{product_id}/stock": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Retrieve a product's stock",
+        "operationId": "get_product_stock",
+        "description": "Returns one row in `locations` for each inventory location the product is assigned to, with the location's `id` as `warehouse`, its name as `warehouse_name`, the product's `stock` there and the `low_stock_level`, and whether it is the product's default. `available_stock` is the sum of the rows' `stock`, and exactly one row has `is_default` set to `true`. A product with no location returns `multi_location_enabled: false` and `locations: []`, and a product with variations also returns `variations`. Query parameters are ignored.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product's stock. `status` is always `success`. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductStock"
+                },
+                "example": {
+                  "status": "success",
+                  "product_id": 101,
+                  "multi_location_enabled": true,
+                  "track_inventory": true,
+                  "available_stock": 35,
+                  "locations": [
+                    {
+                      "warehouse": 1,
+                      "warehouse_name": "Sydney Warehouse",
+                      "stock": 10,
+                      "low_stock_level": 2,
+                      "is_default": true
+                    },
+                    {
+                      "warehouse": 4,
+                      "warehouse_name": "Sydney Store Room",
+                      "stock": 25,
+                      "low_stock_level": 5,
+                      "is_default": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No product has that `product_id`. The message is `Product not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/products/101/stock\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.get_product_stock(101)\nprint(response.map[\"available_stock\"])\nfor location in response.map[\"locations\"]:\n    print(location[\"warehouse\"], location[\"warehouse_name\"], location[\"stock\"], location[\"is_default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.getProductStock(101);\nconsole.log(response.map.available_stock);\nfor (const location of response.map.locations) {\n    console.log(location.warehouse, location.warehouse_name, location.stock, location.is_default);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::getProductStock($client, 101);\n\nforeach ($response->map['locations'] as $location) {\n    echo $location['warehouse'], ' ', $location['warehouse_name'], ': ', $location['stock'], $location['is_default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['available_stock'], ' in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().getProductStock(101);\nMap<?, ?> stock = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) stock.get(\"locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"warehouse\") + \" \" + location.get(\"warehouse_name\") + \" \"\n            + location.get(\"stock\") + \" \" + location.get(\"is_default\"));\n}\nSystem.out.println(stock.get(\"available_stock\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.GetProductStockAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"available_stock\"]);\nforeach (var location in ((IReadOnlyList<object?>)body[\"locations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{location[\"warehouse\"]} {location[\"warehouse_name\"]} {location[\"stock\"]} {location[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.getProductStock(101);\nfinal stock = response.map as Map;\nprint(stock['available_stock']);\nfor (final location in stock['locations'] as List) {\n  final row = location as Map;\n  print('${row['warehouse']} ${row['warehouse_name']} ${row['stock']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().GetProductStock(ctx, 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"available_stock\"])\nfor _, row := range body[\"locations\"].([]any) {\n\tlocation := row.(map[string]any)\n\tfmt.Println(location[\"warehouse\"], location[\"warehouse_name\"], location[\"stock\"], location[\"is_default\"])\n}\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Set a product's stock",
+        "operationId": "update_product_stock",
+        "description": "Send `locations` with one row for every location the product keeps; a location you leave out is unassigned, even while it holds stock. Each row takes the location's `id` as `warehouse`, the units as `stock`, and optionally `low_stock_level` and `is_default`. When no row has `is_default: true`, the first row you send becomes the product's default. The rows [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) returns can be sent back as they are: `warehouse_name` and other extra keys are ignored.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product's stock after the write, with the same fields as [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) and no `ETag` header. Rows can come back in a different order from the one you sent. On a product that had no location, `locations` is `[]` although the rows are stored: read the stock again to see them.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductStock"
+                },
+                "example": {
+                  "status": "success",
+                  "product_id": 101,
+                  "multi_location_enabled": true,
+                  "track_inventory": true,
+                  "available_stock": 40,
+                  "locations": [
+                    {
+                      "warehouse": 1,
+                      "warehouse_name": "Sydney Warehouse",
+                      "stock": 10,
+                      "low_stock_level": 2,
+                      "is_default": true
+                    },
+                    {
+                      "warehouse": 4,
+                      "warehouse_name": "Sydney Store Room",
+                      "stock": 30,
+                      "low_stock_level": 5,
+                      "is_default": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`locations` is missing or empty (message `locations is required`), a row has a negative `stock` (message `stock can not be a negative number`), or a row has no `warehouse` (message `invalid inventory location: null`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/products/101/stock\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"note\": \"Restock\",\n    \"locations\": [\n      {\n        \"warehouse\": 1,\n        \"stock\": 10,\n        \"low_stock_level\": 2,\n        \"is_default\": true\n      },\n      {\n        \"warehouse\": 4,\n        \"stock\": 30,\n        \"low_stock_level\": 5,\n        \"is_default\": false\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.update_product_stock(101, {\n    \"note\": \"Restock\",\n    \"locations\": [\n        {\"warehouse\": 1, \"stock\": 10, \"low_stock_level\": 2, \"is_default\": True},\n        {\"warehouse\": 4, \"stock\": 30, \"low_stock_level\": 5, \"is_default\": False},\n    ],\n})\nprint(response.map[\"available_stock\"])\nfor location in response.map[\"locations\"]:\n    print(location[\"warehouse\"], location[\"stock\"], location[\"is_default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.updateProductStock(101, {\n    note: 'Restock',\n    locations: [\n        {warehouse: 1, stock: 10, low_stock_level: 2, is_default: true},\n        {warehouse: 4, stock: 30, low_stock_level: 5, is_default: false},\n    ],\n});\nconsole.log(response.map.available_stock);\nfor (const location of response.map.locations) {\n    console.log(location.warehouse, location.stock, location.is_default);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::updateProductStock($client, 101, [\n    'note' => 'Restock',\n    'locations' => [\n        ['warehouse' => 1, 'stock' => 10, 'low_stock_level' => 2, 'is_default' => true],\n        ['warehouse' => 4, 'stock' => 30, 'low_stock_level' => 5, 'is_default' => false],\n    ],\n]);\n\necho $response->map['available_stock'], ' in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().updateProductStock(101, Map.of(\"note\", \"Restock\", \"locations\", List.of(\n        Map.of(\"warehouse\", 1, \"stock\", 10, \"low_stock_level\", 2, \"is_default\", true),\n        Map.of(\"warehouse\", 4, \"stock\", 30, \"low_stock_level\", 5, \"is_default\", false))));\nMap<?, ?> stock = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) stock.get(\"locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"warehouse\") + \" \" + location.get(\"stock\") + \" \" + location.get(\"is_default\"));\n}\nSystem.out.println(stock.get(\"available_stock\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.UpdateProductStockAsync(101, new Dictionary<string, object?>\n{\n    [\"note\"] = \"Restock\", [\"locations\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"warehouse\"] = 1, [\"stock\"] = 10, [\"low_stock_level\"] = 2, [\"is_default\"] = true },\n        new Dictionary<string, object?> { [\"warehouse\"] = 4, [\"stock\"] = 30, [\"low_stock_level\"] = 5, [\"is_default\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"available_stock\"]);\nforeach (var location in ((IReadOnlyList<object?>)body[\"locations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{location[\"warehouse\"]} {location[\"warehouse_name\"]} {location[\"stock\"]} {location[\"is_default\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.updateProductStock(101, {\n  'note': 'Restock',\n  'locations': [\n    {'warehouse': 1, 'stock': 10, 'low_stock_level': 2, 'is_default': true},\n    {'warehouse': 4, 'stock': 30, 'low_stock_level': 5, 'is_default': false},\n  ],\n});\nfinal stock = response.map as Map;\nprint(stock['available_stock']);\nfor (final location in stock['locations'] as List) {\n  print('${(location as Map)['warehouse']} ${location['stock']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().UpdateProductStock(ctx, 101, map[string]any{\n\t\"note\": \"Restock\",\n\t\"locations\": []any{\n\t\tmap[string]any{\"warehouse\": 1, \"stock\": 10, \"low_stock_level\": 2, \"is_default\": true},\n\t\tmap[string]any{\"warehouse\": 4, \"stock\": 30, \"low_stock_level\": 5, \"is_default\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"available_stock\"], body[\"locations\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductStockInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/products/{product_id}/stock/locations/{inventory_location_id}": {
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Unassign an inventory location from a product",
+        "operationId": "delete_product_stock_location",
+        "description": "Removes the location from the product's stock and returns `204` with an empty body. The location must hold `0` units of the product and must not be the product's default, or the call is rejected with `409`: first set its stock to `0`, or make another row the default, with [Set a product's stock](/api-reference/products/set-a-products-stock). Afterwards [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) no longer lists the product there. Once the location is unassigned from every product, you can delete it with [Delete an inventory location](/api-reference/inventory-locations/delete-an-inventory-location).",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`: the `warehouse` of one of the rows [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) returns.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The location is unassigned from the product. The body is empty, and the `Content-Type` header is `text/html`."
+          },
+          "404": {
+            "description": "The location is not assigned to the product, for example because you already unassigned it. The message is `Inventory location <inventory_location_id> is not assigned to product <product_id>.`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The location still holds units of the product: the message is `Product <product_id> still holds <n> units at this location. Set its stock here to 0 first.` and `details[0].code` is `has_stock`. Or the location is the product's default: the message is `This is product <product_id>'s default location. Make another of its locations the default first.` and `details[0].code` is `is_default`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "Product 101 still holds 25 units at this location. Set its stock here to 0 first.",
+                    "details": [
+                      {
+                        "field": "location_id",
+                        "code": "has_stock",
+                        "message": "25 units held",
+                        "value": 4
+                      }
+                    ],
+                    "request_id": "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/products/101/stock/locations/19\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.delete_product_stock_location(101, 19)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.deleteProductStockLocation(101, 19);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::deleteProductStockLocation($client, 101, 19);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().deleteProductStockLocation(101, 19);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.DeleteProductStockLocationAsync(101, 19);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.deleteProductStockLocation(101, 19);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().DeleteProductStockLocation(ctx, 101, 19, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
     "/admin/variations": {
       "get": {
         "tags": [
@@ -58080,6 +58759,1530 @@
                         "string"
                       ],
                       "description": "The value you sent, such as `abc` or `created_on`. On the `out_of_range` error for `limit=0` it is the number `0`; on the `invalid_integer` error for `limit=-1` it is the string `\"-1\"`. On a `name` rejected for its length, it is the number of characters you sent. Absent on a parameter the listing does not accept and on a missing `name`."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "description": "One product: 69 fields, the same set on every product.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The product's `id`. Pass it as `product_id` in a path. Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "Read-only: sending it is rejected with `400` and the reason `unknown_field`."
+          },
+          "urls": {
+            "$ref": "#/components/schemas/ProductUrls",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "heading": {
+            "type": "string"
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductParent"
+            },
+            "description": "The categories the product is filed under. In a write, send their ids as a list of numbers."
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ProductNamedReference",
+            "description": "Who created the product. Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Changes when the product changes. A value you send is ignored."
+          },
+          "transaction_no": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "custom_type": {
+            "type": "string"
+          },
+          "invoice_note": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "product_page": {
+            "$ref": "#/components/schemas/ProductNamedReference",
+            "description": "The product's page as `id` and `name`. Some products return `{}` instead."
+          },
+          "product_layout": {
+            "description": "`{}` on every product read."
+          },
+          "custom_class": {
+            "type": "string",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "available_on_date_range": {
+            "type": "boolean"
+          },
+          "available_from_date": {
+            "type": "string"
+          },
+          "available_to_date": {
+            "type": "string"
+          },
+          "available_for": {
+            "type": "string",
+            "description": "Who can buy the product. `selected` limits it to the customers and groups in `selected_customers`."
+          },
+          "selected_customers": {
+            "description": "The customers and customer groups the product is available to, as an object with `customers` and `groups`, or `[]` when the product names none.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductSelectedCustomers"
+              },
+              {
+                "type": "array",
+                "maxItems": 0
+              }
+            ]
+          },
+          "restrict_for_selected_customers": {
+            "type": "array"
+          },
+          "password_protected": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string",
+            "description": "`***` when the product has a password, `\"\"` when it has none. Sending back `***` keeps the stored password."
+          },
+          "available_on_weekdays": {
+            "$ref": "#/components/schemas/ProductAvailableOnWeekdays"
+          },
+          "base_price": {
+            "type": "number"
+          },
+          "cost_price": {
+            "type": "number"
+          },
+          "compare_at_price": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "is_on_sale": {
+            "type": "boolean"
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "sold_out": {
+            "type": "boolean",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "length": {
+            "type": "number",
+            "description": "Read-only here: write it in `product_properties`. A changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "width": {
+            "type": "number",
+            "description": "Read-only here: write it in `product_properties`. A changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "height": {
+            "type": "number",
+            "description": "Read-only here: write it in `product_properties`. A changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "weight": {
+            "type": "number",
+            "description": "Read-only here: write it in `product_properties`. A changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "sold_out_label": {
+            "type": "string",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "featured_label": {
+            "type": "string"
+          },
+          "is_new": {
+            "type": "boolean"
+          },
+          "featured": {
+            "type": "boolean",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "new": {
+            "type": "boolean",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "model": {
+            "type": "string",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "product_properties": {
+            "$ref": "#/components/schemas/ProductProperties"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Changes when the product changes, including when its stock changes. A write that changes nothing keeps it. A value you send is ignored."
+          },
+          "created_on": {
+            "type": "string",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "last_updated_on": {
+            "type": "string",
+            "description": "Changes when the product changes. A value you send is ignored."
+          },
+          "last_updated_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductNamedReference"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who last changed the product, or `null`. Changes when the product changes. A value you send is ignored."
+          },
+          "schedule_type": {
+            "type": "string"
+          },
+          "custom_schedule_option": {
+            "type": "string"
+          },
+          "tax_settings": {
+            "$ref": "#/components/schemas/ProductTaxSettings"
+          },
+          "variation_price_display": {
+            "$ref": "#/components/schemas/ProductVariationPriceDisplay"
+          },
+          "administrative_status": {
+            "type": "boolean"
+          },
+          "is_draft": {
+            "type": "boolean",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          },
+          "product_summary": {
+            "type": "string"
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "product_pricing_and_stock": {
+            "$ref": "#/components/schemas/ProductPricingAndStock"
+          },
+          "image_and_video": {
+            "$ref": "#/components/schemas/ProductImageAndVideo"
+          },
+          "advanced": {
+            "$ref": "#/components/schemas/ProductAdvanced"
+          },
+          "related_products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductLink"
+            }
+          },
+          "similar_products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductLink"
+            }
+          },
+          "seo_configs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSeoConfig"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTag"
+            }
+          },
+          "custom_properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductCustomProperty"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductReview"
+            },
+            "description": "Read-only: sending it is rejected with `400` and the reason `unknown_field`."
+          },
+          "product_variation": {
+            "$ref": "#/components/schemas/ProductVariation",
+            "description": "The product's variation types and variants, or `{}` on a product with no variations."
+          },
+          "preorder_enabled": {
+            "type": "boolean"
+          },
+          "has_variations": {
+            "type": "boolean",
+            "description": "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
+          }
+        }
+      },
+      "ProductUrls": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The product's URL slug."
+          },
+          "product_url": {
+            "type": "string",
+            "description": "The product's full storefront address."
+          }
+        }
+      },
+      "ProductNamedReference": {
+        "type": "object",
+        "description": "A record the product refers to: an author, a page, a customer or a customer group.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The `id` of the named person, page, customer or customer group."
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductParent": {
+        "type": "object",
+        "description": "One category the product is filed under. [List categories](/api-reference/categories/list-categories) returns the store's categories.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The category's id."
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_in_trash": {
+            "type": "boolean"
+          },
+          "is_parent_in_trash": {
+            "type": "boolean"
+          },
+          "is_disposable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductSelectedCustomers": {
+        "type": "object",
+        "properties": {
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductNamedReference"
+            },
+            "description": "The customers the product is available to."
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductNamedReference"
+            },
+            "description": "The customer groups the product is available to."
+          }
+        }
+      },
+      "ProductWeekday": {
+        "type": "object",
+        "description": "One day of the weekday schedule.",
+        "properties": {
+          "day": {
+            "type": "string"
+          },
+          "start_hour": {
+            "type": "integer"
+          },
+          "start_minute": {
+            "type": "integer"
+          },
+          "end_hour": {
+            "type": "integer"
+          },
+          "end_minute": {
+            "type": "integer"
+          },
+          "is_full_day": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductAvailableOnWeekdays": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "weekdays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductWeekday"
+            },
+            "description": "One entry per day in the schedule, or `[]` when `enabled` is `false`."
+          }
+        }
+      },
+      "ProductProperties": {
+        "type": "object",
+        "description": "The product's dimensions. Write them here; the product's top-level `length`, `width`, `height` and `weight` repeat them and are read-only.",
+        "properties": {
+          "length": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "length_unit": {
+            "type": "string"
+          },
+          "weight_unit": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductTaxSettings": {
+        "type": "object",
+        "description": "Tax settings for this product. They apply only when `overwrite_default_config` is `true`.",
+        "properties": {
+          "overwrite_default_config": {
+            "type": "boolean"
+          },
+          "is_tax_exempt": {
+            "type": "boolean"
+          },
+          "show_price_with_tax": {
+            "type": "boolean"
+          },
+          "is_price_with_tax": {
+            "type": "boolean"
+          },
+          "system_default_tax": {
+            "type": "boolean"
+          },
+          "tax_message": {
+            "type": "string"
+          },
+          "base_price_rounding": {
+            "type": "string"
+          },
+          "default_tax_code": {
+            "type": "string"
+          },
+          "custom_tax_profile_id": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductVariationPriceDisplay": {
+        "type": "object",
+        "description": "Which variant price a listing shows, and its labels.",
+        "properties": {
+          "method": {
+            "type": "string"
+          },
+          "label_for_lowest_price": {
+            "type": "string"
+          },
+          "label_for_highest_price": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductWarehouseStock": {
+        "type": "object",
+        "description": "One location's units, in an older format.",
+        "properties": {
+          "warehouse": {
+            "type": "string",
+            "description": "The inventory location's id, as text, such as `\"4\"`. Every other location id in these responses is a number."
+          },
+          "stock": {
+            "type": "integer"
+          }
+        }
+      },
+      "ProductStockLocation": {
+        "type": "object",
+        "description": "One inventory location the product is assigned to.",
+        "properties": {
+          "warehouse": {
+            "type": "integer",
+            "description": "The inventory location's id. Pass it as `inventory_location_id` to unassign the location."
+          },
+          "warehouse_name": {
+            "type": "string",
+            "description": "The inventory location's name."
+          },
+          "stock": {
+            "type": "integer",
+            "description": "The units of the product at this location."
+          },
+          "low_stock_level": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The low-stock level at this location, or `null` when it was set without one."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "`true` on the product's default location. Exactly one row has it."
+          }
+        }
+      },
+      "ProductPricingAndStock": {
+        "type": "object",
+        "description": "The product's pricing and stock settings.",
+        "properties": {
+          "track_inventory": {
+            "type": "boolean"
+          },
+          "available_stock": {
+            "type": "integer",
+            "description": "The sum of `stock` over the product's locations."
+          },
+          "low_level_stock": {
+            "type": "integer",
+            "description": "Takes the `low_stock_level` of the product's default location."
+          },
+          "warehouses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductWarehouseStock"
+            },
+            "description": "The same units as `locations`, with each location id as text."
+          },
+          "minimum_order_quantity": {
+            "type": "integer"
+          },
+          "maximum_order_quantity": {
+            "type": "integer"
+          },
+          "tax_profile": {
+            "description": "`{}` on every product read."
+          },
+          "shipping_profile": {
+            "description": "`{}` on every product read."
+          },
+          "enable_multiple_order": {
+            "type": "boolean"
+          },
+          "multiple_order_quantity": {
+            "type": "integer"
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "on_sale_price_type": {
+            "type": "string"
+          },
+          "on_sale_price": {
+            "type": "number"
+          },
+          "expected_to_pay": {
+            "type": "boolean"
+          },
+          "expected_to_pay_price": {
+            "type": "number"
+          },
+          "enable_call_for_price": {
+            "type": "boolean"
+          },
+          "restrict_price_for": {
+            "type": "string"
+          },
+          "restrict_price_for_except_customers": {
+            "type": "array"
+          },
+          "restrict_purchase_for": {
+            "type": "string"
+          },
+          "restrict_purchase_for_selected_customers": {
+            "type": "array"
+          },
+          "hide_price": {
+            "type": "boolean"
+          },
+          "enable_combined_stock_selling_limit": {
+            "type": "boolean"
+          },
+          "combined_stock_selling_limit": {
+            "type": "integer"
+          },
+          "enable_advance_pricing": {
+            "type": "boolean"
+          },
+          "suppliers": {
+            "type": "array"
+          },
+          "is_multi_location_enabled": {
+            "type": "boolean"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockLocation"
+            },
+            "description": "The same rows as `locations` in [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock)."
+          }
+        }
+      },
+      "ProductImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The image's id."
+          },
+          "filename": {
+            "type": "string"
+          },
+          "alt_text": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductVideo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The video's id."
+          },
+          "filename": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductImageAndVideo": {
+        "type": "object",
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImage"
+            }
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVideo"
+            }
+          },
+          "specs": {
+            "type": "array"
+          }
+        }
+      },
+      "ProductAdvanceInformation": {
+        "type": "object",
+        "description": "The product's identifiers and origin. An update that names one of these fields keeps the others.",
+        "properties": {
+          "global_trade_item_number": {
+            "type": "string"
+          },
+          "gtin": {
+            "type": "string"
+          },
+          "mpn": {
+            "type": "string",
+            "description": "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
+          },
+          "upc": {
+            "type": "string",
+            "description": "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
+          },
+          "barcode": {
+            "type": "string",
+            "description": "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
+          },
+          "country_of_origin": {
+            "type": "string"
+          },
+          "hs_code": {
+            "type": "string",
+            "description": "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
+          },
+          "product_condition": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductAdvanced": {
+        "type": "object",
+        "properties": {
+          "advance_information": {
+            "$ref": "#/components/schemas/ProductAdvanceInformation"
+          },
+          "webtool_disable_tracking": {
+            "type": "boolean"
+          },
+          "meta_tags": {
+            "type": "array"
+          }
+        }
+      },
+      "ProductLink": {
+        "type": "object",
+        "description": "A related or similar product.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The linked product's id."
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductSeoConfig": {
+        "type": "object",
+        "description": "One SEO setting on the product.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The SEO setting's id."
+          },
+          "value": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "config_key": {
+            "type": "string"
+          },
+          "meta_tags": {
+            "type": "array"
+          }
+        }
+      },
+      "ProductTagValue": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The tag value's id."
+          },
+          "title": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductTag": {
+        "type": "object",
+        "description": "One tag on the product, with its values.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The `id` of this entry in the product's `tags`."
+          },
+          "tag_id": {
+            "type": "integer",
+            "description": "The tag's own id."
+          },
+          "name": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTagValue"
+            }
+          },
+          "display_in_product_page": {
+            "type": "boolean"
+          },
+          "enable_expanded_view": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductCustomProperty": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The custom property's id."
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductReview": {
+        "type": "object",
+        "description": "One review of the product.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The review's id."
+          },
+          "productId": {
+            "type": "integer",
+            "description": "The reviewed product's id. This is the only camelCase field name in the product."
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "review": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rating": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array"
+          }
+        }
+      },
+      "ProductVariationTypeOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The option's id."
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "default": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductVariationType": {
+        "type": "object",
+        "description": "One variation type the product uses, with its options.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The variation type's id."
+          },
+          "name": {
+            "type": "string"
+          },
+          "standard": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVariationTypeOption"
+            }
+          }
+        }
+      },
+      "ProductCombinationOptionType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The variation type's id."
+          },
+          "role": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "standard": {
+            "type": "string"
+          },
+          "is_disposable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductCombinationOption": {
+        "type": "object",
+        "description": "One option of a variant.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The option's id."
+          },
+          "index": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductCombinationOptionType"
+            },
+            "description": "A list of one entry: the variation type the option belongs to."
+          },
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "color_has_swatch": {
+            "type": "boolean"
+          },
+          "color_swatch_value": {
+            "type": "string"
+          },
+          "image_base_url": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductCombinationImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The image's id."
+          },
+          "thumbnail": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductCombinationPriceAndStock": {
+        "type": "object",
+        "description": "A variant's pricing and stock settings.",
+        "properties": {
+          "track_inventory": {
+            "type": "boolean"
+          },
+          "available_stock": {
+            "type": "integer"
+          },
+          "low_level_stock": {
+            "type": "integer"
+          },
+          "minimum_order_quantity": {
+            "type": "integer"
+          },
+          "maximum_order_quantity": {
+            "type": "integer"
+          },
+          "supported_max_order_quantity": {
+            "type": "integer"
+          },
+          "enable_multiple_order": {
+            "type": "boolean"
+          },
+          "multiple_order_quantity": {
+            "type": "integer"
+          },
+          "on_sale": {
+            "type": "boolean"
+          },
+          "sold_out": {
+            "type": "boolean"
+          },
+          "sold_out_label": {
+            "type": "string"
+          },
+          "on_sale_price_type": {
+            "type": "string"
+          },
+          "on_sale_price": {
+            "type": "number"
+          },
+          "expected_to_pay": {
+            "type": "boolean"
+          },
+          "expected_to_pay_price": {
+            "type": "number"
+          },
+          "enable_call_for_price": {
+            "type": "boolean"
+          },
+          "hide_price": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductCombinationDetails": {
+        "type": "object",
+        "description": "One variant of the product.",
+        "properties": {
+          "variation_id": {
+            "type": "integer",
+            "description": "The variant's id."
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "custom_sku": {
+            "type": "string"
+          },
+          "urls": {
+            "$ref": "#/components/schemas/ProductUrls"
+          },
+          "meta_tags": {
+            "type": "array"
+          },
+          "is_inventory_enabled": {
+            "type": "boolean"
+          },
+          "available_stock": {
+            "type": "integer"
+          },
+          "low_stock_level": {
+            "type": "integer"
+          },
+          "spec": {
+            "type": "string"
+          },
+          "is_multiple_order_quantity": {
+            "type": "boolean"
+          },
+          "is_on_sale": {
+            "type": "boolean"
+          },
+          "is_expect_to_pay": {
+            "type": "boolean"
+          },
+          "is_call_for_price_enabled": {
+            "type": "boolean"
+          },
+          "is_new": {
+            "type": "boolean"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "on_sale_amount_type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "product_condition": {
+            "type": "string"
+          },
+          "featured_label": {
+            "type": "string"
+          },
+          "base_price": {
+            "type": "number"
+          },
+          "cost_price": {
+            "type": "number"
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "expect_to_pay_price": {
+            "type": "number"
+          },
+          "weight": {
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "A number on some products and text on others."
+          },
+          "height": {
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "A number on some products and text on others."
+          },
+          "length": {
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "A number on some products and text on others."
+          },
+          "width": {
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "A number on some products and text on others."
+          },
+          "display_price": {
+            "type": "number"
+          },
+          "previous_price": {
+            "type": "number"
+          },
+          "price_and_stock": {
+            "$ref": "#/components/schemas/ProductCombinationPriceAndStock"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductCombinationImage"
+            }
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVideo"
+            }
+          },
+          "specs": {
+            "type": "array"
+          },
+          "supported_max_order_quantity": {
+            "type": "integer"
+          },
+          "is_base": {
+            "type": "boolean"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "country_of_origin": {
+            "type": "string"
+          },
+          "hs_code": {
+            "type": "string"
+          },
+          "tax": {
+            "type": "number"
+          },
+          "tax_message": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductCombination": {
+        "type": "object",
+        "description": "One combination of options and the variant it makes.",
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductCombinationOption"
+            }
+          },
+          "details": {
+            "$ref": "#/components/schemas/ProductCombinationDetails"
+          }
+        }
+      },
+      "ProductVariation": {
+        "type": "object",
+        "description": "`{}` on a product with no variations.",
+        "properties": {
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVariationType"
+            }
+          },
+          "available_combinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductCombination"
+            }
+          }
+        }
+      },
+      "ProductInput": {
+        "type": "object",
+        "description": "Send these fields at the top level of the body, not inside `product`. Only the fields you send change, inside nested blocks too. A read-only field from [Retrieve a product](/api-reference/products/retrieve-a-product) is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "custom_type": {
+            "type": "string"
+          },
+          "invoice_note": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "available_on_date_range": {
+            "type": "boolean"
+          },
+          "available_from_date": {
+            "type": "string",
+            "description": "Sent on its own, it is ignored."
+          },
+          "available_to_date": {
+            "type": "string",
+            "description": "Sent on its own, it is ignored."
+          },
+          "available_for": {
+            "type": "string"
+          },
+          "password_protected": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string",
+            "description": "Send `***` to keep the stored password. Sent on its own, it is ignored."
+          },
+          "available_on_weekdays": {
+            "$ref": "#/components/schemas/ProductAvailableOnWeekdays"
+          },
+          "base_price": {
+            "type": "number"
+          },
+          "cost_price": {
+            "type": "number"
+          },
+          "compare_at_price": {
+            "type": "number"
+          },
+          "is_on_sale": {
+            "type": "boolean"
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "featured_label": {
+            "type": "string"
+          },
+          "is_new": {
+            "type": "boolean"
+          },
+          "product_properties": {
+            "$ref": "#/components/schemas/ProductProperties",
+            "description": "Write the dimensions here."
+          },
+          "schedule_type": {
+            "type": "string"
+          },
+          "custom_schedule_option": {
+            "type": "string"
+          },
+          "tax_settings": {
+            "$ref": "#/components/schemas/ProductTaxSettings"
+          },
+          "variation_price_display": {
+            "$ref": "#/components/schemas/ProductVariationPriceDisplay"
+          },
+          "administrative_status": {
+            "type": "boolean"
+          },
+          "product_summary": {
+            "type": "string"
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "product_pricing_and_stock": {
+            "$ref": "#/components/schemas/ProductPricingAndStock"
+          },
+          "image_and_video": {
+            "$ref": "#/components/schemas/ProductImageAndVideo"
+          },
+          "advanced": {
+            "$ref": "#/components/schemas/ProductAdvanced",
+            "description": "Write `mpn`, `upc`, `barcode` and `hs_code` in `advance_information` here."
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The ids of the categories to file the product under."
+          },
+          "related_products": {
+            "type": "array"
+          },
+          "similar_products": {
+            "type": "array"
+          },
+          "tags": {
+            "type": "array"
+          },
+          "preorder_enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductStockVariation": {
+        "type": "object",
+        "description": "One variant's stock, on a product with variations.",
+        "properties": {
+          "variation_id": {
+            "type": "integer",
+            "description": "The variant's id."
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "The variant's own product `id`. It differs from the `product_id` in the path."
+          },
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "available_stock": {
+            "type": "integer"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockLocation"
+            }
+          }
+        }
+      },
+      "ProductStock": {
+        "type": "object",
+        "description": "A product's stock at each inventory location it is assigned to.",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Always `success`."
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "The product's id, the `product_id` in the path."
+          },
+          "multi_location_enabled": {
+            "type": "boolean",
+            "description": "`false` on a product with no location. Assigning the product's first location sets it to `true`."
+          },
+          "track_inventory": {
+            "type": "boolean"
+          },
+          "available_stock": {
+            "type": "integer",
+            "description": "The sum of `stock` over the rows in `locations`."
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockLocation"
+            },
+            "description": "One row per inventory location the product is assigned to, or `[]` when it has none."
+          },
+          "variations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockVariation"
+            },
+            "description": "Only on a product with variations: one entry per variant."
+          }
+        }
+      },
+      "ProductStockLocationInput": {
+        "type": "object",
+        "required": [
+          "warehouse"
+        ],
+        "description": "One location the product keeps. Other keys, such as `warehouse_name`, are ignored.",
+        "properties": {
+          "warehouse": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Required. The inventory location's id, as a number or as numeric text. [List inventory locations](/api-reference/inventory-locations/list-inventory-locations) returns the store's locations."
+          },
+          "stock": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "The units at this location, `0` or more."
+          },
+          "low_stock_level": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The low-stock level at this location. Left out or `null`, it is stored as `null`."
+          },
+          "is_default": {
+            "type": "boolean",
+            "description": "Send `true` on the row for the product's default location. When no row has it, the first row you send becomes the default."
+          }
+        }
+      },
+      "ProductStockInput": {
+        "type": "object",
+        "required": [
+          "locations"
+        ],
+        "description": "Send these fields at the top level of the body.",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Optional. It changes nothing you can read back in the response or on the product."
+          },
+          "locations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ProductStockLocationInput"
+            },
+            "description": "Required and not empty. Replaces the product's whole set of locations: a location you leave out is unassigned, even while it holds stock."
+          }
+        }
+      },
+      "ProductFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Returned beside `product` when you send `field_metadata=true` or `1`. An object keyed by field name, such as `id`: `{\"type\": \"integer\", \"read_only\": true}`. The `password` entry has `write_only: true`. It lists `mpn`, `upc`, `barcode`, `hs_code`, `length`, `width`, `height`, `weight` and `sold_out_label` as writable at the top level, but an update rejects each of them there."
+      },
+      "ProductError": {
+        "type": "object",
+        "description": "Rejections return this shape. A method a path does not support is rejected too: `HEAD` on a product returns `404` although its `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `locations is required`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or parameter, or an empty list.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_parameter`, `has_stock` or `is_default`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "value": {
+                      "description": "The value involved, when the API includes it, such as the inventory location's id on `has_stock`."
                     }
                   }
                 }

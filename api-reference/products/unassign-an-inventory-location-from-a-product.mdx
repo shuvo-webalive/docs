@@ -1,0 +1,9 @@
+---
+title: "Unassign an inventory location from a product"
+description: "Unassigns an inventory location that holds `0` units of the product and is not its default."
+openapi: "DELETE /admin/products/{product_id}/stock/locations/{inventory_location_id}"
+---
+
+Removes the location from the product's stock and returns `204` with an empty body. The location must hold `0` units of the product and must not be the product's default, or the call is rejected with `409`: first set its stock to `0`, or make another row the default, with [Set a product's stock](/api-reference/products/set-a-products-stock). Afterwards [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) no longer lists the product there. Once the location is unassigned from every product, you can delete it with [Delete an inventory location](/api-reference/inventory-locations/delete-an-inventory-location).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
