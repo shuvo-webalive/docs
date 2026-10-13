@@ -4,7 +4,8 @@
       "name": "Customers",
       "icon": "users",
       "modules": [
-        "customers"
+        "customers",
+        "customer_groups"
       ]
     },
     {

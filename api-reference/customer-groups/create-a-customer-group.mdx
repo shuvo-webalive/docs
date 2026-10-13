@@ -1,0 +1,9 @@
+---
+title: "Create a customer group"
+description: "Creates a customer group and returns it, with the group's `id` to pass as `customer_group_id`."
+openapi: "POST /admin/customer_groups"
+---
+
+Wrap the group in `customer_group`; only `name` is required. The store trims spaces from the ends of `name`, and no other group can have the same name in any letter case. A field you leave out gets its default: `status` becomes `A`, `description` becomes `null`, every flag becomes `false`, and every amount, text and choice becomes `null`. `status` accepts `active` and `inactive` and returns `A` or `I`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

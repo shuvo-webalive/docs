@@ -1,0 +1,58 @@
+---
+title: "Customer groups"
+sidebarTitle: "Overview"
+description: "List, count, create, update and delete customer groups, and choose which customers belong to each group."
+---
+
+The Customer groups API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/customer_groups`.
+
+<Warning>
+  **Replacing a group's members removes every customer you leave out of the list.**
+  [Replace the members of a customer group](/api-reference/customer-groups/replace-the-members-of-a-customer-group) makes the list you send the
+  whole membership, and `{"customers": []}` empties the group. To add one customer and keep the
+  others, use [Add a customer to a customer group](/api-reference/customer-groups/add-a-customer-to-a-customer-group).
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List customer groups](/api-reference/customer-groups/list-customer-groups) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customer_groups` | Returns customer groups, 20 per call or the `limit` you send, sorted by `name` by default. |
+| [Count customer groups](/api-reference/customer-groups/count-customer-groups) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customer_groups/count` | Returns the number of customer groups that match your `search_text`, `name` and `status` filters. |
+| [Create a customer group](/api-reference/customer-groups/create-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customer_groups` | Creates a customer group and returns it, with the group's `id` to pass as `customer_group_id`. |
+| [Retrieve a customer group](/api-reference/customer-groups/retrieve-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customer_groups/{customer_group_id}` | Returns the customer group whose `id` you pass as `customer_group_id`, with its members. |
+| [Update a customer group](/api-reference/customer-groups/update-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/customer_groups/{customer_group_id}` | Changes only the fields you send, nested settings included, and returns the customer group. |
+| [Delete a customer group](/api-reference/customer-groups/delete-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/customer_groups/{customer_group_id}` | Deletes a customer group permanently. Its members stay in the store as customers. |
+| [Replace the members of a customer group](/api-reference/customer-groups/replace-the-members-of-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/customer_groups/{customer_group_id}/customers` | Replaces a customer group's whole member list with the `customer_id` values you send. |
+| [Retrieve a member of a customer group](/api-reference/customer-groups/retrieve-a-member-of-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/customer_groups/{customer_group_id}/customers/{customer_id}` | Returns one member of a customer group, by the customer's `customer_id`. |
+| [Add a customer to a customer group](/api-reference/customer-groups/add-a-customer-to-a-customer-group) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/customer_groups/assign` | Adds one customer to a customer group and keeps the group's other members. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap a group in `customer_group` when you create or update it.** Send
+  `{"customer_group": {"name": "Wholesale Partners"}}`. A body without the wrapper is rejected
+  with `400` and the message `customer_group is required`. Replacing the members and adding a
+  customer take bodies without that wrapper: `{"customers": [...]}` and
+  `{"customer": ..., "group": ...}`.
+- **An update changes only the fields you send, inside nested settings too.**
+  `{"customer_group": {"tax_configuration": {"tax_exempt": true}}}` changes `tax_exempt` and keeps
+  the other five tax settings. There is no replace: `PUT` on a group is rejected with `405`.
+- **Members are customers, identified by their `customer_id`.** The member calls take the customer's
+  `customer_id`, as a number or a string, not its `internal_id`. A customer's groups are listed
+  under `customer_groups` when you [retrieve the customer](/api-reference/customers/retrieve-a-customer).
+- **A listing returns 20 groups per call unless you send `limit`.** `limit` takes `1` to `100`. To get
+  more, send a higher `offset`, or `page`, while `pagination.has_next` is `true`. To sort by date,
+  send `sort=created` or `sort=updated`: `created_at` and `updated_at` are rejected with `400`.
+- **There is no `HEAD` call.** `HEAD` returns `404` on every customer group path, even though the
+  `Allow` header of an `OPTIONS` request lists it on the listing, count and group paths. Use `GET`
+  instead.
+- **Groups already in the store can hold values a write rejects.** A stored group can have a `status`
+  other than `A` or `I`, a `default_tax_code` a create rejects, or a `name` with spaces at either end.
+  Such a group matches neither `status=A` nor `status=I`, so those two counts can add up to less
+  than the total.

@@ -1,0 +1,42 @@
+{
+  "sdk": "python",
+  "module": "customer_groups",
+  "endpoints": {
+    "list_customer_groups": {
+      "function": "list_customer_groups",
+      "code": "response = client.customer_groups.list_customer_groups(\n    {\"search_text\": \"wholesale\", \"status\": \"active\", \"limit\": 50}\n)\nfor group in response.map[\"customer_groups\"]:\n    print(group[\"id\"], group[\"name\"], group[\"status\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "count_customer_groups": {
+      "function": "count_customer_groups",
+      "code": "response = client.customer_groups.count_customer_groups({\"search_text\": \"wholesale\", \"status\": \"I\"})\nprint(response.map[\"total\"])\n"
+    },
+    "create_customer_group": {
+      "function": "create_customer_group",
+      "code": "response = client.customer_groups.create_customer_group({\"customer_group\": {\n    \"name\": \"Wholesale Partners\", \"description\": \"Trade accounts\", \"status\": \"active\",\n    \"purchase_preference\": {\"minimum_purchase\": {\"enabled\": True, \"amount\": 50}, \"on_account_purchase\": {\n        \"enabled\": True, \"max_purchase\": {\"enabled\": True, \"amount\": 500}, \"credit_limit\": {\"enabled\": True, \"amount\": 1000},\n        \"payment_terms\": {\"enabled\": True, \"terms\": \"NET_30\"}}},\n    \"tax_configuration\": {\"override_store_tax\": True, \"tax_exempt\": False, \"tax_message\": \"Prices exclude GST\",\n        \"show_prices_with_tax_included\": True, \"prices_entered_with_tax_included\": False, \"base_price_rounding\": \"up\"},\n    \"product_display\": {\"overwrite_default\": True, \"variation_display_type\": \"enable_matrix_view\",\n        \"display_parent_image\": True, \"activate_colour_variation_image\": False, \"show_selected_variation_value\": True,\n        \"strike_through_out_of_stock\": False, \"single_click_variation_loading\": True, \"price_display_method\": \"highest\"}}})\ngroup = response.map[\"customer_group\"]\nprint(group[\"id\"], group[\"status\"], group[\"purchase_preference\"][\"on_account_purchase\"][\"payment_terms\"][\"terms\"])\n"
+    },
+    "get_customer_group": {
+      "function": "get_customer_group",
+      "code": "response = client.customer_groups.get_customer_group(1234)\ngroup = response.map[\"customer_group\"]\nprint(group[\"name\"], group[\"status\"], group[\"customer_count\"])\nfor customer in group[\"customers\"]:\n    print(customer[\"id\"], customer[\"email\"])\n"
+    },
+    "patch_customer_group": {
+      "function": "patch_customer_group",
+      "code": "response = client.customer_groups.patch_customer_group(1234, {\n    \"customer_group\": {\n        \"status\": \"inactive\",\n        \"purchase_preference\": {\"minimum_purchase\": {\"amount\": 75}},\n    },\n})\ngroup = response.map[\"customer_group\"]\nprint(group[\"status\"], group[\"purchase_preference\"][\"minimum_purchase\"][\"amount\"])\n"
+    },
+    "delete_customer_group": {
+      "function": "delete_customer_group",
+      "code": "response = client.customer_groups.delete_customer_group(1234)\nprint(response.status_code)\n"
+    },
+    "update_customer_group_customers": {
+      "function": "update_customer_group_customers",
+      "code": "response = client.customer_groups.update_customer_group_customers(\n    1234, {\"customers\": [5678, \"5679\"]}\n)\ngroup = response.map[\"customer_group\"]\nprint(group[\"customer_count\"])\nfor customer in group[\"customers\"]:\n    print(customer[\"id\"], customer[\"email\"])\n"
+    },
+    "get_customer_group_customer": {
+      "function": "get_customer_group_customer",
+      "code": "response = client.customer_groups.get_customer_group_customer(1234, 5678)\ncustomer = response.map[\"customer\"]\nprint(customer[\"id\"], customer[\"first_name\"], customer[\"last_name\"], customer[\"email\"])\n"
+    },
+    "assign_customer_group": {
+      "function": "assign_customer_group",
+      "code": "response = client.customer_groups.assign_customer_group({\"customer\": 5678, \"group\": 1234})\nprint(response.map[\"added\"], response.map[\"customer_id\"], response.map[\"group\"][\"name\"])\n"
+    }
+  }
+}

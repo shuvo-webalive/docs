@@ -1,0 +1,9 @@
+---
+title: "Add a customer to a customer group"
+description: "Adds one customer to a customer group and keeps the group's other members."
+openapi: "POST /admin/customer_groups/assign"
+---
+
+Send the customer's `customer_id` as `customer` and the group's `customer_group_id` as `group`, as numbers or strings, with no wrapper. The customer joins the group beside its other members. The call returns `201` whether or not it added the customer: `added` is `true` when the customer joined and `false` when the customer was already a member.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,42 @@
+{
+  "sdk": "dotnet",
+  "module": "customer_groups",
+  "endpoints": {
+    "list_customer_groups": {
+      "function": "ListCustomerGroupsAsync",
+      "code": "var response = await client.CustomerGroups.ListCustomerGroupsAsync(\n    new Dictionary<string, object?> { [\"search_text\"] = \"wholesale\", [\"status\"] = \"active\", [\"limit\"] = 50 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customerGroup in ((IReadOnlyList<object?>)body[\"customer_groups\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customerGroup[\"id\"]} {customerGroup[\"name\"]} {customerGroup[\"status\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine(pagination[\"total\"]);"
+    },
+    "count_customer_groups": {
+      "function": "CountCustomerGroupsAsync",
+      "code": "var response = await client.CustomerGroups.CountCustomerGroupsAsync(\n    new Dictionary<string, object?> { [\"search_text\"] = \"wholesale\", [\"status\"] = \"I\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "create_customer_group": {
+      "function": "CreateCustomerGroupAsync",
+      "code": "var response = await client.CustomerGroups.CreateCustomerGroupAsync(new Dictionary<string, object?>\n{\n    [\"customer_group\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wholesale Partners\", [\"description\"] = \"Trade accounts\", [\"status\"] = \"active\",\n        [\"purchase_preference\"] = new Dictionary<string, object?>\n        {\n            [\"minimum_purchase\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"amount\"] = 50 },\n            [\"on_account_purchase\"] = new Dictionary<string, object?>\n            {\n                [\"enabled\"] = true,\n                [\"max_purchase\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"amount\"] = 500 },\n                [\"credit_limit\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"amount\"] = 1000 },\n                [\"payment_terms\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"terms\"] = \"NET_30\" },\n            },\n        },\n        [\"tax_configuration\"] = new Dictionary<string, object?>\n        {\n            [\"override_store_tax\"] = true, [\"tax_exempt\"] = false, [\"tax_message\"] = \"Prices exclude GST\",\n            [\"show_prices_with_tax_included\"] = true, [\"prices_entered_with_tax_included\"] = false,\n            [\"base_price_rounding\"] = \"up\",\n        },\n        [\"product_display\"] = new Dictionary<string, object?>\n        {\n            [\"overwrite_default\"] = true, [\"variation_display_type\"] = \"enable_matrix_view\",\n            [\"display_parent_image\"] = true, [\"activate_colour_variation_image\"] = false,\n            [\"show_selected_variation_value\"] = true, [\"strike_through_out_of_stock\"] = false,\n            [\"single_click_variation_loading\"] = true, [\"price_display_method\"] = \"highest\",\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine($\"{customerGroup[\"id\"]} {customerGroup[\"name\"]} {customerGroup[\"status\"]}\");"
+    },
+    "get_customer_group": {
+      "function": "GetCustomerGroupAsync",
+      "code": "var response = await client.CustomerGroups.GetCustomerGroupAsync(1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine($\"{customerGroup[\"name\"]} {customerGroup[\"customer_count\"]}\");\nforeach (var customer in ((IReadOnlyList<object?>)customerGroup[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"id\"]} {customer[\"email\"]}\");"
+    },
+    "patch_customer_group": {
+      "function": "PatchCustomerGroupAsync",
+      "code": "var response = await client.CustomerGroups.PatchCustomerGroupAsync(1234, new Dictionary<string, object?>\n{\n    [\"customer_group\"] = new Dictionary<string, object?>\n    {\n        [\"status\"] = \"inactive\",\n        [\"purchase_preference\"] = new Dictionary<string, object?> { [\"minimum_purchase\"] = new Dictionary<string, object?> { [\"amount\"] = 75 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine($\"{customerGroup[\"status\"]} {customerGroup[\"updated_at\"]}\");"
+    },
+    "delete_customer_group": {
+      "function": "DeleteCustomerGroupAsync",
+      "code": "var response = await client.CustomerGroups.DeleteCustomerGroupAsync(1234);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_customer_group_customers": {
+      "function": "UpdateCustomerGroupCustomersAsync",
+      "code": "var response = await client.CustomerGroups.UpdateCustomerGroupCustomersAsync(1234, new Dictionary<string, object?>\n{\n    [\"customers\"] = new object[] { 5678, \"5679\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine(customerGroup[\"customer_count\"]);\nforeach (var customer in ((IReadOnlyList<object?>)customerGroup[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"id\"]} {customer[\"email\"]}\");"
+    },
+    "get_customer_group_customer": {
+      "function": "GetCustomerGroupCustomerAsync",
+      "code": "var response = await client.CustomerGroups.GetCustomerGroupCustomerAsync(1234, 5678);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine($\"{customer[\"id\"]} {customer[\"first_name\"]} {customer[\"last_name\"]} {customer[\"email\"]}\");"
+    },
+    "assign_customer_group": {
+      "function": "AssignCustomerGroupAsync",
+      "code": "var response = await client.CustomerGroups.AssignCustomerGroupAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = 5678, [\"group\"] = 1234,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"group\"]!;\nConsole.WriteLine($\"{body[\"customer_id\"]} {customerGroup[\"name\"]} {body[\"added\"]}\");"
+    }
+  }
+}

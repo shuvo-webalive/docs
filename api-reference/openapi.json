@@ -28,6 +28,9 @@
       "name": "Customers"
     },
     {
+      "name": "Customer groups"
+    },
+    {
       "name": "Category page"
     },
     {
@@ -2288,6 +2291,1394 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/StoreCreditAdjustmentInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customer_groups": {
+      "get": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "List customer groups",
+        "operationId": "list_customer_groups",
+        "description": "Returns the customer groups under `customer_groups`, sorted by `name` unless you send `sort`, with a `pagination` block. Send `search_text` to keep only groups whose `name` contains that text, and `status` to keep only active or inactive groups. Query parameters this call does not list, such as `q`, are ignored. The response has no `ETag` or `Last-Modified` header.",
+        "parameters": [
+          {
+            "name": "search_text",
+            "in": "query",
+            "description": "Keeps only groups whose `name` contains this text, in any letter case. It does not search `description`.",
+            "schema": {
+              "type": "string",
+              "example": "wholesale"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Another name for `search_text`. Keeps only groups whose `name` contains this text, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "wholesale"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Keeps only active groups (`A` or `active`) or inactive groups (`I` or `inactive`). Any other value is rejected with `400` (`invalid_enum`).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "A",
+                "I",
+                "active",
+                "inactive"
+              ],
+              "example": "active"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The field to sort by: `id`, `name`, `status`, `description`, `created` or `updated`. Without it, groups are sorted by `name`. Any other value, including `created_at` and `updated_at`, is rejected with `400` (`invalid_sort_field`).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name",
+                "status",
+                "description",
+                "created",
+                "updated"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`. Defaults to `asc`. Any other value is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "asc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of groups per page, from `1` to `100`. Defaults to `20`. `pagination.limit` shows the value applied. `0` is rejected with `400` and the message `'limit' must be a positive integer`; a value above `100` with the message `page size must be 100 or fewer`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of groups to skip. A negative value is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page number, starting at `1`. The store skips `(page - 1) * limit` groups, so `limit=2&page=2` skips 2 groups.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key beside the groups and `pagination`. It describes each field of a group.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The groups on this page in `customer_groups`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`. Each group has the 13 fields of `CustomerGroup`, without its members. With `field_metadata=true`, a `field_metadata` key is added.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_groups": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerGroup"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/CustomerGroupPagination"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CustomerGroupFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "customer_groups": [
+                    {
+                      "id": 1236,
+                      "name": "Members Club",
+                      "description": null,
+                      "status": "A",
+                      "default_tax_code": null,
+                      "add_as_new_customer_default_group": false,
+                      "shipping_profile": null,
+                      "background_image": null,
+                      "purchase_preference": {
+                        "minimum_purchase": {
+                          "enabled": false,
+                          "amount": null
+                        },
+                        "on_account_purchase": {
+                          "enabled": false,
+                          "max_purchase": {
+                            "enabled": false,
+                            "amount": null
+                          },
+                          "credit_limit": {
+                            "enabled": false,
+                            "amount": null
+                          },
+                          "payment_terms": {
+                            "enabled": false,
+                            "terms": null
+                          }
+                        }
+                      },
+                      "tax_configuration": {
+                        "override_store_tax": false,
+                        "tax_exempt": false,
+                        "tax_message": null,
+                        "show_prices_with_tax_included": false,
+                        "prices_entered_with_tax_included": false,
+                        "base_price_rounding": null
+                      },
+                      "product_display": {
+                        "overwrite_default": false,
+                        "variation_display_type": null,
+                        "display_parent_image": false,
+                        "activate_colour_variation_image": false,
+                        "show_selected_variation_value": false,
+                        "strike_through_out_of_stock": false,
+                        "single_click_variation_loading": false,
+                        "price_display_method": null
+                      },
+                      "created_at": "2026-07-16T06:24:24",
+                      "updated_at": "2026-07-16T06:24:24"
+                    },
+                    {
+                      "id": 1234,
+                      "name": "Wholesale Partners",
+                      "description": "Trade accounts",
+                      "status": "A",
+                      "default_tax_code": null,
+                      "add_as_new_customer_default_group": false,
+                      "shipping_profile": null,
+                      "background_image": null,
+                      "purchase_preference": {
+                        "minimum_purchase": {
+                          "enabled": true,
+                          "amount": 50
+                        },
+                        "on_account_purchase": {
+                          "enabled": true,
+                          "max_purchase": {
+                            "enabled": true,
+                            "amount": 500
+                          },
+                          "credit_limit": {
+                            "enabled": true,
+                            "amount": 1000
+                          },
+                          "payment_terms": {
+                            "enabled": true,
+                            "terms": "net_30"
+                          }
+                        }
+                      },
+                      "tax_configuration": {
+                        "override_store_tax": true,
+                        "tax_exempt": false,
+                        "tax_message": "Prices exclude GST",
+                        "show_prices_with_tax_included": true,
+                        "prices_entered_with_tax_included": false,
+                        "base_price_rounding": "up"
+                      },
+                      "product_display": {
+                        "overwrite_default": true,
+                        "variation_display_type": "enable_matrix_view",
+                        "display_parent_image": true,
+                        "activate_colour_variation_image": false,
+                        "show_selected_variation_value": true,
+                        "strike_through_out_of_stock": false,
+                        "single_click_variation_loading": true,
+                        "price_display_method": "highest"
+                      },
+                      "created_at": "2026-10-11T09:15:02",
+                      "updated_at": "2026-10-11T09:15:02"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A query parameter has a value the listing does not accept: `limit` is `0` (`'limit' must be a positive integer`) or above `100` (`page size must be 100 or fewer`); `offset` is negative; `status` is not `A`, `I`, `active` or `inactive` (`invalid_enum`); `sort` is not one of its six fields (`invalid_sort_field`); or `dir` is not `asc` or `desc`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customer_groups?search_text=wholesale&status=active&limit=50\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.list_customer_groups(\n    {\"search_text\": \"wholesale\", \"status\": \"active\", \"limit\": 50}\n)\nfor group in response.map[\"customer_groups\"]:\n    print(group[\"id\"], group[\"name\"], group[\"status\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.listCustomerGroups({search_text: 'wholesale', status: 'active', limit: 50});\nfor (const customerGroup of response.map.customer_groups) {\n    console.log(customerGroup.id, customerGroup.name, customerGroup.status);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::listCustomerGroups($client, ['search_text' => 'wholesale', 'status' => 'active', 'limit' => 50]);\n\nforeach ($response->map['customer_groups'] as $group) {\n    echo $group['id'], ' ', $group['name'], ' ', $group['status'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().listCustomerGroups(\n        Map.of(\"search_text\", \"wholesale\", \"status\", \"active\", \"limit\", 50));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"customer_groups\")) {\n    Map<?, ?> group = (Map<?, ?>) row;\n    System.out.println(group.get(\"id\") + \" \" + group.get(\"name\") + \" \" + group.get(\"status\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.ListCustomerGroupsAsync(\n    new Dictionary<string, object?> { [\"search_text\"] = \"wholesale\", [\"status\"] = \"active\", [\"limit\"] = 50 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customerGroup in ((IReadOnlyList<object?>)body[\"customer_groups\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customerGroup[\"id\"]} {customerGroup[\"name\"]} {customerGroup[\"status\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine(pagination[\"total\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.listCustomerGroups(\n    queryParams: {'search_text': 'wholesale', 'status': 'active', 'limit': 50});\nfinal body = response.map as Map;\nfor (final group in body['customer_groups'] as List) {\n  print('${(group as Map)['id']} ${group['name']} ${group['status']}');\n}\nprint((body['pagination'] as Map)['has_next']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().ListCustomerGroups(ctx, map[string]any{\"search_text\": \"wholesale\", \"status\": \"active\", \"limit\": 50}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"customer_groups\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfmt.Println(group[\"id\"], group[\"name\"], group[\"status\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"has_next\"])\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Create a customer group",
+        "operationId": "create_customer_group",
+        "description": "Wrap the group in `customer_group`; only `name` is required. The store trims spaces from the ends of `name`, and no other group can have the same name in any letter case. A field you leave out gets its default: `status` becomes `A`, `description` becomes `null`, every flag becomes `false`, and every amount, text and choice becomes `null`. `status` accepts `active` and `inactive` and returns `A` or `I`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new group, with the group's `id`, which the other calls take as `customer_group_id`. `payment_terms.terms` returns in lower case, such as `net_30`. The response has no `Location` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_group": {
+                      "$ref": "#/components/schemas/CustomerGroup"
+                    }
+                  }
+                },
+                "example": {
+                  "customer_group": {
+                    "id": 1234,
+                    "name": "Wholesale Partners",
+                    "description": "Trade accounts",
+                    "status": "A",
+                    "default_tax_code": null,
+                    "add_as_new_customer_default_group": false,
+                    "shipping_profile": null,
+                    "background_image": null,
+                    "purchase_preference": {
+                      "minimum_purchase": {
+                        "enabled": true,
+                        "amount": 50
+                      },
+                      "on_account_purchase": {
+                        "enabled": true,
+                        "max_purchase": {
+                          "enabled": true,
+                          "amount": 500
+                        },
+                        "credit_limit": {
+                          "enabled": true,
+                          "amount": 1000
+                        },
+                        "payment_terms": {
+                          "enabled": true,
+                          "terms": "net_30"
+                        }
+                      }
+                    },
+                    "tax_configuration": {
+                      "override_store_tax": true,
+                      "tax_exempt": false,
+                      "tax_message": "Prices exclude GST",
+                      "show_prices_with_tax_included": true,
+                      "prices_entered_with_tax_included": false,
+                      "base_price_rounding": "up"
+                    },
+                    "product_display": {
+                      "overwrite_default": true,
+                      "variation_display_type": "enable_matrix_view",
+                      "display_parent_image": true,
+                      "activate_colour_variation_image": false,
+                      "show_selected_variation_value": true,
+                      "strike_through_out_of_stock": false,
+                      "single_click_variation_loading": true,
+                      "price_display_method": "highest"
+                    },
+                    "created_at": "2026-10-11T09:15:02",
+                    "updated_at": "2026-10-11T09:15:02"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `customer_group`: the code is `invalid_request` and the message `customer_group is required`. Or `default_tax_code` names a tax code the store does not have: the code is `invalid_reference` and the message `no tax code with code <code>`. Or `shipping_profile` is an object instead of a bare number: the message is `shipping profile id must be numeric`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customer_groups\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"customer_group\": {\n      \"name\": \"Wholesale Partners\",\n      \"description\": \"Trade accounts\",\n      \"status\": \"active\",\n      \"purchase_preference\": {\n        \"minimum_purchase\": {\n          \"enabled\": true,\n          \"amount\": 50\n        },\n        \"on_account_purchase\": {\n          \"enabled\": true,\n          \"max_purchase\": {\n            \"enabled\": true,\n            \"amount\": 500\n          },\n          \"credit_limit\": {\n            \"enabled\": true,\n            \"amount\": 1000\n          },\n          \"payment_terms\": {\n            \"enabled\": true,\n            \"terms\": \"NET_30\"\n          }\n        }\n      },\n      \"tax_configuration\": {\n        \"override_store_tax\": true,\n        \"tax_exempt\": false,\n        \"tax_message\": \"Prices exclude GST\",\n        \"show_prices_with_tax_included\": true,\n        \"prices_entered_with_tax_included\": false,\n        \"base_price_rounding\": \"up\"\n      },\n      \"product_display\": {\n        \"overwrite_default\": true,\n        \"variation_display_type\": \"enable_matrix_view\",\n        \"display_parent_image\": true,\n        \"activate_colour_variation_image\": false,\n        \"show_selected_variation_value\": true,\n        \"strike_through_out_of_stock\": false,\n        \"single_click_variation_loading\": true,\n        \"price_display_method\": \"highest\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.create_customer_group({\"customer_group\": {\n    \"name\": \"Wholesale Partners\", \"description\": \"Trade accounts\", \"status\": \"active\",\n    \"purchase_preference\": {\"minimum_purchase\": {\"enabled\": True, \"amount\": 50}, \"on_account_purchase\": {\n        \"enabled\": True, \"max_purchase\": {\"enabled\": True, \"amount\": 500}, \"credit_limit\": {\"enabled\": True, \"amount\": 1000},\n        \"payment_terms\": {\"enabled\": True, \"terms\": \"NET_30\"}}},\n    \"tax_configuration\": {\"override_store_tax\": True, \"tax_exempt\": False, \"tax_message\": \"Prices exclude GST\",\n        \"show_prices_with_tax_included\": True, \"prices_entered_with_tax_included\": False, \"base_price_rounding\": \"up\"},\n    \"product_display\": {\"overwrite_default\": True, \"variation_display_type\": \"enable_matrix_view\",\n        \"display_parent_image\": True, \"activate_colour_variation_image\": False, \"show_selected_variation_value\": True,\n        \"strike_through_out_of_stock\": False, \"single_click_variation_loading\": True, \"price_display_method\": \"highest\"}}})\ngroup = response.map[\"customer_group\"]\nprint(group[\"id\"], group[\"status\"], group[\"purchase_preference\"][\"on_account_purchase\"][\"payment_terms\"][\"terms\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.createCustomerGroup({\n    customer_group: {\n        name: 'Wholesale Partners',\n        description: 'Trade accounts',\n        status: 'active',\n        purchase_preference: {\n            minimum_purchase: {enabled: true, amount: 50},\n            on_account_purchase: {\n                enabled: true,\n                max_purchase: {enabled: true, amount: 500},\n                credit_limit: {enabled: true, amount: 1000},\n                payment_terms: {enabled: true, terms: 'NET_30'},\n            },\n        },\n        tax_configuration: {\n            override_store_tax: true,\n            tax_exempt: false,\n            tax_message: 'Prices exclude GST',\n            show_prices_with_tax_included: true,\n            prices_entered_with_tax_included: false,\n            base_price_rounding: 'up',\n        },\n        product_display: {\n            overwrite_default: true,\n            variation_display_type: 'enable_matrix_view',\n            display_parent_image: true,\n            activate_colour_variation_image: false,\n            show_selected_variation_value: true,\n            strike_through_out_of_stock: false,\n            single_click_variation_loading: true,\n            price_display_method: 'highest',\n        },\n    },\n});\nconsole.log(response.map.customer_group.id, response.map.customer_group.status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::createCustomerGroup($client, ['customer_group' => [\n    'name' => 'Wholesale Partners', 'description' => 'Trade accounts', 'status' => 'active',\n    'purchase_preference' => [\n        'minimum_purchase' => ['enabled' => true, 'amount' => 50],\n        'on_account_purchase' => [\n            'enabled' => true, 'max_purchase' => ['enabled' => true, 'amount' => 500],\n            'credit_limit' => ['enabled' => true, 'amount' => 1000], 'payment_terms' => ['enabled' => true, 'terms' => 'NET_30'],\n        ],\n    ],\n    'tax_configuration' => [\n        'override_store_tax' => true, 'tax_exempt' => false, 'tax_message' => 'Prices exclude GST',\n        'show_prices_with_tax_included' => true, 'prices_entered_with_tax_included' => false, 'base_price_rounding' => 'up',\n    ],\n    'product_display' => [\n        'overwrite_default' => true, 'variation_display_type' => 'enable_matrix_view', 'display_parent_image' => true,\n        'activate_colour_variation_image' => false, 'show_selected_variation_value' => true,\n        'strike_through_out_of_stock' => false, 'single_click_variation_loading' => true, 'price_display_method' => 'highest',\n    ],\n]]);\n\n$group = $response->map['customer_group'];\necho $group['id'], ' ', $group['status'], ' ', $group['purchase_preference']['on_account_purchase']['payment_terms']['terms'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().createCustomerGroup(Map.of(\"customer_group\", Map.of(\n        \"name\", \"Wholesale Partners\", \"description\", \"Trade accounts\", \"status\", \"active\",\n        \"purchase_preference\", Map.of(\n                \"minimum_purchase\", Map.of(\"enabled\", true, \"amount\", 50),\n                \"on_account_purchase\", Map.of(\n                        \"enabled\", true, \"max_purchase\", Map.of(\"enabled\", true, \"amount\", 500),\n                        \"credit_limit\", Map.of(\"enabled\", true, \"amount\", 1000),\n                        \"payment_terms\", Map.of(\"enabled\", true, \"terms\", \"NET_30\"))),\n        \"tax_configuration\", Map.of(\n                \"override_store_tax\", true, \"tax_exempt\", false, \"tax_message\", \"Prices exclude GST\",\n                \"show_prices_with_tax_included\", true, \"prices_entered_with_tax_included\", false,\n                \"base_price_rounding\", \"up\"),\n        \"product_display\", Map.of(\n                \"overwrite_default\", true, \"variation_display_type\", \"enable_matrix_view\",\n                \"display_parent_image\", true, \"activate_colour_variation_image\", false,\n                \"show_selected_variation_value\", true, \"strike_through_out_of_stock\", false,\n                \"single_click_variation_loading\", true, \"price_display_method\", \"highest\"))));\nMap<?, ?> group = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer_group\");\nMap<?, ?> onAccount = (Map<?, ?>) ((Map<?, ?>) group.get(\"purchase_preference\")).get(\"on_account_purchase\");\nSystem.out.println(group.get(\"id\") + \" \" + group.get(\"status\") + \" \" + ((Map<?, ?>) onAccount.get(\"payment_terms\")).get(\"terms\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.CreateCustomerGroupAsync(new Dictionary<string, object?>\n{\n    [\"customer_group\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wholesale Partners\", [\"description\"] = \"Trade accounts\", [\"status\"] = \"active\",\n        [\"purchase_preference\"] = new Dictionary<string, object?>\n        {\n            [\"minimum_purchase\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"amount\"] = 50 },\n            [\"on_account_purchase\"] = new Dictionary<string, object?>\n            {\n                [\"enabled\"] = true,\n                [\"max_purchase\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"amount\"] = 500 },\n                [\"credit_limit\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"amount\"] = 1000 },\n                [\"payment_terms\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"terms\"] = \"NET_30\" },\n            },\n        },\n        [\"tax_configuration\"] = new Dictionary<string, object?>\n        {\n            [\"override_store_tax\"] = true, [\"tax_exempt\"] = false, [\"tax_message\"] = \"Prices exclude GST\",\n            [\"show_prices_with_tax_included\"] = true, [\"prices_entered_with_tax_included\"] = false,\n            [\"base_price_rounding\"] = \"up\",\n        },\n        [\"product_display\"] = new Dictionary<string, object?>\n        {\n            [\"overwrite_default\"] = true, [\"variation_display_type\"] = \"enable_matrix_view\",\n            [\"display_parent_image\"] = true, [\"activate_colour_variation_image\"] = false,\n            [\"show_selected_variation_value\"] = true, [\"strike_through_out_of_stock\"] = false,\n            [\"single_click_variation_loading\"] = true, [\"price_display_method\"] = \"highest\",\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine($\"{customerGroup[\"id\"]} {customerGroup[\"name\"]} {customerGroup[\"status\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.createCustomerGroup({\n  'customer_group': {\n    'name': 'Wholesale Partners', 'description': 'Trade accounts', 'status': 'active',\n    'purchase_preference': {'minimum_purchase': {'enabled': true, 'amount': 50}, 'on_account_purchase': {\n      'enabled': true, 'max_purchase': {'enabled': true, 'amount': 500}, 'credit_limit': {'enabled': true, 'amount': 1000},\n      'payment_terms': {'enabled': true, 'terms': 'NET_30'}}},\n    'tax_configuration': {'override_store_tax': true, 'tax_exempt': false, 'tax_message': 'Prices exclude GST',\n      'show_prices_with_tax_included': true, 'prices_entered_with_tax_included': false, 'base_price_rounding': 'up'},\n    'product_display': {'overwrite_default': true, 'variation_display_type': 'enable_matrix_view',\n      'display_parent_image': true, 'activate_colour_variation_image': false, 'show_selected_variation_value': true,\n      'strike_through_out_of_stock': false, 'single_click_variation_loading': true, 'price_display_method': 'highest'},\n  },\n});\nfinal group = (response.map as Map)['customer_group'] as Map;\nprint('${group['id']} ${group['status']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().CreateCustomerGroup(ctx, map[string]any{\"customer_group\": map[string]any{\n\t\"name\": \"Wholesale Partners\", \"description\": \"Trade accounts\", \"status\": \"active\",\n\t\"purchase_preference\": map[string]any{\"minimum_purchase\": map[string]any{\"enabled\": true, \"amount\": 50}, \"on_account_purchase\": map[string]any{\n\t\t\"enabled\": true, \"max_purchase\": map[string]any{\"enabled\": true, \"amount\": 500}, \"credit_limit\": map[string]any{\"enabled\": true, \"amount\": 1000},\n\t\t\"payment_terms\": map[string]any{\"enabled\": true, \"terms\": \"NET_30\"}}},\n\t\"tax_configuration\": map[string]any{\"override_store_tax\": true, \"tax_exempt\": false, \"tax_message\": \"Prices exclude GST\",\n\t\t\"show_prices_with_tax_included\": true, \"prices_entered_with_tax_included\": false, \"base_price_rounding\": \"up\"},\n\t\"product_display\": map[string]any{\"overwrite_default\": true, \"variation_display_type\": \"enable_matrix_view\",\n\t\t\"display_parent_image\": true, \"activate_colour_variation_image\": false, \"show_selected_variation_value\": true,\n\t\t\"strike_through_out_of_stock\": false, \"single_click_variation_loading\": true, \"price_display_method\": \"highest\"}}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nterms := group[\"purchase_preference\"].(map[string]any)[\"on_account_purchase\"].(map[string]any)[\"payment_terms\"].(map[string]any)\nfmt.Println(group[\"id\"], group[\"status\"], terms[\"terms\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer_group"
+                ],
+                "properties": {
+                  "customer_group": {
+                    "$ref": "#/components/schemas/CustomerGroupInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customer_groups/count": {
+      "get": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Count customer groups",
+        "operationId": "count_customer_groups",
+        "description": "Returns the number of groups as `total`. `search_text`, `name` and `status` narrow the count the same way they narrow the listing, so `total` matches the listing's `pagination.total` for the same filters. `limit`, `offset` and `field_metadata` change nothing. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "search_text",
+            "in": "query",
+            "description": "Keeps only groups whose `name` contains this text, in any letter case. It does not search `description`.",
+            "schema": {
+              "type": "string",
+              "example": "wholesale"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Another name for `search_text`. Keeps only groups whose `name` contains this text, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "wholesale"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Keeps only active groups (`A` or `active`) or inactive groups (`I` or `inactive`). Any other value is rejected with `400` (`invalid_enum`).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "A",
+                "I",
+                "active",
+                "inactive"
+              ],
+              "example": "active"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number of groups that match, under `total`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "total": 2
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`status` is not `A`, `I`, `active` or `inactive` (`invalid_enum`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customer_groups/count?search_text=wholesale&status=I\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.count_customer_groups({\"search_text\": \"wholesale\", \"status\": \"I\"})\nprint(response.map[\"total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.countCustomerGroups({search_text: 'wholesale', status: 'I'});\nconsole.log(response.map.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::countCustomerGroups($client, ['search_text' => 'wholesale', 'status' => 'I']);\n\necho $response->map['total'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().countCustomerGroups(\n        Map.of(\"search_text\", \"wholesale\", \"status\", \"I\"));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.CountCustomerGroupsAsync(\n    new Dictionary<string, object?> { [\"search_text\"] = \"wholesale\", [\"status\"] = \"I\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.countCustomerGroups(\n    queryParams: {'search_text': 'wholesale', 'status': 'I'});\nprint((response.map as Map)['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().CountCustomerGroups(ctx, map[string]any{\"search_text\": \"wholesale\", \"status\": \"I\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/customer_groups/{customer_group_id}": {
+      "get": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Retrieve a customer group",
+        "operationId": "get_customer_group",
+        "description": "Returns one group under `customer_group`, with the 13 fields a listing entry has plus `customer_count` and `customers`. Each entry in `customers` gives a member's `customer_id` as `id`, with `first_name`, `last_name` and `email`. Send `field_metadata=true` to add a description of each field beside the group. The response has an `ETag` header.",
+        "parameters": [
+          {
+            "name": "customer_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer group's `id`, from a listing or from the response to creating the group.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key beside the group. It describes each field of a group.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group and its members. With `field_metadata=true`, a `field_metadata` key is added beside `customer_group`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_group": {
+                      "$ref": "#/components/schemas/CustomerGroupDetail"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CustomerGroupFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "customer_group": {
+                    "id": 1234,
+                    "name": "Wholesale Partners",
+                    "description": "Trade accounts",
+                    "status": "A",
+                    "default_tax_code": null,
+                    "add_as_new_customer_default_group": false,
+                    "shipping_profile": null,
+                    "background_image": null,
+                    "purchase_preference": {
+                      "minimum_purchase": {
+                        "enabled": true,
+                        "amount": 50
+                      },
+                      "on_account_purchase": {
+                        "enabled": true,
+                        "max_purchase": {
+                          "enabled": true,
+                          "amount": 500
+                        },
+                        "credit_limit": {
+                          "enabled": true,
+                          "amount": 1000
+                        },
+                        "payment_terms": {
+                          "enabled": true,
+                          "terms": "net_30"
+                        }
+                      }
+                    },
+                    "tax_configuration": {
+                      "override_store_tax": true,
+                      "tax_exempt": false,
+                      "tax_message": "Prices exclude GST",
+                      "show_prices_with_tax_included": true,
+                      "prices_entered_with_tax_included": false,
+                      "base_price_rounding": "up"
+                    },
+                    "product_display": {
+                      "overwrite_default": true,
+                      "variation_display_type": "enable_matrix_view",
+                      "display_parent_image": true,
+                      "activate_colour_variation_image": false,
+                      "show_selected_variation_value": true,
+                      "strike_through_out_of_stock": false,
+                      "single_click_variation_loading": true,
+                      "price_display_method": "highest"
+                    },
+                    "created_at": "2026-10-11T09:15:02",
+                    "updated_at": "2026-10-11T09:15:02",
+                    "customer_count": 1,
+                    "customers": [
+                      {
+                        "id": 5678,
+                        "first_name": "Jane",
+                        "last_name": "Citizen",
+                        "email": "jane.citizen@example.com"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No customer group has that `customer_group_id`. The code is `not_found` and the message `Customer group not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customer_groups/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.get_customer_group(1234)\ngroup = response.map[\"customer_group\"]\nprint(group[\"name\"], group[\"status\"], group[\"customer_count\"])\nfor customer in group[\"customers\"]:\n    print(customer[\"id\"], customer[\"email\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.getCustomerGroup(1234);\nconst customerGroup = response.map.customer_group;\nconsole.log(customerGroup.name, customerGroup.status, customerGroup.customer_count);\nfor (const customer of customerGroup.customers) {\n    console.log(customer.id, customer.first_name, customer.last_name, customer.email);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::getCustomerGroup($client, 1234);\n\n$group = $response->map['customer_group'];\necho $group['name'], ' ', $group['status'], ' ', $group['customer_count'], PHP_EOL;\nforeach ($group['customers'] as $customer) {\n    echo $customer['id'], ' ', $customer['email'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().getCustomerGroup(1234);\nMap<?, ?> group = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer_group\");\nSystem.out.println(group.get(\"name\") + \" \" + group.get(\"status\") + \" \" + group.get(\"customer_count\"));\nfor (Object row : (List<?>) group.get(\"customers\")) {\n    Map<?, ?> customer = (Map<?, ?>) row;\n    System.out.println(customer.get(\"id\") + \" \" + customer.get(\"email\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.GetCustomerGroupAsync(1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine($\"{customerGroup[\"name\"]} {customerGroup[\"customer_count\"]}\");\nforeach (var customer in ((IReadOnlyList<object?>)customerGroup[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"id\"]} {customer[\"email\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.getCustomerGroup(1234);\nfinal group = (response.map as Map)['customer_group'] as Map;\nprint('${group['name']} ${group['status']} ${group['customer_count']}');\nfor (final customer in group['customers'] as List) {\n  print('${(customer as Map)['id']} ${customer['email']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().GetCustomerGroup(ctx, 1234, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nfmt.Println(group[\"name\"], group[\"status\"], group[\"customer_count\"])\nfor _, row := range group[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"id\"], customer[\"email\"])\n}\n"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Update a customer group",
+        "operationId": "patch_customer_group",
+        "description": "Wrap the change in `customer_group`. Only the fields you send change, and inside `purchase_preference`, `tax_configuration` and `product_display` only the keys you send change. Send `null` to clear `default_tax_code`, `shipping_profile` or `background_image`. `PUT` on a group is rejected with `405` and the message `HTTP method not allowed for this endpoint.`",
+        "parameters": [
+          {
+            "name": "customer_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer group's `id`, from a listing or from the response to creating the group.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group after the change, with the 13 fields a listing entry has. To get its members, use [Retrieve a customer group](/api-reference/customer-groups/retrieve-a-customer-group).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_group": {
+                      "$ref": "#/components/schemas/CustomerGroup"
+                    }
+                  }
+                },
+                "example": {
+                  "customer_group": {
+                    "id": 1234,
+                    "name": "Wholesale Partners",
+                    "description": "Trade accounts",
+                    "status": "I",
+                    "default_tax_code": null,
+                    "add_as_new_customer_default_group": false,
+                    "shipping_profile": null,
+                    "background_image": null,
+                    "purchase_preference": {
+                      "minimum_purchase": {
+                        "enabled": true,
+                        "amount": 75
+                      },
+                      "on_account_purchase": {
+                        "enabled": true,
+                        "max_purchase": {
+                          "enabled": true,
+                          "amount": 500
+                        },
+                        "credit_limit": {
+                          "enabled": true,
+                          "amount": 1000
+                        },
+                        "payment_terms": {
+                          "enabled": true,
+                          "terms": "net_30"
+                        }
+                      }
+                    },
+                    "tax_configuration": {
+                      "override_store_tax": true,
+                      "tax_exempt": false,
+                      "tax_message": "Prices exclude GST",
+                      "show_prices_with_tax_included": true,
+                      "prices_entered_with_tax_included": false,
+                      "base_price_rounding": "up"
+                    },
+                    "product_display": {
+                      "overwrite_default": true,
+                      "variation_display_type": "enable_matrix_view",
+                      "display_parent_image": true,
+                      "activate_colour_variation_image": false,
+                      "show_selected_variation_value": true,
+                      "strike_through_out_of_stock": false,
+                      "single_click_variation_loading": true,
+                      "price_display_method": "highest"
+                    },
+                    "created_at": "2026-10-11T09:15:02",
+                    "updated_at": "2026-10-11T09:20:41"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `customer_group`: the code is `invalid_request` and the message `customer_group is required`. Or `default_tax_code` names a tax code the store does not have: the code is `invalid_reference` and the message `no tax code with code <code>`. Or `shipping_profile` is an object instead of a bare number: the message is `shipping profile id must be numeric`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/customer_groups/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"customer_group\": {\n      \"status\": \"inactive\",\n      \"purchase_preference\": {\n        \"minimum_purchase\": {\n          \"amount\": 75\n        }\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.patch_customer_group(1234, {\n    \"customer_group\": {\n        \"status\": \"inactive\",\n        \"purchase_preference\": {\"minimum_purchase\": {\"amount\": 75}},\n    },\n})\ngroup = response.map[\"customer_group\"]\nprint(group[\"status\"], group[\"purchase_preference\"][\"minimum_purchase\"][\"amount\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.patchCustomerGroup(1234, {\n    customer_group: {status: 'inactive', purchase_preference: {minimum_purchase: {amount: 75}}},\n});\nconst customerGroup = response.map.customer_group;\nconsole.log(customerGroup.status, customerGroup.purchase_preference.minimum_purchase.amount);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::patchCustomerGroup($client, 1234, [\n    'customer_group' => [\n        'status' => 'inactive',\n        'purchase_preference' => ['minimum_purchase' => ['amount' => 75]],\n    ],\n]);\n\n$group = $response->map['customer_group'];\necho $group['status'], ' ', $group['purchase_preference']['minimum_purchase']['amount'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().patchCustomerGroup(1234, Map.of(\"customer_group\", Map.of(\n        \"status\", \"inactive\",\n        \"purchase_preference\", Map.of(\"minimum_purchase\", Map.of(\"amount\", 75)))));\nMap<?, ?> group = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer_group\");\nMap<?, ?> minimumPurchase = (Map<?, ?>) ((Map<?, ?>) group.get(\"purchase_preference\")).get(\"minimum_purchase\");\nSystem.out.println(group.get(\"status\") + \" \" + minimumPurchase.get(\"amount\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.PatchCustomerGroupAsync(1234, new Dictionary<string, object?>\n{\n    [\"customer_group\"] = new Dictionary<string, object?>\n    {\n        [\"status\"] = \"inactive\",\n        [\"purchase_preference\"] = new Dictionary<string, object?> { [\"minimum_purchase\"] = new Dictionary<string, object?> { [\"amount\"] = 75 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine($\"{customerGroup[\"status\"]} {customerGroup[\"updated_at\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.patchCustomerGroup(1234, {\n  'customer_group': {\n    'status': 'inactive',\n    'purchase_preference': {\n      'minimum_purchase': {'amount': 75},\n    },\n  },\n});\nfinal group = (response.map as Map)['customer_group'] as Map;\nfinal preference = group['purchase_preference'] as Map;\nprint('${group['status']} ${(preference['minimum_purchase'] as Map)['amount']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().PatchCustomerGroup(ctx, 1234, map[string]any{\n\t\"customer_group\": map[string]any{\n\t\t\"status\":              \"inactive\",\n\t\t\"purchase_preference\": map[string]any{\"minimum_purchase\": map[string]any{\"amount\": 75}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nfmt.Println(group[\"status\"], group[\"purchase_preference\"].(map[string]any)[\"minimum_purchase\"].(map[string]any)[\"amount\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer_group"
+                ],
+                "properties": {
+                  "customer_group": {
+                    "$ref": "#/components/schemas/CustomerGroupInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Delete a customer group",
+        "operationId": "delete_customer_group",
+        "description": "Deletes the group permanently and returns `204` with no body; retrieving or deleting it again returns `404`. Its members stay as customers, and the group is removed from each member's `customer_groups`. When this call returns `404`, the next [customer delete](/api-reference/customers/delete-a-customer) on the same connection can return `404` with the message `Customer already in trash`, or `204`, and not delete the customer: its `is_in_trash` stays `false`. Send that customer delete on a new connection, or send it again.",
+        "parameters": [
+          {
+            "name": "customer_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer group's `id`, from a listing or from the response to creating the group.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No customer group has that `customer_group_id`, for example because you already deleted it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/customer_groups/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.delete_customer_group(1234)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.deleteCustomerGroup(1234);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::deleteCustomerGroup($client, 1234);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().deleteCustomerGroup(1234);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.DeleteCustomerGroupAsync(1234);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.deleteCustomerGroup(1234);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().DeleteCustomerGroup(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/customer_groups/{customer_group_id}/customers": {
+      "patch": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Replace the members of a customer group",
+        "operationId": "update_customer_group_customers",
+        "description": "Send `{\"customers\": [...]}` with the `customer_id` of every customer who should be in the group, as numbers or strings. The list you send becomes the membership: a customer you leave out leaves the group, and `[]` removes every member. To add one customer and keep the others, use [Add a customer to a customer group](/api-reference/customer-groups/add-a-customer-to-a-customer-group). The `updated_at` in the response is the time the store responded, but the stored `updated_at` does not change, so a later read returns the earlier value.",
+        "parameters": [
+          {
+            "name": "customer_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer group's `id`, from a listing or from the response to creating the group.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group with its new members in `customers`, and `customer_count` set to the number of members.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer_group": {
+                      "$ref": "#/components/schemas/CustomerGroupDetail"
+                    }
+                  }
+                },
+                "example": {
+                  "customer_group": {
+                    "id": 1234,
+                    "name": "Wholesale Partners",
+                    "description": "Trade accounts",
+                    "status": "A",
+                    "default_tax_code": null,
+                    "add_as_new_customer_default_group": false,
+                    "shipping_profile": null,
+                    "background_image": null,
+                    "purchase_preference": {
+                      "minimum_purchase": {
+                        "enabled": true,
+                        "amount": 50
+                      },
+                      "on_account_purchase": {
+                        "enabled": true,
+                        "max_purchase": {
+                          "enabled": true,
+                          "amount": 500
+                        },
+                        "credit_limit": {
+                          "enabled": true,
+                          "amount": 1000
+                        },
+                        "payment_terms": {
+                          "enabled": true,
+                          "terms": "net_30"
+                        }
+                      }
+                    },
+                    "tax_configuration": {
+                      "override_store_tax": true,
+                      "tax_exempt": false,
+                      "tax_message": "Prices exclude GST",
+                      "show_prices_with_tax_included": true,
+                      "prices_entered_with_tax_included": false,
+                      "base_price_rounding": "up"
+                    },
+                    "product_display": {
+                      "overwrite_default": true,
+                      "variation_display_type": "enable_matrix_view",
+                      "display_parent_image": true,
+                      "activate_colour_variation_image": false,
+                      "show_selected_variation_value": true,
+                      "strike_through_out_of_stock": false,
+                      "single_click_variation_loading": true,
+                      "price_display_method": "highest"
+                    },
+                    "created_at": "2026-10-11T09:15:02",
+                    "updated_at": "2026-10-11T09:30:12",
+                    "customer_count": 2,
+                    "customers": [
+                      {
+                        "id": 5678,
+                        "first_name": "Jane",
+                        "last_name": "Citizen",
+                        "email": "jane.citizen@example.com"
+                      },
+                      {
+                        "id": 5679,
+                        "first_name": "Sam",
+                        "last_name": "Lee",
+                        "email": "sam.lee@example.com"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body has no `customers` array. The message is `A 'customers' array is required (send [] to remove all members).`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "You sent a bare array instead of `{\"customers\": [...]}`. The message is `Unexpected Error Occurred`. Wrap the list in `customers`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/customer_groups/1234/customers\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"customers\": [\n      5678,\n      \"5679\"\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.update_customer_group_customers(\n    1234, {\"customers\": [5678, \"5679\"]}\n)\ngroup = response.map[\"customer_group\"]\nprint(group[\"customer_count\"])\nfor customer in group[\"customers\"]:\n    print(customer[\"id\"], customer[\"email\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.updateCustomerGroupCustomers(1234, {customers: [5678, '5679']});\nconst customerGroup = response.map.customer_group;\nconsole.log(customerGroup.customer_count);\nfor (const customer of customerGroup.customers) {\n    console.log(customer.id, customer.email);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::updateCustomerGroupCustomers($client, 1234, ['customers' => [5678, '5679']]);\n\n$group = $response->map['customer_group'];\necho $group['customer_count'], PHP_EOL;\nforeach ($group['customers'] as $customer) {\n    echo $customer['id'], ' ', $customer['email'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().updateCustomerGroupCustomers(1234,\n        Map.of(\"customers\", List.of(5678, \"5679\")));\nMap<?, ?> group = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer_group\");\nSystem.out.println(group.get(\"customer_count\"));\nfor (Object row : (List<?>) group.get(\"customers\")) {\n    Map<?, ?> customer = (Map<?, ?>) row;\n    System.out.println(customer.get(\"id\") + \" \" + customer.get(\"email\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.UpdateCustomerGroupCustomersAsync(1234, new Dictionary<string, object?>\n{\n    [\"customers\"] = new object[] { 5678, \"5679\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"customer_group\"]!;\nConsole.WriteLine(customerGroup[\"customer_count\"]);\nforeach (var customer in ((IReadOnlyList<object?>)customerGroup[\"customers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customer[\"id\"]} {customer[\"email\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.updateCustomerGroupCustomers(1234, {\n  'customers': [5678, '5679'],\n});\nfinal group = (response.map as Map)['customer_group'] as Map;\nprint(group['customer_count']);\nfor (final customer in group['customers'] as List) {\n  print('${(customer as Map)['id']} ${customer['email']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().UpdateCustomerGroupCustomers(ctx, 1234, map[string]any{\"customers\": []any{5678, \"5679\"}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nfmt.Println(group[\"customer_count\"])\nfor _, row := range group[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"id\"], customer[\"email\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerGroupCustomersInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/customer_groups/{customer_group_id}/customers/{customer_id}": {
+      "get": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Retrieve a member of a customer group",
+        "operationId": "get_customer_group_customer",
+        "description": "Returns the member under `customer`, with the same four fields as the member's entry in the group's `customers` list: `id`, which is the customer's `customer_id`, `first_name`, `last_name` and `email`. Use it to check whether a customer belongs to a group: a customer who is not a member returns `404`. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "customer_group_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer group's `id`, from a listing or from the response to creating the group.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "description": "The customer's `customer_id`, which is the `id` of the customer's entry in the group's `customers` list. Do not send the customer's `internal_id`: the store reads the value as a `customer_id` and looks up that customer instead.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The member.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customer": {
+                      "$ref": "#/components/schemas/CustomerGroupMember"
+                    }
+                  }
+                },
+                "example": {
+                  "customer": {
+                    "id": 5678,
+                    "first_name": "Jane",
+                    "last_name": "Citizen",
+                    "email": "jane.citizen@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The customer with that `customer_id` is not a member of this group: the code is `not_found` and the message `Customer <customer_id> is not a member of this group.` No customer has that `customer_id`: the message is `No Customer Found`. No customer group has that `customer_group_id`: the message is `Customer group not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/customer_groups/1234/customers/5678\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.get_customer_group_customer(1234, 5678)\ncustomer = response.map[\"customer\"]\nprint(customer[\"id\"], customer[\"first_name\"], customer[\"last_name\"], customer[\"email\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.getCustomerGroupCustomer(1234, 5678);\nconst customer = response.map.customer;\nconsole.log(customer.id, customer.first_name, customer.last_name, customer.email);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::getCustomerGroupCustomer($client, 1234, 5678);\n\n$customer = $response->map['customer'];\necho $customer['id'], ' ', $customer['first_name'], ' ', $customer['last_name'], ' ', $customer['email'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().getCustomerGroupCustomer(1234, 5678);\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"id\") + \" \" + customer.get(\"first_name\") + \" \" + customer.get(\"last_name\") + \" \" + customer.get(\"email\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.GetCustomerGroupCustomerAsync(1234, 5678);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine($\"{customer[\"id\"]} {customer[\"first_name\"]} {customer[\"last_name\"]} {customer[\"email\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.customerGroups.getCustomerGroupCustomer(1234, 5678);\nfinal customer = (response.map as Map)['customer'] as Map;\nprint('${customer['id']} ${customer['first_name']} ${customer['last_name']}');\nprint(customer['email']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().GetCustomerGroupCustomer(ctx, 1234, 5678, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncustomer := resp.Map().(map[string]any)[\"customer\"].(map[string]any)\nfmt.Println(customer[\"id\"], customer[\"first_name\"], customer[\"last_name\"], customer[\"email\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/customer_groups/assign": {
+      "post": {
+        "tags": [
+          "Customer groups"
+        ],
+        "summary": "Add a customer to a customer group",
+        "operationId": "assign_customer_group",
+        "description": "Send the customer's `customer_id` as `customer` and the group's `customer_group_id` as `group`, as numbers or strings, with no wrapper. The customer joins the group beside its other members. The call returns `201` whether or not it added the customer: `added` is `true` when the customer joined and `false` when the customer was already a member.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "`status` set to `success`, the customer's `customer_id` and `email`, the group in `group` with the 13 fields a listing entry has, and `added`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerGroupAssignment"
+                },
+                "example": {
+                  "status": "success",
+                  "customer_id": 5678,
+                  "email": "jane.citizen@example.com",
+                  "group": {
+                    "id": 1234,
+                    "name": "Wholesale Partners",
+                    "description": "Trade accounts",
+                    "status": "A",
+                    "default_tax_code": null,
+                    "add_as_new_customer_default_group": false,
+                    "shipping_profile": null,
+                    "background_image": null,
+                    "purchase_preference": {
+                      "minimum_purchase": {
+                        "enabled": true,
+                        "amount": 50
+                      },
+                      "on_account_purchase": {
+                        "enabled": true,
+                        "max_purchase": {
+                          "enabled": true,
+                          "amount": 500
+                        },
+                        "credit_limit": {
+                          "enabled": true,
+                          "amount": 1000
+                        },
+                        "payment_terms": {
+                          "enabled": true,
+                          "terms": "net_30"
+                        }
+                      }
+                    },
+                    "tax_configuration": {
+                      "override_store_tax": true,
+                      "tax_exempt": false,
+                      "tax_message": "Prices exclude GST",
+                      "show_prices_with_tax_included": true,
+                      "prices_entered_with_tax_included": false,
+                      "base_price_rounding": "up"
+                    },
+                    "product_display": {
+                      "overwrite_default": true,
+                      "variation_display_type": "enable_matrix_view",
+                      "display_parent_image": true,
+                      "activate_colour_variation_image": false,
+                      "show_selected_variation_value": true,
+                      "strike_through_out_of_stock": false,
+                      "single_click_variation_loading": true,
+                      "price_display_method": "highest"
+                    },
+                    "created_at": "2026-10-11T09:15:02",
+                    "updated_at": "2026-10-11T09:15:02"
+                  },
+                  "added": true
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/customer_groups/assign\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"customer\": 5678,\n    \"group\": 1234\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.customer_groups.assign_customer_group({\"customer\": 5678, \"group\": 1234})\nprint(response.map[\"added\"], response.map[\"customer_id\"], response.map[\"group\"][\"name\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.customerGroups.assignCustomerGroup({customer: 5678, group: 1234});\nconsole.log(response.map.status, response.map.added, response.map.customer_id, response.map.group.name);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$client = ClientRegistry::buildClient();\n\n$response = CustomerGroups::assignCustomerGroup($client, ['customer' => 5678, 'group' => 1234]);\n\necho $response->map['added'] ? 'added' : 'already a member', ' ', $response->map['customer_id'], ' ', $response->map['group']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.customerGroups().assignCustomerGroup(\n        Map.of(\"customer\", 5678, \"group\", 1234));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"added\") + \" \" + body.get(\"customer_id\") + \" \" + ((Map<?, ?>) body.get(\"group\")).get(\"name\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CustomerGroups.AssignCustomerGroupAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = 5678, [\"group\"] = 1234,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customerGroup = (IReadOnlyDictionary<string, object?>)body[\"group\"]!;\nConsole.WriteLine($\"{body[\"customer_id\"]} {customerGroup[\"name\"]} {body[\"added\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.customerGroups.assignCustomerGroup({\n  'customer': 5678,\n  'group': 1234,\n});\nfinal body = response.map as Map;\nprint('${body['added']} ${body['customer_id']} ${(body['group'] as Map)['name']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CustomerGroups().AssignCustomerGroup(ctx, map[string]any{\"customer\": 5678, \"group\": 1234}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"added\"], body[\"customer_id\"], body[\"group\"].(map[string]any)[\"name\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerGroupAssignInput"
               }
             }
           }
@@ -38176,6 +39567,600 @@
                 "message": {
                   "type": "string"
                 }
+              }
+            }
+          }
+        }
+      },
+      "CustomerGroup": {
+        "type": "object",
+        "description": "One customer group, as a listing, a create, an update and an add-a-customer response return it.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The customer group's `id`, assigned by the store. Pass it as `customer_group_id` in a path, or as `group` when you add a customer."
+          },
+          "name": {
+            "type": "string",
+            "description": "The group's name. No two groups have the same name in any letter case."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text, or `null` when none is set."
+          },
+          "status": {
+            "type": "string",
+            "description": "`A` for an active group and `I` for an inactive one. A group already in the store can hold another value."
+          },
+          "default_tax_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The code of the group's default tax code, or `null`. See [Tax codes](/tax-codes)."
+          },
+          "add_as_new_customer_default_group": {
+            "type": "boolean",
+            "description": "Marks the group as the default group for new customers. At most one group has it set to `true`."
+          },
+          "shipping_profile": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerGroupShippingProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The group's shipping profile, or `null`."
+          },
+          "background_image": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerGroupBackgroundImage"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The group's background image, or `null`."
+          },
+          "purchase_preference": {
+            "$ref": "#/components/schemas/CustomerGroupPurchasePreference"
+          },
+          "tax_configuration": {
+            "$ref": "#/components/schemas/CustomerGroupTaxConfiguration"
+          },
+          "product_display": {
+            "$ref": "#/components/schemas/CustomerGroupProductDisplay"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the group was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "When the group last changed. Replacing the members does not change it."
+          }
+        }
+      },
+      "CustomerGroupDetail": {
+        "type": "object",
+        "description": "One customer group with its members, as retrieving a group and replacing its members return it.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The customer group's `id`, assigned by the store. Pass it as `customer_group_id` in a path, or as `group` when you add a customer."
+          },
+          "name": {
+            "type": "string",
+            "description": "The group's name. No two groups have the same name in any letter case."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text, or `null` when none is set."
+          },
+          "status": {
+            "type": "string",
+            "description": "`A` for an active group and `I` for an inactive one. A group already in the store can hold another value."
+          },
+          "default_tax_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The code of the group's default tax code, or `null`. See [Tax codes](/tax-codes)."
+          },
+          "add_as_new_customer_default_group": {
+            "type": "boolean",
+            "description": "Marks the group as the default group for new customers. At most one group has it set to `true`."
+          },
+          "shipping_profile": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerGroupShippingProfile"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The group's shipping profile, or `null`."
+          },
+          "background_image": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerGroupBackgroundImage"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The group's background image, or `null`."
+          },
+          "purchase_preference": {
+            "$ref": "#/components/schemas/CustomerGroupPurchasePreference"
+          },
+          "tax_configuration": {
+            "$ref": "#/components/schemas/CustomerGroupTaxConfiguration"
+          },
+          "product_display": {
+            "$ref": "#/components/schemas/CustomerGroupProductDisplay"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the group was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "When the group last changed. Replacing the members does not change it."
+          },
+          "customer_count": {
+            "type": "integer",
+            "description": "The number of members, the length of `customers`."
+          },
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerGroupMember"
+            },
+            "description": "The group's members. The order is not the order you sent them in."
+          }
+        }
+      },
+      "CustomerGroupInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "description": "Send these fields inside `customer_group`. On an update, send only the fields you want to change.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "description": "Required on create. 2 to 100 characters. The store trims spaces from both ends, and no other group can have the same name in any letter case."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text. `null` when you leave it out on create."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "A",
+              "I",
+              "active",
+              "inactive"
+            ],
+            "description": "`A` or `active` for an active group, `I` or `inactive` for an inactive one. Always returned as `A` or `I`. Defaults to `A`."
+          },
+          "default_tax_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The code of a tax code the store has. An unknown code is rejected with `400`. Send `null` to clear it."
+          },
+          "add_as_new_customer_default_group": {
+            "type": "boolean",
+            "description": "Marks the group as the default group for new customers. At most one group has it set to `true`. Defaults to `false`."
+          },
+          "shipping_profile": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The shipping profile's `id`, as a bare number. `{\"id\": 3}` is rejected with `400`. Send `null` to clear it. It returns as an object with `id` and `name`."
+          },
+          "background_image": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The image as a base64 string or a `data:` URI, such as `data:image/png;base64,...`. It returns as an object with `url`, `width` and `height`. Send `null` to remove it."
+          },
+          "purchase_preference": {
+            "$ref": "#/components/schemas/CustomerGroupPurchasePreference"
+          },
+          "tax_configuration": {
+            "$ref": "#/components/schemas/CustomerGroupTaxConfiguration"
+          },
+          "product_display": {
+            "$ref": "#/components/schemas/CustomerGroupProductDisplay"
+          }
+        }
+      },
+      "CustomerGroupShippingProfile": {
+        "type": "object",
+        "description": "The shipping profile a group uses. A write sends only the profile's `id`, as a bare number.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The shipping profile's `id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The shipping profile's name."
+          }
+        }
+      },
+      "CustomerGroupBackgroundImage": {
+        "type": "object",
+        "description": "The stored image. A write sends a base64 string or a `data:` URI instead.",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Where the image is stored, under the store's `/resources/` path."
+          },
+          "width": {
+            "type": "integer",
+            "description": "The image width in pixels."
+          },
+          "height": {
+            "type": "integer",
+            "description": "The image height in pixels."
+          }
+        }
+      },
+      "CustomerGroupAmountSetting": {
+        "type": "object",
+        "description": "A switch and its amount. `minimum_purchase`, `max_purchase` and `credit_limit` all take this shape.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "amount": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "A number, or `null` when none is set."
+          }
+        }
+      },
+      "CustomerGroupPaymentTerms": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "terms": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Send `NET_30`, `NET_60` or `NET_90`. It returns in lower case, such as `net_30`."
+          }
+        }
+      },
+      "CustomerGroupOnAccountPurchase": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "max_purchase": {
+            "$ref": "#/components/schemas/CustomerGroupAmountSetting"
+          },
+          "credit_limit": {
+            "$ref": "#/components/schemas/CustomerGroupAmountSetting"
+          },
+          "payment_terms": {
+            "$ref": "#/components/schemas/CustomerGroupPaymentTerms"
+          }
+        }
+      },
+      "CustomerGroupPurchasePreference": {
+        "type": "object",
+        "description": "On an update, only the keys you send change.",
+        "properties": {
+          "minimum_purchase": {
+            "$ref": "#/components/schemas/CustomerGroupAmountSetting"
+          },
+          "on_account_purchase": {
+            "$ref": "#/components/schemas/CustomerGroupOnAccountPurchase"
+          }
+        }
+      },
+      "CustomerGroupTaxConfiguration": {
+        "type": "object",
+        "description": "On an update, only the keys you send change.",
+        "properties": {
+          "override_store_tax": {
+            "type": "boolean"
+          },
+          "tax_exempt": {
+            "type": "boolean"
+          },
+          "tax_message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "show_prices_with_tax_included": {
+            "type": "boolean"
+          },
+          "prices_entered_with_tax_included": {
+            "type": "boolean"
+          },
+          "base_price_rounding": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "nearest",
+              "up",
+              "down",
+              null
+            ],
+            "description": "`nearest`, `up` or `down`, or `null` when none is set."
+          }
+        }
+      },
+      "CustomerGroupProductDisplay": {
+        "type": "object",
+        "description": "On an update, only the keys you send change.",
+        "properties": {
+          "overwrite_default": {
+            "type": "boolean"
+          },
+          "variation_display_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Such as `enable_matrix_view`, or `null` when none is set."
+          },
+          "display_parent_image": {
+            "type": "boolean"
+          },
+          "activate_colour_variation_image": {
+            "type": "boolean"
+          },
+          "show_selected_variation_value": {
+            "type": "boolean"
+          },
+          "strike_through_out_of_stock": {
+            "type": "boolean"
+          },
+          "single_click_variation_loading": {
+            "type": "boolean"
+          },
+          "price_display_method": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "lowest",
+              "highest",
+              null
+            ],
+            "description": "`lowest` or `highest`, or `null` when none is set."
+          }
+        }
+      },
+      "CustomerGroupMember": {
+        "type": "object",
+        "description": "One member of a customer group.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The member's `customer_id`. Pass it as `customer_id` in a path."
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerGroupCustomersInput": {
+        "type": "object",
+        "required": [
+          "customers"
+        ],
+        "description": "Send `customers` at the top level of the body, with no wrapper.",
+        "properties": {
+          "customers": {
+            "type": "array",
+            "items": {
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "description": "The `customer_id` of every customer who should be in the group, as numbers or strings. Customers you leave out leave the group. `[]` removes every member."
+          }
+        }
+      },
+      "CustomerGroupAssignInput": {
+        "type": "object",
+        "required": [
+          "customer",
+          "group"
+        ],
+        "description": "Send both fields at the top level of the body, with no wrapper.",
+        "properties": {
+          "customer": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "The customer's `customer_id`, as a number or a string."
+          },
+          "group": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "The customer group's `customer_group_id`, as a number or a string."
+          }
+        }
+      },
+      "CustomerGroupAssignment": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`success`."
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "The customer's `customer_id`."
+          },
+          "email": {
+            "type": "string",
+            "description": "The customer's email address."
+          },
+          "group": {
+            "$ref": "#/components/schemas/CustomerGroup"
+          },
+          "added": {
+            "type": "boolean",
+            "description": "`true` when the customer joined the group, `false` when the customer was already a member."
+          }
+        }
+      },
+      "CustomerGroupPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of groups that match your request."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, or `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of groups skipped before this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when there is a page before this one. An `offset` past the last group returns no groups and `false`."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there is a page after this one."
+          }
+        }
+      },
+      "CustomerGroupFieldDescription": {
+        "type": "object",
+        "description": "Describes one field. Each entry has `type`; the other keys appear only where they apply, along with the field's bounds, such as the 2 to 100 character length of `name`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The field's value type."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether a create must send the field. `true` on `name`."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "`true` on a field no write can set. Every field except the ten in `CustomerGroupInput` has it."
+          },
+          "values": {
+            "type": "array",
+            "description": "The field's allowed values."
+          },
+          "default": {
+            "description": "The field's default value."
+          },
+          "fields": {
+            "type": "object",
+            "description": "On `purchase_preference`, `tax_configuration` and `product_display`, a description of each nested field, keyed by dotted path such as `minimum_purchase.amount`."
+          }
+        }
+      },
+      "CustomerGroupFieldMetadata": {
+        "type": "object",
+        "description": "Describes each field of a customer group, keyed by field name: the 13 fields of `CustomerGroup` and `customer_count`. Returned only when you send `field_metadata=true`.",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/CustomerGroupFieldDescription"
+        }
+      },
+      "CustomerGroupError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `invalid_reference`, `not_found` or `method_not_allowed`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `customer_group is required`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or parameter, or an empty list.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
               }
             }
           }

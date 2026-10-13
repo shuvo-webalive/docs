@@ -1,0 +1,9 @@
+---
+title: "List customer groups"
+description: "Returns customer groups, 20 per call or the `limit` you send, sorted by `name` by default."
+openapi: "GET /admin/customer_groups"
+---
+
+Returns the customer groups under `customer_groups`, sorted by `name` unless you send `sort`, with a `pagination` block. Send `search_text` to keep only groups whose `name` contains that text, and `status` to keep only active or inactive groups. Query parameters this call does not list, such as `q`, are ignored. The response has no `ETag` or `Last-Modified` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

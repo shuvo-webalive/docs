@@ -1,0 +1,42 @@
+{
+  "sdk": "js",
+  "module": "customer_groups",
+  "endpoints": {
+    "list_customer_groups": {
+      "function": "listCustomerGroups",
+      "code": "const response = await client.customerGroups.listCustomerGroups({search_text: 'wholesale', status: 'active', limit: 50});\nfor (const customerGroup of response.map.customer_groups) {\n    console.log(customerGroup.id, customerGroup.name, customerGroup.status);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "count_customer_groups": {
+      "function": "countCustomerGroups",
+      "code": "const response = await client.customerGroups.countCustomerGroups({search_text: 'wholesale', status: 'I'});\nconsole.log(response.map.total);\n"
+    },
+    "create_customer_group": {
+      "function": "createCustomerGroup",
+      "code": "const response = await client.customerGroups.createCustomerGroup({\n    customer_group: {\n        name: 'Wholesale Partners',\n        description: 'Trade accounts',\n        status: 'active',\n        purchase_preference: {\n            minimum_purchase: {enabled: true, amount: 50},\n            on_account_purchase: {\n                enabled: true,\n                max_purchase: {enabled: true, amount: 500},\n                credit_limit: {enabled: true, amount: 1000},\n                payment_terms: {enabled: true, terms: 'NET_30'},\n            },\n        },\n        tax_configuration: {\n            override_store_tax: true,\n            tax_exempt: false,\n            tax_message: 'Prices exclude GST',\n            show_prices_with_tax_included: true,\n            prices_entered_with_tax_included: false,\n            base_price_rounding: 'up',\n        },\n        product_display: {\n            overwrite_default: true,\n            variation_display_type: 'enable_matrix_view',\n            display_parent_image: true,\n            activate_colour_variation_image: false,\n            show_selected_variation_value: true,\n            strike_through_out_of_stock: false,\n            single_click_variation_loading: true,\n            price_display_method: 'highest',\n        },\n    },\n});\nconsole.log(response.map.customer_group.id, response.map.customer_group.status);\n"
+    },
+    "get_customer_group": {
+      "function": "getCustomerGroup",
+      "code": "const response = await client.customerGroups.getCustomerGroup(1234);\nconst customerGroup = response.map.customer_group;\nconsole.log(customerGroup.name, customerGroup.status, customerGroup.customer_count);\nfor (const customer of customerGroup.customers) {\n    console.log(customer.id, customer.first_name, customer.last_name, customer.email);\n}\n"
+    },
+    "patch_customer_group": {
+      "function": "patchCustomerGroup",
+      "code": "const response = await client.customerGroups.patchCustomerGroup(1234, {\n    customer_group: {status: 'inactive', purchase_preference: {minimum_purchase: {amount: 75}}},\n});\nconst customerGroup = response.map.customer_group;\nconsole.log(customerGroup.status, customerGroup.purchase_preference.minimum_purchase.amount);\n"
+    },
+    "delete_customer_group": {
+      "function": "deleteCustomerGroup",
+      "code": "const response = await client.customerGroups.deleteCustomerGroup(1234);\nconsole.log(response.statusCode);\n"
+    },
+    "update_customer_group_customers": {
+      "function": "updateCustomerGroupCustomers",
+      "code": "const response = await client.customerGroups.updateCustomerGroupCustomers(1234, {customers: [5678, '5679']});\nconst customerGroup = response.map.customer_group;\nconsole.log(customerGroup.customer_count);\nfor (const customer of customerGroup.customers) {\n    console.log(customer.id, customer.email);\n}\n"
+    },
+    "get_customer_group_customer": {
+      "function": "getCustomerGroupCustomer",
+      "code": "const response = await client.customerGroups.getCustomerGroupCustomer(1234, 5678);\nconst customer = response.map.customer;\nconsole.log(customer.id, customer.first_name, customer.last_name, customer.email);\n"
+    },
+    "assign_customer_group": {
+      "function": "assignCustomerGroup",
+      "code": "const response = await client.customerGroups.assignCustomerGroup({customer: 5678, group: 1234});\nconsole.log(response.map.status, response.map.added, response.map.customer_id, response.map.group.name);\n"
+    }
+  }
+}
