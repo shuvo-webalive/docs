@@ -1,0 +1,38 @@
+{
+  "sdk": "js",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "listCountries",
+      "code": "const response = await client.countries.listCountries({search: 'aus'});\nfor (const country of response.map.countries) {\n    console.log(country.id, country.code, country.name, country.state_count);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "head_countries": {
+      "function": "headCountries",
+      "code": "const response = await client.countries.headCountries();\nconsole.log(response.statusCode);\n"
+    },
+    "get_country": {
+      "function": "getCountry",
+      "code": "const response = await client.countries.getCountry('AU');\nconst country = response.map.country;\nconsole.log(country.id, country.name, country.state_count, country.default);\n"
+    },
+    "head_country": {
+      "function": "headCountry",
+      "code": "const response = await client.countries.headCountry('AU');\nconsole.log(response.statusCode);\n"
+    },
+    "list_country_states": {
+      "function": "listCountryStates",
+      "code": "const response = await client.countries.listCountryStates('AU', {limit: 3});\nconsole.log(response.map.country.name);\nfor (const state of response.map.states) {\n    console.log(state.id, state.code, state.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_country_states": {
+      "function": "headCountryStates",
+      "code": "const response = await client.countries.headCountryStates('AU');\nconsole.log(response.statusCode);\n"
+    },
+    "get_country_state": {
+      "function": "getCountryState",
+      "code": "const response = await client.countries.getCountryState('AU', 'VIC');\nconst state = response.map.state;\nconsole.log(response.map.country.code, state.id, state.name, state.active);\n"
+    },
+    "head_country_state": {
+      "function": "headCountryState",
+      "code": "const response = await client.countries.headCountryState('AU', 'VIC');\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

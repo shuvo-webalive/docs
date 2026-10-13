@@ -1,0 +1,9 @@
+---
+title: "Retrieve a country"
+description: "Returns the country you name in `country_id` by its `id`, `code` or `name`."
+openapi: "GET /admin/countries/{country_id}"
+---
+
+Returns one country under the `country` key, with the same six fields a listing row has: `id`, `code`, `name`, `state_count`, `active` and `default`. `AU`, `au`, `Australia` and the country's `id` all return the same body and the same `ETag`. A query parameter you add is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

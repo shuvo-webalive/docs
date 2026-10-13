@@ -1,0 +1,38 @@
+{
+  "sdk": "dotnet",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "ListCountriesAsync",
+      "code": "var response = await client.Countries.ListCountriesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"aus\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var country in ((IReadOnlyList<object?>)body[\"countries\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{country[\"id\"]} {country[\"code\"]} {country[\"name\"]} {country[\"state_count\"]}\");"
+    },
+    "head_countries": {
+      "function": "HeadCountriesAsync",
+      "code": "var response = await client.Countries.HeadCountriesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_country": {
+      "function": "GetCountryAsync",
+      "code": "var response = await client.Countries.GetCountryAsync(\"AU\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar country = (IReadOnlyDictionary<string, object?>)body[\"country\"]!;\nConsole.WriteLine($\"{country[\"id\"]} {country[\"name\"]} {country[\"state_count\"]}\");"
+    },
+    "head_country": {
+      "function": "HeadCountryAsync",
+      "code": "var response = await client.Countries.HeadCountryAsync(\"AU\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "list_country_states": {
+      "function": "ListCountryStatesAsync",
+      "code": "var response = await client.Countries.ListCountryStatesAsync(\"AU\",\n    new Dictionary<string, object?> { [\"limit\"] = 3 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var state in ((IReadOnlyList<object?>)body[\"states\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{state[\"id\"]} {state[\"code\"]} {state[\"name\"]}\");"
+    },
+    "head_country_states": {
+      "function": "HeadCountryStatesAsync",
+      "code": "var response = await client.Countries.HeadCountryStatesAsync(\"AU\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_country_state": {
+      "function": "GetCountryStateAsync",
+      "code": "var response = await client.Countries.GetCountryStateAsync(\"AU\", \"VIC\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar state = (IReadOnlyDictionary<string, object?>)body[\"state\"]!;\nConsole.WriteLine($\"{state[\"id\"]} {state[\"code\"]} {state[\"name\"]}\");"
+    },
+    "head_country_state": {
+      "function": "HeadCountryStateAsync",
+      "code": "var response = await client.Countries.HeadCountryStateAsync(\"AU\", \"VIC\");\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

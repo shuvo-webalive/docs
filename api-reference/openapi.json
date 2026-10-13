@@ -124,6 +124,9 @@
       "name": "Blog categories"
     },
     {
+      "name": "Countries"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -36284,6 +36287,1029 @@
         ]
       }
     },
+    "/admin/countries": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "List countries",
+        "operationId": "list_countries",
+        "description": "Returns your store's countries in ascending `id` order, 20 per call unless you send `limit`. Send `code`, `name` or `id` to find one country by its exact value, or `search` to match part of a `name` or `code`; filters you send together must all match. Send `sort` and `order` to change the order. `dir`, `q`, `field_metadata` and other parameters the listing does not know, except `page`, are ignored.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of countries per page, from `1` to `100`, or `all` (in any letter case) for every row from `offset` on. Defaults to `20`. `pagination.limit` shows the page size applied; with `all` it shows the number of rows returned. `0`, `-1`, `101` and text other than `all` are rejected with `400`.",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "all"
+                  ]
+                }
+              ],
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of countries to skip. A negative value is rejected with `400`. An `offset` past the last row returns no rows, the full `total`, `has_previous` set to `true` and `has_next` set to `false`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Keeps only the country with this two-letter `code`, in any letter case. A value that is not two letters is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "example": "NZ"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Keeps only the country with exactly this `name`, in any letter case. Part of a name matches nothing; use `search` for that.",
+            "schema": {
+              "type": "string",
+              "example": "New Zealand"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Keeps only the country whose `id` is this number.",
+            "schema": {
+              "type": "integer",
+              "example": 160
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only countries whose `name` or `code` contains this text, in any letter case. `gb` finds United Kingdom by its code. A value of only spaces applies no filter.",
+            "schema": {
+              "type": "string",
+              "example": "zeal"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "description": "`true` keeps only active countries and `false` only inactive ones, in any letter case. Any other value, `1` included, is rejected with `400`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The field to sort by: `id`, `name` or `code`. Defaults to `id`. `name` sorts without regard to letter case. Any other value, `state_count` included, is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name",
+                "code"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`. Defaults to `asc`. `dir` is ignored.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The countries on this page in `countries`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`. The response has an `ETag` header and `Cache-Control: private, no-cache`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "countries": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Country"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/CountryPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "countries": [
+                    {
+                      "id": 12,
+                      "code": "AU",
+                      "name": "Australia",
+                      "state_count": 8,
+                      "active": true,
+                      "default": false
+                    },
+                    {
+                      "id": 14,
+                      "code": "AT",
+                      "name": "Austria",
+                      "state_count": 0,
+                      "active": true,
+                      "default": false
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          },
+          "400": {
+            "description": "You sent a query parameter value the listing does not accept, such as `limit=101`, or you sent `page`. The `error.code` is `invalid_request`. Each rejected parameter has a `details` entry naming it in `field`. The messages are `must be a whole number from 1 to 100, or all` for `limit`, `must be 0 or more` for `offset`, `must be true or false` for `active`, `must be one of id, name, code` for `sort`, and `is not supported - page with offset and limit` for `page`. A `code` that is not two letters is rejected with `must be a 2-letter country code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "1 parameter failed validation.",
+                    "details": [
+                      {
+                        "field": "limit",
+                        "code": "out_of_range",
+                        "message": "must be a whole number from 1 to 100, or all",
+                        "value": "101"
+                      }
+                    ],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/countries?search=aus\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.list_countries({\"search\": \"aus\"})\nfor country in response.map[\"countries\"]:\n    print(country[\"id\"], country[\"code\"], country[\"name\"], country[\"state_count\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.listCountries({search: 'aus'});\nfor (const country of response.map.countries) {\n    console.log(country.id, country.code, country.name, country.state_count);\n}\nconsole.log(response.map.pagination.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::listCountries($client, ['search' => 'aus']);\n\nforeach ($response->map['countries'] as $country) {\n    echo $country['id'], ' ', $country['code'], ' ', $country['name'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().listCountries(Map.of(\"search\", \"aus\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"countries\")) {\n    Map<?, ?> country = (Map<?, ?>) row;\n    System.out.println(country.get(\"id\") + \" \" + country.get(\"code\") + \" \" + country.get(\"name\") + \" \" + country.get(\"state_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.ListCountriesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"aus\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var country in ((IReadOnlyList<object?>)body[\"countries\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{country[\"id\"]} {country[\"code\"]} {country[\"name\"]} {country[\"state_count\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries\n    .listCountries(queryParams: {'search': 'aus'});\nfinal countries = (response.map as Map)['countries'] as List;\nfor (final country in countries) {\n  print('${(country as Map)['code']} ${country['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().ListCountries(ctx, map[string]any{\"search\": \"aus\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"countries\"].([]any) {\n\tcountry := row.(map[string]any)\n\tfmt.Println(country[\"id\"], country[\"code\"], country[\"name\"], country[\"state_count\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Check the countries list",
+        "operationId": "head_countries",
+        "description": "Returns `200` with headers only and no body. The `ETag` is the same one [List countries](/api-reference/countries/list-countries) returns when you send no query parameters. Compare it with the `ETag` you saved to see whether the list changed without downloading it.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including the list's `ETag`. No body."
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/countries\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.head_countries()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.headCountries();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::headCountries($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().headCountries();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.HeadCountriesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.headCountries();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().HeadCountries(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/countries/{country_id}": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Retrieve a country",
+        "operationId": "get_country",
+        "description": "Returns one country under the `country` key, with the same six fields a listing row has: `id`, `code`, `name`, `state_count`, `active` and `default`. `AU`, `au`, `Australia` and the country's `id` all return the same body and the same `ETag`. A query parameter you add is ignored.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's numeric `id`, its two-letter `code` or its `name`, in any letter case, such as `12`, `AU`, `au` or `Australia`. Surrounding spaces are trimmed. The SDKs encode the spaces in a name such as `New Zealand` for you.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country. The response has an `ETag` header and `Cache-Control: private, no-cache`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "$ref": "#/components/schemas/Country"
+                    }
+                  }
+                },
+                "example": {
+                  "country": {
+                    "id": 12,
+                    "code": "AU",
+                    "name": "Australia",
+                    "state_count": 8,
+                    "active": true,
+                    "default": false
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          },
+          "404": {
+            "description": "No country has that `country_id` as its `id`, `code` or `name`. The message is `Country not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Country not found",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/countries/AU\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.get_country(\"AU\")\ncountry = response.map[\"country\"]\nprint(country[\"id\"], country[\"name\"], country[\"state_count\"], country[\"default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.getCountry('AU');\nconst country = response.map.country;\nconsole.log(country.id, country.name, country.state_count, country.default);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::getCountry($client, 'AU');\n\n$country = $response->map['country'];\necho $country['name'], ': ', $country['state_count'], ' states', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().getCountry(\"AU\");\nMap<?, ?> country = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country\");\nSystem.out.println(country.get(\"id\") + \" \" + country.get(\"code\") + \" \" + country.get(\"name\"));\nSystem.out.println(country.get(\"state_count\") + \" \" + country.get(\"active\") + \" \" + country.get(\"default\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.GetCountryAsync(\"AU\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar country = (IReadOnlyDictionary<string, object?>)body[\"country\"]!;\nConsole.WriteLine($\"{country[\"id\"]} {country[\"name\"]} {country[\"state_count\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.getCountry('AU');\nfinal country = (response.map as Map)['country'] as Map;\nprint('${country['name']} ${country['state_count']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().GetCountry(ctx, \"AU\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountry := resp.Map().(map[string]any)[\"country\"].(map[string]any)\nfmt.Println(country[\"id\"], country[\"name\"], country[\"state_count\"], country[\"default\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Check a country",
+        "operationId": "head_country",
+        "description": "Returns `200` with headers only and no body. The `ETag` is the same one [Retrieve a country](/api-reference/countries/retrieve-a-country) returns for that country, whichever form of `country_id` you send.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's numeric `id`, its two-letter `code` or its `name`, in any letter case, such as `12`, `AU`, `au` or `Australia`. Surrounding spaces are trimmed. The SDKs encode the spaces in a name such as `New Zealand` for you.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, including the country's `ETag`. No body."
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/countries/AU\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.head_country(\"AU\")\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.headCountry('AU');\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::headCountry($client, 'AU');\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().headCountry(\"AU\");\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.HeadCountryAsync(\"AU\");\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.headCountry('AU');\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().HeadCountry(ctx, \"AU\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/countries/{country_id}/states": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "List the states of a country",
+        "operationId": "list_country_states",
+        "description": "Returns the states of the country in `country_id`, in ascending `id` order, 20 per call unless you send `limit`. The country's `id`, `code` and `name` come in `country`, next to `states` and `pagination`. The query parameters work as they do on [List countries](/api-reference/countries/list-countries), except that a state `code` is one to three letters or digits. A country with no states returns an empty `states` list and a `total` of `0`.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's numeric `id`, its two-letter `code` or its `name`, in any letter case, such as `12`, `AU`, `au` or `Australia`. Surrounding spaces are trimmed. The SDKs encode the spaces in a name such as `New Zealand` for you.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of states per page, from `1` to `100`, or `all` (in any letter case) for every row from `offset` on. Defaults to `20`. `pagination.limit` shows the page size applied; with `all` it shows the number of rows returned. `0`, `-1`, `101` and text other than `all` are rejected with `400`.",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "all"
+                  ]
+                }
+              ],
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of states to skip. A negative value is rejected with `400`. An `offset` past the last row returns no rows, the full `total`, `has_previous` set to `true` and `has_next` set to `false`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Keeps only the state with this `code`, in any letter case. The code is one to three letters or digits; any other value is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "example": "VIC"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Keeps only the state with exactly this `name`, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "Victoria"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Keeps only the state whose `id` is this number.",
+            "schema": {
+              "type": "integer",
+              "example": 72
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only states whose `name` or `code` contains this text, in any letter case.",
+            "schema": {
+              "type": "string",
+              "example": "south"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "description": "`true` keeps only active states and `false` only inactive ones. Any other value is rejected with `400`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The field to sort by: `id`, `name` or `code`. Defaults to `id`. `name` sorts without regard to letter case. Any other value, `state_count` included, is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name",
+                "code"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`. Defaults to `asc`. `dir` is ignored.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country's `id`, `code` and `name` in `country`, the states on this page in `states`, and `pagination`. The response has an `ETag` header and `Cache-Control: private, no-cache`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "$ref": "#/components/schemas/CountryReference"
+                    },
+                    "states": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CountryState"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/CountryPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "country": {
+                    "id": 12,
+                    "code": "AU",
+                    "name": "Australia"
+                  },
+                  "states": [
+                    {
+                      "id": 66,
+                      "code": "ACT",
+                      "name": "Australian Capital Territory",
+                      "active": true,
+                      "default": false
+                    },
+                    {
+                      "id": 67,
+                      "code": "NSW",
+                      "name": "New South Wales",
+                      "active": true,
+                      "default": false
+                    },
+                    {
+                      "id": 68,
+                      "code": "NT",
+                      "name": "Northern Territory",
+                      "active": true,
+                      "default": false
+                    }
+                  ],
+                  "pagination": {
+                    "total": 8,
+                    "limit": 3,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": true
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          },
+          "400": {
+            "description": "You sent a query parameter value the listing does not accept, such as `limit=101`, or you sent `page`. The `error.code` is `invalid_request`. Each rejected parameter has a `details` entry naming it in `field`. The messages are `must be a whole number from 1 to 100, or all` for `limit`, `must be 0 or more` for `offset`, `must be true or false` for `active`, `must be one of id, name, code` for `sort`, and `is not supported - page with offset and limit` for `page`. A state `code` that is not one to three letters or digits is rejected with `must be 1 to 3 letters or digits`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "1 parameter failed validation.",
+                    "details": [
+                      {
+                        "field": "limit",
+                        "code": "out_of_range",
+                        "message": "must be a whole number from 1 to 100, or all",
+                        "value": "101"
+                      }
+                    ],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No country has that `country_id` as its `id`, `code` or `name`. The message is `Country not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Country not found",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/countries/AU/states?limit=3\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.list_country_states(\"AU\", {\"limit\": 3})\nprint(response.map[\"country\"][\"name\"])\nfor state in response.map[\"states\"]:\n    print(state[\"id\"], state[\"code\"], state[\"name\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.listCountryStates('AU', {limit: 3});\nconsole.log(response.map.country.name);\nfor (const state of response.map.states) {\n    console.log(state.id, state.code, state.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::listCountryStates($client, 'AU', ['limit' => 3]);\n\nforeach ($response->map['states'] as $state) {\n    echo $state['code'], ' ', $state['name'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().listCountryStates(\"AU\", Map.of(\"limit\", 3));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((Map<?, ?>) body.get(\"country\")).get(\"name\"));\nfor (Object row : (List<?>) body.get(\"states\")) {\n    Map<?, ?> state = (Map<?, ?>) row;\n    System.out.println(state.get(\"id\") + \" \" + state.get(\"code\") + \" \" + state.get(\"name\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.ListCountryStatesAsync(\"AU\",\n    new Dictionary<string, object?> { [\"limit\"] = 3 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var state in ((IReadOnlyList<object?>)body[\"states\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{state[\"id\"]} {state[\"code\"]} {state[\"name\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries\n    .listCountryStates('AU', queryParams: {'limit': 3});\nfinal states = (response.map as Map)['states'] as List;\nfor (final state in states) {\n  print('${(state as Map)['code']} ${state['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().ListCountryStates(ctx, \"AU\", map[string]any{\"limit\": 3}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"country\"].(map[string]any)[\"name\"], body[\"pagination\"].(map[string]any)[\"total\"])\nfor _, row := range body[\"states\"].([]any) {\n\tstate := row.(map[string]any)\n\tfmt.Println(state[\"id\"], state[\"code\"], state[\"name\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Check the states of a country",
+        "operationId": "head_country_states",
+        "description": "Returns `200` with headers only and no body. The `ETag` is the same one [List the states of a country](/api-reference/countries/list-the-states-of-a-country) returns for that country when you send no query parameters.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's numeric `id`, its two-letter `code` or its `name`, in any letter case, such as `12`, `AU`, `au` or `Australia`. Surrounding spaces are trimmed. The SDKs encode the spaces in a name such as `New Zealand` for you.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, including the state list's `ETag`. No body."
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/countries/AU/states\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.head_country_states(\"AU\")\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.headCountryStates('AU');\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::headCountryStates($client, 'AU');\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().headCountryStates(\"AU\");\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.HeadCountryStatesAsync(\"AU\");\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.headCountryStates('AU');\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().HeadCountryStates(ctx, \"AU\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/countries/{country_id}/states/{state_id}": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Retrieve a state",
+        "operationId": "get_country_state",
+        "description": "Returns the state under the `state` key, with the same five fields a state listing row has: `id`, `code`, `name`, `active` and `default`. The country's `id`, `code` and `name` come in `country`, next to `state`. `VIC`, `vic`, `Victoria` and the state's `id` all return the same body and the same `ETag`. A query parameter you add is ignored.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's numeric `id`, its two-letter `code` or its `name`, in any letter case, such as `12`, `AU`, `au` or `Australia`. Surrounding spaces are trimmed. The SDKs encode the spaces in a name such as `New Zealand` for you.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state_id",
+            "in": "path",
+            "required": true,
+            "description": "The state's numeric `id`, its `code` or its `name`, in any letter case, such as `72`, `VIC` or `Victoria`. Surrounding spaces are trimmed. The state must belong to the country in `country_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country's `id`, `code` and `name` in `country`, and the state in `state`. The response has an `ETag` header and `Cache-Control: private, no-cache`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "$ref": "#/components/schemas/CountryReference"
+                    },
+                    "state": {
+                      "$ref": "#/components/schemas/CountryState"
+                    }
+                  }
+                },
+                "example": {
+                  "country": {
+                    "id": 12,
+                    "code": "AU",
+                    "name": "Australia"
+                  },
+                  "state": {
+                    "id": 72,
+                    "code": "VIC",
+                    "name": "Victoria",
+                    "active": true,
+                    "default": false
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          },
+          "404": {
+            "description": "The country in `country_id` has no state with that `state_id` as its `id`, `code` or `name`. A state that belongs to another country returns this too. The message is `State not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "State not found",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/countries/AU/states/VIC\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.get_country_state(\"AU\", \"VIC\")\nstate = response.map[\"state\"]\nprint(response.map[\"country\"][\"code\"], state[\"id\"], state[\"name\"], state[\"default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.getCountryState('AU', 'VIC');\nconst state = response.map.state;\nconsole.log(response.map.country.code, state.id, state.name, state.active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::getCountryState($client, 'AU', 'VIC');\n\n$state = $response->map['state'];\necho $state['name'], ', ', $response->map['country']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().getCountryState(\"AU\", \"VIC\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> state = (Map<?, ?>) body.get(\"state\");\nSystem.out.println(((Map<?, ?>) body.get(\"country\")).get(\"name\"));\nSystem.out.println(state.get(\"id\") + \" \" + state.get(\"code\") + \" \" + state.get(\"name\") + \" \" + state.get(\"active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.GetCountryStateAsync(\"AU\", \"VIC\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar state = (IReadOnlyDictionary<string, object?>)body[\"state\"]!;\nConsole.WriteLine($\"{state[\"id\"]} {state[\"code\"]} {state[\"name\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.getCountryState('AU', 'VIC');\nfinal state = (response.map as Map)['state'] as Map;\nprint('${state['code']} ${state['name']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().GetCountryState(ctx, \"AU\", \"VIC\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nstate := body[\"state\"].(map[string]any)\nfmt.Println(body[\"country\"].(map[string]any)[\"code\"], state[\"id\"], state[\"code\"], state[\"name\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Check a state",
+        "operationId": "head_country_state",
+        "description": "Returns `200` with headers only and no body. The `ETag` is the same one [Retrieve a state](/api-reference/countries/retrieve-a-state) returns for that state.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "path",
+            "required": true,
+            "description": "The country's numeric `id`, its two-letter `code` or its `name`, in any letter case, such as `12`, `AU`, `au` or `Australia`. Surrounding spaces are trimmed. The SDKs encode the spaces in a name such as `New Zealand` for you.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state_id",
+            "in": "path",
+            "required": true,
+            "description": "The state's numeric `id`, its `code` or its `name`, in any letter case, such as `72`, `VIC` or `Victoria`. Surrounding spaces are trimmed. The state must belong to the country in `country_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, including the state's `ETag`. No body."
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/countries/AU/states/VIC\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.countries.head_country_state(\"AU\", \"VIC\")\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.countries.headCountryState('AU', 'VIC');\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$client = ClientRegistry::buildClient();\n\n$response = Countries::headCountryState($client, 'AU', 'VIC');\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.countries().headCountryState(\"AU\", \"VIC\");\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Countries.HeadCountryStateAsync(\"AU\", \"VIC\");\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.countries.headCountryState('AU', 'VIC');\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Countries().HeadCountryState(ctx, \"AU\", \"VIC\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -52629,6 +53655,149 @@
               "request_id": {
                 "type": "string",
                 "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's numeric `id`. Pass it, the `code` or the `name` as `country_id` in a path."
+          },
+          "code": {
+            "type": "string",
+            "description": "The country's code: two upper-case letters, such as `AU`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The country's name, such as `Australia`."
+          },
+          "state_count": {
+            "type": "integer",
+            "description": "How many states the country has. It equals `pagination.total` from [List the states of a country](/api-reference/countries/list-the-states-of-a-country)."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the country is active."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "`true` only on the store's default country, the `default_country` in the `administration` site settings section."
+          }
+        }
+      },
+      "CountryReference": {
+        "type": "object",
+        "description": "The country a state list or a state belongs to.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's numeric `id`."
+          },
+          "code": {
+            "type": "string",
+            "description": "The country's two-letter code."
+          },
+          "name": {
+            "type": "string",
+            "description": "The country's name."
+          }
+        }
+      },
+      "CountryState": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The state's numeric `id`. It is unique across all countries. Pass it, the `code` or the `name` as `state_id` in a path."
+          },
+          "code": {
+            "type": "string",
+            "description": "The state's code, such as `VIC`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The state's name, such as `Victoria`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the state is active."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "`true` only on the store's default state, the `default_state` in the `administration` site settings section. `false` on every other state of every country."
+          }
+        }
+      },
+      "CountryPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of rows that match your request."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, or `20`. With `limit=all`, the number of rows returned."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of rows skipped before this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when there is a page before this one."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there is a page after this one."
+          }
+        }
+      },
+      "CountryError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `method_not_allowed`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Country not found` or `1 parameter failed validation.`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected query parameter. Empty on a `404` or a `405`.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why the parameter was rejected, such as `out_of_range`, `invalid_enum` or `unsupported_parameter`."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "What the parameter accepts, such as `must be true or false`."
+                    },
+                    "value": {
+                      "description": "The value you sent."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "A 36-character identifier for this request."
               }
             }
           }

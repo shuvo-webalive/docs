@@ -1,0 +1,38 @@
+{
+  "sdk": "python",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "list_countries",
+      "code": "response = client.countries.list_countries({\"search\": \"aus\"})\nfor country in response.map[\"countries\"]:\n    print(country[\"id\"], country[\"code\"], country[\"name\"], country[\"state_count\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_countries": {
+      "function": "head_countries",
+      "code": "response = client.countries.head_countries()\nprint(response.status_code)\n"
+    },
+    "get_country": {
+      "function": "get_country",
+      "code": "response = client.countries.get_country(\"AU\")\ncountry = response.map[\"country\"]\nprint(country[\"id\"], country[\"name\"], country[\"state_count\"], country[\"default\"])\n"
+    },
+    "head_country": {
+      "function": "head_country",
+      "code": "response = client.countries.head_country(\"AU\")\nprint(response.status_code)\n"
+    },
+    "list_country_states": {
+      "function": "list_country_states",
+      "code": "response = client.countries.list_country_states(\"AU\", {\"limit\": 3})\nprint(response.map[\"country\"][\"name\"])\nfor state in response.map[\"states\"]:\n    print(state[\"id\"], state[\"code\"], state[\"name\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_country_states": {
+      "function": "head_country_states",
+      "code": "response = client.countries.head_country_states(\"AU\")\nprint(response.status_code)\n"
+    },
+    "get_country_state": {
+      "function": "get_country_state",
+      "code": "response = client.countries.get_country_state(\"AU\", \"VIC\")\nstate = response.map[\"state\"]\nprint(response.map[\"country\"][\"code\"], state[\"id\"], state[\"name\"], state[\"default\"])\n"
+    },
+    "head_country_state": {
+      "function": "head_country_state",
+      "code": "response = client.countries.head_country_state(\"AU\", \"VIC\")\nprint(response.status_code)\n"
+    }
+  }
+}

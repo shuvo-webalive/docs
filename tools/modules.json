@@ -100,6 +100,13 @@
       ]
     },
     {
+      "name": "Countries and currencies",
+      "icon": "globe",
+      "modules": [
+        "countries"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [

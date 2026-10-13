@@ -1,0 +1,38 @@
+{
+  "sdk": "dart",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "listCountries",
+      "code": "final response = await client.countries\n    .listCountries(queryParams: {'search': 'aus'});\nfinal countries = (response.map as Map)['countries'] as List;\nfor (final country in countries) {\n  print('${(country as Map)['code']} ${country['name']}');\n}"
+    },
+    "head_countries": {
+      "function": "headCountries",
+      "code": "final response = await client.countries.headCountries();\nprint(response.statusCode);"
+    },
+    "get_country": {
+      "function": "getCountry",
+      "code": "final response = await client.countries.getCountry('AU');\nfinal country = (response.map as Map)['country'] as Map;\nprint('${country['name']} ${country['state_count']}');"
+    },
+    "head_country": {
+      "function": "headCountry",
+      "code": "final response = await client.countries.headCountry('AU');\nprint(response.statusCode);"
+    },
+    "list_country_states": {
+      "function": "listCountryStates",
+      "code": "final response = await client.countries\n    .listCountryStates('AU', queryParams: {'limit': 3});\nfinal states = (response.map as Map)['states'] as List;\nfor (final state in states) {\n  print('${(state as Map)['code']} ${state['name']}');\n}"
+    },
+    "head_country_states": {
+      "function": "headCountryStates",
+      "code": "final response = await client.countries.headCountryStates('AU');\nprint(response.statusCode);"
+    },
+    "get_country_state": {
+      "function": "getCountryState",
+      "code": "final response = await client.countries.getCountryState('AU', 'VIC');\nfinal state = (response.map as Map)['state'] as Map;\nprint('${state['code']} ${state['name']}');"
+    },
+    "head_country_state": {
+      "function": "headCountryState",
+      "code": "final response = await client.countries.headCountryState('AU', 'VIC');\nprint(response.statusCode);"
+    }
+  }
+}

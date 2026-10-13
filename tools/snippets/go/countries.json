@@ -1,0 +1,38 @@
+{
+  "sdk": "go",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "ListCountries",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().ListCountries(ctx, map[string]any{\"search\": \"aus\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"countries\"].([]any) {\n\tcountry := row.(map[string]any)\n\tfmt.Println(country[\"id\"], country[\"code\"], country[\"name\"], country[\"state_count\"])\n}"
+    },
+    "head_countries": {
+      "function": "HeadCountries",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().HeadCountries(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])"
+    },
+    "get_country": {
+      "function": "GetCountry",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().GetCountry(ctx, \"AU\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountry := resp.Map().(map[string]any)[\"country\"].(map[string]any)\nfmt.Println(country[\"id\"], country[\"name\"], country[\"state_count\"], country[\"default\"])"
+    },
+    "head_country": {
+      "function": "HeadCountry",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().HeadCountry(ctx, \"AU\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])"
+    },
+    "list_country_states": {
+      "function": "ListCountryStates",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().ListCountryStates(ctx, \"AU\", map[string]any{\"limit\": 3}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"country\"].(map[string]any)[\"name\"], body[\"pagination\"].(map[string]any)[\"total\"])\nfor _, row := range body[\"states\"].([]any) {\n\tstate := row.(map[string]any)\n\tfmt.Println(state[\"id\"], state[\"code\"], state[\"name\"])\n}"
+    },
+    "head_country_states": {
+      "function": "HeadCountryStates",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().HeadCountryStates(ctx, \"AU\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])"
+    },
+    "get_country_state": {
+      "function": "GetCountryState",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().GetCountryState(ctx, \"AU\", \"VIC\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nstate := body[\"state\"].(map[string]any)\nfmt.Println(body[\"country\"].(map[string]any)[\"code\"], state[\"id\"], state[\"code\"], state[\"name\"])"
+    },
+    "head_country_state": {
+      "function": "HeadCountryState",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Countries().HeadCountryState(ctx, \"AU\", \"VIC\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])"
+    }
+  }
+}

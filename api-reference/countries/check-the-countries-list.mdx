@@ -1,0 +1,9 @@
+---
+title: "Check the countries list"
+description: "Returns the headers of the countries list, including its `ETag`, with no body."
+openapi: "HEAD /admin/countries"
+---
+
+Returns `200` with headers only and no body. The `ETag` is the same one [List countries](/api-reference/countries/list-countries) returns when you send no query parameters. Compare it with the `ETag` you saved to see whether the list changed without downloading it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
