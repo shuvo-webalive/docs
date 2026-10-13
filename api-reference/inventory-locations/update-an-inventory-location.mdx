@@ -1,0 +1,9 @@
+---
+title: "Update an inventory location"
+description: "Changes only the fields you send on an inventory location and returns the location."
+openapi: "PATCH /admin/inventory_locations/{inventory_location_id}"
+---
+
+Send only the fields you want to change, at the top level of the body: `name`, `address`, `active` or `default`. Fields you leave out keep their values, and `"address": null` clears the address. `"default": true` makes this location the default and active, even if you also send `"active": false`, and `"default": false` on the default location is rejected with `409`. Send an `If-Match` header if you want the call rejected with `409` when the location changed since you read it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

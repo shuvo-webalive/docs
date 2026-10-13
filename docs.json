@@ -433,6 +433,7 @@
                   "api-reference/inventory-locations/retrieve-an-inventory-location",
                   "api-reference/inventory-locations/check-an-inventory-location",
                   "api-reference/inventory-locations/replace-an-inventory-location",
+                  "api-reference/inventory-locations/update-an-inventory-location",
                   "api-reference/inventory-locations/delete-an-inventory-location",
                   "api-reference/inventory-locations/list-stock-at-an-inventory-location",
                   "api-reference/inventory-locations/set-the-default-inventory-location",

@@ -5,22 +5,24 @@ SLUG = "inventory-locations"
 BASE = "/admin/inventory_locations"
 ICON = "warehouse"
 
-OVERVIEW_DESCRIPTION = "List, create, replace and delete inventory locations, activate or deactivate them, see the products each one holds, and choose the default location."
-INTRO = "The Inventory locations API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/inventory_locations`."
+OVERVIEW_DESCRIPTION = "List, create, replace, update and delete inventory locations, activate or deactivate them, see the products each one holds, and choose the default location."
+INTRO = "The Inventory locations API has eleven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/inventory_locations`."
 
 RETRIEVE_PAGE = "/api-reference/inventory-locations/retrieve-an-inventory-location"
 DEFAULT_PAGE = "/api-reference/inventory-locations/set-the-default-inventory-location"
 STATUS_PAGE = "/api-reference/inventory-locations/activate-or-deactivate-an-inventory-location"
+PATCH_PAGE = "/api-reference/inventory-locations/update-an-inventory-location"
 
 WARNING = (
     "**Replacing a location resets `address` and `active` when you leave them out of the body.** `PUT`\n"
     "  on a location does not merge: `address` becomes `null` and `active` becomes `true`. A `default`\n"
-    "  you leave out keeps its value. Send every field you want to keep."
+    "  you leave out keeps its value. Send every field you want to keep, or use\n"
+    "  [Update an inventory location](" + PATCH_PAGE + ") to change only the fields you send."
 )
 
 NOTES = [
-    "**Send the fields at the top level of the body, not inside `inventory_location`.** Create and\n"
-    "  replace both accept only `name`, `address`, `active` and `default`, at the top level. Any other\n"
+    "**Send the fields at the top level of the body, not inside `inventory_location`.** Create,\n"
+    "  replace and update accept only `name`, `address`, `active` and `default`, at the top level. Any other\n"
     "  field, including a wrapping `inventory_location`, is rejected with `400`. Responses return the\n"
     "  location inside `inventory_location`.",
     "**`is_active` and `is_default` are still accepted in request bodies.** The store reads them as\n"
@@ -28,7 +30,7 @@ NOTES = [
     "  different values, the request is rejected with `400` and the reason `conflicting_field`.",
     "**At most one location is the default.**\n"
     "  [Set the default inventory location](" + DEFAULT_PAGE + ") gives the flag to the location you name and\n"
-    "  takes it from the location that had it. A create or replace with `\"default\": true` takes the flag\n"
+    "  takes it from the location that had it. A create, replace or update with `\"default\": true` takes the flag\n"
     "  the same way. You cannot take the flag away with `\"default\": false` or delete the default\n"
     "  location: make another location the default first, or the request is rejected with `409`.",
     "**A listing returns 20 locations per call unless you send `limit`.** `limit` takes `1` to `100`,\n"
@@ -36,11 +38,11 @@ NOTES = [
     "  `pagination.has_next` is `true`. The listing accepts only `q`, `limit` and `offset`, and the stock\n"
     "  listing only `limit` and `offset`: any other query parameter, `page` included, is rejected with\n"
     "  `400`.",
-    "**A `200` does not prove a write worked.** For a method these paths do not support, such as\n"
-    "  `PATCH` on a location or any write to `/stock`, the store returns `200` with\n"
-    "  `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and stores nothing. Use `PUT` to\n"
-    "  replace a location, and [Activate or deactivate an inventory location](" + STATUS_PAGE + ") to change\n"
-    "  only `active`. No call changes stock.",
+    "**A method a path does not support is rejected with `405`.** The response has an `Allow` header\n"
+    "  that lists the methods the path accepts. A location accepts `GET`, `HEAD`, `PUT`, `PATCH` and\n"
+    "  `DELETE`: use `PUT` to replace it, `PATCH` to change only the fields you send, and\n"
+    "  [Activate or deactivate an inventory location](" + STATUS_PAGE + ") to change only `active`.\n"
+    "  `/stock` accepts only `GET` and `HEAD`, so no call changes stock.",
 ]
 
 INVENTORY_LOCATION_ID = {
@@ -49,6 +51,13 @@ INVENTORY_LOCATION_ID = {
     "required": True,
     "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
     "schema": {"type": "integer", "example": 4},
+}
+
+IF_MATCH = {
+    "name": "If-Match",
+    "in": "header",
+    "description": "Optional. The location's current `ETag`, such as the one returned by your last update to it. If the location changed since then, the call is rejected with `409`.",
+    "schema": {"type": "string", "example": "\"5d41402abc4b2a76\""},
 }
 
 Q = {"name": "q", "in": "query", "description": "Keeps only locations whose `name` contains this text, in any letter case. It does not search `address`.", "schema": {"type": "string", "example": "Sydney"}}
@@ -74,6 +83,7 @@ SAMPLE_PAGINATION = {"total": 2, "limit": 20, "offset": 0, "has_previous": False
 
 CREATED_ROW = {"id": 19, "name": "Perth Warehouse", "address": "4 Example Street, Perth WA 6000", "active": True, "default": False, "created_at": "2026-09-24T09:15:02", "updated_at": "2026-09-24T09:15:02"}
 REPLACED_ROW = dict(CREATED_ROW, address="10 Example Street, Perth WA 6000", updated_at="2026-09-24T09:20:41")
+PATCHED_ROW = dict(CREATED_ROW, address="12 Example Street, Perth WA 6000", updated_at="2026-09-24T09:22:15")
 DEACTIVATED_ROW = dict(CREATED_ROW, active=False, updated_at="2026-09-24T09:18:30")
 DEFAULT_ROW = dict(SAMPLE_ROWS[1], default=True, updated_at="2026-09-24T09:25:10")
 
@@ -195,6 +205,28 @@ ENDPOINTS = [
         "example_call": {"path": {"inventory_location_id": 19}},
     },
     {
+        "key": "patch_inventory_location",
+        "slug": "update-an-inventory-location",
+        "title": "Update an inventory location",
+        "method": "PATCH",
+        "path": BASE + "/{inventory_location_id}",
+        "summary": "Changes only the fields you send on an inventory location and returns the location.",
+        "description": "Send only the fields you want to change, at the top level of the body: `name`, `address`, `active` or `default`. Fields you leave out keep their values, and `\"address\": null` clears the address. `\"default\": true` makes this location the default and active, even if you also send `\"active\": false`, and `\"default\": false` on the default location is rejected with `409`. Send an `If-Match` header if you want the call rejected with `409` when the location changed since you read it.",
+        "parameters": [INVENTORY_LOCATION_ID, IF_MATCH],
+        "body": {"schema": {"$ref": "#/components/schemas/InventoryLocationPatchInput"}, "example": {"address": "12 Example Street, Perth WA 6000"}},
+        "responses": {
+            "200": {
+                "description": "The inventory location after the change, with an `ETag` header. Fields you did not send keep their values.",
+                "schema": ROW_RESPONSE,
+                "example": {"inventory_location": PATCHED_ROW},
+            },
+            "400": {"description": "The body is `{}`: the message is `send at least one field to change`. Or the body wraps the fields in `inventory_location` or has a field the store does not accept (reason `unknown_field`); `name` is `null` or blank (message `name: must be 1 to 250 characters`); the body sends `id` (message `id: must not be sent; the location is the one in the URL`); or `active` or `default` is not a boolean (reason `invalid_boolean`).", "schema": ERROR_REF},
+            "404": {"description": "No inventory location has that `inventory_location_id`. The message is `Inventory location not found`.", "schema": ERROR_REF},
+            "409": {"description": "You sent `\"default\": false` for the default location: the message is `the default inventory location can not be un-set; make another location the default instead`. Or your `If-Match` value is not the location's current `ETag`: the message is `The inventory location changed since it was read - fetch it again and retry.`", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"inventory_location_id": 19}},
+    },
+    {
         "key": "delete_inventory_location",
         "slug": "delete-an-inventory-location",
         "title": "Delete an inventory location",
@@ -289,6 +321,12 @@ SCHEMAS = {
         "address": {"type": ["string", "null"], "description": "Free text. A replace without it sets it to `null`. On create, an object here returns `500`."},
         "active": {"type": "boolean", "description": "Defaults to `true`, and a replace without it sets it to `true`."},
         "default": {"type": "boolean", "description": "Send `true` to make this location the default; the location that had the flag loses it. Defaults to `false` on create. A replace without it keeps the current value, and `false` on the default location is rejected with `409`."},
+    }},
+    "InventoryLocationPatchInput": {"type": "object", "minProperties": 1, "description": "Send at least one of these fields, at the top level of the body. Fields you leave out keep their values. Any other field, `id` included, is rejected with `400`.", "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 250, "description": "1 to 250 characters. `null` is rejected with `400`."},
+        "address": {"type": ["string", "null"], "description": "Free text. `null` clears the address."},
+        "active": {"type": "boolean", "description": "`true` activates the location and `false` deactivates it. A value that is not a boolean is rejected with `400`."},
+        "default": {"type": "boolean", "description": "Send `true` to make this location the default; it also becomes active, and the location that had the flag loses it. `false` on the default location is rejected with `409`."},
     }},
     "InventoryLocationStatusInput": {"type": "object", "required": ["active"], "description": "`active` is the only field accepted. `is_active` is accepted as another name for it.", "properties": {
         "active": {"type": "boolean", "description": "Required. `true` activates the location and `false` deactivates it."},

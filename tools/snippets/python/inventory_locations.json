@@ -26,6 +26,10 @@
       "function": "update_inventory_location",
       "code": "response = client.inventory_locations.update_inventory_location(19, {\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"10 Example Street, Perth WA 6000\",\n    \"active\": True,\n    \"default\": False,\n})\nlocation = response.map[\"inventory_location\"]\nprint(location[\"address\"], location[\"active\"], location[\"default\"])\n"
     },
+    "patch_inventory_location": {
+      "function": "patch_inventory_location",
+      "code": "response = client.inventory_locations.patch_inventory_location(19, {\n    \"address\": \"12 Example Street, Perth WA 6000\",\n})\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"address\"], location[\"active\"])\n"
+    },
     "delete_inventory_location": {
       "function": "delete_inventory_location",
       "code": "response = client.inventory_locations.delete_inventory_location(19)\nprint(response.status_code)\n"
