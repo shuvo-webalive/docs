@@ -1,0 +1,9 @@
+---
+title: "Set the base currency"
+description: "Makes an active currency the base and rescales every currency's `conversion_rate` to match."
+openapi: "PUT /admin/currencies/{currency_id}/base"
+---
+
+Makes the currency the base: its `conversion_rate` becomes `1`, the old base loses the flag, and every other currency's rate, inactive ones included, is divided by the new base's old rate. Every currency gets a new `updated_at` and `ETag`. Send no body: any body, `{}` included, is rejected with `400`. The response returns only the new base's `id`, `name`, `code` and `base`, so retrieve the currency for its other fields.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

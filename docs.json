@@ -615,6 +615,24 @@
                   "api-reference/countries/retrieve-a-state",
                   "api-reference/countries/check-a-state"
                 ]
+              },
+              {
+                "group": "Currencies",
+                "expanded": false,
+                "pages": [
+                  "currencies",
+                  "api-reference/currencies/list-currencies",
+                  "api-reference/currencies/check-the-currencies-list",
+                  "api-reference/currencies/count-currencies",
+                  "api-reference/currencies/check-the-currency-count",
+                  "api-reference/currencies/create-a-currency",
+                  "api-reference/currencies/retrieve-a-currency",
+                  "api-reference/currencies/check-a-currency",
+                  "api-reference/currencies/replace-a-currency",
+                  "api-reference/currencies/update-a-currency",
+                  "api-reference/currencies/delete-a-currency",
+                  "api-reference/currencies/set-the-base-currency"
+                ]
               }
             ]
           },

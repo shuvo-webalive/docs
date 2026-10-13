@@ -1,0 +1,9 @@
+---
+title: "Count currencies"
+description: "Returns the number of currencies that match `search` and `active`, as `total`."
+openapi: "GET /admin/currencies/count"
+---
+
+Returns the number of currencies as `total`, at the top level of the body. `search` and `active` narrow the count as they narrow the listing, so the number matches the listing's `pagination.total` for the same filters. `limit`, `q`, `field_metadata` and unknown query parameters are ignored. A bad `active` or `sort` value is rejected with `400`, as on the listing, even though the count does not sort.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

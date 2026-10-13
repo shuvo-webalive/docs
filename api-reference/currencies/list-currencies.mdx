@@ -1,0 +1,9 @@
+---
+title: "List currencies"
+description: "Returns up to 20 currencies per call, or the `limit` you send, with paging totals."
+openapi: "GET /admin/currencies"
+---
+
+Returns the currencies in `currencies`, 20 per call unless you send `limit`, and `pagination` with the total and whether more pages follow. Without `sort`, they come in ascending order of the currency's `id`, and the base currency is not moved to the top. Send `search` to find currencies by `name` or `code`, and `active` to keep only active or inactive ones. `page` is rejected with `400`; `q`, `base` and any other unknown query parameter are ignored and do not filter the listing.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,50 @@
+{
+  "sdk": "python",
+  "module": "currencies",
+  "endpoints": {
+    "list_currencies": {
+      "function": "list_currencies",
+      "code": "response = client.currencies.list_currencies({\"search\": \"dollar\", \"active\": True})\nfor currency in response.map[\"currencies\"]:\n    print(currency[\"id\"], currency[\"code\"], currency[\"name\"], currency[\"conversion_rate\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_currencies": {
+      "function": "head_currencies",
+      "code": "response = client.currencies.head_currencies()\nprint(response.status_code)\n"
+    },
+    "count_currencies": {
+      "function": "count_currencies",
+      "code": "response = client.currencies.count_currencies({\"search\": \"dollar\", \"active\": True})\nprint(response.map[\"total\"])\n"
+    },
+    "head_currencies_count": {
+      "function": "head_currencies_count",
+      "code": "response = client.currencies.head_currencies_count()\nprint(response.status_code)\n"
+    },
+    "create_currency": {
+      "function": "create_currency",
+      "code": "response = client.currencies.create_currency({\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": True,\n})\nprint(response.map[\"currency\"][\"id\"])\n"
+    },
+    "get_currency": {
+      "function": "get_currency",
+      "code": "response = client.currencies.get_currency(1234, {\"field_metadata\": True})\ncurrency = response.map[\"currency\"]\nprint(currency[\"code\"], currency[\"symbol\"], currency[\"conversion_rate\"], currency[\"base\"])\nprint(response.map[\"field_metadata\"][\"rounding\"][\"options\"])\n"
+    },
+    "head_currency": {
+      "function": "head_currency",
+      "code": "response = client.currencies.head_currency(1234)\nprint(response.status_code)\n"
+    },
+    "update_currency": {
+      "function": "update_currency",
+      "code": "response = client.currencies.update_currency(1234, {\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": {\"code\": \"US\"},\n    \"conversion_rate\": 1.5,\n    \"precision\": 3,\n    \"rounding\": \"up\",\n    \"active\": False,\n})\ncurrency = response.map[\"currency\"]\nprint(currency[\"country\"][\"code\"], currency[\"conversion_rate\"], currency[\"rounding\"], currency[\"active\"])\n"
+    },
+    "patch_currency": {
+      "function": "patch_currency",
+      "code": "response = client.currencies.patch_currency(1234, {\"conversion_rate\": 2.5})\nprint(response.map[\"currency\"][\"conversion_rate\"])\n"
+    },
+    "delete_currency": {
+      "function": "delete_currency",
+      "code": "response = client.currencies.delete_currency(1234)\nprint(response.status_code)\n"
+    },
+    "set_base_currency": {
+      "function": "set_base_currency",
+      "code": "response = client.currencies.set_base_currency(1234)\nbase = response.map[\"currency\"]\nprint(base[\"code\"], base[\"base\"])\nprint(response.map[\"previous_base\"])\n"
+    }
+  }
+}
