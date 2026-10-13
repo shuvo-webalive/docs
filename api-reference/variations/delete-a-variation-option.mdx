@@ -1,0 +1,9 @@
+---
+title: "Delete a variation option"
+description: "Deletes one option from a variation type and leaves the type's other options unchanged."
+openapi: "DELETE /admin/variations/{variation_id}/options/{variation_option_id}"
+---
+
+Deletes the option permanently and returns `204` with no body. The type keeps every other option as it was. You cannot delete a type's last option: to remove it, delete the type with [Delete a variation type](/api-reference/variations/delete-a-variation-type) and `cascade=true`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

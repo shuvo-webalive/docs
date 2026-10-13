@@ -1,0 +1,9 @@
+---
+title: "Update a variation type"
+description: "Changes only the fields and options you send in a variation type and keeps the rest."
+openapi: "PATCH /admin/variations/{variation_id}"
+---
+
+Wrap the change in `variation`. Sending `name` alone renames the type and keeps every option. An option sent with its `id` changes only the fields you send for it, and an option sent without an `id` is added. Setting `default` on one option takes it off the option that had it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,9 @@
+---
+title: "Retrieve a variation type"
+description: "Returns the variation type whose `id` you pass as `variation_id`, with its options."
+openapi: "GET /admin/variations/{variation_id}"
+---
+
+Returns one variation type under the `variation` key, with the same five fields a listing entry has: `id`, `name`, `standard`, `disposable` and `options`. The response has an `ETag` header, which changes when the type's content changes. Send `field_metadata=true` to also get a description of each field.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

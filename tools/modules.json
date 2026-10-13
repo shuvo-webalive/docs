@@ -101,6 +101,13 @@
       ]
     },
     {
+      "name": "Products",
+      "icon": "box",
+      "modules": [
+        "variations"
+      ]
+    },
+    {
       "name": "Countries and currencies",
       "icon": "globe",
       "modules": [

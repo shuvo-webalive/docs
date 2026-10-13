@@ -1,0 +1,9 @@
+---
+title: "Update a product's variants"
+description: "Sets availability, prices, stock or order quantities on several variants of one product."
+openapi: "PATCH /admin/products/{product_id}/variations/bulk"
+---
+
+Send `variation_ids` and at least one of `available`, `base_price`, `cost_price`, `available_stock`, `min_order_quantity` and `max_order_quantity`, at the top level of the body with no wrapper. Every variant you name gets the values you send. If any entry in `variation_ids` is not a variant of this product, the whole request is rejected and nothing is written. `available_stock` sets the variant's `inventory.quantity` even when inventory tracking is off. Other body fields, and query parameters other than `response`, are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

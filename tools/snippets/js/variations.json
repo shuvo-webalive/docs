@@ -1,0 +1,50 @@
+{
+  "sdk": "js",
+  "module": "variations",
+  "endpoints": {
+    "list_variations": {
+      "function": "listVariations",
+      "code": "const response = await client.variations.listVariations({search: 'size', standard: 'text'});\nfor (const variation of response.map.variations) {\n    console.log(variation.id, variation.name, variation.standard);\n}\n"
+    },
+    "head_variations": {
+      "function": "headVariations",
+      "code": "const response = await client.variations.headVariations();\nconsole.log(response.statusCode);\n"
+    },
+    "create_variation": {
+      "function": "createVariation",
+      "code": "const response = await client.variations.createVariation({\n    variation: {\n        name: 'Shirt Size',\n        standard: 'text',\n        options: [\n            {label: 'Small', value: 'S', order: 1, default: true},\n            {label: 'Medium', value: 'M', order: 2},\n        ],\n    },\n});\nconsole.log(response.map.variation.id, response.map.variation.options);\n"
+    },
+    "get_variation": {
+      "function": "getVariation",
+      "code": "const response = await client.variations.getVariation(12);\nconst variation = response.map.variation;\nconsole.log(variation.name, variation.standard, variation.options);\n"
+    },
+    "head_variation": {
+      "function": "headVariation",
+      "code": "const response = await client.variations.headVariation(12);\nconsole.log(response.statusCode);\n"
+    },
+    "update_variation": {
+      "function": "updateVariation",
+      "code": "const response = await client.variations.updateVariation(15, {\n    variation: {\n        name: 'Shirt Size',\n        options: [\n            {id: 201, label: 'Small', value: 'S', order: 1, default: true},\n            {label: 'Large', value: 'L', order: 3},\n        ],\n    },\n});\nconsole.log(response.map.variation.options);\n"
+    },
+    "patch_variation": {
+      "function": "patchVariation",
+      "code": "const response = await client.variations.patchVariation(15, {\n    variation: {\n        options: [\n            {id: 201, label: 'Petite'},\n            {label: 'Extra Large', value: 'XL', order: 4},\n        ],\n    },\n});\nconsole.log(response.map.variation.options);\n"
+    },
+    "delete_variation": {
+      "function": "deleteVariation",
+      "code": "const response = await client.variations.deleteVariation(15, {cascade: true});\nconsole.log(response.statusCode);\n"
+    },
+    "delete_variation_option": {
+      "function": "deleteVariationOption",
+      "code": "const response = await client.variations.deleteVariationOption(15, 204);\nconsole.log(response.statusCode);\n"
+    },
+    "list_product_variations": {
+      "function": "listProductVariations",
+      "code": "const response = await client.variations.listProductVariations(4321);\nfor (const group of response.map.variations) {\n    for (const variant of group.variants) {\n        console.log(variant.variation_id, variant.name, variant.pricing.base_price);\n    }\n}\n"
+    },
+    "update_product_variations": {
+      "function": "updateProductVariations",
+      "code": "const response = await client.variations.updateProductVariations(4321, {\n    variation_ids: [91],\n    available: true,\n    available_stock: 12,\n    min_order_quantity: 1,\n    max_order_quantity: 5,\n});\nconsole.log(response.map.message);\nfor (const variant of response.map.updated) {\n    console.log(variant.id, variant.name);\n}\n"
+    }
+  }
+}

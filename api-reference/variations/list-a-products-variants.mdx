@@ -1,0 +1,9 @@
+---
+title: "List a product's variants"
+description: "Returns every variant of the product whose `id` you pass as `product_id`."
+openapi: "GET /admin/products/{product_id}/variations"
+---
+
+Returns the product's variants in one call, with no paging, grouped under `variations`. Each group's `product_key` joins the product's variation type names with `/`, and each variant's `key` joins its option labels the same way. A product without variants returns `{"variations": []}`. Query parameters are ignored, and this path has no `HEAD`: it returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

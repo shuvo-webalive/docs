@@ -1,0 +1,50 @@
+{
+  "sdk": "go",
+  "module": "variations",
+  "endpoints": {
+    "list_variations": {
+      "function": "ListVariations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().ListVariations(ctx, map[string]any{\"search\": \"size\", \"standard\": \"text\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variations\"].([]any) {\n\tvariation := row.(map[string]any)\n\tfmt.Println(variation[\"id\"], variation[\"name\"], variation[\"standard\"])\n}"
+    },
+    "head_variations": {
+      "function": "HeadVariations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().HeadVariations(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_variation": {
+      "function": "CreateVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().CreateVariation(ctx, map[string]any{\"variation\": map[string]any{\n\t\"name\":     \"Shirt Size\",\n\t\"standard\": \"text\",\n\t\"options\": []any{\n\t\tmap[string]any{\"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": true},\n\t\tmap[string]any{\"label\": \"Medium\", \"value\": \"M\", \"order\": 2},\n\t},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"variation\"].(map[string]any)[\"id\"])"
+    },
+    "get_variation": {
+      "function": "GetVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().GetVariation(ctx, 12, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\nfmt.Println(variation[\"name\"], variation[\"standard\"])\nfor _, row := range variation[\"options\"].([]any) {\n\toption := row.(map[string]any)\n\tfmt.Println(option[\"id\"], option[\"label\"], option[\"value\"], option[\"default\"])\n}"
+    },
+    "head_variation": {
+      "function": "HeadVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().HeadVariation(ctx, 12, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_variation": {
+      "function": "UpdateVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().UpdateVariation(ctx, 15, map[string]any{\"variation\": map[string]any{\n\t\"name\": \"Shirt Size\",\n\t\"options\": []any{\n\t\tmap[string]any{\"id\": 201, \"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": true},\n\t\tmap[string]any{\"label\": \"Large\", \"value\": \"L\", \"order\": 3},\n\t},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\nfmt.Println(variation[\"name\"], len(variation[\"options\"].([]any)))"
+    },
+    "patch_variation": {
+      "function": "PatchVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().PatchVariation(ctx, 15, map[string]any{\"variation\": map[string]any{\"options\": []any{\n\tmap[string]any{\"id\": 201, \"label\": \"Petite\"},\n\tmap[string]any{\"label\": \"Extra Large\", \"value\": \"XL\", \"order\": 4},\n}}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variation\"].(map[string]any)[\"options\"].([]any) {\n\toption := row.(map[string]any)\n\tfmt.Println(option[\"id\"], option[\"label\"], option[\"value\"])\n}"
+    },
+    "delete_variation": {
+      "function": "DeleteVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().DeleteVariation(ctx, 15, map[string]any{\"cascade\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "delete_variation_option": {
+      "function": "DeleteVariationOption",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().DeleteVariationOption(ctx, 15, 204, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "list_product_variations": {
+      "function": "ListProductVariations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().ListProductVariations(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variations\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfor _, item := range group[\"variants\"].([]any) {\n\t\tvariant := item.(map[string]any)\n\t\tfmt.Println(group[\"product_key\"], variant[\"variation_id\"], variant[\"key\"], variant[\"available\"])\n\t}\n}"
+    },
+    "update_product_variations": {
+      "function": "UpdateProductVariations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().UpdateProductVariations(ctx, 4321, map[string]any{\n\t\"variation_ids\":      []any{91},\n\t\"available\":          true,\n\t\"available_stock\":    12,\n\t\"min_order_quantity\": 1,\n\t\"max_order_quantity\": 5,\n}, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"message\"], body[\"updated\"])"
+    }
+  }
+}

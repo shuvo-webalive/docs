@@ -1,0 +1,9 @@
+---
+title: "Replace a variation type"
+description: "Replaces a variation type's name and option list. Options you leave out are deleted."
+openapi: "PUT /admin/variations/{variation_id}"
+---
+
+Wrap the type in `variation` and send `name` and the full `options` list. An option sent with its `id` is changed, an option sent without an `id` is added, and every option you leave out is deleted. You can leave out `standard`: the type keeps its own. A different `standard` is rejected, because it cannot change after the type is created.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

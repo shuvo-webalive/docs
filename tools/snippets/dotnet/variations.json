@@ -1,0 +1,50 @@
+{
+  "sdk": "dotnet",
+  "module": "variations",
+  "endpoints": {
+    "list_variations": {
+      "function": "ListVariationsAsync",
+      "code": "var response = await client.Variations.ListVariationsAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"size\", [\"standard\"] = \"text\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var variation in ((IReadOnlyList<object?>)body[\"variations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{variation[\"id\"]} {variation[\"name\"]} {variation[\"standard\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_variations": {
+      "function": "HeadVariationsAsync",
+      "code": "var response = await client.Variations.HeadVariationsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_variation": {
+      "function": "CreateVariationAsync",
+      "code": "var response = await client.Variations.CreateVariationAsync(new Dictionary<string, object?>\n{\n    [\"variation\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Shirt Size\", [\"standard\"] = \"text\", [\"options\"] = new object[]\n        {\n            new Dictionary<string, object?> { [\"label\"] = \"Small\", [\"value\"] = \"S\", [\"order\"] = 1, [\"default\"] = true },\n            new Dictionary<string, object?> { [\"label\"] = \"Medium\", [\"value\"] = \"M\", [\"order\"] = 2 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nConsole.WriteLine($\"{variation[\"id\"]} {variation[\"name\"]}\");"
+    },
+    "get_variation": {
+      "function": "GetVariationAsync",
+      "code": "var response = await client.Variations.GetVariationAsync(12);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nConsole.WriteLine($\"{variation[\"name\"]} {variation[\"standard\"]}\");\nforeach (var option in ((IReadOnlyList<object?>)variation[\"options\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{option[\"id\"]} {option[\"label\"]} {option[\"value\"]}\");"
+    },
+    "head_variation": {
+      "function": "HeadVariationAsync",
+      "code": "var response = await client.Variations.HeadVariationAsync(12);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_variation": {
+      "function": "UpdateVariationAsync",
+      "code": "var response = await client.Variations.UpdateVariationAsync(15, new Dictionary<string, object?>\n{\n    [\"variation\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Shirt Size\", [\"options\"] = new object[]\n        {\n            new Dictionary<string, object?> { [\"id\"] = 201, [\"label\"] = \"Small\", [\"value\"] = \"S\", [\"order\"] = 1, [\"default\"] = true },\n            new Dictionary<string, object?> { [\"label\"] = \"Large\", [\"value\"] = \"L\", [\"order\"] = 3 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nforeach (var option in ((IReadOnlyList<object?>)variation[\"options\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{option[\"id\"]} {option[\"label\"]} {option[\"value\"]}\");"
+    },
+    "patch_variation": {
+      "function": "PatchVariationAsync",
+      "code": "var response = await client.Variations.PatchVariationAsync(15, new Dictionary<string, object?>\n{\n    [\"variation\"] = new Dictionary<string, object?>\n    {\n        [\"options\"] = new object[]\n        {\n            new Dictionary<string, object?> { [\"id\"] = 201, [\"label\"] = \"Petite\" },\n            new Dictionary<string, object?> { [\"label\"] = \"Extra Large\", [\"value\"] = \"XL\", [\"order\"] = 4 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nforeach (var option in ((IReadOnlyList<object?>)variation[\"options\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{option[\"id\"]} {option[\"label\"]} {option[\"value\"]}\");"
+    },
+    "delete_variation": {
+      "function": "DeleteVariationAsync",
+      "code": "var response = await client.Variations.DeleteVariationAsync(15, new Dictionary<string, object?> { [\"cascade\"] = true });\nConsole.WriteLine(response.StatusCode);"
+    },
+    "delete_variation_option": {
+      "function": "DeleteVariationOptionAsync",
+      "code": "var response = await client.Variations.DeleteVariationOptionAsync(15, 204);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "list_product_variations": {
+      "function": "ListProductVariationsAsync",
+      "code": "var response = await client.Variations.ListProductVariationsAsync(4321);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var group in ((IReadOnlyList<object?>)body[\"variations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    Console.WriteLine(group[\"product_key\"]);\n    foreach (var variant in ((IReadOnlyList<object?>)group[\"variants\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n        Console.WriteLine($\"{variant[\"variation_id\"]} {variant[\"key\"]} {variant[\"available\"]}\");\n}"
+    },
+    "update_product_variations": {
+      "function": "UpdateProductVariationsAsync",
+      "code": "var response = await client.Variations.UpdateProductVariationsAsync(4321, new Dictionary<string, object?>\n{\n    [\"variation_ids\"] = new object[] { 91 }, [\"available\"] = true, [\"available_stock\"] = 12,\n    [\"min_order_quantity\"] = 1, [\"max_order_quantity\"] = 5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"message\"]);\nforeach (var variant in ((IReadOnlyList<object?>)body[\"updated\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{variant[\"id\"]} {variant[\"name\"]}\");"
+    }
+  }
+}
