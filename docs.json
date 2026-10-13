@@ -597,6 +597,31 @@
             ]
           },
           {
+            "group": "Products",
+            "icon": "box",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Variations",
+                "expanded": false,
+                "pages": [
+                  "variations",
+                  "api-reference/variations/list-variation-types",
+                  "api-reference/variations/check-the-variation-types-list",
+                  "api-reference/variations/create-a-variation-type",
+                  "api-reference/variations/retrieve-a-variation-type",
+                  "api-reference/variations/check-a-variation-type",
+                  "api-reference/variations/replace-a-variation-type",
+                  "api-reference/variations/update-a-variation-type",
+                  "api-reference/variations/delete-a-variation-type",
+                  "api-reference/variations/delete-a-variation-option",
+                  "api-reference/variations/list-a-products-variants",
+                  "api-reference/variations/update-a-products-variants"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Countries and currencies",
             "icon": "globe",
             "expanded": false,

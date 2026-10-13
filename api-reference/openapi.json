@@ -127,6 +127,9 @@
       "name": "Blog categories"
     },
     {
+      "name": "Variations"
+    },
+    {
       "name": "Countries"
     },
     {
@@ -37681,6 +37684,1289 @@
         ]
       }
     },
+    "/admin/variations": {
+      "get": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "List variation types",
+        "operationId": "list_variations",
+        "description": "Returns the variation types in ascending order of each type's `id`, 20 per call unless you send `limit`. Each type comes with every one of its options. `pagination` gives the number of matching types in `total`, and `has_next` is `true` while another page follows. Send `search` to keep only types whose `name` contains that text, and `standard` to keep only one kind of type. Any query parameter not listed here is rejected with `400`.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only types whose `name` contains this text, in any letter case. It does not search option labels.",
+            "schema": {
+              "type": "string",
+              "example": "size"
+            }
+          },
+          {
+            "name": "standard",
+            "in": "query",
+            "description": "Keeps only types of this kind: `text`, `color` or `image`, in any letter case. Any other value is rejected with `400` and the reason `invalid_enum`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "text",
+                "color",
+                "image"
+              ],
+              "example": "text"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of types per page, from `1` to `100`. Defaults to `20`. `pagination.limit` shows the value applied. `0`, values above `100` and text such as `abc` are rejected with `400` and the message `must be a whole number from 1 to 100`. The reason is `out_of_range` for `0` and values above `100`, and `invalid_integer` for text.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of types to skip, `0` or more. Do not send it with `page`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "1-based page number, read as `offset = (page - 1) * limit`. Sending both `page` and `offset` is rejected with `400` and the reason `conflicting_params`.",
+            "schema": {
+              "type": "integer",
+              "example": 2
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each field of a variation type and of an option: its type, its limits, and whether it is read-only. Accepts `true`, `false`, `1` and `0`; any other value is rejected with `400` and the reason `invalid_boolean`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The variation types on this page in `variations`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`. With `field_metadata=true`, a `field_metadata` key is added between them. The response has no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "variations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Variation"
+                      }
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/VariationFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`."
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/VariationPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "variations": [
+                    {
+                      "id": 12,
+                      "name": "Size",
+                      "standard": "text",
+                      "disposable": false,
+                      "options": [
+                        {
+                          "id": 101,
+                          "label": "Small",
+                          "value": "S",
+                          "order": 1,
+                          "default": false,
+                          "image": null
+                        },
+                        {
+                          "id": 102,
+                          "label": "Medium",
+                          "value": "M",
+                          "order": 2,
+                          "default": true,
+                          "image": null
+                        }
+                      ]
+                    },
+                    {
+                      "id": 14,
+                      "name": "Shoe Size",
+                      "standard": "text",
+                      "disposable": false,
+                      "options": [
+                        {
+                          "id": 131,
+                          "label": "UK 8",
+                          "value": "8",
+                          "order": 1,
+                          "default": false,
+                          "image": null
+                        },
+                        {
+                          "id": 132,
+                          "label": "UK 9",
+                          "value": "9",
+                          "order": 2,
+                          "default": false,
+                          "image": null
+                        }
+                      ]
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a query parameter the listing does not accept (reason `unknown_parameter`), a `standard` other than `text`, `color` or `image` (reason `invalid_enum`), a `limit` that is not a whole number from `1` to `100` (message `must be a whole number from 1 to 100`; reason `out_of_range` for `0` or `101`, and `invalid_integer` for text such as `abc`), both `page` and `offset` (reason `conflicting_params`), or a `field_metadata` that is not a boolean (reason `invalid_boolean`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/variations?search=size&standard=text\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.list_variations({\"search\": \"size\", \"standard\": \"text\"})\nfor variation in response.map[\"variations\"]:\n    print(variation[\"id\"], variation[\"name\"], len(variation[\"options\"]))\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.listVariations({search: 'size', standard: 'text'});\nfor (const variation of response.map.variations) {\n    console.log(variation.id, variation.name, variation.standard);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::listVariations($client, ['search' => 'size', 'standard' => 'text']);\n\nforeach ($response->map['variations'] as $variation) {\n    echo $variation['id'], ' ', $variation['name'], ': ', implode(', ', array_column($variation['options'], 'label')), PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().listVariations(Map.of(\"search\", \"size\", \"standard\", \"text\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"variations\")) {\n    Map<?, ?> variation = (Map<?, ?>) row;\n    System.out.println(variation.get(\"id\") + \" \" + variation.get(\"name\") + \" \" + variation.get(\"standard\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.ListVariationsAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"size\", [\"standard\"] = \"text\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var variation in ((IReadOnlyList<object?>)body[\"variations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{variation[\"id\"]} {variation[\"name\"]} {variation[\"standard\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations\n    .listVariations(queryParams: {'search': 'size', 'standard': 'text'});\nfinal body = response.map as Map;\nfor (final variation in body['variations'] as List) {\n  print('${(variation as Map)['id']} ${variation['name']} ${variation['standard']}');\n}\nprint((body['pagination'] as Map)['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().ListVariations(ctx, map[string]any{\"search\": \"size\", \"standard\": \"text\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variations\"].([]any) {\n\tvariation := row.(map[string]any)\n\tfmt.Println(variation[\"id\"], variation[\"name\"], variation[\"standard\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Check the variation types list",
+        "operationId": "head_variations",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. To read the types, use [List variation types](/api-reference/variations/list-variation-types).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.head_variations()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.headVariations();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::headVariations($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().headVariations();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.HeadVariationsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.headVariations();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().HeadVariations(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Create a variation type",
+        "operationId": "create_variation",
+        "description": "Wrap the type in `variation` and send `name`, `standard` and at least one option. The response gives the type's `id`, which the other calls take as `variation_id`, and each option's own `id`. `name` and each option's `label` and `value` are trimmed, and `standard` is stored in lower case. For an `image` type, send each option's picture as `image` with `base64` and `filename`, and no `value`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new variation type, with `disposable` set to `false` and an `id` on every option. The response has an `ETag` header and a `Location` header with the type's path, such as `/api/v4/admin/variations/15`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "variation": {
+                      "$ref": "#/components/schemas/Variation"
+                    }
+                  }
+                },
+                "example": {
+                  "variation": {
+                    "id": 15,
+                    "name": "Shirt Size",
+                    "standard": "text",
+                    "disposable": false,
+                    "options": [
+                      {
+                        "id": 201,
+                        "label": "Small",
+                        "value": "S",
+                        "order": 1,
+                        "default": true,
+                        "image": null
+                      },
+                      {
+                        "id": 202,
+                        "label": "Medium",
+                        "value": "M",
+                        "order": 2,
+                        "default": false,
+                        "image": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `variation`: each top-level key is reported with the reason `unknown_field`, and `variation` with the reason `required`. Or a field breaks a rule: `name` must be 2 to 100 characters, `standard` must be `text`, `color` or `image`, `options` must hold 1 to 1000 options, and each option's `order` must be from `0` to `999`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another type already has that `name`, in any letter case. The response body is not valid JSON: the message is `Variation type having name \"<name>\" already exists`, with the name inserted unescaped, and `details` is empty. Check the status code instead of parsing the body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"variation\": {\n      \"name\": \"Shirt Size\",\n      \"standard\": \"text\",\n      \"options\": [\n        {\n          \"label\": \"Small\",\n          \"value\": \"S\",\n          \"order\": 1,\n          \"default\": true\n        },\n        {\n          \"label\": \"Medium\",\n          \"value\": \"M\",\n          \"order\": 2\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.create_variation({\n    \"variation\": {\n        \"name\": \"Shirt Size\",\n        \"standard\": \"text\",\n        \"options\": [\n            {\"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": True},\n            {\"label\": \"Medium\", \"value\": \"M\", \"order\": 2},\n        ],\n    },\n})\nvariation = response.map[\"variation\"]\nprint(variation[\"id\"], [option[\"id\"] for option in variation[\"options\"]])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.createVariation({\n    variation: {\n        name: 'Shirt Size',\n        standard: 'text',\n        options: [\n            {label: 'Small', value: 'S', order: 1, default: true},\n            {label: 'Medium', value: 'M', order: 2},\n        ],\n    },\n});\nconsole.log(response.map.variation.id, response.map.variation.options);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::createVariation($client, ['variation' => [\n    'name' => 'Shirt Size', 'standard' => 'text',\n    'options' => [\n        ['label' => 'Small', 'value' => 'S', 'order' => 1, 'default' => true],\n        ['label' => 'Medium', 'value' => 'M', 'order' => 2],\n    ],\n]]);\n\n$variation = $response->map['variation'];\necho $variation['id'], ': ', implode(', ', array_column($variation['options'], 'id')), PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().createVariation(Map.of(\"variation\", Map.of(\n        \"name\", \"Shirt Size\", \"standard\", \"text\", \"options\", List.of(\n                Map.of(\"label\", \"Small\", \"value\", \"S\", \"order\", 1, \"default\", true),\n                Map.of(\"label\", \"Medium\", \"value\", \"M\", \"order\", 2)))));\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nSystem.out.println(variation.get(\"id\") + \" \" + variation.get(\"name\"));\nfor (Object row : (List<?>) variation.get(\"options\")) {\n    Map<?, ?> option = (Map<?, ?>) row;\n    System.out.println(option.get(\"id\") + \" \" + option.get(\"label\") + \" \" + option.get(\"default\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.CreateVariationAsync(new Dictionary<string, object?>\n{\n    [\"variation\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Shirt Size\", [\"standard\"] = \"text\", [\"options\"] = new object[]\n        {\n            new Dictionary<string, object?> { [\"label\"] = \"Small\", [\"value\"] = \"S\", [\"order\"] = 1, [\"default\"] = true },\n            new Dictionary<string, object?> { [\"label\"] = \"Medium\", [\"value\"] = \"M\", [\"order\"] = 2 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nConsole.WriteLine($\"{variation[\"id\"]} {variation[\"name\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.createVariation({\n  'variation': {\n    'name': 'Shirt Size',\n    'standard': 'text',\n    'options': [\n      {'label': 'Small', 'value': 'S', 'order': 1, 'default': true},\n      {'label': 'Medium', 'value': 'M', 'order': 2},\n    ],\n  },\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nprint('${variation['id']} ${variation['options']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().CreateVariation(ctx, map[string]any{\"variation\": map[string]any{\n\t\"name\":     \"Shirt Size\",\n\t\"standard\": \"text\",\n\t\"options\": []any{\n\t\tmap[string]any{\"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": true},\n\t\tmap[string]any{\"label\": \"Medium\", \"value\": \"M\", \"order\": 2},\n\t},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"variation\"].(map[string]any)[\"id\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "variation"
+                ],
+                "properties": {
+                  "variation": {
+                    "$ref": "#/components/schemas/VariationInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/variations/{variation_id}": {
+      "get": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Retrieve a variation type",
+        "operationId": "get_variation",
+        "description": "Returns one variation type under the `variation` key, with the same five fields a listing entry has: `id`, `name`, `standard`, `disposable` and `options`. The response has an `ETag` header, which changes when the type's content changes. Send `field_metadata=true` to also get a description of each field.",
+        "parameters": [
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variation type's `id`, from a listing or from the response to creating the type.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each field of a variation type and of an option: its type, its limits, and whether it is read-only. Accepts `true`, `false`, `1` and `0`; any other value is rejected with `400` and the reason `invalid_boolean`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The variation type. With `field_metadata=true`, a `field_metadata` key is added beside it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "variation": {
+                      "$ref": "#/components/schemas/Variation"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/VariationFieldMetadata",
+                      "description": "Only when you send `field_metadata=true`."
+                    }
+                  }
+                },
+                "example": {
+                  "variation": {
+                    "id": 12,
+                    "name": "Size",
+                    "standard": "text",
+                    "disposable": false,
+                    "options": [
+                      {
+                        "id": 101,
+                        "label": "Small",
+                        "value": "S",
+                        "order": 1,
+                        "default": false,
+                        "image": null
+                      },
+                      {
+                        "id": 102,
+                        "label": "Medium",
+                        "value": "M",
+                        "order": 2,
+                        "default": true,
+                        "image": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No variation type has that `variation_id`. The message is `Variation not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/variations/12\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.get_variation(12)\nvariation = response.map[\"variation\"]\nprint(variation[\"name\"], variation[\"standard\"])\nfor option in variation[\"options\"]:\n    print(option[\"id\"], option[\"label\"], option[\"value\"], option[\"default\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.getVariation(12);\nconst variation = response.map.variation;\nconsole.log(variation.name, variation.standard, variation.options);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::getVariation($client, 12);\n\n$variation = $response->map['variation'];\necho $variation['name'], ' (', $variation['standard'], ')', PHP_EOL;\nforeach ($variation['options'] as $option) {\n    echo $option['id'], ' ', $option['label'], $option['default'] ? ' (default)' : '', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().getVariation(12);\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nSystem.out.println(variation.get(\"name\") + \" \" + variation.get(\"standard\"));\nfor (Object row : (List<?>) variation.get(\"options\")) {\n    Map<?, ?> option = (Map<?, ?>) row;\n    System.out.println(option.get(\"id\") + \" \" + option.get(\"label\") + \" \" + option.get(\"value\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.GetVariationAsync(12);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nConsole.WriteLine($\"{variation[\"name\"]} {variation[\"standard\"]}\");\nforeach (var option in ((IReadOnlyList<object?>)variation[\"options\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{option[\"id\"]} {option[\"label\"]} {option[\"value\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.getVariation(12);\nfinal variation = (response.map as Map)['variation'] as Map;\nprint('${variation['name']} ${variation['standard']}');\nfor (final option in variation['options'] as List) {\n  print('${(option as Map)['id']} ${option['label']} ${option['value']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().GetVariation(ctx, 12, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\nfmt.Println(variation[\"name\"], variation[\"standard\"])\nfor _, row := range variation[\"options\"].([]any) {\n\toption := row.(map[string]any)\n\tfmt.Println(option[\"id\"], option[\"label\"], option[\"value\"], option[\"default\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Check a variation type",
+        "operationId": "head_variation",
+        "description": "Returns `200` with headers only and no body. The `ETag` header has the same value that [Retrieve a variation type](/api-reference/variations/retrieve-a-variation-type) returns for the type, so you can check whether the type has changed without downloading it.",
+        "parameters": [
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variation type's `id`, from a listing or from the response to creating the type.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body, with the type's `ETag`."
+          },
+          "404": {
+            "description": "No variation type has that `variation_id`. Headers only, no body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/variations/12\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.head_variation(12)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.headVariation(12);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::headVariation($client, 12);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().headVariation(12);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.HeadVariationAsync(12);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.headVariation(12);\nprint(response.statusCode);\nprint(response.headers['etag']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().HeadVariation(ctx, 12, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Replace a variation type",
+        "operationId": "update_variation",
+        "description": "Wrap the type in `variation` and send `name` and the full `options` list. An option sent with its `id` is changed, an option sent without an `id` is added, and every option you leave out is deleted. You can leave out `standard`: the type keeps its own. A different `standard` is rejected, because it cannot change after the type is created.",
+        "parameters": [
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variation type's `id`, from a listing or from the response to creating the type.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The variation type after the replace, with exactly the options you sent. A new option has a new `id`. The response has the type's `ETag`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "variation": {
+                      "$ref": "#/components/schemas/Variation"
+                    }
+                  }
+                },
+                "example": {
+                  "variation": {
+                    "id": 15,
+                    "name": "Shirt Size",
+                    "standard": "text",
+                    "disposable": false,
+                    "options": [
+                      {
+                        "id": 201,
+                        "label": "Small",
+                        "value": "S",
+                        "order": 1,
+                        "default": true,
+                        "image": null
+                      },
+                      {
+                        "id": 203,
+                        "label": "Large",
+                        "value": "L",
+                        "order": 3,
+                        "default": false,
+                        "image": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `variation`; `name` is missing (message `variation.name: is required`); `options` is missing (message `variation.options: must hold at least one option`); or `standard` differs from the type's own (reason `read_only_field`, message `cannot be changed after the variation type is created`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/variations/15\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"variation\": {\n      \"name\": \"Shirt Size\",\n      \"options\": [\n        {\n          \"id\": 201,\n          \"label\": \"Small\",\n          \"value\": \"S\",\n          \"order\": 1,\n          \"default\": true\n        },\n        {\n          \"label\": \"Large\",\n          \"value\": \"L\",\n          \"order\": 3\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.update_variation(15, {\n    \"variation\": {\n        \"name\": \"Shirt Size\",\n        \"options\": [\n            {\"id\": 201, \"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": True},\n            {\"label\": \"Large\", \"value\": \"L\", \"order\": 3},\n        ],\n    },\n})\nfor option in response.map[\"variation\"][\"options\"]:\n    print(option[\"id\"], option[\"label\"], option[\"value\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.updateVariation(15, {\n    variation: {\n        name: 'Shirt Size',\n        options: [\n            {id: 201, label: 'Small', value: 'S', order: 1, default: true},\n            {label: 'Large', value: 'L', order: 3},\n        ],\n    },\n});\nconsole.log(response.map.variation.options);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::updateVariation($client, 15, ['variation' => [\n    'name' => 'Shirt Size',\n    'options' => [\n        ['id' => 201, 'label' => 'Small', 'value' => 'S', 'order' => 1, 'default' => true],\n        ['label' => 'Large', 'value' => 'L', 'order' => 3],\n    ],\n]]);\n\necho implode(', ', array_column($response->map['variation']['options'], 'label')), PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().updateVariation(15, Map.of(\"variation\", Map.of(\n        \"name\", \"Shirt Size\", \"options\", List.of(\n                Map.of(\"id\", 201, \"label\", \"Small\", \"value\", \"S\", \"order\", 1, \"default\", true),\n                Map.of(\"label\", \"Large\", \"value\", \"L\", \"order\", 3)))));\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nfor (Object row : (List<?>) variation.get(\"options\")) {\n    Map<?, ?> option = (Map<?, ?>) row;\n    System.out.println(option.get(\"id\") + \" \" + option.get(\"label\") + \" \" + option.get(\"value\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.UpdateVariationAsync(15, new Dictionary<string, object?>\n{\n    [\"variation\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Shirt Size\", [\"options\"] = new object[]\n        {\n            new Dictionary<string, object?> { [\"id\"] = 201, [\"label\"] = \"Small\", [\"value\"] = \"S\", [\"order\"] = 1, [\"default\"] = true },\n            new Dictionary<string, object?> { [\"label\"] = \"Large\", [\"value\"] = \"L\", [\"order\"] = 3 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nforeach (var option in ((IReadOnlyList<object?>)variation[\"options\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{option[\"id\"]} {option[\"label\"]} {option[\"value\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.updateVariation(15, {\n  'variation': {\n    'name': 'Shirt Size',\n    'options': [\n      {'id': 201, 'label': 'Small', 'value': 'S', 'order': 1, 'default': true},\n      {'label': 'Large', 'value': 'L', 'order': 3},\n    ],\n  },\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nprint(variation['options']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().UpdateVariation(ctx, 15, map[string]any{\"variation\": map[string]any{\n\t\"name\": \"Shirt Size\",\n\t\"options\": []any{\n\t\tmap[string]any{\"id\": 201, \"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": true},\n\t\tmap[string]any{\"label\": \"Large\", \"value\": \"L\", \"order\": 3},\n\t},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\nfmt.Println(variation[\"name\"], len(variation[\"options\"].([]any)))\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "variation"
+                ],
+                "properties": {
+                  "variation": {
+                    "$ref": "#/components/schemas/VariationInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Update a variation type",
+        "operationId": "patch_variation",
+        "description": "Wrap the change in `variation`. Sending `name` alone renames the type and keeps every option. An option sent with its `id` changes only the fields you send for it, and an option sent without an `id` is added. Setting `default` on one option takes it off the option that had it.",
+        "parameters": [
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variation type's `id`, from a listing or from the response to creating the type.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The variation type after the change, with every option it had and any option you added. `{\"variation\": {}}` returns `200` with the type unchanged.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "variation": {
+                      "$ref": "#/components/schemas/Variation"
+                    }
+                  }
+                },
+                "example": {
+                  "variation": {
+                    "id": 15,
+                    "name": "Shirt Size",
+                    "standard": "text",
+                    "disposable": false,
+                    "options": [
+                      {
+                        "id": 201,
+                        "label": "Petite",
+                        "value": "S",
+                        "order": 1,
+                        "default": true,
+                        "image": null
+                      },
+                      {
+                        "id": 203,
+                        "label": "Large",
+                        "value": "L",
+                        "order": 3,
+                        "default": false,
+                        "image": null
+                      },
+                      {
+                        "id": 204,
+                        "label": "Extra Large",
+                        "value": "XL",
+                        "order": 4,
+                        "default": false,
+                        "image": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not wrapped in `variation`, or `standard` differs from the type's own (reason `read_only_field`, message `cannot be changed after the variation type is created`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/variations/15\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"variation\": {\n      \"options\": [\n        {\n          \"id\": 201,\n          \"label\": \"Petite\"\n        },\n        {\n          \"label\": \"Extra Large\",\n          \"value\": \"XL\",\n          \"order\": 4\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.patch_variation(15, {\n    \"variation\": {\n        \"options\": [\n            {\"id\": 201, \"label\": \"Petite\"},\n            {\"label\": \"Extra Large\", \"value\": \"XL\", \"order\": 4},\n        ],\n    },\n})\nfor option in response.map[\"variation\"][\"options\"]:\n    print(option[\"id\"], option[\"label\"], option[\"value\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.patchVariation(15, {\n    variation: {\n        options: [\n            {id: 201, label: 'Petite'},\n            {label: 'Extra Large', value: 'XL', order: 4},\n        ],\n    },\n});\nconsole.log(response.map.variation.options);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::patchVariation($client, 15, ['variation' => [\n    'options' => [\n        ['id' => 201, 'label' => 'Petite'],\n        ['label' => 'Extra Large', 'value' => 'XL', 'order' => 4],\n    ],\n]]);\n\nforeach ($response->map['variation']['options'] as $option) {\n    echo $option['id'], ' ', $option['label'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().patchVariation(15, Map.of(\"variation\", Map.of(\n        \"options\", List.of(\n                Map.of(\"id\", 201, \"label\", \"Petite\"),\n                Map.of(\"label\", \"Extra Large\", \"value\", \"XL\", \"order\", 4)))));\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nfor (Object row : (List<?>) variation.get(\"options\")) {\n    Map<?, ?> option = (Map<?, ?>) row;\n    System.out.println(option.get(\"id\") + \" \" + option.get(\"label\") + \" \" + option.get(\"value\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.PatchVariationAsync(15, new Dictionary<string, object?>\n{\n    [\"variation\"] = new Dictionary<string, object?>\n    {\n        [\"options\"] = new object[]\n        {\n            new Dictionary<string, object?> { [\"id\"] = 201, [\"label\"] = \"Petite\" },\n            new Dictionary<string, object?> { [\"label\"] = \"Extra Large\", [\"value\"] = \"XL\", [\"order\"] = 4 },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nforeach (var option in ((IReadOnlyList<object?>)variation[\"options\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{option[\"id\"]} {option[\"label\"]} {option[\"value\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.patchVariation(15, {\n  'variation': {\n    'options': [\n      {'id': 201, 'label': 'Petite'},\n      {'label': 'Extra Large', 'value': 'XL', 'order': 4},\n    ],\n  },\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nfor (final option in variation['options'] as List) {\n  print('${(option as Map)['id']} ${option['label']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().PatchVariation(ctx, 15, map[string]any{\"variation\": map[string]any{\"options\": []any{\n\tmap[string]any{\"id\": 201, \"label\": \"Petite\"},\n\tmap[string]any{\"label\": \"Extra Large\", \"value\": \"XL\", \"order\": 4},\n}}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variation\"].(map[string]any)[\"options\"].([]any) {\n\toption := row.(map[string]any)\n\tfmt.Println(option[\"id\"], option[\"label\"], option[\"value\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "variation"
+                ],
+                "properties": {
+                  "variation": {
+                    "$ref": "#/components/schemas/VariationInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Delete a variation type",
+        "operationId": "delete_variation",
+        "description": "Deletes the type permanently and returns `204` with no body. The type leaves the listing, and retrieving or deleting it again returns `404`. A type that has options is deleted only with `cascade=true`, which deletes its options too.",
+        "parameters": [
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variation type's `id`, from a listing or from the response to creating the type.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "cascade",
+            "in": "query",
+            "description": "Send `true` or `1` to delete the type's options with it. Without it, or with `false` or `0`, a type that has options is rejected with `409`. Any other value is rejected with `400` and the reason `invalid_boolean`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "400": {
+            "description": "`cascade` is not a boolean. The reason is `invalid_boolean`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No variation type has that `variation_id`, for example because you already deleted it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The type still has options and you did not send `cascade=true`. The message is `This variation type still has N option(s).`, and `details[0]` names the field `options` with the reason `in_use` and the message `send ?cascade=true to delete them with the type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/variations/15?cascade=true\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.delete_variation(15, {\"cascade\": True})\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.deleteVariation(15, {cascade: true});\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::deleteVariation($client, 15, ['cascade' => 'true']);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().deleteVariation(15, Map.of(\"cascade\", true));\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.DeleteVariationAsync(15, new Dictionary<string, object?> { [\"cascade\"] = true });\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations\n    .deleteVariation(15, queryParams: {'cascade': true});\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().DeleteVariation(ctx, 15, map[string]any{\"cascade\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/variations/{variation_id}/options/{variation_option_id}": {
+      "delete": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Delete a variation option",
+        "operationId": "delete_variation_option",
+        "description": "Deletes the option permanently and returns `204` with no body. The type keeps every other option as it was. You cannot delete a type's last option: to remove it, delete the type with [Delete a variation type](/api-reference/variations/delete-a-variation-type) and `cascade=true`.",
+        "parameters": [
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variation type's `id`, from a listing or from the response to creating the type.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "variation_option_id",
+            "in": "path",
+            "required": true,
+            "description": "The option's `id`, from the variation type's `options` list. The option must belong to the type you pass as `variation_id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "The type has no option with that `variation_option_id`, for example because the option belongs to another type. The message is `Variation option N not found on this variation type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The option is the type's last one. The message is `a variation type must keep at least one option`, and `details[0].code` is `last_option`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/variations/15/options/204\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.delete_variation_option(15, 204)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.deleteVariationOption(15, 204);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::deleteVariationOption($client, 15, 204);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().deleteVariationOption(15, 204);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.DeleteVariationOptionAsync(15, 204);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.deleteVariationOption(15, 204);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().DeleteVariationOption(ctx, 15, 204, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/products/{product_id}/variations": {
+      "get": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "List a product's variants",
+        "operationId": "list_product_variations",
+        "description": "Returns the product's variants in one call, with no paging, grouped under `variations`. Each group's `product_key` joins the product's variation type names with `/`, and each variant's `key` joins its option labels the same way. A product without variants returns `{\"variations\": []}`. Query parameters are ignored, and this path has no `HEAD`: it returns `404`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product's variant groups in `variations`. Each variant has nineteen fields, including its `variation_id`, which [Update a product's variants](/api-reference/variations/update-a-products-variants) takes in `variation_ids`. Prices arrive as whole numbers or decimals, such as `0` and `10.0`. On a product whose prices include tax, `base_price` and `sale_price` are net of tax. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationProductVariants"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No product has that `product_id`. The message is `Product not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/products/4321/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.list_product_variations(4321)\nfor group in response.map[\"variations\"]:\n    print(group[\"product_key\"])\n    for variant in group[\"variants\"]:\n        print(variant[\"variation_id\"], variant[\"key\"], variant[\"sku\"], variant[\"available\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.listProductVariations(4321);\nfor (const group of response.map.variations) {\n    for (const variant of group.variants) {\n        console.log(variant.variation_id, variant.name, variant.pricing.base_price);\n    }\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::listProductVariations($client, 4321);\n\nforeach ($response->map['variations'] as $group) {\n    foreach ($group['variants'] as $variant) {\n        echo $variant['variation_id'], ' ', $variant['key'], ' ', $variant['pricing']['base_price'], ' ', $variant['inventory']['quantity'], PHP_EOL;\n    }\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().listProductVariations(4321);\nfor (Object group : (List<?>) ((Map<?, ?>) response.getMap()).get(\"variations\")) {\n    System.out.println(((Map<?, ?>) group).get(\"product_key\"));\n    for (Object row : (List<?>) ((Map<?, ?>) group).get(\"variants\")) {\n        Map<?, ?> variant = (Map<?, ?>) row;\n        Map<?, ?> pricing = (Map<?, ?>) variant.get(\"pricing\");\n        Map<?, ?> inventory = (Map<?, ?>) variant.get(\"inventory\");\n        System.out.println(variant.get(\"variation_id\") + \" \" + variant.get(\"key\") + \" \"\n                + pricing.get(\"base_price\") + \" \" + inventory.get(\"quantity\"));\n    }\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.ListProductVariationsAsync(4321);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var group in ((IReadOnlyList<object?>)body[\"variations\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    Console.WriteLine(group[\"product_key\"]);\n    foreach (var variant in ((IReadOnlyList<object?>)group[\"variants\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n        Console.WriteLine($\"{variant[\"variation_id\"]} {variant[\"key\"]} {variant[\"available\"]}\");\n}\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.listProductVariations(4321);\nfor (final group in (response.map as Map)['variations'] as List) {\n  print((group as Map)['product_key']);\n  for (final variant in group['variants'] as List) {\n    print('${(variant as Map)['variation_id']} ${variant['key']} ${variant['sku']}');\n  }\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().ListProductVariations(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variations\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfor _, item := range group[\"variants\"].([]any) {\n\t\tvariant := item.(map[string]any)\n\t\tfmt.Println(group[\"product_key\"], variant[\"variation_id\"], variant[\"key\"], variant[\"available\"])\n\t}\n}\n"
+          }
+        ]
+      }
+    },
+    "/admin/products/{product_id}/variations/bulk": {
+      "patch": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Update a product's variants",
+        "operationId": "update_product_variations",
+        "description": "Send `variation_ids` and at least one of `available`, `base_price`, `cost_price`, `available_stock`, `min_order_quantity` and `max_order_quantity`, at the top level of the body with no wrapper. Every variant you name gets the values you send. If any entry in `variation_ids` is not a variant of this product, the whole request is rejected and nothing is written. `available_stock` sets the variant's `inventory.quantity` even when inventory tracking is off. Other body fields, and query parameters other than `response`, are ignored.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "response",
+            "in": "query",
+            "description": "`slim` (the default) returns each updated variant's `id` and `name`. `full` returns fourteen fields for each one. Any other value is rejected with `400`, the reason `invalid_enum` and the message `must be one of slim, full`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "slim",
+                "full"
+              ],
+              "example": "full"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. The `url` in a `full` entry returns `404` if you call it, and its `sale_price` and `is_on_sale` can differ from what [List a product's variants](/api-reference/variations/list-a-products-variants) returns for a product on sale: read the variant back there to check its values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationBulkResult"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "1 variations updated",
+                  "updated": [
+                    {
+                      "id": 91,
+                      "name": "Cotton T-Shirt"
+                    }
+                  ],
+                  "failed": []
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`variation_ids` is empty (reason `invalid_variation_ids`); an entry in `variation_ids` is not a variant of this product (message `variation N does not belong to product M`); the body sends none of the six fields (message `send at least one of available, base_price, cost_price, available_stock, min_order_quantity, max_order_quantity`); the body is not a JSON object (message `request body must be a JSON object`); or `response` is not `slim` or `full` (reason `invalid_enum`, message `must be one of slim, full`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/products/4321/variations/bulk\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"variation_ids\": [\n      91\n    ],\n    \"available\": true,\n    \"available_stock\": 12,\n    \"min_order_quantity\": 1,\n    \"max_order_quantity\": 5\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.update_product_variations(4321, {\n    \"variation_ids\": [91],\n    \"available\": True,\n    \"available_stock\": 12,\n    \"min_order_quantity\": 1,\n    \"max_order_quantity\": 5,\n})\nprint(response.map[\"message\"])\nfor variant in response.map[\"updated\"]:\n    print(variant[\"id\"], variant[\"name\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.updateProductVariations(4321, {\n    variation_ids: [91],\n    available: true,\n    available_stock: 12,\n    min_order_quantity: 1,\n    max_order_quantity: 5,\n});\nconsole.log(response.map.message);\nfor (const variant of response.map.updated) {\n    console.log(variant.id, variant.name);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::updateProductVariations($client, 4321, [\n    'variation_ids' => [91], 'available' => true, 'available_stock' => 12,\n    'min_order_quantity' => 1, 'max_order_quantity' => 5,\n]);\n\necho $response->map['message'], PHP_EOL;\nforeach ($response->map['updated'] as $variant) {\n    echo $variant['id'], ' ', $variant['name'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().updateProductVariations(4321, Map.of(\n        \"variation_ids\", List.of(91), \"available\", true, \"available_stock\", 12,\n        \"min_order_quantity\", 1, \"max_order_quantity\", 5));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"message\"));\nfor (Object row : (List<?>) body.get(\"updated\")) {\n    Map<?, ?> variant = (Map<?, ?>) row;\n    System.out.println(variant.get(\"id\") + \" \" + variant.get(\"name\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.UpdateProductVariationsAsync(4321, new Dictionary<string, object?>\n{\n    [\"variation_ids\"] = new object[] { 91 }, [\"available\"] = true, [\"available_stock\"] = 12,\n    [\"min_order_quantity\"] = 1, [\"max_order_quantity\"] = 5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"message\"]);\nforeach (var variant in ((IReadOnlyList<object?>)body[\"updated\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{variant[\"id\"]} {variant[\"name\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.updateProductVariations(4321, {\n  'variation_ids': [91],\n  'available': true,\n  'available_stock': 12,\n  'min_order_quantity': 1,\n  'max_order_quantity': 5,\n});\nfinal body = response.map as Map;\nprint(body['message']);\nfor (final variant in body['updated'] as List) {\n  print('${(variant as Map)['id']} ${variant['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().UpdateProductVariations(ctx, 4321, map[string]any{\n\t\"variation_ids\":      []any{91},\n\t\"available\":          true,\n\t\"available_stock\":    12,\n\t\"min_order_quantity\": 1,\n\t\"max_order_quantity\": 5,\n}, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"message\"], body[\"updated\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VariationBulkInput"
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/countries": {
       "get": {
         "tags": [
@@ -56794,6 +58080,682 @@
                         "string"
                       ],
                       "description": "The value you sent, such as `abc` or `created_on`. On the `out_of_range` error for `limit=0` it is the number `0`; on the `invalid_integer` error for `limit=-1` it is the string `\"-1\"`. On a `name` rejected for its length, it is the number of characters you sent. Absent on a parameter the listing does not accept and on a missing `name`."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "Variation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The variation type's `id`, set by the store. Pass it as `variation_id` in a path. Read-only."
+          },
+          "name": {
+            "type": "string",
+            "description": "The type's name, 2 to 100 characters. No two types have the same name, in any letter case."
+          },
+          "standard": {
+            "type": "string",
+            "enum": [
+              "text",
+              "color",
+              "image"
+            ],
+            "description": "The kind of type: `text`, `color` or `image`. It cannot change after the type is created."
+          },
+          "disposable": {
+            "type": "boolean",
+            "description": "Read-only. `false` on a type you create."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariationOption"
+            },
+            "description": "The type's options."
+          }
+        }
+      },
+      "VariationOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The option's `id`, set by the store. Pass it as `variation_option_id` to delete the option, or send it as the option's `id` in a replace or update to change the option."
+          },
+          "label": {
+            "type": "string",
+            "description": "The option's label, unique within its type."
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The option's value. On a `color` type, a colour such as `#ff0000` or `rgb(0,0,255)`. `null` on an `image` option."
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999,
+            "description": "The option's order number, from `0` to `999`."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "`true` on the type's default option. At most one option has it."
+          },
+          "image": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/VariationOptionImage"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The option's picture on an `image` type, or `null` on a `text` or `color` type."
+          }
+        }
+      },
+      "VariationOptionImage": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The full address of the stored picture."
+          },
+          "file_name": {
+            "type": "string",
+            "description": "The `filename` you sent with the picture."
+          }
+        }
+      },
+      "VariationInput": {
+        "type": "object",
+        "description": "Send these fields inside `variation`. Create requires `name`, `standard` and `options`; replace requires `name` and `options`; update takes any of them.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "description": "2 to 100 characters, trimmed. A name another type has, in any letter case, is rejected with `409`."
+          },
+          "standard": {
+            "type": "string",
+            "enum": [
+              "text",
+              "color",
+              "image"
+            ],
+            "description": "`text`, `color` or `image`, in any letter case; stored in lower case. Leave it out on replace and update, or send the type's own value: a different value is rejected with `400`."
+          },
+          "options": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/VariationOptionInput"
+            },
+            "description": "1 to 1000 options. On replace, this is the full list: options you leave out are deleted."
+          }
+        }
+      },
+      "VariationOptionInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Send the `id` of one of this type's options to change that option. Leave it out to add a new option."
+          },
+          "label": {
+            "type": "string",
+            "description": "Unique within the type. Trimmed."
+          },
+          "value": {
+            "type": "string",
+            "description": "Trimmed. On a `color` type, a hex value, `rgb()`, `rgba()`, `hsl()`, `hsla()`, `hsv()` or a colour name. Leave it out on an `image` option."
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999,
+            "description": "From `0` to `999`."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "Optional. `true` makes this the type's default option and takes the flag off the option that had it."
+          },
+          "image": {
+            "$ref": "#/components/schemas/VariationOptionImageInput"
+          }
+        }
+      },
+      "VariationOptionImageInput": {
+        "type": "object",
+        "description": "An option's picture on an `image` type. The response returns it as `image.url` and `image.file_name`.",
+        "properties": {
+          "base64": {
+            "type": "string",
+            "description": "The picture's file content, base64-encoded."
+          },
+          "filename": {
+            "type": "string",
+            "description": "The picture's file name, such as `swatch.png`."
+          }
+        }
+      },
+      "VariationPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of variation types that match your request."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, or `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of types skipped before this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when `offset` is above `0`. It is `false` when `offset` is past the last type."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there is a page after this one."
+          }
+        }
+      },
+      "VariationFieldMetadata": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Describes the five fields of a variation type, keyed by field name. Each entry gives the field's `type`. `id` and `disposable` have `read_only` set to `true`. `standard` lists `text`, `color` and `image` in `values`. `options` has `min_items` `1`, `max_items` `1000` and a `fields` block that describes the six option fields."
+      },
+      "VariationProductVariants": {
+        "type": "object",
+        "properties": {
+          "variations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariationProductVariantGroup"
+            },
+            "description": "The product's variant groups. Empty for a product without variants."
+          }
+        }
+      },
+      "VariationProductVariantGroup": {
+        "type": "object",
+        "properties": {
+          "product_key": {
+            "type": "string",
+            "description": "The product's variation type names joined with `/`, such as `Size/Colour`."
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariationProductVariant"
+            }
+          }
+        }
+      },
+      "VariationProductVariant": {
+        "type": "object",
+        "properties": {
+          "variation_id": {
+            "type": "integer",
+            "description": "Identifies the variant. It is not a variation type's `id`. Send it in `variation_ids` to update the variant."
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the variant is available."
+          },
+          "is_base": {
+            "type": "boolean"
+          },
+          "key": {
+            "type": "string",
+            "description": "The variant's option labels joined with `/`, such as `Small/Red`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The variant's name."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The variant's SKU."
+          },
+          "custom_sku": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "country_of_origin": {
+            "type": "string"
+          },
+          "hs_code": {
+            "type": "string"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/VariationProductVariantPricing"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/VariationProductVariantInventory"
+          },
+          "ordering": {
+            "$ref": "#/components/schemas/VariationProductVariantOrdering"
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/VariationProductVariantDimensions"
+          },
+          "badges": {
+            "$ref": "#/components/schemas/VariationProductVariantBadges"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariationProductVariantImage"
+            },
+            "description": "The variant's images."
+          }
+        }
+      },
+      "VariationProductVariantPricing": {
+        "type": "object",
+        "description": "On a product whose prices include tax, `base_price` and `sale_price` are the stored prices divided by the tax rate and rounded to the cent.",
+        "properties": {
+          "base_price": {
+            "type": "number",
+            "description": "The variant's base price."
+          },
+          "cost_price": {
+            "type": "number",
+            "description": "The variant's cost price."
+          },
+          "sale_price": {
+            "type": "number",
+            "description": "The variant's sale price."
+          },
+          "is_on_sale": {
+            "type": "boolean",
+            "description": "Whether the variant is on sale."
+          },
+          "sale_amount_type": {
+            "type": "string"
+          },
+          "hide_price": {
+            "type": "boolean"
+          },
+          "is_call_for_price": {
+            "type": "boolean"
+          },
+          "expect_to_pay": {
+            "$ref": "#/components/schemas/VariationProductVariantExpectToPay"
+          },
+          "tiered_pricing": {
+            "type": "object"
+          }
+        }
+      },
+      "VariationProductVariantExpectToPay": {
+        "type": "object",
+        "properties": {
+          "is_enabled": {
+            "type": "boolean"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "VariationProductVariantInventory": {
+        "type": "object",
+        "properties": {
+          "is_enabled": {
+            "type": "boolean",
+            "description": "Whether inventory tracking is on for the variant."
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "The variant's stock. `available_stock` in an update sets it, even when tracking is off."
+          },
+          "low_stock_threshold": {
+            "type": "integer"
+          },
+          "is_sold_out": {
+            "type": "boolean"
+          },
+          "sold_out_label": {
+            "type": "string"
+          }
+        }
+      },
+      "VariationProductVariantOrdering": {
+        "type": "object",
+        "properties": {
+          "min_quantity": {
+            "type": "integer",
+            "description": "The smallest quantity a customer can order."
+          },
+          "max_quantity": {
+            "type": "integer",
+            "description": "The largest quantity a customer can order. `0` means no maximum."
+          },
+          "multiple_of": {
+            "type": "integer"
+          },
+          "is_multiple_quantity_required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VariationProductVariantDimensions": {
+        "type": "object",
+        "properties": {
+          "length": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "weight": {
+            "type": [
+              "number",
+              "string"
+            ],
+            "description": "A number, or a numeric string such as `\"26.455471\"`. Read both forms."
+          }
+        }
+      },
+      "VariationProductVariantImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The image's `id`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The full address of the image."
+          },
+          "thumbnail": {
+            "type": "string",
+            "description": "The full address of the image's thumbnail."
+          }
+        }
+      },
+      "VariationProductVariantBadges": {
+        "type": "object",
+        "properties": {
+          "is_featured": {
+            "type": "boolean"
+          },
+          "is_new_arrival": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VariationBulkInput": {
+        "type": "object",
+        "required": [
+          "variation_ids"
+        ],
+        "description": "Send these fields at the top level of the body, with no wrapper. Send `variation_ids` and at least one other field. Other fields are ignored.",
+        "properties": {
+          "variation_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": [
+                "integer",
+                "string"
+              ]
+            },
+            "description": "The `variation_id` of each variant to update, as numbers or numeric strings such as `\"22\"`. Every one must be a variant of the product whose `product_id` is in the path."
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the variants are available."
+          },
+          "base_price": {
+            "type": "number",
+            "description": "The base price to store, as sent. On a product whose prices include tax, send the price including tax."
+          },
+          "cost_price": {
+            "type": "number",
+            "description": "The cost price to store, as sent."
+          },
+          "available_stock": {
+            "type": "integer",
+            "description": "Sets each variant's `inventory.quantity`, even when inventory tracking is off."
+          },
+          "min_order_quantity": {
+            "type": "integer",
+            "description": "Sets each variant's `ordering.min_quantity`."
+          },
+          "max_order_quantity": {
+            "type": "integer",
+            "description": "Sets each variant's `ordering.max_quantity`. `0` means no maximum."
+          }
+        }
+      },
+      "VariationBulkResult": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`success`."
+          },
+          "message": {
+            "type": "string",
+            "description": "The number of variants updated, such as `1 variations updated`."
+          },
+          "updated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariationBulkUpdate"
+            },
+            "description": "One entry per variant written."
+          },
+          "failed": {
+            "type": "array",
+            "items": {},
+            "description": "An empty list. When an entry in `variation_ids` is not a variant of the product, the whole request is rejected with `400` instead."
+          }
+        }
+      },
+      "VariationBulkUpdate": {
+        "type": "object",
+        "description": "One updated variant. Only `id` and `name` unless you send `response=full`.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The variant's `variation_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The variant's name."
+          },
+          "sku": {
+            "type": "string"
+          },
+          "custom_sku": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` where [List a product's variants](/api-reference/variations/list-a-products-variants) returns `\"\"`."
+          },
+          "barcode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` where [List a product's variants](/api-reference/variations/list-a-products-variants) returns `\"\"`."
+          },
+          "country_of_origin": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` where [List a product's variants](/api-reference/variations/list-a-products-variants) returns `\"\"`."
+          },
+          "hs_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` where [List a product's variants](/api-reference/variations/list-a-products-variants) returns `\"\"`."
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariationBulkOption"
+            },
+            "description": "The options that make up the variant."
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/VariationBulkPricing"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/VariationBulkInventory"
+          },
+          "ordering": {
+            "$ref": "#/components/schemas/VariationBulkOrdering"
+          },
+          "transaction_no": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "A path such as `/api/v4/admin/products/4321/variations/91`. Calling it returns `404` with the message `No such endpoint`."
+          }
+        }
+      },
+      "VariationBulkOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The variation option's `id`."
+          },
+          "type": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string",
+            "description": "The option's label."
+          }
+        }
+      },
+      "VariationBulkPricing": {
+        "type": "object",
+        "description": "`base_price` is the price as stored, including tax on a product whose prices include tax. `sale_price` and `is_on_sale` can differ from what [List a product's variants](/api-reference/variations/list-a-products-variants) returns for a product on sale.",
+        "properties": {
+          "base_price": {
+            "type": "number"
+          },
+          "cost_price": {
+            "type": "number"
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "is_on_sale": {
+            "type": "boolean"
+          }
+        }
+      },
+      "VariationBulkInventory": {
+        "type": "object",
+        "properties": {
+          "is_enabled": {
+            "type": "boolean"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "low_stock_threshold": {
+            "type": "integer"
+          }
+        }
+      },
+      "VariationBulkOrdering": {
+        "type": "object",
+        "properties": {
+          "min_quantity": {
+            "type": "integer"
+          },
+          "max_quantity": {
+            "type": "integer",
+            "description": "`0` means no maximum."
+          }
+        }
+      },
+      "VariationError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Variation not found`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or parameter, or an empty list.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_field`, `invalid_enum` or `last_option`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Why the field or parameter was rejected, or `null`."
+                    },
+                    "value": {
+                      "description": "The value you sent, when a value was rejected, such as `foo` for `standard`."
                     }
                   }
                 }

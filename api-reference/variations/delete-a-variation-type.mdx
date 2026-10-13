@@ -1,0 +1,9 @@
+---
+title: "Delete a variation type"
+description: "Deletes a variation type permanently. Send `cascade=true` to delete its options with it."
+openapi: "DELETE /admin/variations/{variation_id}"
+---
+
+Deletes the type permanently and returns `204` with no body. The type leaves the listing, and retrieving or deleting it again returns `404`. A type that has options is deleted only with `cascade=true`, which deletes its options too.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,9 @@
+---
+title: "Check a variation type"
+description: "Returns headers only for one variation type, including the same `ETag` a retrieve returns."
+openapi: "HEAD /admin/variations/{variation_id}"
+---
+
+Returns `200` with headers only and no body. The `ETag` header has the same value that [Retrieve a variation type](/api-reference/variations/retrieve-a-variation-type) returns for the type, so you can check whether the type has changed without downloading it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

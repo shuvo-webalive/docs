@@ -1,0 +1,50 @@
+{
+  "sdk": "python",
+  "module": "variations",
+  "endpoints": {
+    "list_variations": {
+      "function": "list_variations",
+      "code": "response = client.variations.list_variations({\"search\": \"size\", \"standard\": \"text\"})\nfor variation in response.map[\"variations\"]:\n    print(variation[\"id\"], variation[\"name\"], len(variation[\"options\"]))\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_variations": {
+      "function": "head_variations",
+      "code": "response = client.variations.head_variations()\nprint(response.status_code)\n"
+    },
+    "create_variation": {
+      "function": "create_variation",
+      "code": "response = client.variations.create_variation({\n    \"variation\": {\n        \"name\": \"Shirt Size\",\n        \"standard\": \"text\",\n        \"options\": [\n            {\"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": True},\n            {\"label\": \"Medium\", \"value\": \"M\", \"order\": 2},\n        ],\n    },\n})\nvariation = response.map[\"variation\"]\nprint(variation[\"id\"], [option[\"id\"] for option in variation[\"options\"]])\n"
+    },
+    "get_variation": {
+      "function": "get_variation",
+      "code": "response = client.variations.get_variation(12)\nvariation = response.map[\"variation\"]\nprint(variation[\"name\"], variation[\"standard\"])\nfor option in variation[\"options\"]:\n    print(option[\"id\"], option[\"label\"], option[\"value\"], option[\"default\"])\n"
+    },
+    "head_variation": {
+      "function": "head_variation",
+      "code": "response = client.variations.head_variation(12)\nprint(response.status_code)\n"
+    },
+    "update_variation": {
+      "function": "update_variation",
+      "code": "response = client.variations.update_variation(15, {\n    \"variation\": {\n        \"name\": \"Shirt Size\",\n        \"options\": [\n            {\"id\": 201, \"label\": \"Small\", \"value\": \"S\", \"order\": 1, \"default\": True},\n            {\"label\": \"Large\", \"value\": \"L\", \"order\": 3},\n        ],\n    },\n})\nfor option in response.map[\"variation\"][\"options\"]:\n    print(option[\"id\"], option[\"label\"], option[\"value\"])\n"
+    },
+    "patch_variation": {
+      "function": "patch_variation",
+      "code": "response = client.variations.patch_variation(15, {\n    \"variation\": {\n        \"options\": [\n            {\"id\": 201, \"label\": \"Petite\"},\n            {\"label\": \"Extra Large\", \"value\": \"XL\", \"order\": 4},\n        ],\n    },\n})\nfor option in response.map[\"variation\"][\"options\"]:\n    print(option[\"id\"], option[\"label\"], option[\"value\"])\n"
+    },
+    "delete_variation": {
+      "function": "delete_variation",
+      "code": "response = client.variations.delete_variation(15, {\"cascade\": True})\nprint(response.status_code)\n"
+    },
+    "delete_variation_option": {
+      "function": "delete_variation_option",
+      "code": "response = client.variations.delete_variation_option(15, 204)\nprint(response.status_code)\n"
+    },
+    "list_product_variations": {
+      "function": "list_product_variations",
+      "code": "response = client.variations.list_product_variations(4321)\nfor group in response.map[\"variations\"]:\n    print(group[\"product_key\"])\n    for variant in group[\"variants\"]:\n        print(variant[\"variation_id\"], variant[\"key\"], variant[\"sku\"], variant[\"available\"])\n"
+    },
+    "update_product_variations": {
+      "function": "update_product_variations",
+      "code": "response = client.variations.update_product_variations(4321, {\n    \"variation_ids\": [91],\n    \"available\": True,\n    \"available_stock\": 12,\n    \"min_order_quantity\": 1,\n    \"max_order_quantity\": 5,\n})\nprint(response.map[\"message\"])\nfor variant in response.map[\"updated\"]:\n    print(variant[\"id\"], variant[\"name\"])\n"
+    }
+  }
+}

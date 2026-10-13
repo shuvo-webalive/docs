@@ -1,0 +1,62 @@
+---
+title: "Variations"
+sidebarTitle: "Overview"
+description: "List, create, replace, update and delete variation types and their options, and read and update the variants of a product."
+---
+
+The Variations API has eleven endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`.
+
+<Warning>
+  **Replacing a variation type deletes every option you leave out of the body.** `PUT` on a type
+  keeps only the options you send: an option sent with its `id` is changed, an option sent without
+  an `id` is added, and every other option is deleted. To change or add options without deleting any,
+  use [Update a variation type](/api-reference/variations/update-a-variation-type), which changes only what you send.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List variation types](/api-reference/variations/list-variation-types) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/variations` | Returns variation types with their options, by ascending `id`, 20 per call unless you send `limit`. |
+| [Check the variation types list](/api-reference/variations/check-the-variation-types-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/variations` | Checks that the variation types list is reachable. Returns headers only, with no body. |
+| [Create a variation type](/api-reference/variations/create-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/variations` | Creates a variation type with its options and returns it with the type's `id`. |
+| [Retrieve a variation type](/api-reference/variations/retrieve-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/variations/{variation_id}` | Returns the variation type whose `id` you pass as `variation_id`, with its options. |
+| [Check a variation type](/api-reference/variations/check-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/variations/{variation_id}` | Returns headers only for one variation type, including the same `ETag` a retrieve returns. |
+| [Replace a variation type](/api-reference/variations/replace-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/variations/{variation_id}` | Replaces a variation type's name and option list. Options you leave out are deleted. |
+| [Update a variation type](/api-reference/variations/update-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/variations/{variation_id}` | Changes only the fields and options you send in a variation type and keeps the rest. |
+| [Delete a variation type](/api-reference/variations/delete-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/variations/{variation_id}` | Deletes a variation type permanently. Send `cascade=true` to delete its options with it. |
+| [Delete a variation option](/api-reference/variations/delete-a-variation-option) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/variations/{variation_id}/options/{variation_option_id}` | Deletes one option from a variation type and leaves the type's other options unchanged. |
+| [List a product's variants](/api-reference/variations/list-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/admin/products/{product_id}/variations` | Returns every variant of the product whose `id` you pass as `product_id`. |
+| [Update a product's variants](/api-reference/variations/update-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/admin/products/{product_id}/variations/bulk` | Sets availability, prices, stock or order quantities on several variants of one product. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap every variation type write in `variation`.** Create, replace and update all take
+  `{"variation": {...}}`. A bare record is rejected with `400`: each top-level key is reported with
+  the reason `unknown_field`, and `variation` with the reason `required`.
+  [Update a product's variants](/api-reference/variations/update-a-products-variants) is the opposite: send its fields at the top level
+  of the body, with no wrapper.
+- **Delete a variation type with `cascade=true`.** A type you create always has at least one option,
+  and you cannot delete a type's last option on its own. Without `cascade=true`,
+  [Delete a variation type](/api-reference/variations/delete-a-variation-type) rejects a type that has options with `409` and the
+  message `This variation type still has N option(s).` With `cascade=true`, the type and its options
+  are deleted together.
+- **`variation_ids` takes each variant's `variation_id`, not a variation type's `id`.** Each variant that
+  [List a product's variants](/api-reference/variations/list-a-products-variants) returns has its own `variation_id`.
+  Send those values in `variation_ids` to [Update a product's variants](/api-reference/variations/update-a-products-variants). A variant
+  of another product is rejected with `400` and nothing is written.
+- **On a product whose prices include tax, the variant prices you read are net of tax.**
+  [List a product's variants](/api-reference/variations/list-a-products-variants) returns each variant's `base_price` and
+  `sale_price` divided by the tax rate and rounded to the cent: a stored `90.99` reads `82.72`.
+  [Update a product's variants](/api-reference/variations/update-a-products-variants) stores the price you send as it is. A price you read
+  and write back is therefore not the price that was stored: send the price including tax.
+- **The listing returns 20 types per call unless you send `limit`.** `limit` takes `1` to `100`. To get
+  more, send a higher `offset`, or the next `page`, while `pagination.has_next` is `true`. The listing
+  accepts only `search`, `standard`, `limit`, `offset`, `page` and `field_metadata`: any other query
+  parameter, such as `q` or `sort`, is rejected with `400` and the reason `unknown_parameter`.

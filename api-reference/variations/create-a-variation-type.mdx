@@ -1,0 +1,9 @@
+---
+title: "Create a variation type"
+description: "Creates a variation type with its options and returns it with the type's `id`."
+openapi: "POST /admin/variations"
+---
+
+Wrap the type in `variation` and send `name`, `standard` and at least one option. The response gives the type's `id`, which the other calls take as `variation_id`, and each option's own `id`. `name` and each option's `label` and `value` are trimmed, and `standard` is stored in lower case. For an `image` type, send each option's picture as `image` with `base64` and `filename`, and no `value`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,50 @@
+{
+  "sdk": "dart",
+  "module": "variations",
+  "endpoints": {
+    "list_variations": {
+      "function": "listVariations",
+      "code": "final response = await client.variations\n    .listVariations(queryParams: {'search': 'size', 'standard': 'text'});\nfinal body = response.map as Map;\nfor (final variation in body['variations'] as List) {\n  print('${(variation as Map)['id']} ${variation['name']} ${variation['standard']}');\n}\nprint((body['pagination'] as Map)['total']);"
+    },
+    "head_variations": {
+      "function": "headVariations",
+      "code": "final response = await client.variations.headVariations();\nprint(response.statusCode);"
+    },
+    "create_variation": {
+      "function": "createVariation",
+      "code": "final response = await client.variations.createVariation({\n  'variation': {\n    'name': 'Shirt Size',\n    'standard': 'text',\n    'options': [\n      {'label': 'Small', 'value': 'S', 'order': 1, 'default': true},\n      {'label': 'Medium', 'value': 'M', 'order': 2},\n    ],\n  },\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nprint('${variation['id']} ${variation['options']}');"
+    },
+    "get_variation": {
+      "function": "getVariation",
+      "code": "final response = await client.variations.getVariation(12);\nfinal variation = (response.map as Map)['variation'] as Map;\nprint('${variation['name']} ${variation['standard']}');\nfor (final option in variation['options'] as List) {\n  print('${(option as Map)['id']} ${option['label']} ${option['value']}');\n}"
+    },
+    "head_variation": {
+      "function": "headVariation",
+      "code": "final response = await client.variations.headVariation(12);\nprint(response.statusCode);\nprint(response.headers['etag']);"
+    },
+    "update_variation": {
+      "function": "updateVariation",
+      "code": "final response = await client.variations.updateVariation(15, {\n  'variation': {\n    'name': 'Shirt Size',\n    'options': [\n      {'id': 201, 'label': 'Small', 'value': 'S', 'order': 1, 'default': true},\n      {'label': 'Large', 'value': 'L', 'order': 3},\n    ],\n  },\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nprint(variation['options']);"
+    },
+    "patch_variation": {
+      "function": "patchVariation",
+      "code": "final response = await client.variations.patchVariation(15, {\n  'variation': {\n    'options': [\n      {'id': 201, 'label': 'Petite'},\n      {'label': 'Extra Large', 'value': 'XL', 'order': 4},\n    ],\n  },\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nfor (final option in variation['options'] as List) {\n  print('${(option as Map)['id']} ${option['label']}');\n}"
+    },
+    "delete_variation": {
+      "function": "deleteVariation",
+      "code": "final response = await client.variations\n    .deleteVariation(15, queryParams: {'cascade': true});\nprint(response.statusCode);"
+    },
+    "delete_variation_option": {
+      "function": "deleteVariationOption",
+      "code": "final response = await client.variations.deleteVariationOption(15, 204);\nprint(response.statusCode);"
+    },
+    "list_product_variations": {
+      "function": "listProductVariations",
+      "code": "final response = await client.variations.listProductVariations(4321);\nfor (final group in (response.map as Map)['variations'] as List) {\n  print((group as Map)['product_key']);\n  for (final variant in group['variants'] as List) {\n    print('${(variant as Map)['variation_id']} ${variant['key']} ${variant['sku']}');\n  }\n}"
+    },
+    "update_product_variations": {
+      "function": "updateProductVariations",
+      "code": "final response = await client.variations.updateProductVariations(4321, {\n  'variation_ids': [91],\n  'available': true,\n  'available_stock': 12,\n  'min_order_quantity': 1,\n  'max_order_quantity': 5,\n});\nfinal body = response.map as Map;\nprint(body['message']);\nfor (final variant in body['updated'] as List) {\n  print('${(variant as Map)['id']} ${variant['name']}');\n}"
+    }
+  }
+}
