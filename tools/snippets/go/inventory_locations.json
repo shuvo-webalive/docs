@@ -26,6 +26,10 @@
       "function": "UpdateInventoryLocation",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().UpdateInventoryLocation(ctx, 19, map[string]any{\n\t\"name\":    \"Perth Warehouse\",\n\t\"address\": \"10 Example Street, Perth WA 6000\",\n\t\"active\":  true,\n\t\"default\": false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"address\"], location[\"active\"], location[\"default\"])"
     },
+    "patch_inventory_location": {
+      "function": "PatchInventoryLocation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().PatchInventoryLocation(ctx, 19, map[string]any{\n\t\"address\": \"12 Example Street, Perth WA 6000\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"address\"], location[\"active\"])"
+    },
     "delete_inventory_location": {
       "function": "DeleteInventoryLocation",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().DeleteInventoryLocation(ctx, 19, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"

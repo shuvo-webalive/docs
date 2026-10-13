@@ -26,6 +26,10 @@
       "function": "updateInventoryLocation",
       "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::updateInventoryLocation($client, 19, [\n    'name' => 'Perth Warehouse',\n    'address' => '10 Example Street, Perth WA 6000',\n    'active' => true,\n    'default' => false,\n]);\n\necho $response->map['inventory_location']['address'], PHP_EOL;"
     },
+    "patch_inventory_location": {
+      "function": "patchInventoryLocation",
+      "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::patchInventoryLocation($client, 19, [\n    'address' => '12 Example Street, Perth WA 6000',\n]);\n\necho $response->map['inventory_location']['address'], PHP_EOL;"
+    },
     "delete_inventory_location": {
       "function": "deleteInventoryLocation",
       "code": "use WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$response = InventoryLocations::deleteInventoryLocation($client, 19);\n\necho $response->statusCode, PHP_EOL;"

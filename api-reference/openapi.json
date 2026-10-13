@@ -24272,6 +24272,144 @@
           }
         }
       },
+      "patch": {
+        "tags": [
+          "Inventory locations"
+        ],
+        "summary": "Update an inventory location",
+        "operationId": "patch_inventory_location",
+        "description": "Send only the fields you want to change, at the top level of the body: `name`, `address`, `active` or `default`. Fields you leave out keep their values, and `\"address\": null` clears the address. `\"default\": true` makes this location the default and active, even if you also send `\"active\": false`, and `\"default\": false` on the default location is rejected with `409`. Send an `If-Match` header if you want the call rejected with `409` when the location changed since you read it.",
+        "parameters": [
+          {
+            "name": "inventory_location_id",
+            "in": "path",
+            "required": true,
+            "description": "The inventory location's `id`, from a listing or from the response to creating the location.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "Optional. The location's current `ETag`, such as the one returned by your last update to it. If the location changed since then, the call is rejected with `409`.",
+            "schema": {
+              "type": "string",
+              "example": "\"5d41402abc4b2a76\""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The inventory location after the change, with an `ETag` header. Fields you did not send keep their values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "inventory_location": {
+                      "$ref": "#/components/schemas/InventoryLocation"
+                    }
+                  }
+                },
+                "example": {
+                  "inventory_location": {
+                    "id": 19,
+                    "name": "Perth Warehouse",
+                    "address": "12 Example Street, Perth WA 6000",
+                    "active": true,
+                    "default": false,
+                    "created_at": "2026-09-24T09:15:02",
+                    "updated_at": "2026-09-24T09:22:15"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is `{}`: the message is `send at least one field to change`. Or the body wraps the fields in `inventory_location` or has a field the store does not accept (reason `unknown_field`); `name` is `null` or blank (message `name: must be 1 to 250 characters`); the body sends `id` (message `id: must not be sent; the location is the one in the URL`); or `active` or `default` is not a boolean (reason `invalid_boolean`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryLocationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No inventory location has that `inventory_location_id`. The message is `Inventory location not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryLocationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "You sent `\"default\": false` for the default location: the message is `the default inventory location can not be un-set; make another location the default instead`. Or your `If-Match` value is not the location's current `ETag`: the message is `The inventory location changed since it was read - fetch it again and retry.`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryLocationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/inventory_locations/19\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"address\": \"12 Example Street, Perth WA 6000\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.inventory_locations.patch_inventory_location(19, {\n    \"address\": \"12 Example Street, Perth WA 6000\",\n})\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"address\"], location[\"active\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.inventoryLocations.patchInventoryLocation(19, {\n    address: '12 Example Street, Perth WA 6000',\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\InventoryLocations\\InventoryLocations;\n\n$client = ClientRegistry::buildClient();\n\n$response = InventoryLocations::patchInventoryLocation($client, 19, [\n    'address' => '12 Example Street, Perth WA 6000',\n]);\n\necho $response->map['inventory_location']['address'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.inventoryLocations().patchInventoryLocation(19, Map.of(\n        \"address\", \"12 Example Street, Perth WA 6000\"));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.InventoryLocations.PatchInventoryLocationAsync(19, new Dictionary<string, object?>\n{\n    [\"address\"] = \"12 Example Street, Perth WA 6000\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar inventoryLocation = (IReadOnlyDictionary<string, object?>)body[\"inventory_location\"]!;\nConsole.WriteLine($\"{inventoryLocation[\"name\"]} {inventoryLocation[\"address\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.inventoryLocations.patchInventoryLocation(19, {\n  'address': '12 Example Street, Perth WA 6000',\n});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['address']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.InventoryLocations().PatchInventoryLocation(ctx, 19, map[string]any{\n\t\"address\": \"12 Example Street, Perth WA 6000\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"address\"], location[\"active\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryLocationPatchInput"
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Inventory locations"
@@ -52253,6 +52391,34 @@
           "default": {
             "type": "boolean",
             "description": "Send `true` to make this location the default; the location that had the flag loses it. Defaults to `false` on create. A replace without it keeps the current value, and `false` on the default location is rejected with `409`."
+          }
+        }
+      },
+      "InventoryLocationPatchInput": {
+        "type": "object",
+        "minProperties": 1,
+        "description": "Send at least one of these fields, at the top level of the body. Fields you leave out keep their values. Any other field, `id` included, is rejected with `400`.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 250,
+            "description": "1 to 250 characters. `null` is rejected with `400`."
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Free text. `null` clears the address."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "`true` activates the location and `false` deactivates it. A value that is not a boolean is rejected with `400`."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "Send `true` to make this location the default; it also becomes active, and the location that had the flag loses it. `false` on the default location is rejected with `409`."
           }
         }
       },

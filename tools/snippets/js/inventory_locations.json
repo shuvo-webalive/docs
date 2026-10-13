@@ -26,6 +26,10 @@
       "function": "updateInventoryLocation",
       "code": "const response = await client.inventoryLocations.updateInventoryLocation(19, {\n    name: 'Perth Warehouse',\n    address: '10 Example Street, Perth WA 6000',\n    active: true,\n    default: false,\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.address, inventoryLocation.active, inventoryLocation.default);\n"
     },
+    "patch_inventory_location": {
+      "function": "patchInventoryLocation",
+      "code": "const response = await client.inventoryLocations.patchInventoryLocation(19, {\n    address: '12 Example Street, Perth WA 6000',\n});\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.active);\n"
+    },
     "delete_inventory_location": {
       "function": "deleteInventoryLocation",
       "code": "const response = await client.inventoryLocations.deleteInventoryLocation(19);\nconsole.log(response.statusCode);\n"

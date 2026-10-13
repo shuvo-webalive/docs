@@ -26,6 +26,10 @@
       "function": "updateInventoryLocation",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().updateInventoryLocation(19, Map.of(\n        \"name\", \"Perth Warehouse\", \"address\", \"10 Example Street, Perth WA 6000\",\n        \"active\", true, \"default\", false));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\nSystem.out.println(location.get(\"active\") + \" \" + location.get(\"default\"));"
     },
+    "patch_inventory_location": {
+      "function": "patchInventoryLocation",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().patchInventoryLocation(19, Map.of(\n        \"address\", \"12 Example Street, Perth WA 6000\"));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));"
+    },
     "delete_inventory_location": {
       "function": "deleteInventoryLocation",
       "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.inventoryLocations().deleteInventoryLocation(19);\nSystem.out.println(response.getStatusCode());"
