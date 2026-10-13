@@ -1,0 +1,9 @@
+---
+title: "List countries"
+description: "Returns up to 20 countries per call, or the `limit` you send, in `id` order."
+openapi: "GET /admin/countries"
+---
+
+Returns your store's countries in ascending `id` order, 20 per call unless you send `limit`. Send `code`, `name` or `id` to find one country by its exact value, or `search` to match part of a `name` or `code`; filters you send together must all match. Send `sort` and `order` to change the order. `dir`, `q`, `field_metadata` and other parameters the listing does not know, except `page`, are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

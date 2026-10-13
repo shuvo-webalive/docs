@@ -1,0 +1,38 @@
+{
+  "sdk": "java",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "listCountries",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.countries().listCountries(Map.of(\"search\", \"aus\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"countries\")) {\n    Map<?, ?> country = (Map<?, ?>) row;\n    System.out.println(country.get(\"id\") + \" \" + country.get(\"code\") + \" \" + country.get(\"name\") + \" \" + country.get(\"state_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "head_countries": {
+      "function": "headCountries",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.countries().headCountries();\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_country": {
+      "function": "getCountry",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.countries().getCountry(\"AU\");\nMap<?, ?> country = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country\");\nSystem.out.println(country.get(\"id\") + \" \" + country.get(\"code\") + \" \" + country.get(\"name\"));\nSystem.out.println(country.get(\"state_count\") + \" \" + country.get(\"active\") + \" \" + country.get(\"default\"));"
+    },
+    "head_country": {
+      "function": "headCountry",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.countries().headCountry(\"AU\");\nSystem.out.println(response.getStatusCode());"
+    },
+    "list_country_states": {
+      "function": "listCountryStates",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.countries().listCountryStates(\"AU\", Map.of(\"limit\", 3));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((Map<?, ?>) body.get(\"country\")).get(\"name\"));\nfor (Object row : (List<?>) body.get(\"states\")) {\n    Map<?, ?> state = (Map<?, ?>) row;\n    System.out.println(state.get(\"id\") + \" \" + state.get(\"code\") + \" \" + state.get(\"name\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "head_country_states": {
+      "function": "headCountryStates",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.countries().headCountryStates(\"AU\");\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_country_state": {
+      "function": "getCountryState",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.countries().getCountryState(\"AU\", \"VIC\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> state = (Map<?, ?>) body.get(\"state\");\nSystem.out.println(((Map<?, ?>) body.get(\"country\")).get(\"name\"));\nSystem.out.println(state.get(\"id\") + \" \" + state.get(\"code\") + \" \" + state.get(\"name\") + \" \" + state.get(\"active\"));"
+    },
+    "head_country_state": {
+      "function": "headCountryState",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.countries().headCountryState(\"AU\", \"VIC\");\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

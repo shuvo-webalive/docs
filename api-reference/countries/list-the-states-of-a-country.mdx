@@ -1,0 +1,9 @@
+---
+title: "List the states of a country"
+description: "Returns the country's states, up to 20 per call, with the country's `id`, `code` and `name`."
+openapi: "GET /admin/countries/{country_id}/states"
+---
+
+Returns the states of the country in `country_id`, in ascending `id` order, 20 per call unless you send `limit`. The country's `id`, `code` and `name` come in `country`, next to `states` and `pagination`. The query parameters work as they do on [List countries](/api-reference/countries/list-countries), except that a state `code` is one to three letters or digits. A country with no states returns an empty `states` list and a `total` of `0`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

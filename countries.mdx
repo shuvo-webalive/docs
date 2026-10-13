@@ -1,0 +1,62 @@
+---
+title: "Countries"
+sidebarTitle: "Overview"
+description: "List your store's countries and each country's states, and look one up by its `id`, `code` or `name`."
+---
+
+The Countries API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/countries`.
+
+<Warning>
+  **Send `order`, not `dir`, to reverse a listing, and `search`, not `q`, to find rows by text.**
+  Both listings ignore `dir`, `q`, `field_metadata` and any other parameter they do not know,
+  except `page`: you get `200` and the same rows as without them. `order` takes `asc` or `desc`;
+  `search` matches part of a `name` or a `code`.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List countries](/api-reference/countries/list-countries) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/countries` | Returns up to 20 countries per call, or the `limit` you send, in `id` order. |
+| [Check the countries list](/api-reference/countries/check-the-countries-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/countries` | Returns the headers of the countries list, including its `ETag`, with no body. |
+| [Retrieve a country](/api-reference/countries/retrieve-a-country) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/countries/{country_id}` | Returns the country you name in `country_id` by its `id`, `code` or `name`. |
+| [Check a country](/api-reference/countries/check-a-country) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/countries/{country_id}` | Returns the headers of one country, including its `ETag`, with no body. |
+| [List the states of a country](/api-reference/countries/list-the-states-of-a-country) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/countries/{country_id}/states` | Returns the country's states, up to 20 per call, with the country's `id`, `code` and `name`. |
+| [Check the states of a country](/api-reference/countries/check-the-states-of-a-country) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/countries/{country_id}/states` | Returns the headers of a country's state list, including its `ETag`, with no body. |
+| [Retrieve a state](/api-reference/countries/retrieve-a-state) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/countries/{country_id}/states/{state_id}` | Returns one state of a country, with the country's `id`, `code` and `name`. |
+| [Check a state](/api-reference/countries/check-a-state) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/countries/{country_id}/states/{state_id}` | Returns the headers of one state, including its `ETag`, with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **You can only read countries and states.** Every path accepts `GET`, `HEAD` and `OPTIONS`, and
+  `OPTIONS` returns `204` with `Allow: GET, HEAD, OPTIONS`.
+  `POST`, `PUT` and `PATCH` are rejected with `405 method_not_allowed`, the message
+  `HTTP method not allowed for this endpoint.` and the header `Allow: GET, HEAD, OPTIONS`.
+- **`country_id` and `state_id` each take an `id`, a `code` or a `name`.** `{country_id}` takes the country's
+  numeric `id`, its two-letter `code` or its `name`. `{state_id}` takes the state's `id`, `code` or
+  `name` within that country. Letter case does not matter, surrounding spaces are trimmed, and every
+  form returns the same body and `ETag`. A state's `id` is unique across all countries, but the state path
+  still returns `404` for a state that belongs to another country.
+- **Exactly one country has `default` set to `true`.** It is the `default_country` in the
+  `administration` section of the site settings, which you read with
+  [Get a settings section](/api-reference/site-settings/get-a-settings-section). The state named there as
+  `default_state`, when one is set, is the only state with `default` set to `true`.
+- **Send `limit=all` to get every row in one call.** It returns every row from `offset` on. In that
+  response, `pagination.limit` is the number of rows returned, not the word `all`. Otherwise
+  `limit` takes `1` to `100` and defaults to `20`. `all` works in any letter case. `page` is
+  rejected with `400`: use `offset`.
+- **Every read returns an `ETag`.** Each `GET` response has an `ETag` and
+  `Cache-Control: private, no-cache`, and no `Last-Modified`. Each `HEAD` returns the same `ETag`
+  as the matching `GET`. Send that `ETag` in `If-None-Match` on a `GET` or a `HEAD`, and while it
+  is still current you get `304` with no body. The SDK functions take no headers, so they never
+  send `If-None-Match`: you get `304` only from your own HTTP calls.
+- **Errors have one shape.** The body is an `error` object with `code`, `message`, `details` and
+  `request_id`. A rejected query parameter adds one `details` entry with its `field`, `code`,
+  `message` and `value`, and `message` counts them, such as `1 parameter failed validation.`.
+  `details` is empty on a `404` or a `405`.

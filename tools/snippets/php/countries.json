@@ -1,0 +1,38 @@
+{
+  "sdk": "php",
+  "module": "countries",
+  "endpoints": {
+    "list_countries": {
+      "function": "listCountries",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::listCountries($client, ['search' => 'aus']);\n\nforeach ($response->map['countries'] as $country) {\n    echo $country['id'], ' ', $country['code'], ' ', $country['name'], PHP_EOL;\n}"
+    },
+    "head_countries": {
+      "function": "headCountries",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::headCountries($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_country": {
+      "function": "getCountry",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::getCountry($client, 'AU');\n\n$country = $response->map['country'];\necho $country['name'], ': ', $country['state_count'], ' states', PHP_EOL;"
+    },
+    "head_country": {
+      "function": "headCountry",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::headCountry($client, 'AU');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "list_country_states": {
+      "function": "listCountryStates",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::listCountryStates($client, 'AU', ['limit' => 3]);\n\nforeach ($response->map['states'] as $state) {\n    echo $state['code'], ' ', $state['name'], PHP_EOL;\n}"
+    },
+    "head_country_states": {
+      "function": "headCountryStates",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::headCountryStates($client, 'AU');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_country_state": {
+      "function": "getCountryState",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::getCountryState($client, 'AU', 'VIC');\n\n$state = $response->map['state'];\necho $state['name'], ', ', $response->map['country']['name'], PHP_EOL;"
+    },
+    "head_country_state": {
+      "function": "headCountryState",
+      "code": "use WebCommander\\Sdk\\Resources\\Countries\\Countries;\n\n$response = Countries::headCountryState($client, 'AU', 'VIC');\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

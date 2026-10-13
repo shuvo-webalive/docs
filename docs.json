@@ -575,6 +575,28 @@
             ]
           },
           {
+            "group": "Countries and currencies",
+            "icon": "globe",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Countries",
+                "expanded": false,
+                "pages": [
+                  "countries",
+                  "api-reference/countries/list-countries",
+                  "api-reference/countries/check-the-countries-list",
+                  "api-reference/countries/retrieve-a-country",
+                  "api-reference/countries/check-a-country",
+                  "api-reference/countries/list-the-states-of-a-country",
+                  "api-reference/countries/check-the-states-of-a-country",
+                  "api-reference/countries/retrieve-a-state",
+                  "api-reference/countries/check-a-state"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
