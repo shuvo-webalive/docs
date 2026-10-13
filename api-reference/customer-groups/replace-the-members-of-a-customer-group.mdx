@@ -1,0 +1,9 @@
+---
+title: "Replace the members of a customer group"
+description: "Replaces a customer group's whole member list with the `customer_id` values you send."
+openapi: "PATCH /admin/customer_groups/{customer_group_id}/customers"
+---
+
+Send `{"customers": [...]}` with the `customer_id` of every customer who should be in the group, as numbers or strings. The list you send becomes the membership: a customer you leave out leaves the group, and `[]` removes every member. To add one customer and keep the others, use [Add a customer to a customer group](/api-reference/customer-groups/add-a-customer-to-a-customer-group). The `updated_at` in the response is the time the store responded, but the stored `updated_at` does not change, so a later read returns the earlier value.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,42 @@
+{
+  "sdk": "go",
+  "module": "customer_groups",
+  "endpoints": {
+    "list_customer_groups": {
+      "function": "ListCustomerGroups",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().ListCustomerGroups(ctx, map[string]any{\"search_text\": \"wholesale\", \"status\": \"active\", \"limit\": 50}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"customer_groups\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfmt.Println(group[\"id\"], group[\"name\"], group[\"status\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"has_next\"])\n"
+    },
+    "count_customer_groups": {
+      "function": "CountCustomerGroups",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().CountCustomerGroups(ctx, map[string]any{\"search_text\": \"wholesale\", \"status\": \"I\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])\n"
+    },
+    "create_customer_group": {
+      "function": "CreateCustomerGroup",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().CreateCustomerGroup(ctx, map[string]any{\"customer_group\": map[string]any{\n\t\"name\": \"Wholesale Partners\", \"description\": \"Trade accounts\", \"status\": \"active\",\n\t\"purchase_preference\": map[string]any{\"minimum_purchase\": map[string]any{\"enabled\": true, \"amount\": 50}, \"on_account_purchase\": map[string]any{\n\t\t\"enabled\": true, \"max_purchase\": map[string]any{\"enabled\": true, \"amount\": 500}, \"credit_limit\": map[string]any{\"enabled\": true, \"amount\": 1000},\n\t\t\"payment_terms\": map[string]any{\"enabled\": true, \"terms\": \"NET_30\"}}},\n\t\"tax_configuration\": map[string]any{\"override_store_tax\": true, \"tax_exempt\": false, \"tax_message\": \"Prices exclude GST\",\n\t\t\"show_prices_with_tax_included\": true, \"prices_entered_with_tax_included\": false, \"base_price_rounding\": \"up\"},\n\t\"product_display\": map[string]any{\"overwrite_default\": true, \"variation_display_type\": \"enable_matrix_view\",\n\t\t\"display_parent_image\": true, \"activate_colour_variation_image\": false, \"show_selected_variation_value\": true,\n\t\t\"strike_through_out_of_stock\": false, \"single_click_variation_loading\": true, \"price_display_method\": \"highest\"}}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nterms := group[\"purchase_preference\"].(map[string]any)[\"on_account_purchase\"].(map[string]any)[\"payment_terms\"].(map[string]any)\nfmt.Println(group[\"id\"], group[\"status\"], terms[\"terms\"])\n"
+    },
+    "get_customer_group": {
+      "function": "GetCustomerGroup",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().GetCustomerGroup(ctx, 1234, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nfmt.Println(group[\"name\"], group[\"status\"], group[\"customer_count\"])\nfor _, row := range group[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"id\"], customer[\"email\"])\n}\n"
+    },
+    "patch_customer_group": {
+      "function": "PatchCustomerGroup",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().PatchCustomerGroup(ctx, 1234, map[string]any{\n\t\"customer_group\": map[string]any{\n\t\t\"status\":              \"inactive\",\n\t\t\"purchase_preference\": map[string]any{\"minimum_purchase\": map[string]any{\"amount\": 75}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nfmt.Println(group[\"status\"], group[\"purchase_preference\"].(map[string]any)[\"minimum_purchase\"].(map[string]any)[\"amount\"])\n"
+    },
+    "delete_customer_group": {
+      "function": "DeleteCustomerGroup",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().DeleteCustomerGroup(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "update_customer_group_customers": {
+      "function": "UpdateCustomerGroupCustomers",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().UpdateCustomerGroupCustomers(ctx, 1234, map[string]any{\"customers\": []any{5678, \"5679\"}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngroup := resp.Map().(map[string]any)[\"customer_group\"].(map[string]any)\nfmt.Println(group[\"customer_count\"])\nfor _, row := range group[\"customers\"].([]any) {\n\tcustomer := row.(map[string]any)\n\tfmt.Println(customer[\"id\"], customer[\"email\"])\n}\n"
+    },
+    "get_customer_group_customer": {
+      "function": "GetCustomerGroupCustomer",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().GetCustomerGroupCustomer(ctx, 1234, 5678, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncustomer := resp.Map().(map[string]any)[\"customer\"].(map[string]any)\nfmt.Println(customer[\"id\"], customer[\"first_name\"], customer[\"last_name\"], customer[\"email\"])\n"
+    },
+    "assign_customer_group": {
+      "function": "AssignCustomerGroup",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CustomerGroups().AssignCustomerGroup(ctx, map[string]any{\"customer\": 5678, \"group\": 1234}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"added\"], body[\"customer_id\"], body[\"group\"].(map[string]any)[\"name\"])\n"
+    }
+  }
+}

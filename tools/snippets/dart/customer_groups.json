@@ -1,0 +1,42 @@
+{
+  "sdk": "dart",
+  "module": "customer_groups",
+  "endpoints": {
+    "list_customer_groups": {
+      "function": "listCustomerGroups",
+      "code": "final response = await client.customerGroups.listCustomerGroups(\n    queryParams: {'search_text': 'wholesale', 'status': 'active', 'limit': 50});\nfinal body = response.map as Map;\nfor (final group in body['customer_groups'] as List) {\n  print('${(group as Map)['id']} ${group['name']} ${group['status']}');\n}\nprint((body['pagination'] as Map)['has_next']);"
+    },
+    "count_customer_groups": {
+      "function": "countCustomerGroups",
+      "code": "final response = await client.customerGroups.countCustomerGroups(\n    queryParams: {'search_text': 'wholesale', 'status': 'I'});\nprint((response.map as Map)['total']);"
+    },
+    "create_customer_group": {
+      "function": "createCustomerGroup",
+      "code": "final response = await client.customerGroups.createCustomerGroup({\n  'customer_group': {\n    'name': 'Wholesale Partners', 'description': 'Trade accounts', 'status': 'active',\n    'purchase_preference': {'minimum_purchase': {'enabled': true, 'amount': 50}, 'on_account_purchase': {\n      'enabled': true, 'max_purchase': {'enabled': true, 'amount': 500}, 'credit_limit': {'enabled': true, 'amount': 1000},\n      'payment_terms': {'enabled': true, 'terms': 'NET_30'}}},\n    'tax_configuration': {'override_store_tax': true, 'tax_exempt': false, 'tax_message': 'Prices exclude GST',\n      'show_prices_with_tax_included': true, 'prices_entered_with_tax_included': false, 'base_price_rounding': 'up'},\n    'product_display': {'overwrite_default': true, 'variation_display_type': 'enable_matrix_view',\n      'display_parent_image': true, 'activate_colour_variation_image': false, 'show_selected_variation_value': true,\n      'strike_through_out_of_stock': false, 'single_click_variation_loading': true, 'price_display_method': 'highest'},\n  },\n});\nfinal group = (response.map as Map)['customer_group'] as Map;\nprint('${group['id']} ${group['status']}');"
+    },
+    "get_customer_group": {
+      "function": "getCustomerGroup",
+      "code": "final response = await client.customerGroups.getCustomerGroup(1234);\nfinal group = (response.map as Map)['customer_group'] as Map;\nprint('${group['name']} ${group['status']} ${group['customer_count']}');\nfor (final customer in group['customers'] as List) {\n  print('${(customer as Map)['id']} ${customer['email']}');\n}"
+    },
+    "patch_customer_group": {
+      "function": "patchCustomerGroup",
+      "code": "final response = await client.customerGroups.patchCustomerGroup(1234, {\n  'customer_group': {\n    'status': 'inactive',\n    'purchase_preference': {\n      'minimum_purchase': {'amount': 75},\n    },\n  },\n});\nfinal group = (response.map as Map)['customer_group'] as Map;\nfinal preference = group['purchase_preference'] as Map;\nprint('${group['status']} ${(preference['minimum_purchase'] as Map)['amount']}');"
+    },
+    "delete_customer_group": {
+      "function": "deleteCustomerGroup",
+      "code": "final response = await client.customerGroups.deleteCustomerGroup(1234);\nprint(response.statusCode);"
+    },
+    "update_customer_group_customers": {
+      "function": "updateCustomerGroupCustomers",
+      "code": "final response = await client.customerGroups.updateCustomerGroupCustomers(1234, {\n  'customers': [5678, '5679'],\n});\nfinal group = (response.map as Map)['customer_group'] as Map;\nprint(group['customer_count']);\nfor (final customer in group['customers'] as List) {\n  print('${(customer as Map)['id']} ${customer['email']}');\n}"
+    },
+    "get_customer_group_customer": {
+      "function": "getCustomerGroupCustomer",
+      "code": "final response =\n    await client.customerGroups.getCustomerGroupCustomer(1234, 5678);\nfinal customer = (response.map as Map)['customer'] as Map;\nprint('${customer['id']} ${customer['first_name']} ${customer['last_name']}');\nprint(customer['email']);"
+    },
+    "assign_customer_group": {
+      "function": "assignCustomerGroup",
+      "code": "final response = await client.customerGroups.assignCustomerGroup({\n  'customer': 5678,\n  'group': 1234,\n});\nfinal body = response.map as Map;\nprint('${body['added']} ${body['customer_id']} ${(body['group'] as Map)['name']}');"
+    }
+  }
+}

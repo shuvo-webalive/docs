@@ -1,0 +1,9 @@
+---
+title: "Count customer groups"
+description: "Returns the number of customer groups that match your `search_text`, `name` and `status` filters."
+openapi: "GET /admin/customer_groups/count"
+---
+
+Returns the number of groups as `total`. `search_text`, `name` and `status` narrow the count the same way they narrow the listing, so `total` matches the listing's `pagination.total` for the same filters. `limit`, `offset` and `field_metadata` change nothing. The response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

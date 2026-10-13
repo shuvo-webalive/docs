@@ -1,0 +1,9 @@
+---
+title: "Delete a customer group"
+description: "Deletes a customer group permanently. Its members stay in the store as customers."
+openapi: "DELETE /admin/customer_groups/{customer_group_id}"
+---
+
+Deletes the group permanently and returns `204` with no body; retrieving or deleting it again returns `404`. Its members stay as customers, and the group is removed from each member's `customer_groups`. When this call returns `404`, the next [customer delete](/api-reference/customers/delete-a-customer) on the same connection can return `404` with the message `Customer already in trash`, or `204`, and not delete the customer: its `is_in_trash` stays `false`. Send that customer delete on a new connection, or send it again.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

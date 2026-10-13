@@ -1,0 +1,9 @@
+---
+title: "Retrieve a customer group"
+description: "Returns the customer group whose `id` you pass as `customer_group_id`, with its members."
+openapi: "GET /admin/customer_groups/{customer_group_id}"
+---
+
+Returns one group under `customer_group`, with the 13 fields a listing entry has plus `customer_count` and `customers`. Each entry in `customers` gives a member's `customer_id` as `id`, with `first_name`, `last_name` and `email`. Send `field_metadata=true` to add a description of each field beside the group. The response has an `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

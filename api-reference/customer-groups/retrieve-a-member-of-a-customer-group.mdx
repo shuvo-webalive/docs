@@ -1,0 +1,9 @@
+---
+title: "Retrieve a member of a customer group"
+description: "Returns one member of a customer group, by the customer's `customer_id`."
+openapi: "GET /admin/customer_groups/{customer_group_id}/customers/{customer_id}"
+---
+
+Returns the member under `customer`, with the same four fields as the member's entry in the group's `customers` list: `id`, which is the customer's `customer_id`, `first_name`, `last_name` and `email`. Use it to check whether a customer belongs to a group: a customer who is not a member returns `404`. The response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
