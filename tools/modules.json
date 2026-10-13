@@ -104,7 +104,8 @@
       "name": "Countries and currencies",
       "icon": "globe",
       "modules": [
-        "countries"
+        "countries",
+        "currencies"
       ]
     },
     {

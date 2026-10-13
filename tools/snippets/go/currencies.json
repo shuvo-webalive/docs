@@ -1,0 +1,50 @@
+{
+  "sdk": "go",
+  "module": "currencies",
+  "endpoints": {
+    "list_currencies": {
+      "function": "ListCurrencies",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().ListCurrencies(ctx, map[string]any{\"search\": \"dollar\", \"active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"currencies\"].([]any) {\n\tcurrency := row.(map[string]any)\n\tfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"name\"], currency[\"conversion_rate\"], currency[\"base\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "head_currencies": {
+      "function": "HeadCurrencies",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().HeadCurrencies(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "count_currencies": {
+      "function": "CountCurrencies",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().CountCurrencies(ctx, map[string]any{\"search\": \"dollar\", \"active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])\n"
+    },
+    "head_currencies_count": {
+      "function": "HeadCurrenciesCount",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().HeadCurrenciesCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "create_currency": {
+      "function": "CreateCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().CreateCurrency(ctx, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": \"NZ\",\n\t\"conversion_rate\": 1.2345, \"precision\": 2, \"rounding\": \"nearest\", \"active\": true,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"base\"])\n"
+    },
+    "get_currency": {
+      "function": "GetCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().GetCurrency(ctx, 1234, map[string]any{\"field_metadata\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ncurrency := body[\"currency\"].(map[string]any)\nfmt.Println(currency[\"name\"], currency[\"code\"], currency[\"symbol\"], currency[\"conversion_rate\"], currency[\"country\"].(map[string]any)[\"code\"])\nfmt.Println(body[\"field_metadata\"].(map[string]any)[\"code\"].(map[string]any)[\"pattern\"], resp.Headers[\"Etag\"])\n"
+    },
+    "head_currency": {
+      "function": "HeadCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().HeadCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+    },
+    "update_currency": {
+      "function": "UpdateCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().UpdateCurrency(ctx, 1234, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": map[string]any{\"code\": \"US\"},\n\t\"conversion_rate\": 1.5, \"precision\": 3, \"rounding\": \"up\", \"active\": false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"country\"].(map[string]any)[\"code\"], currency[\"conversion_rate\"], currency[\"rounding\"], currency[\"active\"])\n"
+    },
+    "patch_currency": {
+      "function": "PatchCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().PatchCurrency(ctx, 1234, map[string]any{\"conversion_rate\": 2.5}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"conversion_rate\"], currency[\"updated_at\"])\n"
+    },
+    "delete_currency": {
+      "function": "DeleteCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().DeleteCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "set_base_currency": {
+      "function": "SetBaseCurrency",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().SetBaseCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ncurrency := body[\"currency\"].(map[string]any)\nprevious, _ := body[\"previous_base\"].(map[string]any)\nfmt.Println(currency[\"code\"], currency[\"base\"], previous[\"code\"])\n"
+    }
+  }
+}

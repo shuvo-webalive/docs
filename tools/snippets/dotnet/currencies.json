@@ -1,0 +1,50 @@
+{
+  "sdk": "dotnet",
+  "module": "currencies",
+  "endpoints": {
+    "list_currencies": {
+      "function": "ListCurrenciesAsync",
+      "code": "var response = await client.Currencies.ListCurrenciesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"dollar\", [\"active\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var currency in ((IReadOnlyList<object?>)body[\"currencies\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{currency[\"id\"]} {currency[\"code\"]} {currency[\"name\"]} {currency[\"conversion_rate\"]} {currency[\"base\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_currencies": {
+      "function": "HeadCurrenciesAsync",
+      "code": "var response = await client.Currencies.HeadCurrenciesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_currencies": {
+      "function": "CountCurrenciesAsync",
+      "code": "var response = await client.Currencies.CountCurrenciesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"dollar\", [\"active\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "head_currencies_count": {
+      "function": "HeadCurrenciesCountAsync",
+      "code": "var response = await client.Currencies.HeadCurrenciesCountAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_currency": {
+      "function": "CreateCurrencyAsync",
+      "code": "var response = await client.Currencies.CreateCurrencyAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Example Dollar\", [\"code\"] = \"XEX\", [\"symbol\"] = \"$\", [\"country\"] = \"NZ\",\n    [\"conversion_rate\"] = 1.2345, [\"precision\"] = 2, [\"rounding\"] = \"nearest\", [\"active\"] = true,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"id\"]} {currency[\"code\"]} {currency[\"base\"]}\");"
+    },
+    "get_currency": {
+      "function": "GetCurrencyAsync",
+      "code": "var response = await client.Currencies.GetCurrencyAsync(1234,\n    new Dictionary<string, object?> { [\"field_metadata\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"code\"]} {currency[\"name\"]} {currency[\"conversion_rate\"]} {currency[\"active\"]}\");\nConsole.WriteLine(string.Join(\", \", ((IReadOnlyDictionary<string, object?>)body[\"field_metadata\"]!).Keys));"
+    },
+    "head_currency": {
+      "function": "HeadCurrencyAsync",
+      "code": "var response = await client.Currencies.HeadCurrencyAsync(1234);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_currency": {
+      "function": "UpdateCurrencyAsync",
+      "code": "var response = await client.Currencies.UpdateCurrencyAsync(1234, new Dictionary<string, object?>\n{\n    [\"name\"] = \"Example Dollar\", [\"code\"] = \"XEX\", [\"symbol\"] = \"$\",\n    [\"country\"] = new Dictionary<string, object?> { [\"code\"] = \"US\" },\n    [\"conversion_rate\"] = 1.5, [\"precision\"] = 3, [\"rounding\"] = \"up\", [\"active\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"conversion_rate\"]} {currency[\"precision\"]} {currency[\"rounding\"]} {currency[\"active\"]}\");"
+    },
+    "patch_currency": {
+      "function": "PatchCurrencyAsync",
+      "code": "var response = await client.Currencies.PatchCurrencyAsync(1234, new Dictionary<string, object?>\n{\n    [\"conversion_rate\"] = 2.5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"code\"]} {currency[\"conversion_rate\"]}\");"
+    },
+    "delete_currency": {
+      "function": "DeleteCurrencyAsync",
+      "code": "var response = await client.Currencies.DeleteCurrencyAsync(1234);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "set_base_currency": {
+      "function": "SetBaseCurrencyAsync",
+      "code": "var response = await client.Currencies.SetBaseCurrencyAsync(1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"code\"]} {currency[\"base\"]}\");\nif (body[\"previous_base\"] is IReadOnlyDictionary<string, object?> previousBase)\n    Console.WriteLine(previousBase[\"code\"]);"
+    }
+  }
+}

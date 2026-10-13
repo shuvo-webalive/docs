@@ -1,0 +1,9 @@
+---
+title: "Update a currency"
+description: "Changes only the fields you send and returns the currency."
+openapi: "PATCH /admin/currencies/{currency_id}"
+---
+
+Send only the fields to change, at the top level of the body. Every field you leave out keeps its value. The store trims spaces from `name`, `code` and `symbol` as on create. An empty body is rejected with `400`, and so is any change to the base currency.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

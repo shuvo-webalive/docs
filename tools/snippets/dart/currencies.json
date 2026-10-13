@@ -1,0 +1,50 @@
+{
+  "sdk": "dart",
+  "module": "currencies",
+  "endpoints": {
+    "list_currencies": {
+      "function": "listCurrencies",
+      "code": "final response = await client.currencies\n    .listCurrencies(queryParams: {'search': 'dollar', 'active': true});\nfinal currencies = (response.map as Map)['currencies'] as List;\nfor (final currency in currencies) {\n  print('${(currency as Map)['code']} ${currency['name']}');\n}"
+    },
+    "head_currencies": {
+      "function": "headCurrencies",
+      "code": "final response = await client.currencies.headCurrencies();\nprint(response.statusCode);"
+    },
+    "count_currencies": {
+      "function": "countCurrencies",
+      "code": "final response = await client.currencies\n    .countCurrencies(queryParams: {'search': 'dollar', 'active': true});\nprint((response.map as Map)['total']);"
+    },
+    "head_currencies_count": {
+      "function": "headCurrenciesCount",
+      "code": "final response = await client.currencies.headCurrenciesCount();\nprint(response.statusCode);"
+    },
+    "create_currency": {
+      "function": "createCurrency",
+      "code": "final response = await client.currencies.createCurrency({\n  'name': 'Example Dollar',\n  'code': 'XEX',\n  'symbol': '\\$',\n  'country': 'NZ',\n  'conversion_rate': 1.2345,\n  'precision': 2,\n  'rounding': 'nearest',\n  'active': true,\n});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['id']} ${currency['code']}');"
+    },
+    "get_currency": {
+      "function": "getCurrency",
+      "code": "final response = await client.currencies\n    .getCurrency(1234, queryParams: {'field_metadata': true});\nfinal body = response.map as Map;\nfinal currency = body['currency'] as Map;\nprint('${currency['code']} ${currency['conversion_rate']}');\nprint((body['field_metadata'] as Map).keys);"
+    },
+    "head_currency": {
+      "function": "headCurrency",
+      "code": "final response = await client.currencies.headCurrency(1234);\nprint(response.statusCode);\nprint(response.headers['etag']);"
+    },
+    "update_currency": {
+      "function": "updateCurrency",
+      "code": "final response = await client.currencies.updateCurrency(1234, {\n  'name': 'Example Dollar',\n  'code': 'XEX',\n  'symbol': '\\$',\n  'country': {'code': 'US'},\n  'conversion_rate': 1.5,\n  'precision': 3,\n  'rounding': 'up',\n  'active': false,\n});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['conversion_rate']} ${currency['rounding']}');"
+    },
+    "patch_currency": {
+      "function": "patchCurrency",
+      "code": "final response = await client.currencies\n    .patchCurrency(1234, {'conversion_rate': 2.5});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['code']} ${currency['conversion_rate']}');"
+    },
+    "delete_currency": {
+      "function": "deleteCurrency",
+      "code": "final response = await client.currencies.deleteCurrency(1234);\nprint(response.statusCode);"
+    },
+    "set_base_currency": {
+      "function": "setBaseCurrency",
+      "code": "final response = await client.currencies.setBaseCurrency(1234);\nfinal body = response.map as Map;\nprint((body['currency'] as Map)['code']);\nprint(body['previous_base']);"
+    }
+  }
+}

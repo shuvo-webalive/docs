@@ -130,6 +130,9 @@
       "name": "Countries"
     },
     {
+      "name": "Currencies"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -38701,6 +38704,1164 @@
         ]
       }
     },
+    "/admin/currencies": {
+      "get": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "List currencies",
+        "operationId": "list_currencies",
+        "description": "Returns the currencies in `currencies`, 20 per call unless you send `limit`, and `pagination` with the total and whether more pages follow. Without `sort`, they come in ascending order of the currency's `id`, and the base currency is not moved to the top. Send `search` to find currencies by `name` or `code`, and `active` to keep only active or inactive ones. `page` is rejected with `400`; `q`, `base` and any other unknown query parameter are ignored and do not filter the listing.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only currencies whose `name` or `code` contains this text, in any letter case. It does not search `symbol` or the country.",
+            "schema": {
+              "type": "string",
+              "example": "dollar"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "description": "Send `true` to keep only active currencies, or `false` to keep only inactive ones. Any other value is rejected with `400`, the reason `invalid_enum` and the message `must be true or false`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The field to sort by. Without it, currencies come in ascending order of the currency's `id`, and the base currency is not moved to the top. Any other value is rejected with `400` and the reason `invalid_enum`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name",
+                "code",
+                "symbol",
+                "precision",
+                "rounding",
+                "conversion_rate",
+                "active",
+                "base",
+                "updated_at"
+              ],
+              "example": "code"
+            }
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`. Any other value is rejected with `400`. `order` is accepted as another name for `dir`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "desc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of currencies per page, from `1` to `100`. Defaults to `20`. `pagination.limit` shows the value applied. `0` and values above `100` are rejected with `400` and the message `must be a whole number from 1 to 100`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of currencies to skip, `0` or more. A negative value is rejected with `400`, the reason `out_of_range` and the message `must be 0 or more`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key beside `currencies` and `pagination`. It describes each currency field: its type, whether you can write it, and its limits and default.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The currencies on this page in `currencies`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`. With `field_metadata=true`, a `field_metadata` key is added beside them. The response has no `ETag` or `Last-Modified` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currencies": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Currency"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/CurrencyPagination"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CurrencyFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "currencies": [
+                    {
+                      "id": 1,
+                      "name": "US Dollar",
+                      "code": "USD",
+                      "symbol": "$",
+                      "country": {
+                        "id": 236,
+                        "code": "US",
+                        "name": "United States"
+                      },
+                      "conversion_rate": 1,
+                      "rounding": "nearest",
+                      "precision": 2,
+                      "active": true,
+                      "base": true,
+                      "updated_at": "2026-10-11T04:12:09Z"
+                    },
+                    {
+                      "id": 4,
+                      "name": "Pound Sterling",
+                      "code": "GBP",
+                      "symbol": "£",
+                      "country": {
+                        "id": 235,
+                        "code": "GB",
+                        "name": "United Kingdom"
+                      },
+                      "conversion_rate": 0.79,
+                      "rounding": "nearest",
+                      "precision": 2,
+                      "active": true,
+                      "base": false,
+                      "updated_at": "2026-10-11T04:12:09Z"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A query parameter has a value the listing does not accept: `active` is not `true` or `false`, `sort` is not one of the ten sort fields (reason `invalid_enum`, and the message lists the ten fields), `dir` is not `asc` or `desc`, `limit` is `0` or more than `100` (reason `out_of_range`), or `offset` is negative. Or you sent `page`: the reason is `unsupported_parameter` and the message is `is not supported - page with offset and limit`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/currencies?search=dollar&active=true\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.list_currencies({\"search\": \"dollar\", \"active\": True})\nfor currency in response.map[\"currencies\"]:\n    print(currency[\"id\"], currency[\"code\"], currency[\"name\"], currency[\"conversion_rate\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.listCurrencies({search: 'dollar', active: true});\nfor (const currency of response.map.currencies) {\n    console.log(currency.id, currency.code, currency.name, currency.conversion_rate, currency.base);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::listCurrencies($client, ['search' => 'dollar', 'active' => true]);\n\nforeach ($response->map['currencies'] as $currency) {\n    echo $currency['id'], ' ', $currency['code'], ' ', $currency['name'], ' ', $currency['conversion_rate'], $currency['base'] ? ' (base)' : '', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().listCurrencies(Map.of(\"search\", \"dollar\", \"active\", true));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"currencies\")) {\n    Map<?, ?> currency = (Map<?, ?>) row;\n    System.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"name\") + \" \" + currency.get(\"base\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.ListCurrenciesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"dollar\", [\"active\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var currency in ((IReadOnlyList<object?>)body[\"currencies\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{currency[\"id\"]} {currency[\"code\"]} {currency[\"name\"]} {currency[\"conversion_rate\"]} {currency[\"base\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies\n    .listCurrencies(queryParams: {'search': 'dollar', 'active': true});\nfinal currencies = (response.map as Map)['currencies'] as List;\nfor (final currency in currencies) {\n  print('${(currency as Map)['code']} ${currency['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().ListCurrencies(ctx, map[string]any{\"search\": \"dollar\", \"active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"currencies\"].([]any) {\n\tcurrency := row.(map[string]any)\n\tfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"name\"], currency[\"conversion_rate\"], currency[\"base\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Check the currencies list",
+        "operationId": "head_currencies",
+        "description": "Returns `200` with headers only and no body: `Content-Length` is `0`. The response has no `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/currencies\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.head_currencies()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.headCurrencies();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::headCurrencies($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().headCurrencies();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.HeadCurrenciesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.headCurrencies();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().HeadCurrencies(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Create a currency",
+        "operationId": "create_currency",
+        "description": "Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The new currency, with the currency's `id`, which the other calls take as `currency_id`. The `Location` header holds the full URL of the new currency.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "$ref": "#/components/schemas/Currency"
+                    }
+                  }
+                },
+                "example": {
+                  "currency": {
+                    "id": 1234,
+                    "name": "Example Dollar",
+                    "code": "XEX",
+                    "symbol": "$",
+                    "country": {
+                      "id": 160,
+                      "code": "NZ",
+                      "name": "New Zealand"
+                    },
+                    "conversion_rate": 1.2345,
+                    "rounding": "nearest",
+                    "precision": 2,
+                    "active": true,
+                    "base": false,
+                    "updated_at": "2026-10-11T05:20:41Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid for a currency. `name`, `code` or `symbol` is missing (reason `required`); `code` is not three letters (reason `invalid_format`); `symbol` is longer than 3 characters (reason `too_long`); `precision` is outside `1` to `9` (reason `out_of_range`); `rounding` is not `nearest`, `up` or `down` (reason `invalid_enum`); `country` is a list (reason `invalid_type`) or names a country the store does not have (reason `unknown_reference`, message `no such country`); the body has a field that is not a currency field, such as `base`, `updated_at` or a wrapping `currency` (reason `unknown_field`, message `is not a currency field`); or it sends `id` (reason `unexpected_field`, message `must not be present - the URL names the currency`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another currency already has that `name`, in any letter case (`A currency with this name already exists.`, `details[0].code` `duplicate`) or that `code` (`A currency with this code already exists.`). The reason is `conflict`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/currencies\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": true\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.create_currency({\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": True,\n})\nprint(response.map[\"currency\"][\"id\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.createCurrency({\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: 'NZ',\n    conversion_rate: 1.2345,\n    precision: 2,\n    rounding: 'nearest',\n    active: true,\n});\nconsole.log(response.map.currency.id, response.map.currency.code, response.map.currency.base);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::createCurrency($client, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => 'NZ',\n    'conversion_rate' => 1.2345, 'precision' => 2, 'rounding' => 'nearest', 'active' => true,\n]);\n\n$currency = $response->map['currency'];\necho $currency['id'], ' ', $currency['code'], ' ', $currency['country']['name'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.CreateCurrencyAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Example Dollar\", [\"code\"] = \"XEX\", [\"symbol\"] = \"$\", [\"country\"] = \"NZ\",\n    [\"conversion_rate\"] = 1.2345, [\"precision\"] = 2, [\"rounding\"] = \"nearest\", [\"active\"] = true,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"id\"]} {currency[\"code\"]} {currency[\"base\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.createCurrency({\n  'name': 'Example Dollar',\n  'code': 'XEX',\n  'symbol': '\\$',\n  'country': 'NZ',\n  'conversion_rate': 1.2345,\n  'precision': 2,\n  'rounding': 'nearest',\n  'active': true,\n});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['id']} ${currency['code']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().CreateCurrency(ctx, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": \"NZ\",\n\t\"conversion_rate\": 1.2345, \"precision\": 2, \"rounding\": \"nearest\", \"active\": true,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"base\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrencyInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/currencies/count": {
+      "get": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Count currencies",
+        "operationId": "count_currencies",
+        "description": "Returns the number of currencies as `total`, at the top level of the body. `search` and `active` narrow the count as they narrow the listing, so the number matches the listing's `pagination.total` for the same filters. `limit`, `q`, `field_metadata` and unknown query parameters are ignored. A bad `active` or `sort` value is rejected with `400`, as on the listing, even though the count does not sort.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only currencies whose `name` or `code` contains this text, in any letter case. It does not search `symbol` or the country.",
+            "schema": {
+              "type": "string",
+              "example": "dollar"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "description": "Send `true` to keep only active currencies, or `false` to keep only inactive ones. Any other value is rejected with `400`, the reason `invalid_enum` and the message `must be true or false`.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number of matching currencies. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyCount"
+                },
+                "example": {
+                  "total": 2
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`active` is not `true` or `false`, or `sort` is not one of the ten sort fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/currencies/count?search=dollar&active=true\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.count_currencies({\"search\": \"dollar\", \"active\": True})\nprint(response.map[\"total\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.countCurrencies({search: 'dollar', active: true});\nconsole.log(response.map.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::countCurrencies($client, ['search' => 'dollar', 'active' => true]);\n\necho $response->map['total'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().countCurrencies(Map.of(\"search\", \"dollar\", \"active\", true));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.CountCurrenciesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"dollar\", [\"active\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies\n    .countCurrencies(queryParams: {'search': 'dollar', 'active': true});\nprint((response.map as Map)['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().CountCurrencies(ctx, map[string]any{\"search\": \"dollar\", \"active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Check the currency count",
+        "operationId": "head_currencies_count",
+        "description": "Returns `200` with headers only and no body: `Content-Length` is `0`. The response has no `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The count is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/currencies/count\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.head_currencies_count()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.headCurrenciesCount();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::headCurrenciesCount($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().headCurrenciesCount();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.HeadCurrenciesCountAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.headCurrenciesCount();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().HeadCurrenciesCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/currencies/{currency_id}": {
+      "get": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Retrieve a currency",
+        "operationId": "get_currency",
+        "description": "Returns one currency under the `currency` key, with the same eleven fields a listing entry has. The response has an `ETag` header, which changes when the currency changes. Send `field_metadata=true` to add a description of each field beside `currency`.",
+        "parameters": [
+          {
+            "name": "currency_id",
+            "in": "path",
+            "required": true,
+            "description": "The currency's `id`, from a listing or from the response to creating the currency.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to add a `field_metadata` key beside `currency`. It describes each currency field: its type, whether you can write it, and its limits and default.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The currency. With `field_metadata=true`, a `field_metadata` key is added beside it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "$ref": "#/components/schemas/Currency"
+                    },
+                    "field_metadata": {
+                      "$ref": "#/components/schemas/CurrencyFieldMetadata"
+                    }
+                  }
+                },
+                "example": {
+                  "currency": {
+                    "id": 1234,
+                    "name": "Example Dollar",
+                    "code": "XEX",
+                    "symbol": "$",
+                    "country": {
+                      "id": 160,
+                      "code": "NZ",
+                      "name": "New Zealand"
+                    },
+                    "conversion_rate": 1.2345,
+                    "rounding": "nearest",
+                    "precision": 2,
+                    "active": true,
+                    "base": false,
+                    "updated_at": "2026-10-11T05:20:41Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No currency has that `currency_id`. The message is `Currency <currency_id> was not found.` and the reason is `not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/currencies/1234?field_metadata=true\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.get_currency(1234, {\"field_metadata\": True})\ncurrency = response.map[\"currency\"]\nprint(currency[\"code\"], currency[\"symbol\"], currency[\"conversion_rate\"], currency[\"base\"])\nprint(response.map[\"field_metadata\"][\"rounding\"][\"options\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.getCurrency(1234, {field_metadata: true});\nconst currency = response.map.currency;\nconsole.log(currency.name, currency.code, currency.symbol, currency.conversion_rate, currency.country.code);\nconsole.log(response.map.field_metadata.code.pattern, response.headers.etag);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::getCurrency($client, 1234, ['field_metadata' => true]);\n\n$currency = $response->map['currency'];\necho $currency['name'], ' ', $currency['symbol'], ' ', $currency['conversion_rate'], ' ', $currency['rounding'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().getCurrency(1234, Map.of(\"field_metadata\", true));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> currency = (Map<?, ?>) body.get(\"currency\");\nSystem.out.println(currency.get(\"name\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"conversion_rate\"));\nMap<?, ?> fieldMetadata = (Map<?, ?>) body.get(\"field_metadata\");\nSystem.out.println(((Map<?, ?>) fieldMetadata.get(\"rounding\")).get(\"options\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.GetCurrencyAsync(1234,\n    new Dictionary<string, object?> { [\"field_metadata\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"code\"]} {currency[\"name\"]} {currency[\"conversion_rate\"]} {currency[\"active\"]}\");\nConsole.WriteLine(string.Join(\", \", ((IReadOnlyDictionary<string, object?>)body[\"field_metadata\"]!).Keys));\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies\n    .getCurrency(1234, queryParams: {'field_metadata': true});\nfinal body = response.map as Map;\nfinal currency = body['currency'] as Map;\nprint('${currency['code']} ${currency['conversion_rate']}');\nprint((body['field_metadata'] as Map).keys);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().GetCurrency(ctx, 1234, map[string]any{\"field_metadata\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ncurrency := body[\"currency\"].(map[string]any)\nfmt.Println(currency[\"name\"], currency[\"code\"], currency[\"symbol\"], currency[\"conversion_rate\"], currency[\"country\"].(map[string]any)[\"code\"])\nfmt.Println(body[\"field_metadata\"].(map[string]any)[\"code\"].(map[string]any)[\"pattern\"], resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Check a currency",
+        "operationId": "head_currency",
+        "description": "Returns `200` with headers only and no body when a currency has that `currency_id`, and `404` when none does. The `ETag` header is the same one [Retrieve a currency](/api-reference/currencies/retrieve-a-currency) returns, so you can check whether the currency changed without reading it.",
+        "parameters": [
+          {
+            "name": "currency_id",
+            "in": "path",
+            "required": true,
+            "description": "The currency's `id`, from a listing or from the response to creating the currency.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The currency exists. Headers only, no body, with the currency's `ETag`."
+          },
+          "404": {
+            "description": "No currency has that `currency_id`. No body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/currencies/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.head_currency(1234)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.headCurrency(1234);\nconsole.log(response.statusCode, response.headers.etag);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::headCurrency($client, 1234);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().headCurrency(1234);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.HeadCurrencyAsync(1234);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.headCurrency(1234);\nprint(response.statusCode);\nprint(response.headers['etag']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().HeadCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Replace a currency",
+        "operationId": "update_currency",
+        "description": "Send `name`, `code` and `symbol`, and every other field you want to keep, at the top level of the body. This call replaces the currency rather than merging: a field you leave out goes back to its default, so `conversion_rate` becomes `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and `country` the store's default country. The body follows the same rules as [Create a currency](/api-reference/currencies/create-a-currency). You cannot replace the base currency.",
+        "parameters": [
+          {
+            "name": "currency_id",
+            "in": "path",
+            "required": true,
+            "description": "The currency's `id`, from a listing or from the response to creating the currency.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The currency after the replace, with the values you sent and the default for every field you left out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "$ref": "#/components/schemas/Currency"
+                    }
+                  }
+                },
+                "example": {
+                  "currency": {
+                    "id": 1234,
+                    "name": "Example Dollar",
+                    "code": "XEX",
+                    "symbol": "$",
+                    "country": {
+                      "id": 236,
+                      "code": "US",
+                      "name": "United States"
+                    },
+                    "conversion_rate": 1.5,
+                    "rounding": "up",
+                    "precision": 3,
+                    "active": false,
+                    "base": false,
+                    "updated_at": "2026-10-11T05:24:02Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The currency is the base currency. The message is `The base currency is read-only - make another currency the base first.`, and `details[0]` has `field` `base` and `code` `base_currency_read_only`. Or the body breaks a rule of [Create a currency](/api-reference/currencies/create-a-currency), such as a missing `name`, `code` or `symbol`, an unknown field or an `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/currencies/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": {\n      \"code\": \"US\"\n    },\n    \"conversion_rate\": 1.5,\n    \"precision\": 3,\n    \"rounding\": \"up\",\n    \"active\": false\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.update_currency(1234, {\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": {\"code\": \"US\"},\n    \"conversion_rate\": 1.5,\n    \"precision\": 3,\n    \"rounding\": \"up\",\n    \"active\": False,\n})\ncurrency = response.map[\"currency\"]\nprint(currency[\"country\"][\"code\"], currency[\"conversion_rate\"], currency[\"rounding\"], currency[\"active\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.updateCurrency(1234, {\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: {code: 'US'},\n    conversion_rate: 1.5,\n    precision: 3,\n    rounding: 'up',\n    active: false,\n});\nconst currency = response.map.currency;\nconsole.log(currency.country.code, currency.conversion_rate, currency.rounding, currency.active);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::updateCurrency($client, 1234, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => ['code' => 'US'],\n    'conversion_rate' => 1.5, 'precision' => 3, 'rounding' => 'up', 'active' => false,\n]);\n\n$currency = $response->map['currency'];\necho $currency['conversion_rate'], ' ', $currency['rounding'], ' ', $currency['active'] ? 'active' : 'inactive', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().updateCurrency(1234, Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", Map.of(\"code\", \"US\"),\n        \"conversion_rate\", 1.5, \"precision\", 3, \"rounding\", \"up\", \"active\", false));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"conversion_rate\") + \" \" + currency.get(\"precision\") + \" \" + currency.get(\"rounding\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\") + \" \" + currency.get(\"active\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.UpdateCurrencyAsync(1234, new Dictionary<string, object?>\n{\n    [\"name\"] = \"Example Dollar\", [\"code\"] = \"XEX\", [\"symbol\"] = \"$\",\n    [\"country\"] = new Dictionary<string, object?> { [\"code\"] = \"US\" },\n    [\"conversion_rate\"] = 1.5, [\"precision\"] = 3, [\"rounding\"] = \"up\", [\"active\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"conversion_rate\"]} {currency[\"precision\"]} {currency[\"rounding\"]} {currency[\"active\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.updateCurrency(1234, {\n  'name': 'Example Dollar',\n  'code': 'XEX',\n  'symbol': '\\$',\n  'country': {'code': 'US'},\n  'conversion_rate': 1.5,\n  'precision': 3,\n  'rounding': 'up',\n  'active': false,\n});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['conversion_rate']} ${currency['rounding']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().UpdateCurrency(ctx, 1234, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": map[string]any{\"code\": \"US\"},\n\t\"conversion_rate\": 1.5, \"precision\": 3, \"rounding\": \"up\", \"active\": false,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"country\"].(map[string]any)[\"code\"], currency[\"conversion_rate\"], currency[\"rounding\"], currency[\"active\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrencyInput"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Update a currency",
+        "operationId": "patch_currency",
+        "description": "Send only the fields to change, at the top level of the body. Every field you leave out keeps its value. The store trims spaces from `name`, `code` and `symbol` as on create. An empty body is rejected with `400`, and so is any change to the base currency.",
+        "parameters": [
+          {
+            "name": "currency_id",
+            "in": "path",
+            "required": true,
+            "description": "The currency's `id`, from a listing or from the response to creating the currency.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The currency after the change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "$ref": "#/components/schemas/Currency"
+                    }
+                  }
+                },
+                "example": {
+                  "currency": {
+                    "id": 1234,
+                    "name": "Example Dollar",
+                    "code": "XEX",
+                    "symbol": "$",
+                    "country": {
+                      "id": 160,
+                      "code": "NZ",
+                      "name": "New Zealand"
+                    },
+                    "conversion_rate": 2.5,
+                    "rounding": "nearest",
+                    "precision": 2,
+                    "active": true,
+                    "base": false,
+                    "updated_at": "2026-10-11T05:26:15Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The currency is the base currency. The message is `The base currency is read-only - make another currency the base first.`, and `details[0]` has `field` `base` and `code` `base_currency_read_only`. Or the body is empty (message `request body is empty`), has a field that is not a currency field, or sends `id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/currencies/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"conversion_rate\": 2.5\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.patch_currency(1234, {\"conversion_rate\": 2.5})\nprint(response.map[\"currency\"][\"conversion_rate\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.patchCurrency(1234, {conversion_rate: 2.5});\nconsole.log(response.map.currency.conversion_rate, response.map.currency.updated_at);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::patchCurrency($client, 1234, ['conversion_rate' => 2.5]);\n\necho $response->map['currency']['conversion_rate'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().patchCurrency(1234, Map.of(\"conversion_rate\", 2.5));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"code\") + \" \" + currency.get(\"conversion_rate\") + \" \" + currency.get(\"updated_at\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.PatchCurrencyAsync(1234, new Dictionary<string, object?>\n{\n    [\"conversion_rate\"] = 2.5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"code\"]} {currency[\"conversion_rate\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies\n    .patchCurrency(1234, {'conversion_rate': 2.5});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['code']} ${currency['conversion_rate']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().PatchCurrency(ctx, 1234, map[string]any{\"conversion_rate\": 2.5}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"conversion_rate\"], currency[\"updated_at\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrencyPatchInput"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Delete a currency",
+        "operationId": "delete_currency",
+        "description": "Deletes the currency permanently and returns `204` with no body. The currency leaves the listing, the count goes down by one, and retrieving or deleting it again returns `404`. You cannot delete the base currency: make another currency the base first with [Set the base currency](/api-reference/currencies/set-the-base-currency).",
+        "parameters": [
+          {
+            "name": "currency_id",
+            "in": "path",
+            "required": true,
+            "description": "The currency's `id`, from a listing or from the response to creating the currency.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "No currency has that `currency_id`, for example because you already deleted it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The currency is the base currency. The message is `The base currency cannot be deleted.` and the reason is `conflict`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/currencies/1234\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.delete_currency(1234)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.deleteCurrency(1234);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::deleteCurrency($client, 1234);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().deleteCurrency(1234);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.DeleteCurrencyAsync(1234);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.deleteCurrency(1234);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().DeleteCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/currencies/{currency_id}/base": {
+      "put": {
+        "tags": [
+          "Currencies"
+        ],
+        "summary": "Set the base currency",
+        "operationId": "set_base_currency",
+        "description": "Makes the currency the base: its `conversion_rate` becomes `1`, the old base loses the flag, and every other currency's rate, inactive ones included, is divided by the new base's old rate. Every currency gets a new `updated_at` and `ETag`. Send no body: any body, `{}` included, is rejected with `400`. The response returns only the new base's `id`, `name`, `code` and `base`, so retrieve the currency for its other fields.",
+        "parameters": [
+          {
+            "name": "currency_id",
+            "in": "path",
+            "required": true,
+            "description": "The currency's `id`, from a listing or from the response to creating the currency.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new base in `currency`, with `id`, `name`, `code` and `base`. `previous_base` names the currency that was the base, with `id`, `code` and `name`. `previous_base` is `null` when the currency you named was already the base.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyBaseChange"
+                },
+                "example": {
+                  "currency": {
+                    "id": 1234,
+                    "name": "Example Dollar",
+                    "code": "XEX",
+                    "base": true
+                  },
+                  "previous_base": {
+                    "id": 1,
+                    "code": "USD",
+                    "name": "US Dollar"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a body (message `This endpoint takes no request body.`), or the currency is inactive (message `An inactive currency cannot be the base currency - activate it first.`, `details[0].code` `inactive_currency`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/currencies/1234/base\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.set_base_currency(1234)\nbase = response.map[\"currency\"]\nprint(base[\"code\"], base[\"base\"])\nprint(response.map[\"previous_base\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.setBaseCurrency(1234);\nconsole.log(response.map.currency.code, response.map.currency.base);\nconsole.log(response.map.previous_base?.code);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::setBaseCurrency($client, 1234);\n\necho $response->map['currency']['code'], ' is the base currency', PHP_EOL;\n$previous = $response->map['previous_base'];\necho $previous === null ? 'it was already the base' : 'it replaced ' . $previous['code'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().setBaseCurrency(1234);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> currency = (Map<?, ?>) body.get(\"currency\");\nSystem.out.println(currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(body.get(\"previous_base\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.SetBaseCurrencyAsync(1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"code\"]} {currency[\"base\"]}\");\nif (body[\"previous_base\"] is IReadOnlyDictionary<string, object?> previousBase)\n    Console.WriteLine(previousBase[\"code\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.setBaseCurrency(1234);\nfinal body = response.map as Map;\nprint((body['currency'] as Map)['code']);\nprint(body['previous_base']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().SetBaseCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ncurrency := body[\"currency\"].(map[string]any)\nprevious, _ := body[\"previous_base\"].(map[string]any)\nfmt.Println(currency[\"code\"], currency[\"base\"], previous[\"code\"])\n"
+          }
+        ]
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -55783,6 +56944,434 @@
               "request_id": {
                 "type": "string",
                 "description": "A 36-character identifier for this request."
+              }
+            }
+          }
+        }
+      },
+      "Currency": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The currency's `id`, set by the store. Pass it as `currency_id` in the path of the other calls."
+          },
+          "name": {
+            "type": "string",
+            "description": "The currency's name, unique in any letter case."
+          },
+          "code": {
+            "type": "string",
+            "description": "Three upper-case letters, unique across the store's currencies."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "At most 3 characters."
+          },
+          "country": {
+            "$ref": "#/components/schemas/CurrencyCountry"
+          },
+          "conversion_rate": {
+            "type": "number",
+            "description": "The currency's rate against the base currency, to at most 6 decimal places. `1` on the base currency. A whole number, such as `1`, is returned without a decimal point."
+          },
+          "rounding": {
+            "type": "string",
+            "enum": [
+              "nearest",
+              "up",
+              "down"
+            ]
+          },
+          "precision": {
+            "type": "integer",
+            "description": "From `1` to `9`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the currency is active."
+          },
+          "base": {
+            "type": "boolean",
+            "description": "`true` on the store's base currency. Exactly one currency has it, and only [Set the base currency](/api-reference/currencies/set-the-base-currency) changes it."
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "When the currency last changed, such as `2026-10-11T04:12:09Z`. Setting the base currency changes it on every currency."
+          }
+        }
+      },
+      "CurrencyCountry": {
+        "type": "object",
+        "description": "The country the currency belongs to.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's numeric `id`. A write can send it as `country`."
+          },
+          "code": {
+            "type": "string",
+            "description": "The country's two-letter code."
+          },
+          "name": {
+            "type": "string",
+            "description": "The country's name."
+          }
+        }
+      },
+      "CurrencyInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "code",
+          "symbol"
+        ],
+        "description": "Send these fields at the top level of the body. Any other field, `id` included, is rejected with `400`.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "At most 100 characters. No other currency may have the same name in any letter case. Spaces at either end are removed."
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\s*[A-Za-z]{3}\\s*$",
+            "description": "Three letters, stored in upper case. No other currency may have the same code. The store does not check it against ISO 4217."
+          },
+          "symbol": {
+            "type": "string",
+            "maxLength": 3,
+            "description": "At most 3 characters. Spaces at either end are removed."
+          },
+          "country": {
+            "description": "The country's numeric `id`, its two-letter `code`, its `name`, or an object such as `{\"code\": \"NZ\"}`. Defaults to the store's default country. A country the store does not have is rejected with `400`.",
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "conversion_rate": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 999999999,
+            "description": "Above `0` and at most `999999999`. Stored to 6 decimal places, so `1.234567891` is stored as `1.234568`. Defaults to `1`."
+          },
+          "rounding": {
+            "type": "string",
+            "enum": [
+              "nearest",
+              "up",
+              "down"
+            ],
+            "description": "Defaults to `nearest`."
+          },
+          "precision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9,
+            "description": "From `1` to `9`. Defaults to `2`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Defaults to `true`. An inactive currency cannot be made the base."
+          }
+        }
+      },
+      "CurrencyPatchInput": {
+        "type": "object",
+        "minProperties": 1,
+        "description": "Send only the fields to change, at the top level of the body. Any other field, `id` included, is rejected with `400`, and so is an empty body.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "At most 100 characters. No other currency may have the same name in any letter case. Spaces at either end are removed."
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\s*[A-Za-z]{3}\\s*$",
+            "description": "Three letters, stored in upper case. No other currency may have the same code. The store does not check it against ISO 4217."
+          },
+          "symbol": {
+            "type": "string",
+            "maxLength": 3,
+            "description": "At most 3 characters. Spaces at either end are removed."
+          },
+          "country": {
+            "description": "The country's numeric `id`, its two-letter `code`, its `name`, or an object such as `{\"code\": \"NZ\"}`. Defaults to the store's default country. A country the store does not have is rejected with `400`.",
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "conversion_rate": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 999999999,
+            "description": "Above `0` and at most `999999999`. Stored to 6 decimal places, so `1.234567891` is stored as `1.234568`. Defaults to `1`."
+          },
+          "rounding": {
+            "type": "string",
+            "enum": [
+              "nearest",
+              "up",
+              "down"
+            ],
+            "description": "Defaults to `nearest`."
+          },
+          "precision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9,
+            "description": "From `1` to `9`. Defaults to `2`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Defaults to `true`. An inactive currency cannot be made the base."
+          }
+        }
+      },
+      "CurrencyPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of currencies that match your request."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, or `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of currencies skipped before this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when `offset` is above `0`, even past the last currency."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there are currencies after this page."
+          }
+        }
+      },
+      "CurrencyCount": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of currencies that match `search` and `active`."
+          }
+        }
+      },
+      "CurrencyReference": {
+        "type": "object",
+        "description": "The currency that was the base before the change.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The previous base currency's `id`, which other calls take as `currency_id`."
+          },
+          "code": {
+            "type": "string",
+            "description": "The previous base currency's `code`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The previous base currency's `name`."
+          }
+        }
+      },
+      "CurrencyBaseChange": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "object",
+            "description": "The new base currency. Only these four fields are returned.",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "The new base currency's `id`, the `currency_id` you sent."
+              },
+              "name": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "base": {
+                "type": "boolean",
+                "description": "Always `true`."
+              }
+            }
+          },
+          "previous_base": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CurrencyReference"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The currency that was the base, or `null` when the currency you named was already the base."
+          }
+        }
+      },
+      "CurrencyFieldDescription": {
+        "type": "object",
+        "description": "Describes one currency field. Other keys give the field's limits and default.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The field's value type: `string`, `reference`, `number`, `enum`, `integer`, `boolean` or `datetime`."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "On the eight writable fields: `true` on `name`, `code` and `symbol`, and `false` on the others."
+          },
+          "unique": {
+            "type": "boolean",
+            "description": "`true` on `name` and `code`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "`true` on the eight fields a write can set: `name`, `code`, `symbol`, `country`, `conversion_rate`, `rounding`, `precision` and `active`."
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "`true` on `id`, `base` and `updated_at`."
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "On `rounding`: `nearest`, `up` and `down`."
+          },
+          "accepts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "On `country`: `id`, `code`, `name` and `object`, the forms a write can send."
+          },
+          "pattern": {
+            "type": "string",
+            "description": "On `code`: `3 letters (ISO 4217), stored upper-case`. Any three letters are accepted."
+          },
+          "note": {
+            "type": "string",
+            "description": "On `base`: `change with PUT /api/v4/admin/currencies/{id}/base`, where `{id}` is the currency's `currency_id`."
+          }
+        }
+      },
+      "CurrencyFieldMetadata": {
+        "type": "object",
+        "description": "Describes each currency field, keyed by field name. Returned only when you send `field_metadata=true`.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "name": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "code": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "symbol": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "conversion_rate": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "rounding": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "precision": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "active": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "base": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/CurrencyFieldDescription"
+          }
+        }
+      },
+      "CurrencyError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `The base currency cannot be deleted.`"
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or parameter, or an empty list.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `required`, `unknown_field` or `duplicate`."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "The reason in words, such as `is not a currency field`."
+                    },
+                    "value": {
+                      "type": "string",
+                      "description": "The value you sent for a rejected query parameter, such as `bogus` for `sort=bogus`."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
               }
             }
           }

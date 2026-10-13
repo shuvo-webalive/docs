@@ -1,0 +1,50 @@
+{
+  "sdk": "php",
+  "module": "currencies",
+  "endpoints": {
+    "list_currencies": {
+      "function": "listCurrencies",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::listCurrencies($client, ['search' => 'dollar', 'active' => true]);\n\nforeach ($response->map['currencies'] as $currency) {\n    echo $currency['id'], ' ', $currency['code'], ' ', $currency['name'], ' ', $currency['conversion_rate'], $currency['base'] ? ' (base)' : '', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
+    },
+    "head_currencies": {
+      "function": "headCurrencies",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::headCurrencies($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_currencies": {
+      "function": "countCurrencies",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::countCurrencies($client, ['search' => 'dollar', 'active' => true]);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "head_currencies_count": {
+      "function": "headCurrenciesCount",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::headCurrenciesCount($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_currency": {
+      "function": "createCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::createCurrency($client, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => 'NZ',\n    'conversion_rate' => 1.2345, 'precision' => 2, 'rounding' => 'nearest', 'active' => true,\n]);\n\n$currency = $response->map['currency'];\necho $currency['id'], ' ', $currency['code'], ' ', $currency['country']['name'], PHP_EOL;"
+    },
+    "get_currency": {
+      "function": "getCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::getCurrency($client, 1234, ['field_metadata' => true]);\n\n$currency = $response->map['currency'];\necho $currency['name'], ' ', $currency['symbol'], ' ', $currency['conversion_rate'], ' ', $currency['rounding'], PHP_EOL;"
+    },
+    "head_currency": {
+      "function": "headCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::headCurrency($client, 1234);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_currency": {
+      "function": "updateCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::updateCurrency($client, 1234, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => ['code' => 'US'],\n    'conversion_rate' => 1.5, 'precision' => 3, 'rounding' => 'up', 'active' => false,\n]);\n\n$currency = $response->map['currency'];\necho $currency['conversion_rate'], ' ', $currency['rounding'], ' ', $currency['active'] ? 'active' : 'inactive', PHP_EOL;"
+    },
+    "patch_currency": {
+      "function": "patchCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::patchCurrency($client, 1234, ['conversion_rate' => 2.5]);\n\necho $response->map['currency']['conversion_rate'], PHP_EOL;"
+    },
+    "delete_currency": {
+      "function": "deleteCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::deleteCurrency($client, 1234);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "set_base_currency": {
+      "function": "setBaseCurrency",
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::setBaseCurrency($client, 1234);\n\necho $response->map['currency']['code'], ' is the base currency', PHP_EOL;\n$previous = $response->map['previous_base'];\necho $previous === null ? 'it was already the base' : 'it replaced ' . $previous['code'], PHP_EOL;"
+    }
+  }
+}

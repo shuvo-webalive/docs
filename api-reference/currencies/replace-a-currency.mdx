@@ -1,0 +1,9 @@
+---
+title: "Replace a currency"
+description: "Replaces every field of a currency with your body and returns the currency."
+openapi: "PUT /admin/currencies/{currency_id}"
+---
+
+Send `name`, `code` and `symbol`, and every other field you want to keep, at the top level of the body. This call replaces the currency rather than merging: a field you leave out goes back to its default, so `conversion_rate` becomes `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and `country` the store's default country. The body follows the same rules as [Create a currency](/api-reference/currencies/create-a-currency). You cannot replace the base currency.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

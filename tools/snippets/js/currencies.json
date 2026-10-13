@@ -1,0 +1,50 @@
+{
+  "sdk": "js",
+  "module": "currencies",
+  "endpoints": {
+    "list_currencies": {
+      "function": "listCurrencies",
+      "code": "const response = await client.currencies.listCurrencies({search: 'dollar', active: true});\nfor (const currency of response.map.currencies) {\n    console.log(currency.id, currency.code, currency.name, currency.conversion_rate, currency.base);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_currencies": {
+      "function": "headCurrencies",
+      "code": "const response = await client.currencies.headCurrencies();\nconsole.log(response.statusCode);\n"
+    },
+    "count_currencies": {
+      "function": "countCurrencies",
+      "code": "const response = await client.currencies.countCurrencies({search: 'dollar', active: true});\nconsole.log(response.map.total);\n"
+    },
+    "head_currencies_count": {
+      "function": "headCurrenciesCount",
+      "code": "const response = await client.currencies.headCurrenciesCount();\nconsole.log(response.statusCode);\n"
+    },
+    "create_currency": {
+      "function": "createCurrency",
+      "code": "const response = await client.currencies.createCurrency({\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: 'NZ',\n    conversion_rate: 1.2345,\n    precision: 2,\n    rounding: 'nearest',\n    active: true,\n});\nconsole.log(response.map.currency.id, response.map.currency.code, response.map.currency.base);\n"
+    },
+    "get_currency": {
+      "function": "getCurrency",
+      "code": "const response = await client.currencies.getCurrency(1234, {field_metadata: true});\nconst currency = response.map.currency;\nconsole.log(currency.name, currency.code, currency.symbol, currency.conversion_rate, currency.country.code);\nconsole.log(response.map.field_metadata.code.pattern, response.headers.etag);\n"
+    },
+    "head_currency": {
+      "function": "headCurrency",
+      "code": "const response = await client.currencies.headCurrency(1234);\nconsole.log(response.statusCode, response.headers.etag);\n"
+    },
+    "update_currency": {
+      "function": "updateCurrency",
+      "code": "const response = await client.currencies.updateCurrency(1234, {\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: {code: 'US'},\n    conversion_rate: 1.5,\n    precision: 3,\n    rounding: 'up',\n    active: false,\n});\nconst currency = response.map.currency;\nconsole.log(currency.country.code, currency.conversion_rate, currency.rounding, currency.active);\n"
+    },
+    "patch_currency": {
+      "function": "patchCurrency",
+      "code": "const response = await client.currencies.patchCurrency(1234, {conversion_rate: 2.5});\nconsole.log(response.map.currency.conversion_rate, response.map.currency.updated_at);\n"
+    },
+    "delete_currency": {
+      "function": "deleteCurrency",
+      "code": "const response = await client.currencies.deleteCurrency(1234);\nconsole.log(response.statusCode);\n"
+    },
+    "set_base_currency": {
+      "function": "setBaseCurrency",
+      "code": "const response = await client.currencies.setBaseCurrency(1234);\nconsole.log(response.map.currency.code, response.map.currency.base);\nconsole.log(response.map.previous_base?.code);\n"
+    }
+  }
+}

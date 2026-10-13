@@ -1,0 +1,58 @@
+---
+title: "Currencies"
+sidebarTitle: "Overview"
+description: "List, count, create, replace, update and delete currencies, and choose the store's base currency."
+---
+
+The Currencies API has eleven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/currencies`.
+
+<Warning>
+  **Setting the base currency changes the `conversion_rate` of every currency in the store.**
+  [Set the base currency](/api-reference/currencies/set-the-base-currency) divides every currency's rate, inactive ones included,
+  by the new base's old rate, and sets a new `updated_at` on every currency. Rates are kept to 6
+  decimal places, so switching back does not always restore a rate exactly. Product `base_price` values do not change.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List currencies](/api-reference/currencies/list-currencies) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/currencies` | Returns up to 20 currencies per call, or the `limit` you send, with paging totals. |
+| [Check the currencies list](/api-reference/currencies/check-the-currencies-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/currencies` | Checks that the currencies list is reachable. Returns headers only, with no body. |
+| [Count currencies](/api-reference/currencies/count-currencies) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/currencies/count` | Returns the number of currencies that match `search` and `active`, as `total`. |
+| [Check the currency count](/api-reference/currencies/check-the-currency-count) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/currencies/count` | Checks that the currency count is reachable. Returns headers only, with no body. |
+| [Create a currency](/api-reference/currencies/create-a-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/currencies` | Creates a currency and returns it with its `id`, which other calls take as `currency_id`. |
+| [Retrieve a currency](/api-reference/currencies/retrieve-a-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/currencies/{currency_id}` | Returns the currency whose `id` you pass as `currency_id`, with an `ETag` header. |
+| [Check a currency](/api-reference/currencies/check-a-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/currencies/{currency_id}` | Returns headers only for the currency you pass as `currency_id`, including its `ETag`. |
+| [Replace a currency](/api-reference/currencies/replace-a-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/currencies/{currency_id}` | Replaces every field of a currency with your body and returns the currency. |
+| [Update a currency](/api-reference/currencies/update-a-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/currencies/{currency_id}` | Changes only the fields you send and returns the currency. |
+| [Delete a currency](/api-reference/currencies/delete-a-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/currencies/{currency_id}` | Deletes a currency permanently. You cannot delete the base currency. |
+| [Set the base currency](/api-reference/currencies/set-the-base-currency) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/currencies/{currency_id}/base` | Makes an active currency the base and rescales every currency's `conversion_rate` to match. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send the fields at the top level of the body, not inside `currency`.** Create, replace and
+  update all take the bare record. A body wrapped in `currency` is rejected with `400`: `currency`
+  is reported as `unknown_field`, and `name`, `code` and `symbol` as `required`. Responses return the
+  currency inside `currency`.
+- **`PUT` replaces a currency, and `PATCH` changes only the fields you send.**
+  [Replace a currency](/api-reference/currencies/replace-a-currency) resets every field you leave out: `conversion_rate` to `1`,
+  `rounding` to `nearest`, `precision` to `2`, `active` to `true` and `country` to the store's default
+  country. To change one field, use [Update a currency](/api-reference/currencies/update-a-currency).
+- **Exactly one currency is the base, and you cannot replace, update or delete it.** `PUT` and `PATCH` on
+  the base currency are rejected with `400`, and `DELETE` with `409`. Make another currency the base
+  first with [Set the base currency](/api-reference/currencies/set-the-base-currency). That call is the only way to move the flag,
+  and it rejects an inactive currency.
+- **A listing returns 20 currencies per call unless you send `limit`.** `limit` takes `1` to `100`,
+  and `pagination.limit` shows the page size applied. To get more, send a higher `offset` while
+  `pagination.has_next` is `true`. `page` is rejected with `400`. `q` does not filter the listing:
+  the store ignores it and returns every currency, so send `search` instead.
+- **`code` is any three letters, stored in upper case.** The store does not check it against
+  ISO 4217, even though `field_metadata` describes it as an ISO 4217 code. `code` and `name` must
+  each be unique: a taken one is rejected with `409`. `name` is compared without regard to letter case.
