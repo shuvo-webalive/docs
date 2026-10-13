@@ -100,7 +100,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE,
         "summary": "Returns up to 20 inventory locations per call, or the `limit` you send, default location first, with paging details.",
-        "description": "Returns the inventory locations, 20 per call unless you send `limit`, with a `pagination` block. The default location comes first, then the rest, newest `created_at` first. Send `q` to keep only locations whose `name` contains that text. Only `q`, `limit` and `offset` are accepted; any other query parameter, such as `page` or `field_metadata`, is rejected with `400`. After a `400`, the next one or two requests on the same connection can return that rejection's body instead of their own.",
+        "description": "Returns the inventory locations, 20 per call unless you send `limit`, with a `pagination` block. The default location comes first, then the rest, newest `created_at` first. Send `q` to keep only locations whose `name` or `address` contains that text, in any letter case. Only `q`, `limit` and `offset` are accepted; any other query parameter, such as `page` or `field_metadata`, is rejected with `400`. After a `400`, the next one or two requests on the same connection can return that rejection's body instead of their own.",
         "parameters": [Q, LIMIT, OFFSET],
         "responses": {
             "200": {
@@ -158,7 +158,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{inventory_location_id}",
         "summary": "Returns the inventory location whose `id` you pass as `inventory_location_id`.",
-        "description": "Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `active`, `default`, `created_at` and `updated_at`. The response has no `ETag` header.",
+        "description": "Returns one location under the `inventory_location` key, with the same seven fields a listing entry has: `id`, `name`, `address`, `active`, `default`, `created_at` and `updated_at`. The response has an `ETag` header, which you can send as `If-Match` on an update.",
         "parameters": [INVENTORY_LOCATION_ID],
         "responses": {
             "200": {
@@ -249,7 +249,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{inventory_location_id}/stock",
         "summary": "Returns an inventory location and up to 20 of the products it holds, or the `limit` you send, with paging details.",
-        "description": "Returns the location under `inventory_location`, its products under `items`, 20 per call unless you send `limit`, and a `pagination` block that counts products. Each item names the product in `product` and gives its `available_stock` at this location. A location that holds no products returns an empty `items` list, with `total` set to `0`. Send `offset` to get the next products. Only `limit` and `offset` are accepted; `q`, `page` and any other query parameter are rejected with `400`. This call is read-only: no call on this API changes stock.",
+        "description": "Returns the location under `inventory_location`, its products under `items`, 20 per call unless you send `limit`, and a `pagination` block that counts products. Each item names the product in `product` and gives its `available_stock` at this location. A location that holds no products returns an empty `items` list, with `total` set to `0`. Send `offset` to get the next products. Only `limit` and `offset` are accepted; `q`, `page` and any other query parameter are rejected with `400`. This call is read-only; to change a product's stock at a location, use the [products API](/products).",
         "parameters": [INVENTORY_LOCATION_ID, STOCK_LIMIT, STOCK_OFFSET],
         "responses": {
             "200": {
