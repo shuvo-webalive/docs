@@ -20047,23 +20047,23 @@
         ]
       }
     },
-    "/admin/tax/country_taxes": {
+    "/admin/tax/country-taxes": {
       "get": {
         "tags": [
           "Country taxes"
         ],
         "summary": "List country taxes",
         "operationId": "list_tax_country_taxes",
-        "description": "Returns your store's country taxes under `country_taxes`, up to 20 per call, and a `pagination` object with the total and this page's `offset`. Each country tax has thirteen fields, including `state_rules_count`, the number of its state rules; only [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves. To read every country tax, add `pagination.count` to `offset` after each page until `offset` reaches `pagination.total`. `q` and `field_metadata` are accepted and ignored.",
+        "description": "Returns your store's country taxes under `country_taxes`, newest first, up to `limit` per call with a maximum of `100`. You also get a `pagination` object with the total and this page's `offset`, and `group_meta`, which describes `country_tax` and `state_rules` with a `kind`, a `writable` flag and an `href` each. Each country tax has twelve fields, including `state_rules_count`, the number of its state rules; [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves. To read every country tax, add `pagination.count` to `offset` after each page until `offset` reaches `pagination.total`. Send `sort=name` to sort by name. `q`, `search`, `country_code`, `is_rest_of_world` and `field_metadata` are accepted and ignored. The response has no `ETag`.",
         "parameters": [
           {
             "name": "limit",
             "in": "query",
-            "description": "Country taxes per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`.",
+            "description": "Country taxes per page, from `1` to `100`. A larger value is cut to `100`, and `pagination.limit` shows `100`. `0` is rejected with `400` and the message `'limit' must be a positive integer`.",
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 20,
+              "maximum": 100,
               "example": 20
             }
           },
@@ -20086,9 +20086,22 @@
             }
           },
           {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorts by `id` or `name`, in descending order either way. `order` and `direction` change nothing. Any other value is rejected with `400` and the message `unsupported sort '<value>'`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name"
+              ],
+              "example": "name"
+            }
+          },
+          {
             "name": "q",
             "in": "query",
-            "description": "Accepted and ignored: it does not filter the listing.",
+            "description": "Accepted and ignored: it does not filter the listing. So are `search`, `country_code` and `is_rest_of_world`.",
             "schema": {
               "type": "string"
             }
@@ -20104,7 +20117,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Up to 20 country taxes under `country_taxes`, and a `pagination` object with the number of country taxes in the store and this page's position.",
+            "description": "The country taxes on this page under `country_taxes`, `group_meta`, and a `pagination` object with the number of country taxes in the store and this page's position.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20116,6 +20129,9 @@
                         "$ref": "#/components/schemas/CountryTax"
                       }
                     },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/CountryTaxGroupMeta"
+                    },
                     "pagination": {
                       "$ref": "#/components/schemas/CountryTaxPagination"
                     }
@@ -20124,23 +20140,22 @@
                 "example": {
                   "country_taxes": [
                     {
-                      "id": 5,
-                      "name": "United Kingdom VAT",
+                      "id": 13,
+                      "name": "Singapore",
                       "country": {
-                        "id": 235,
-                        "name": "United Kingdom",
-                        "code": "GB"
+                        "id": 201,
+                        "name": "Singapore",
+                        "code": "SG"
                       },
-                      "code": "VAT",
-                      "tax_rate": 17.5,
-                      "tax_method": "FIXED_RATE",
-                      "is_default": true,
-                      "special_key": null,
+                      "tax_code": "SG",
+                      "tax_rate": 6.25,
+                      "tax_method": "fixed_rate",
+                      "is_default": false,
+                      "is_rest_of_world": false,
                       "state_rules_count": 0,
-                      "rate_display": "17.5%",
-                      "transaction_no": null,
-                      "created_at": "2025-03-10T09:15:00",
-                      "updated_at": "2025-03-10T09:15:00"
+                      "created_on": "2026-06-18T14:45:00Z",
+                      "last_updated_on": "2026-06-18T14:45:00Z",
+                      "last_updated_by": null
                     },
                     {
                       "id": 12,
@@ -20150,37 +20165,47 @@
                         "name": "Japan",
                         "code": "JP"
                       },
-                      "code": "JP",
+                      "tax_code": "JP",
                       "tax_rate": 4.5,
-                      "tax_method": "FIXED_RATE",
+                      "tax_method": "fixed_rate",
                       "is_default": false,
-                      "special_key": null,
+                      "is_rest_of_world": false,
                       "state_rules_count": 0,
-                      "rate_display": "4.5%",
-                      "transaction_no": null,
-                      "created_at": "2026-05-04T08:20:00",
-                      "updated_at": "2026-05-04T08:20:00"
+                      "created_on": "2026-05-04T08:20:00Z",
+                      "last_updated_on": "2026-05-04T08:20:00Z",
+                      "last_updated_by": null
                     },
                     {
-                      "id": 13,
-                      "name": "Singapore",
+                      "id": 5,
+                      "name": "United Kingdom VAT",
                       "country": {
-                        "id": 201,
-                        "name": "Singapore",
-                        "code": "SG"
+                        "id": 235,
+                        "name": "United Kingdom",
+                        "code": "GB"
                       },
-                      "code": "SG",
-                      "tax_rate": 6.25,
-                      "tax_method": "FIXED_RATE",
-                      "is_default": false,
-                      "special_key": null,
+                      "tax_code": "VAT",
+                      "tax_rate": 17.5,
+                      "tax_method": "fixed_rate",
+                      "is_default": true,
+                      "is_rest_of_world": false,
                       "state_rules_count": 0,
-                      "rate_display": "6.25%",
-                      "transaction_no": null,
-                      "created_at": "2026-06-18T14:45:00",
-                      "updated_at": "2026-06-18T14:45:00"
+                      "created_on": "2025-03-10T09:15:00Z",
+                      "last_updated_on": "2025-03-10T09:15:00Z",
+                      "last_updated_by": null
                     }
                   ],
+                  "group_meta": {
+                    "country_tax": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/tax/country-taxes/{id}"
+                    },
+                    "state_rules": {
+                      "kind": "collection",
+                      "writable": true,
+                      "href": "/api/v4/admin/tax/country-taxes/{id}/state-rules"
+                    }
+                  },
                   "pagination": {
                     "total": 3,
                     "limit": 20,
@@ -20196,38 +20221,48 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "`limit` is `0`: the message is `'limit' must be a positive integer`. Or `sort` is not `id` or `name`: the message is `unsupported sort '<value>'`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryTaxError"
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/country_taxes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/country-taxes?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.list_tax_country_taxes({\"limit\": 20})\nfor country_tax in response.map[\"country_taxes\"]:\n    print(country_tax[\"id\"], country_tax[\"name\"], country_tax[\"rate_display\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.list_tax_country_taxes({\"limit\": 20})\nfor country_tax in response.map[\"country_taxes\"]:\n    print(country_tax[\"id\"], country_tax[\"name\"], country_tax[\"tax_rate\"], country_tax[\"state_rules_count\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.listTaxCountryTaxes({limit: 20});\nfor (const countryTax of response.map.country_taxes) {\n    console.log(countryTax.id, countryTax.name, countryTax.rate_display);\n}\nconsole.log(response.map.pagination.total);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.listTaxCountryTaxes({limit: 20});\nfor (const countryTax of response.map.country_taxes) {\n    console.log(countryTax.id, countryTax.name, countryTax.tax_rate, countryTax.tax_method);\n}\nconsole.log(response.map.pagination.total);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::listTaxCountryTaxes($client, ['limit' => 20]);\n\nforeach ($response->map['country_taxes'] as $countryTax) {\n    echo $countryTax['id'], ' ', $countryTax['name'], ' ', $countryTax['rate_display'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' country taxes in total', PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::listTaxCountryTaxes($client, ['limit' => 20]);\n\nforeach ($response->map['country_taxes'] as $countryTax) {\n    echo $countryTax['id'], ' ', $countryTax['name'], ' ', $countryTax['country']['code'], ' ', $countryTax['tax_rate'], ' ', $countryTax['tax_method'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' country taxes in total', PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().listTaxCountryTaxes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"country_taxes\")) {\n    Map<?, ?> countryTax = (Map<?, ?>) row;\n    System.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"rate_display\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().listTaxCountryTaxes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"country_taxes\")) {\n    Map<?, ?> countryTax = (Map<?, ?>) row;\n    System.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \"\n            + countryTax.get(\"state_rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.ListTaxCountryTaxesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var countryTax in ((IReadOnlyList<object?>)body[\"country_taxes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{countryTax[\"id\"]} {countryTax[\"name\"]} {countryTax[\"rate_display\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.ListTaxCountryTaxesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var countryTax in ((IReadOnlyList<object?>)body[\"country_taxes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{countryTax[\"id\"]} {countryTax[\"name\"]} {countryTax[\"tax_code\"]} {countryTax[\"tax_rate\"]}\");\n"
           },
           {
             "lang": "dart",
@@ -20237,7 +20272,7 @@
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().ListTaxCountryTaxes(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"country_taxes\"].([]any) {\n\tcountryTax := row.(map[string]any)\n\tfmt.Println(countryTax[\"id\"], countryTax[\"name\"], countryTax[\"rate_display\"])\n}\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().ListTaxCountryTaxes(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"country_taxes\"].([]any) {\n\tcountryTax := row.(map[string]any)\n\tfmt.Println(countryTax[\"id\"], countryTax[\"name\"], countryTax[\"tax_code\"], countryTax[\"tax_rate\"], countryTax[\"tax_method\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
           }
         ]
       },
@@ -20247,8 +20282,18 @@
         ],
         "summary": "Create a country tax",
         "operationId": "create_tax_country_tax",
-        "description": "Creates a country tax and returns it with the `id` the store assigned, which the other calls take as `country_tax_id`. Wrap the record in `country_tax` and include `country_code`: the store fills `country` and `code` from it and works out `rate_display` from `tax_rate`, but no response includes `country_code` itself. Fields the store does not know are dropped, and you can create a second country tax for a country that already has one. The response has the same thirteen fields as a country tax in the listing.",
-        "parameters": [],
+        "description": "Creates a country tax and returns it with the `id` the store assigned, which the other calls take as `country_tax_id`. Wrap the record in `country_tax` and include `country_code`, in any letter case. The store fills `country` from it, and sets `tax_code` to the country's code unless you send `tax_code`. No response includes `country_code`, and `country_id` is not read. `tax_method` takes `fixed_rate`, `api` or `no_tax` in any letter case and reads back in lower case. `name` is optional and reads `null` when you leave it out. Fields the store does not know are dropped, and you can create a second country tax for a country that already has one. To file the country tax under a transaction number, send an `X-Transaction-No` header, or `transaction_no` at the top level of the body beside `country_tax`. A `transaction_no` inside `country_tax` files nothing. The response has the twelve fields of a listing row, no `state_rules`, and no `ETag` or `Location` header.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. It wins over a different `transaction_no` in the body. No response returns it.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "The new country tax. Its `id` is the `country_tax_id` the other calls take.",
@@ -20265,29 +20310,28 @@
                 "example": {
                   "country_tax": {
                     "id": 42,
-                    "name": "New Zealand",
+                    "name": "NZ GST",
                     "country": {
                       "id": 160,
                       "name": "New Zealand",
                       "code": "NZ"
                     },
-                    "code": "NZ",
-                    "tax_rate": 4.5,
-                    "tax_method": "FIXED_RATE",
+                    "tax_code": "NZ",
+                    "tax_rate": 15.0,
+                    "tax_method": "fixed_rate",
                     "is_default": false,
-                    "special_key": null,
+                    "is_rest_of_world": false,
                     "state_rules_count": 0,
-                    "rate_display": "4.5%",
-                    "transaction_no": null,
-                    "created_at": "2026-09-24T10:00:00",
-                    "updated_at": "2026-09-24T10:00:00"
+                    "created_on": "2026-09-24T10:00:00Z",
+                    "last_updated_on": "2026-09-24T10:00:00Z",
+                    "last_updated_by": null
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "The body has no `country_code`: the code is `invalid_request` and the message is `Invalid country_code`. Or the body is not wrapped in `country_tax`: the message is `country_tax missing`.",
+            "description": "The body has no `country_code`, or a code no country has: the code is `invalid_request` and the message is `Invalid country_code`. Or `tax_method` is not one of the three values: the message is `Invalid tax_method. Must be one of: fixed_rate, api, no_tax`. Or the body is not wrapped in `country_tax`: the message is `country_tax missing`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20309,42 +20353,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax/country_taxes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"country_tax\": {\n      \"country_code\": \"NZ\",\n      \"name\": \"New Zealand\",\n      \"tax_rate\": 4.5,\n      \"tax_method\": \"FIXED_RATE\",\n      \"is_default\": false\n    }\n  }'"
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax/country-taxes\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"country_tax\": {\n      \"country_code\": \"NZ\",\n      \"name\": \"NZ GST\",\n      \"tax_rate\": 15.0,\n      \"tax_method\": \"fixed_rate\"\n    },\n    \"transaction_no\": \"TXN-IMPORT-0001\"\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.create_tax_country_tax({\n    \"country_tax\": {\n        \"country_code\": \"NZ\",\n        \"name\": \"New Zealand\",\n        \"tax_rate\": 4.5,\n        \"tax_method\": \"FIXED_RATE\",\n        \"is_default\": False,\n    },\n})\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"id\"], country_tax[\"country\"][\"code\"], country_tax[\"rate_display\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.create_tax_country_tax({\n    \"country_tax\": {\n        \"country_code\": \"NZ\",\n        \"name\": \"NZ GST\",\n        \"tax_rate\": 15.0,\n        \"tax_method\": \"fixed_rate\",\n    },\n    \"transaction_no\": \"TXN-IMPORT-0001\",\n}, transaction_no=\"TXN-IMPORT-0001\")\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"id\"], country_tax[\"country\"][\"code\"], country_tax[\"tax_code\"], country_tax[\"tax_rate\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst countryTax = {\n    country_code: 'NZ',\n    name: 'New Zealand',\n    tax_rate: 4.5,\n    tax_method: 'FIXED_RATE',\n    is_default: false,\n};\nconst response = await client.taxCountryTaxes.createTaxCountryTax({country_tax: countryTax});\nconsole.log(response.map.country_tax.id, response.map.country_tax.rate_display);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.createTaxCountryTax({\n    country_tax: {country_code: 'NZ', name: 'NZ GST', tax_rate: 15.0, tax_method: 'fixed_rate'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.id, countryTax.tax_code, countryTax.tax_rate, countryTax.country.code);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::createTaxCountryTax($client, [\n    'country_tax' => [\n        'country_code' => 'NZ', 'name' => 'New Zealand',\n        'tax_rate' => 4.5, 'tax_method' => 'FIXED_RATE', 'is_default' => false,\n    ],\n]);\n\necho $response->map['country_tax']['id'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::createTaxCountryTax($client, [\n    'country_tax' => ['country_code' => 'NZ', 'name' => 'NZ GST', 'tax_rate' => 15.0, 'tax_method' => 'fixed_rate'],\n    'transaction_no' => 'TXN-IMPORT-0001',\n], transactionNo: 'TXN-IMPORT-0001');\n\n$countryTax = $response->map['country_tax'];\necho $countryTax['id'], ' ', $countryTax['name'], ' ', $countryTax['tax_code'], ' ', $countryTax['tax_rate'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().createTaxCountryTax(Map.of(\"country_tax\", Map.of(\n        \"country_code\", \"NZ\", \"name\", \"New Zealand\", \"tax_rate\", 4.5, \"tax_method\", \"FIXED_RATE\", \"is_default\", false)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"code\") + \" \" + countryTax.get(\"rate_display\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().createTaxCountryTax(Map.of(\n        \"country_tax\", Map.of(\"country_code\", \"NZ\", \"name\", \"NZ GST\", \"tax_rate\", 15.0, \"tax_method\", \"fixed_rate\"),\n        \"transaction_no\", \"TXN-IMPORT-0001\"), \"TXN-IMPORT-0001\");\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\"));\nSystem.out.println(((Map<?, ?>) countryTax.get(\"country\")).get(\"code\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.CreateTaxCountryTaxAsync(new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?>\n    {\n        [\"country_code\"] = \"NZ\", [\"name\"] = \"New Zealand\", [\"tax_rate\"] = 4.5, [\"tax_method\"] = \"FIXED_RATE\", [\"is_default\"] = false,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine(countryTax[\"id\"]);\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.CreateTaxCountryTaxAsync(new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?>\n    {\n        [\"country_code\"] = \"NZ\", [\"name\"] = \"NZ GST\", [\"tax_rate\"] = 15.0, [\"tax_method\"] = \"fixed_rate\",\n    },\n    [\"transaction_no\"] = \"TXN-IMPORT-0001\",\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"id\"]} {countryTax[\"tax_code\"]} {countryTax[\"tax_rate\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCountryTaxes.createTaxCountryTax({\n  'country_tax': {\n    'country_code': 'NZ',\n    'name': 'New Zealand',\n    'tax_rate': 4.5,\n    'tax_method': 'FIXED_RATE',\n    'is_default': false,\n  },\n});\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint(countryTax['id']);\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCountryTaxes.createTaxCountryTax(\n  {\n    'country_tax': {\n      'country_code': 'NZ',\n      'name': 'NZ GST',\n      'tax_rate': 15.0,\n      'tax_method': 'fixed_rate',\n    },\n    'transaction_no': 'TXN-IMPORT-0001',\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['id']} ${countryTax['name']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().CreateTaxCountryTax(ctx, map[string]any{\n\t\"country_tax\": map[string]any{\"country_code\": \"NZ\", \"name\": \"New Zealand\", \"tax_rate\": 4.5, \"tax_method\": \"FIXED_RATE\", \"is_default\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"id\"], countryTax[\"name\"], countryTax[\"rate_display\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().CreateTaxCountryTax(ctx, map[string]any{\n\t\"country_tax\":    map[string]any{\"country_code\": \"NZ\", \"name\": \"NZ GST\", \"tax_rate\": 15.0, \"tax_method\": \"fixed_rate\"},\n\t\"transaction_no\": \"TXN-IMPORT-0001\",\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"id\"], countryTax[\"name\"], countryTax[\"tax_code\"], countryTax[\"tax_rate\"])\n"
           }
         ],
         "requestBody": {
@@ -20360,6 +20404,10 @@
                   "country_tax": {
                     "$ref": "#/components/schemas/CountryTaxInput",
                     "description": "The new country tax. `country_code` is required."
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional. A transaction number to file the new country tax under. Send it here, beside `country_tax`: inside `country_tax` it files nothing. An `X-Transaction-No` header with a different number wins."
                   }
                 }
               }
@@ -20368,14 +20416,14 @@
         }
       }
     },
-    "/admin/tax/country_taxes/{country_tax_id}": {
+    "/admin/tax/country-taxes/{country_tax_id}": {
       "get": {
         "tags": [
           "Country taxes"
         ],
         "summary": "Retrieve a country tax",
         "operationId": "get_tax_country_tax",
-        "description": "Returns one country tax under the `country_tax` key. It has the thirteen fields the listing returns plus `state_rules`, the list of the country tax's state rules, which no other call returns. A country tax with no state rules has an empty `state_rules` list.",
+        "description": "Returns one country tax under the `country_tax` key. It has the twelve fields of a listing row plus `state_rules`, the list of the country tax's state rules. A country tax with no state rules has an empty `state_rules` list. The response has an `ETag` header, which you can send as `If-Match` on an update. Sending it back in `If-None-Match` still returns `200` and the full body.",
         "parameters": [
           {
             "name": "country_tax_id",
@@ -20389,7 +20437,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The country tax, with its `state_rules`.",
+            "description": "The country tax, with its `state_rules`. The response has an `ETag` header.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20409,33 +20457,31 @@
                       "name": "New Zealand",
                       "code": "NZ"
                     },
-                    "code": "GST",
+                    "tax_code": "GST",
                     "tax_rate": 15.0,
-                    "tax_method": "FIXED_RATE",
+                    "tax_method": "fixed_rate",
                     "is_default": false,
-                    "special_key": null,
+                    "is_rest_of_world": false,
                     "state_rules_count": 1,
-                    "rate_display": "15.0%",
-                    "transaction_no": null,
-                    "created_at": "2026-03-08T12:17:43",
-                    "updated_at": "2026-03-08T12:17:43",
+                    "created_on": "2026-03-08T01:17:43Z",
+                    "last_updated_on": "2026-03-08T01:17:43Z",
+                    "last_updated_by": null,
                     "state_rules": [
                       {
                         "id": 4,
                         "name": null,
                         "state": null,
-                        "state_name": null,
                         "address_line_1": null,
                         "address_line_2": null,
                         "city": null,
                         "post_code": null,
                         "tax_rate": 0.0,
-                        "tax_rule": "USE_COUNTRY_TAX",
+                        "tax_rule": "use_country_tax",
                         "effective_tax_rate": 15.0,
                         "is_default": false,
-                        "transaction_no": null,
-                        "created_at": "2026-03-08T12:17:43",
-                        "updated_at": "2026-03-08T12:17:43"
+                        "created_on": "2026-03-08T01:17:43Z",
+                        "last_updated_on": "2026-03-08T01:17:43Z",
+                        "last_updated_by": null
                       }
                     ]
                   }
@@ -20466,42 +20512,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/country_taxes/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/country-taxes/4\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.get_tax_country_tax(4)\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"name\"], country_tax[\"rate_display\"])\nfor state_rule in country_tax[\"state_rules\"]:\n    print(state_rule[\"tax_rule\"], state_rule[\"effective_tax_rate\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.get_tax_country_tax(4)\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"name\"], country_tax[\"tax_code\"], country_tax[\"tax_rate\"])\nfor state_rule in country_tax[\"state_rules\"]:\n    print(state_rule[\"id\"], state_rule[\"tax_rule\"], state_rule[\"effective_tax_rate\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.getTaxCountryTax(4);\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.name, countryTax.tax_rate, countryTax.rate_display);\nfor (const stateRule of countryTax.state_rules) {\n    console.log(stateRule.id, stateRule.tax_rule, stateRule.effective_tax_rate);\n}\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.getTaxCountryTax(4);\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.name, countryTax.tax_code, countryTax.tax_rate, countryTax.tax_method);\nfor (const stateRule of countryTax.state_rules) {\n    console.log(stateRule.id, stateRule.tax_rule, stateRule.effective_tax_rate);\n}\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::getTaxCountryTax($client, 4);\n\n$countryTax = $response->map['country_tax'];\necho $countryTax['name'], ' ', $countryTax['rate_display'], PHP_EOL;\nforeach ($countryTax['state_rules'] as $rule) {\n    echo 'state rule ', $rule['id'], ' ', $rule['tax_rule'], ' ', $rule['effective_tax_rate'], PHP_EOL;\n}\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::getTaxCountryTax($client, 4);\n\n$countryTax = $response->map['country_tax'];\necho $countryTax['name'], ' ', $countryTax['tax_code'], ' ', $countryTax['tax_rate'], PHP_EOL;\nforeach ($countryTax['state_rules'] as $rule) {\n    echo 'state rule ', $rule['id'], ' ', $rule['tax_rule'], ' ', $rule['effective_tax_rate'], PHP_EOL;\n}\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().getTaxCountryTax(4);\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"rate_display\"));\nfor (Object row : (List<?>) countryTax.get(\"state_rules\")) {\n    Map<?, ?> stateRule = (Map<?, ?>) row;\n    System.out.println(stateRule.get(\"id\") + \" \" + stateRule.get(\"tax_rule\") + \" \" + stateRule.get(\"effective_tax_rate\"));\n}\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().getTaxCountryTax(4);\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"state_rules_count\"));\nfor (Object row : (List<?>) countryTax.get(\"state_rules\")) {\n    Map<?, ?> stateRule = (Map<?, ?>) row;\n    System.out.println(stateRule.get(\"id\") + \" \" + stateRule.get(\"tax_rule\") + \" \" + stateRule.get(\"effective_tax_rate\"));\n}\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.GetTaxCountryTaxAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"name\"]} {countryTax[\"rate_display\"]}\");\nforeach (var stateRule in ((IReadOnlyList<object?>)countryTax[\"state_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{stateRule[\"id\"]} {stateRule[\"tax_rule\"]} {stateRule[\"effective_tax_rate\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.GetTaxCountryTaxAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"name\"]} {countryTax[\"tax_code\"]} {countryTax[\"tax_rate\"]}\");\nforeach (var stateRule in ((IReadOnlyList<object?>)countryTax[\"state_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{stateRule[\"id\"]} {stateRule[\"tax_rule\"]} {stateRule[\"effective_tax_rate\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCountryTaxes.getTaxCountryTax(4);\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['name']} ${countryTax['rate_display']}');\nfinal stateRules = countryTax['state_rules'] as List;\nfor (final stateRule in stateRules) {\n  print('${(stateRule as Map)['id']} ${stateRule['tax_rule']}');\n}\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCountryTaxes.getTaxCountryTax(4);\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['name']} ${countryTax['tax_rate']}');\nfinal stateRules = countryTax['state_rules'] as List;\nfor (final stateRule in stateRules) {\n  print('${(stateRule as Map)['id']} ${stateRule['tax_rule']}');\n}\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().GetTaxCountryTax(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"name\"], countryTax[\"rate_display\"], len(countryTax[\"state_rules\"].([]any)))\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().GetTaxCountryTax(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"name\"], countryTax[\"tax_code\"], countryTax[\"tax_rate\"], resp.Headers[\"Etag\"])\nfor _, row := range countryTax[\"state_rules\"].([]any) {\n\trule := row.(map[string]any)\n\tfmt.Println(rule[\"id\"], rule[\"tax_rule\"], rule[\"effective_tax_rate\"])\n}\n"
           }
         ]
       },
@@ -20511,7 +20557,7 @@
         ],
         "summary": "Update a country tax",
         "operationId": "update_tax_country_tax",
-        "description": "Changes the fields you send inside `country_tax` and returns the updated country tax. Fields you leave out keep their values, so you do not send `country_code` again. When you change `tax_rate`, `rate_display` changes with it. The response has the same thirteen fields as a country tax in the listing, without `state_rules`.",
+        "description": "Changes the fields you send inside `country_tax` and returns the updated country tax. Fields you leave out keep their values, so you do not send `country_code` again. A new `country_code` moves the country tax to that country, and `\"tax_method\": \"no_tax\"` sets `tax_rate` to `0`. Send an `If-Match` header with the `ETag` from your last read if you want the update rejected with `409` when the country tax changed since then. A `transaction_no` at the top level of the body, or in an `X-Transaction-No` header, files the country tax under that number, and its old number then returns `404`. The response has the twelve fields of a listing row plus `state_rules`, and an `ETag` header.",
         "parameters": [
           {
             "name": "country_tax_id",
@@ -20521,40 +20567,49 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "Optional. The country tax's current `ETag`, from your last retrieve or update of it. If the country tax changed since then, the update is rejected with `409`. The SDK functions do not send it.",
+            "schema": {
+              "type": "string",
+              "example": "\"5d41402abc4b2a76b9719d911017c592\""
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "The updated country tax.",
+            "description": "The updated country tax, with its `state_rules`. The response has an `ETag` header.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "country_tax": {
-                      "$ref": "#/components/schemas/CountryTax"
+                      "$ref": "#/components/schemas/CountryTaxDetail"
                     }
                   }
                 },
                 "example": {
                   "country_tax": {
                     "id": 42,
-                    "name": "New Zealand",
+                    "name": "NZ GST",
                     "country": {
                       "id": 160,
                       "name": "New Zealand",
                       "code": "NZ"
                     },
-                    "code": "NZ",
-                    "tax_rate": 6.25,
-                    "tax_method": "FIXED_RATE",
+                    "tax_code": "NZ",
+                    "tax_rate": 12.5,
+                    "tax_method": "fixed_rate",
                     "is_default": false,
-                    "special_key": null,
+                    "is_rest_of_world": false,
                     "state_rules_count": 0,
-                    "rate_display": "6.25%",
-                    "transaction_no": null,
-                    "created_at": "2026-09-24T10:00:00",
-                    "updated_at": "2026-09-24T10:05:00"
+                    "created_on": "2026-09-24T10:00:00Z",
+                    "last_updated_on": "2026-09-24T10:05:00Z",
+                    "last_updated_by": null,
+                    "state_rules": []
                   }
                 }
               }
@@ -20569,48 +20624,66 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Your `If-Match` value is not the country tax's current `ETag`. The code is `conflict` and the message is `The country tax changed since it was read - fetch it again and retry.`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryTaxError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "The country tax changed since it was read - fetch it again and retry.",
+                    "details": [],
+                    "request_id": "3c9a7e21-6b4d-4f8a-a1e5-2d7c9b0f4e18"
+                  }
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/country_taxes/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"country_tax\": {\n      \"tax_rate\": 6.25\n    }\n  }'"
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/country-taxes/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"country_tax\": {\n      \"tax_rate\": 12.5\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.update_tax_country_tax(42, {\n    \"country_tax\": {\"tax_rate\": 6.25},\n})\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"tax_rate\"], country_tax[\"rate_display\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_country_taxes.update_tax_country_tax(42, {\n    \"country_tax\": {\"tax_rate\": 12.5},\n})\ncountry_tax = response.map[\"country_tax\"]\nprint(country_tax[\"tax_rate\"], country_tax[\"last_updated_on\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.updateTaxCountryTax(42, {country_tax: {tax_rate: 6.25}});\nconsole.log(response.map.country_tax.tax_rate, response.map.country_tax.rate_display);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.updateTaxCountryTax(42, {country_tax: {tax_rate: 12.5}});\nconsole.log(response.map.country_tax.tax_rate, response.map.country_tax.last_updated_on);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::updateTaxCountryTax($client, 42, [\n    'country_tax' => ['tax_rate' => 6.25],\n]);\n\necho $response->map['country_tax']['rate_display'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCountryTaxes\\TaxCountryTaxes;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCountryTaxes::updateTaxCountryTax($client, 42, [\n    'country_tax' => ['tax_rate' => 12.5],\n]);\n\necho $response->map['country_tax']['tax_rate'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().updateTaxCountryTax(42,\n        Map.of(\"country_tax\", Map.of(\"tax_rate\", 6.25)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"rate_display\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCountryTaxes().updateTaxCountryTax(42,\n        Map.of(\"country_tax\", Map.of(\"tax_rate\", 12.5)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"last_updated_on\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.UpdateTaxCountryTaxAsync(42, new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?> { [\"tax_rate\"] = 6.25 },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"tax_rate\"]} {countryTax[\"rate_display\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCountryTaxes.UpdateTaxCountryTaxAsync(42, new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?> { [\"tax_rate\"] = 12.5 },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"name\"]} {countryTax[\"tax_rate\"]} {countryTax[\"last_updated_on\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCountryTaxes.updateTaxCountryTax(42, {\n  'country_tax': {'tax_rate': 6.25},\n});\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['tax_rate']} ${countryTax['rate_display']}');\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCountryTaxes.updateTaxCountryTax(42, {\n  'country_tax': {'tax_rate': 12.5},\n});\nfinal countryTax = (response.map as Map)['country_tax'] as Map;\nprint('${countryTax['name']} ${countryTax['tax_rate']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().UpdateTaxCountryTax(ctx, 42, map[string]any{\n\t\"country_tax\": map[string]any{\"tax_rate\": 6.25},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"tax_rate\"], countryTax[\"rate_display\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCountryTaxes().UpdateTaxCountryTax(ctx, 42, map[string]any{\n\t\"country_tax\": map[string]any{\"tax_rate\": 12.5},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncountryTax := resp.Map().(map[string]any)[\"country_tax\"].(map[string]any)\nfmt.Println(countryTax[\"tax_rate\"], countryTax[\"last_updated_on\"], resp.Headers[\"Etag\"])\n"
           }
         ],
         "requestBody": {
@@ -20626,6 +20699,10 @@
                   "country_tax": {
                     "$ref": "#/components/schemas/CountryTaxInput",
                     "description": "The fields to change. Fields you leave out keep their values."
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional. Files the country tax under this number, beside `country_tax`. Its old number then returns `404`. Without it, the filing stays as it was."
                   }
                 }
               }
@@ -20639,7 +20716,7 @@
         ],
         "summary": "Delete a country tax",
         "operationId": "delete_tax_country_tax",
-        "description": "Deletes the country tax permanently and returns `204` with no body. The country tax leaves the listing, `pagination.total` goes down by one, and retrieving it returns `404`. If the request just before this one on the same client was rejected with `404` for an id in its path that no record has, such as a `country_tax_id` that no country tax has, the store handles the delete with that rejected value: it returns `404` and removes nothing. Retrieve the country tax afterwards to confirm it is gone.",
+        "description": "Deletes the country tax permanently and returns `204` with no body. Retrieving or deleting it again returns `404`. If the request just before this one on the same client was rejected with `404`, the store returns that `404` for the delete and removes nothing. Retrieve the country tax afterwards to confirm it is gone.",
         "parameters": [
           {
             "name": "country_tax_id",
@@ -20654,13 +20731,31 @@
         "responses": {
           "204": {
             "description": "Deleted. No body."
+          },
+          "404": {
+            "description": "You already deleted the country tax, or the request just before this one on the same client was rejected with `404` and the store returned that `404` again without deleting anything. The code is `not_found` and the message is `Country tax not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryTaxError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Country tax not found",
+                    "details": [],
+                    "request_id": "3c9a7e21-6b4d-4f8a-a1e5-2d7c9b0f4e18"
+                  }
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax/country_taxes/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax/country-taxes/42\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
@@ -20700,30 +20795,30 @@
         ]
       }
     },
-    "/admin/tax/custom_profiles": {
+    "/admin/tax/custom-profiles": {
       "get": {
         "tags": [
           "Custom tax profiles"
         ],
         "summary": "List custom tax profiles",
         "operationId": "list_tax_custom_profiles",
-        "description": "Returns up to 20 custom tax profiles under `custom_profiles`, and a `pagination` object with the `total` number of profiles and `has_next`, which says whether more rows follow. Each row gives its number of rate rules in `rate_rules_count`; to get the rules themselves, use [Retrieve a custom tax profile](/api-reference/custom-tax-profiles/retrieve-a-custom-tax-profile). Only `limit`, `offset` and `page` change the result; `q` and `field_metadata` are ignored. A `HEAD` or `OPTIONS` request on this path returns `404`.",
+        "description": "Returns your custom tax profiles under `custom_profiles`, newest first, up to `limit` per call with a maximum of `100`. You also get a `pagination` object with the `total` number of profiles and `has_next`, which says whether more profiles follow, and `group_meta`, which describes `custom_profile` and `rules` with a `kind`, a `writable` flag and an `href` each. Each profile gives its number of rules in `rules_count`; to get the rules themselves, use [Retrieve a custom tax profile](/api-reference/custom-tax-profiles/retrieve-a-custom-tax-profile). Send `sort=name` to sort by name. `q`, `search` and `field_metadata` are accepted and ignored. The response has no `ETag`.",
         "parameters": [
           {
             "name": "limit",
             "in": "query",
-            "description": "Rows per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`.",
+            "description": "Custom tax profiles per page, from `1` to `100`. A larger value is cut to `100`, and `pagination.limit` shows `100`. `0` is rejected with `400` and the message `'limit' must be a positive integer`.",
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 20,
+              "maximum": 100,
               "example": 20
             }
           },
           {
             "name": "offset",
             "in": "query",
-            "description": "Number of rows to skip.",
+            "description": "Number of custom tax profiles to skip before this page.",
             "schema": {
               "type": "integer",
               "example": 0
@@ -20732,16 +20827,29 @@
           {
             "name": "page",
             "in": "query",
-            "description": "1-based page number, read as `offset = (page - 1) * limit`. `limit=2&page=2` skips 2 rows.",
+            "description": "1-based page number, read as `offset = (page - 1) * limit`. `limit=2&page=2` skips 2 profiles.",
             "schema": {
               "type": "integer",
               "example": 1
             }
           },
           {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorts by `id` or `name`, in descending order either way. `order` and `direction` change nothing. Any other value is rejected with `400` and the message `unsupported sort '<value>'`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "id",
+                "name"
+              ],
+              "example": "name"
+            }
+          },
+          {
             "name": "q",
             "in": "query",
-            "description": "Accepted and ignored: it does not filter the listing.",
+            "description": "Accepted and ignored: it does not filter the listing. So is `search`.",
             "schema": {
               "type": "string"
             }
@@ -20757,7 +20865,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Up to 20 custom tax profiles under `custom_profiles`, each with nine fields, and `pagination` with the `total` number of profiles, the `offset` and `limit` of this page, and `has_next`.",
+            "description": "The custom tax profiles on this page under `custom_profiles`, each with eight fields, `group_meta`, and `pagination` with the `total` number of profiles, the `offset` and `limit` of this page, and `has_next`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -20769,6 +20877,9 @@
                         "$ref": "#/components/schemas/TaxCustomProfile"
                       }
                     },
+                    "group_meta": {
+                      "$ref": "#/components/schemas/TaxCustomProfileGroupMeta"
+                    },
                     "pagination": {
                       "$ref": "#/components/schemas/TaxCustomProfilePagination"
                     }
@@ -20777,28 +20888,38 @@
                 "example": {
                   "custom_profiles": [
                     {
-                      "id": 1,
-                      "name": "Wholesale customers",
-                      "code": "WHOLESALE",
-                      "description": "Rates for wholesale accounts",
-                      "is_default": true,
-                      "rate_rules_count": 1,
-                      "transaction_no": null,
-                      "created_at": "2026-08-24T10:21:56",
-                      "updated_at": "2026-08-24T10:21:56"
-                    },
-                    {
                       "id": 2,
                       "name": "Export orders",
-                      "code": null,
+                      "tax_code": null,
                       "description": null,
                       "is_default": false,
-                      "rate_rules_count": 0,
-                      "transaction_no": null,
-                      "created_at": "2026-08-31T11:57:23",
-                      "updated_at": "2026-08-31T11:57:23"
+                      "rules_count": 0,
+                      "created_on": "2026-08-31T11:57:23Z",
+                      "last_updated_on": "2026-08-31T11:57:23Z"
+                    },
+                    {
+                      "id": 1,
+                      "name": "Wholesale customers",
+                      "tax_code": "WHOLESALE",
+                      "description": "Rates for wholesale accounts",
+                      "is_default": true,
+                      "rules_count": 1,
+                      "created_on": "2026-08-24T10:21:56Z",
+                      "last_updated_on": "2026-08-24T10:21:56Z"
                     }
                   ],
+                  "group_meta": {
+                    "custom_profile": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/tax/custom-profiles/{id}"
+                    },
+                    "rules": {
+                      "kind": "collection",
+                      "writable": true,
+                      "href": "/api/v4/admin/tax/custom-profiles/{id}/rules"
+                    }
+                  },
                   "pagination": {
                     "total": 2,
                     "limit": 20,
@@ -20814,38 +20935,48 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "`limit` is `0`: the message is `'limit' must be a positive integer`. Or `sort` is not `id` or `name`: the message is `unsupported sort '<value>'`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/custom-profiles?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.list_tax_custom_profiles({\"limit\": 20})\nfor profile in response.map[\"custom_profiles\"]:\n    print(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.list_tax_custom_profiles({\"limit\": 20})\nfor profile in response.map[\"custom_profiles\"]:\n    print(profile[\"id\"], profile[\"name\"], profile[\"rules_count\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.listTaxCustomProfiles({limit: 20});\nfor (const customProfile of response.map.custom_profiles) {\n    console.log(customProfile.id, customProfile.name, customProfile.rate_rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.listTaxCustomProfiles({limit: 20});\nfor (const customProfile of response.map.custom_profiles) {\n    console.log(customProfile.id, customProfile.name, customProfile.rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::listTaxCustomProfiles($client, ['limit' => 20]);\n\nforeach ($response->map['custom_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], ', ', $profile['rate_rules_count'], ' rate rules', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' custom tax profiles in total', PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::listTaxCustomProfiles($client, ['limit' => 20]);\n\nforeach ($response->map['custom_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], ', ', $profile['rules_count'], ' rules', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' custom tax profiles in total', PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().listTaxCustomProfiles(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"custom_profiles\")) {\n    Map<?, ?> customProfile = (Map<?, ?>) row;\n    System.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\") + \" \" + customProfile.get(\"rate_rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().listTaxCustomProfiles(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"custom_profiles\")) {\n    Map<?, ?> customProfile = (Map<?, ?>) row;\n    System.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\") + \" \" + customProfile.get(\"rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.ListTaxCustomProfilesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customProfile in ((IReadOnlyList<object?>)body[\"custom_profiles\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customProfile[\"id\"]} {customProfile[\"name\"]} {customProfile[\"rate_rules_count\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.ListTaxCustomProfilesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var customProfile in ((IReadOnlyList<object?>)body[\"custom_profiles\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{customProfile[\"id\"]} {customProfile[\"name\"]} {customProfile[\"rules_count\"]}\");\n"
           },
           {
             "lang": "dart",
@@ -20855,7 +20986,7 @@
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().ListTaxCustomProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"custom_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\n}\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().ListTaxCustomProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"custom_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"tax_code\"], profile[\"rules_count\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
           }
         ]
       },
@@ -20865,8 +20996,18 @@
         ],
         "summary": "Create a custom tax profile",
         "operationId": "create_tax_custom_profile",
-        "description": "Creates a custom tax profile and returns it with the profile's `id`, which the other calls take as `custom_profile_id`. Wrap the record in `custom_profile`; `name` is required and `description` is optional. Any `code` you send is discarded, so the new profile's `code` is `null`. The response has the nine fields of a listing row, and a new profile holds no rate rules, so its `rate_rules_count` is `0`.",
-        "parameters": [],
+        "description": "Creates a custom tax profile and returns it with the profile's `id`, which the other calls take as `custom_profile_id`. Wrap the record in `custom_profile`; `name` is required, and `description` and `tax_code` are optional. Any `code` you send is discarded, and fields the store does not know are dropped. To file the profile under a transaction number, send an `X-Transaction-No` header, or `transaction_no` at the top level of the body beside `custom_profile`. A `transaction_no` inside `custom_profile` files nothing. The response has the eight fields of a listing row and no `ETag`. A new profile holds no rules, so its `rules_count` is `0`.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. It wins over a different `transaction_no` in the body. No response returns it.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "The new custom tax profile. Its `id` is the `custom_profile_id` the other calls take.",
@@ -20884,24 +21025,31 @@
                   "custom_profile": {
                     "id": 7,
                     "name": "Wholesale customers",
-                    "code": null,
+                    "tax_code": null,
                     "description": "Rates for wholesale accounts",
                     "is_default": false,
-                    "rate_rules_count": 0,
-                    "transaction_no": null,
-                    "created_at": "2026-09-22T09:14:05",
-                    "updated_at": "2026-09-22T09:14:05"
+                    "rules_count": 0,
+                    "created_on": "2026-09-22T09:14:05Z",
+                    "last_updated_on": "2026-09-22T09:14:05Z"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "The body is not wrapped in `custom_profile`, for example a bare record or a body wrapped in the plural `custom_profiles`. The message is `custom_profile missing`.",
+            "description": "`name` is missing: the code is `invalid_request` and the message is `name is required`. Or the body is not wrapped in `custom_profile`, for example a bare record or a body wrapped in the plural `custom_profiles`. The message is `custom_profile missing`.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TaxCustomProfileError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "name is required",
+                    "details": [],
+                    "request_id": "5b2e8c1d-3f4a-4e6b-9c7d-1a2b3c4d5e6f"
+                  }
                 }
               }
             }
@@ -20911,42 +21059,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_profile\": {\n      \"name\": \"Wholesale customers\",\n      \"description\": \"Rates for wholesale accounts\"\n    }\n  }'"
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/tax/custom-profiles\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_profile\": {\n      \"name\": \"Wholesale customers\",\n      \"description\": \"Rates for wholesale accounts\"\n    },\n    \"transaction_no\": \"TXN-IMPORT-0001\"\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.create_tax_custom_profile({\n    \"custom_profile\": {\n        \"name\": \"Wholesale customers\",\n        \"description\": \"Rates for wholesale accounts\",\n    },\n})\nprint(response.map[\"custom_profile\"][\"id\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.create_tax_custom_profile({\n    \"custom_profile\": {\n        \"name\": \"Wholesale customers\",\n        \"description\": \"Rates for wholesale accounts\",\n    },\n    \"transaction_no\": \"TXN-IMPORT-0001\",\n}, transaction_no=\"TXN-IMPORT-0001\")\nprint(response.map[\"custom_profile\"][\"id\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n});\nconsole.log(response.map.custom_profile.id);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.custom_profile.id, response.map.custom_profile.name);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::createTaxCustomProfile($client, [\n    'custom_profile' => ['name' => 'Wholesale customers', 'description' => 'Rates for wholesale accounts'],\n]);\n\necho $response->map['custom_profile']['id'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::createTaxCustomProfile($client, [\n    'custom_profile' => ['name' => 'Wholesale customers', 'description' => 'Rates for wholesale accounts'],\n    'transaction_no' => 'TXN-IMPORT-0001',\n], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['custom_profile']['id'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().createTaxCustomProfile(Map.of(\"custom_profile\",\n        Map.of(\"name\", \"Wholesale customers\", \"description\", \"Rates for wholesale accounts\")));\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().createTaxCustomProfile(Map.of(\n        \"custom_profile\", Map.of(\"name\", \"Wholesale customers\", \"description\", \"Rates for wholesale accounts\"),\n        \"transaction_no\", \"TXN-IMPORT-0001\"), \"TXN-IMPORT-0001\");\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"id\") + \" \" + customProfile.get(\"name\") + \" \" + customProfile.get(\"rules_count\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.CreateTaxCustomProfileAsync(new Dictionary<string, object?>\n{\n    [\"custom_profile\"] = new Dictionary<string, object?> { [\"name\"] = \"Wholesale customers\", [\"description\"] = \"Rates for wholesale accounts\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine(customProfile[\"id\"]);\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.CreateTaxCustomProfileAsync(new Dictionary<string, object?>\n{\n    [\"custom_profile\"] = new Dictionary<string, object?> { [\"name\"] = \"Wholesale customers\", [\"description\"] = \"Rates for wholesale accounts\" },\n    [\"transaction_no\"] = \"TXN-IMPORT-0001\",\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine($\"{customProfile[\"id\"]} {customProfile[\"name\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.createTaxCustomProfile({\n  'custom_profile': {\n    'name': 'Wholesale customers',\n    'description': 'Rates for wholesale accounts',\n  },\n});\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint(customProfile['id']);\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.createTaxCustomProfile(\n  {\n    'custom_profile': {\n      'name': 'Wholesale customers',\n      'description': 'Rates for wholesale accounts',\n    },\n    'transaction_no': 'TXN-IMPORT-0001',\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint(customProfile['id']);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().CreateTaxCustomProfile(ctx, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale customers\", \"description\": \"Rates for wholesale accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().CreateTaxCustomProfile(ctx, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale customers\", \"description\": \"Rates for wholesale accounts\"},\n\t\"transaction_no\": \"TXN-IMPORT-0001\",\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rules_count\"])\n"
           }
         ],
         "requestBody": {
@@ -20961,6 +21109,10 @@
                 "properties": {
                   "custom_profile": {
                     "$ref": "#/components/schemas/TaxCustomProfileInput"
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number wins. On an update, it files only a profile that has no number yet."
                   }
                 }
               }
@@ -20969,14 +21121,14 @@
         }
       }
     },
-    "/admin/tax/custom_profiles/{custom_profile_id}": {
+    "/admin/tax/custom-profiles/{custom_profile_id}": {
       "get": {
         "tags": [
           "Custom tax profiles"
         ],
         "summary": "Retrieve a custom tax profile",
         "operationId": "get_tax_custom_profile",
-        "description": "Returns the profile whose `id` you pass as `custom_profile_id`, under the `custom_profile` key. It has the nine fields of a listing row plus `rate_rules`, the profile's rate rules, which is an empty list when the profile holds none. No other call returns `rate_rules`. A `HEAD` request on this path returns `200` whether or not a profile has that `custom_profile_id`, so use this call to check that a profile exists.",
+        "description": "Returns the profile whose `id` you pass as `custom_profile_id`, under the `custom_profile` key. It has the eight fields of a listing row plus `rules`, the profile's rules, which is an empty list when the profile holds none. Each rule lists in `profiles` the `id` and `name` of every profile it is filed under. No other call returns `rules`. The response has an `ETag` header, which you can send as `If-Match` on an update. Sending it back in `If-None-Match` still returns `200` and the full body.",
         "parameters": [
           {
             "name": "custom_profile_id",
@@ -20990,7 +21142,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The custom tax profile, with its `rate_rules`.",
+            "description": "The custom tax profile, with its `rules`. The response has an `ETag` header.",
             "content": {
               "application/json": {
                 "schema": {
@@ -21005,22 +21157,26 @@
                   "custom_profile": {
                     "id": 1,
                     "name": "Wholesale customers",
-                    "code": "WHOLESALE",
+                    "tax_code": "WHOLESALE",
                     "description": "Rates for wholesale accounts",
                     "is_default": true,
-                    "rate_rules_count": 1,
-                    "transaction_no": null,
-                    "created_at": "2026-08-24T10:21:56",
-                    "updated_at": "2026-08-24T10:21:56",
-                    "rate_rules": [
+                    "rules_count": 1,
+                    "created_on": "2026-08-24T10:21:56Z",
+                    "last_updated_on": "2026-08-24T10:21:56Z",
+                    "rules": [
                       {
                         "id": 12,
                         "name": "Wholesale rate",
                         "description": "Rate for wholesale orders",
                         "zones_count": 2,
-                        "transaction_no": null,
-                        "created_at": "2026-08-24T10:25:40",
-                        "updated_at": "2026-08-24T10:25:40"
+                        "profiles": [
+                          {
+                            "id": 1,
+                            "name": "Wholesale customers"
+                          }
+                        ],
+                        "created_on": "2026-08-24T10:25:40Z",
+                        "last_updated_on": "2026-08-24T10:25:40Z"
                       }
                     ]
                   }
@@ -21029,7 +21185,7 @@
             }
           },
           "404": {
-            "description": "No custom tax profile has that `custom_profile_id`, including a profile you have deleted. The message is `Profile not found`.",
+            "description": "No custom tax profile has that `custom_profile_id`, including a profile you have deleted. The code is `not_found` and the message is `Profile not found`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -21051,42 +21207,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles/1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/custom-profiles/1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.get_tax_custom_profile(1)\ncustom_profile = response.map[\"custom_profile\"]\nprint(custom_profile[\"name\"], custom_profile[\"description\"])\nfor rate_rule in custom_profile[\"rate_rules\"]:\n    print(rate_rule[\"id\"], rate_rule[\"name\"], rate_rule[\"zones_count\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_custom_profiles.get_tax_custom_profile(1)\ncustom_profile = response.map[\"custom_profile\"]\nprint(custom_profile[\"name\"], custom_profile[\"description\"])\nfor rule in custom_profile[\"rules\"]:\n    print(rule[\"id\"], rule[\"name\"], rule[\"zones_count\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nconst customProfile = response.map.custom_profile;\nconsole.log(customProfile.name, customProfile.description, customProfile.rate_rules_count);\nfor (const rateRule of customProfile.rate_rules) {\n    console.log(rateRule.id, rateRule.name, rateRule.zones_count);\n}\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nconst customProfile = response.map.custom_profile;\nconsole.log(customProfile.name, customProfile.tax_code, customProfile.description, customProfile.rules_count);\nfor (const rule of customProfile.rules) {\n    console.log(rule.id, rule.name, rule.zones_count);\n}\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::getTaxCustomProfile($client, 1);\n\n$profile = $response->map['custom_profile'];\necho $profile['name'], ': ', $profile['description'], PHP_EOL;\nforeach ($profile['rate_rules'] as $rule) {\n    echo 'rate rule ', $rule['id'], ' ', $rule['name'], ', ', $rule['zones_count'], ' zones', PHP_EOL;\n}\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\TaxCustomProfiles\\TaxCustomProfiles;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxCustomProfiles::getTaxCustomProfile($client, 1);\n\n$profile = $response->map['custom_profile'];\necho $profile['name'], ': ', $profile['description'], PHP_EOL;\nforeach ($profile['rules'] as $rule) {\n    echo 'rule ', $rule['id'], ' ', $rule['name'], ', ', $rule['zones_count'], ' zones', PHP_EOL;\n}\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().getTaxCustomProfile(1);\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"name\") + \" \" + customProfile.get(\"rate_rules_count\"));\nfor (Object row : (List<?>) customProfile.get(\"rate_rules\")) {\n    Map<?, ?> rateRule = (Map<?, ?>) row;\n    System.out.println(rateRule.get(\"id\") + \" \" + rateRule.get(\"name\") + \" \" + rateRule.get(\"zones_count\"));\n}\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxCustomProfiles().getTaxCustomProfile(1);\nMap<?, ?> customProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_profile\");\nSystem.out.println(customProfile.get(\"name\") + \" \" + customProfile.get(\"rules_count\"));\nfor (Object row : (List<?>) customProfile.get(\"rules\")) {\n    Map<?, ?> rule = (Map<?, ?>) row;\n    System.out.println(rule.get(\"id\") + \" \" + rule.get(\"name\") + \" \" + rule.get(\"zones_count\"));\n}\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.GetTaxCustomProfileAsync(1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine(customProfile[\"name\"]);\nforeach (var rateRule in ((IReadOnlyList<object?>)customProfile[\"rate_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{rateRule[\"id\"]} {rateRule[\"name\"]} {rateRule[\"zones_count\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxCustomProfiles.GetTaxCustomProfileAsync(1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customProfile = (IReadOnlyDictionary<string, object?>)body[\"custom_profile\"]!;\nConsole.WriteLine($\"{customProfile[\"name\"]} {customProfile[\"rules_count\"]}\");\nforeach (var rule in ((IReadOnlyList<object?>)customProfile[\"rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{rule[\"id\"]} {rule[\"name\"]} {rule[\"zones_count\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['rate_rules_count']}');\nfinal rateRules = customProfile['rate_rules'] as List;\nfor (final rateRule in rateRules) {\n  print('${(rateRule as Map)['id']} ${rateRule['name']}');\n}\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['rules_count']}');\nfinal rules = customProfile['rules'] as List;\nfor (final rule in rules) {\n  print('${(rule as Map)['id']} ${rule['name']}');\n}\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().GetTaxCustomProfile(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], len(profile[\"rate_rules\"].([]any)))\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().GetTaxCustomProfile(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"tax_code\"], profile[\"description\"], resp.Headers[\"Etag\"])\nfor _, row := range profile[\"rules\"].([]any) {\n\trule := row.(map[string]any)\n\tfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"zones_count\"])\n}\n"
           }
         ]
       },
@@ -21096,7 +21252,7 @@
         ],
         "summary": "Replace a custom tax profile",
         "operationId": "update_tax_custom_profile",
-        "description": "Replaces the `name` and `description` of the profile whose `id` you pass as `custom_profile_id`, and returns the profile under `custom_profile` with the nine fields of a listing row. Wrap the record in `custom_profile` and send `name` every time, or the call is rejected with `400`. A `description` you leave out comes back `null`, so send the current `description` to keep it. Any `code` you send is discarded.",
+        "description": "Replaces the profile whose `id` you pass as `custom_profile_id`, and returns it under `custom_profile` with the eight fields of a listing row and an `ETag` header. Wrap the record in `custom_profile`. A `description` or `tax_code` you leave out comes back `null`, so send the current values to keep them. A `name` you leave out keeps its value, and an empty `name` is rejected with `400`. Send an `If-Match` header with the `ETag` from your last read if you want the update rejected with `409` when the profile changed since then. A `transaction_no` at the top level of the body, or in an `X-Transaction-No` header, files only a profile that has no number yet.",
         "parameters": [
           {
             "name": "custom_profile_id",
@@ -21106,11 +21262,20 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "Optional. The profile's current `ETag`, from your last retrieve or update of it. If the profile changed since then, the update is rejected with `409`. The SDK functions do not send it.",
+            "schema": {
+              "type": "string",
+              "example": "\"5d41402abc4b2a76b9719d911017c592\""
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "The custom tax profile with its new `name` and `description`.",
+            "description": "The custom tax profile after the replace, without `rules`. The response has an `ETag` header.",
             "content": {
               "application/json": {
                 "schema": {
@@ -21125,20 +21290,19 @@
                   "custom_profile": {
                     "id": 7,
                     "name": "Wholesale and trade customers",
-                    "code": null,
+                    "tax_code": null,
                     "description": "Rates for wholesale and trade accounts",
                     "is_default": false,
-                    "rate_rules_count": 0,
-                    "transaction_no": null,
-                    "created_at": "2026-09-22T09:14:05",
-                    "updated_at": "2026-09-22T09:20:31"
+                    "rules_count": 0,
+                    "created_on": "2026-09-22T09:14:05Z",
+                    "last_updated_on": "2026-09-22T09:20:31Z"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "`name` is missing: `error.code` is `invalid_request` and the message is `Profile name is required`. Or the body is not wrapped in `custom_profile`, and the message is `custom_profile missing`.",
+            "description": "`name` is empty: `error.code` is `invalid_request` and the message is `Profile name is required`. Or the body is not wrapped in `custom_profile`, and the message is `custom_profile missing`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -21154,13 +21318,23 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Your `If-Match` value is not the profile's current `ETag`. The code is `conflict`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_profile\": {\n      \"name\": \"Wholesale and trade customers\",\n      \"description\": \"Rates for wholesale and trade accounts\"\n    }\n  }'"
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/custom-profiles/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"custom_profile\": {\n      \"name\": \"Wholesale and trade customers\",\n      \"description\": \"Rates for wholesale and trade accounts\"\n    }\n  }'"
           },
           {
             "lang": "python",
@@ -21195,7 +21369,7 @@
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().UpdateTaxCustomProfile(ctx, 7, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale and trade customers\", \"description\": \"Rates for wholesale and trade accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxCustomProfiles().UpdateTaxCustomProfile(ctx, 7, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale and trade customers\", \"description\": \"Rates for wholesale and trade accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], profile[\"last_updated_on\"])\n"
           }
         ],
         "requestBody": {
@@ -21210,6 +21384,10 @@
                 "properties": {
                   "custom_profile": {
                     "$ref": "#/components/schemas/TaxCustomProfileInput"
+                  },
+                  "transaction_no": {
+                    "type": "string",
+                    "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number wins. On an update, it files only a profile that has no number yet."
                   }
                 }
               }
@@ -21223,7 +21401,7 @@
         ],
         "summary": "Delete a custom tax profile",
         "operationId": "delete_tax_custom_profile",
-        "description": "Deletes the profile whose `id` you pass as `custom_profile_id` and returns `204` with no body. The profile leaves the listing, and retrieving it afterwards returns `404`. If the request just before this one on the same client was rejected with `404` for an id in its path that no record has, such as a `custom_profile_id` that no profile has, the store handles this call with that rejected value: it returns `404` and deletes nothing. Retrieve the profile afterwards to confirm it is gone.",
+        "description": "Deletes the profile whose `id` you pass as `custom_profile_id` and returns `204` with no body. Retrieving it afterwards returns `404`. Deleting it again returns `400`, not `404`, with the code `invalid_request` and the message `Profile not found`. If the request just before this one on the same client was rejected with `404`, the store returns that `404` for the delete and deletes nothing. Retrieve the profile afterwards to confirm it is gone.",
         "parameters": [
           {
             "name": "custom_profile_id",
@@ -21238,13 +21416,49 @@
         "responses": {
           "204": {
             "description": "Deleted. No body."
+          },
+          "400": {
+            "description": "You already deleted the profile. The code is `invalid_request` and the message is `Profile not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "Profile not found",
+                    "details": [],
+                    "request_id": "5b2e8c1d-3f4a-4e6b-9c7d-1a2b3c4d5e6f"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The request just before this one on the same client was rejected with `404`. The store returns that `404` again and deletes nothing. Retrieve the profile to see whether it still exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxCustomProfileError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "Profile not found",
+                    "details": [],
+                    "request_id": "5b2e8c1d-3f4a-4e6b-9c7d-1a2b3c4d5e6f"
+                  }
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax/custom_profiles/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/tax/custom-profiles/7\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
@@ -51203,6 +51417,7 @@
       },
       "CountryTax": {
         "type": "object",
+        "description": "A country tax as the listing and the create return it: twelve fields, without `state_rules`.",
         "properties": {
           "id": {
             "type": "integer",
@@ -51213,7 +51428,7 @@
               "string",
               "null"
             ],
-            "description": "The country tax's name. Can be `null`."
+            "description": "The country tax's name. `null` when you create it without one."
           },
           "country": {
             "anyOf": [
@@ -51226,56 +51441,49 @@
             ],
             "description": "The country this country tax covers. `null` on the store's rest-of-the-world country tax."
           },
-          "code": {
-            "type": "string",
-            "description": "On a country tax you create, the same as `country.code`. On older country taxes it can be free text such as `GST`, `NO_TAX`, `Tax` or `VAT`, so read `country.code` to find the country."
+          "tax_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "On a country tax you create without `tax_code`, the country's code. On older country taxes it can be free text such as `GST`, `NO_TAX`, `Tax` or `VAT`, so read `country.code` to find the country."
           },
           "tax_rate": {
             "type": "number",
-            "description": "The rate as a number, such as `4.5` for 4.5%."
+            "description": "The rate as a number, such as `15.0` for 15%. `0` after an update sets `tax_method` to `no_tax`."
           },
           "tax_method": {
             "type": "string",
-            "description": "The tax method, such as `FIXED_RATE`."
+            "description": "The tax method in lower case: `fixed_rate`, `api` or `no_tax`."
           },
           "is_default": {
             "type": "boolean",
             "description": "The country tax's default flag. Several country taxes can have `true` at the same time."
           },
-          "special_key": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A key the store sets on some of its own country taxes: `rest_of_world` on the rest-of-the-world country tax, which has `country` set to `null`, and `usa_based` on the United States country tax. `null` on the others, including every country tax you create."
+          "is_rest_of_world": {
+            "type": "boolean",
+            "description": "`true` on the store's rest-of-the-world country tax, which has `country` set to `null`."
           },
           "state_rules_count": {
             "type": "integer",
-            "description": "The number of state rules the country tax has. Only [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves, as `state_rules`."
+            "description": "The number of state rules the country tax has. [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves, as `state_rules`."
           },
-          "rate_display": {
-            "type": "string",
-            "description": "The rate as text, worked out by the store. Usually `tax_rate` with a percent sign, such as `4.5%`. A country tax whose `tax_rate` is `0` shows `No Tax`, and one whose state rules set different rates shows `Varies`."
-          },
-          "transaction_no": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "created_at": {
+          "created_on": {
             "type": "string",
             "description": "When the country tax was created."
           },
-          "updated_at": {
+          "last_updated_on": {
             "type": "string",
             "description": "When the country tax was last changed."
+          },
+          "last_updated_by": {
+            "description": "Who last changed the country tax. The store returns `null`."
           }
         }
       },
       "CountryTaxDetail": {
         "type": "object",
-        "description": "A country tax as [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns it: the thirteen fields the listing returns, plus `state_rules`.",
+        "description": "A country tax as [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) and the update return it: the twelve fields of a listing row, plus `state_rules`.",
         "properties": {
           "id": {
             "type": "integer",
@@ -51286,7 +51494,7 @@
               "string",
               "null"
             ],
-            "description": "The country tax's name. Can be `null`."
+            "description": "The country tax's name. `null` when you create it without one."
           },
           "country": {
             "anyOf": [
@@ -51299,50 +51507,43 @@
             ],
             "description": "The country this country tax covers. `null` on the store's rest-of-the-world country tax."
           },
-          "code": {
-            "type": "string",
-            "description": "On a country tax you create, the same as `country.code`. On older country taxes it can be free text such as `GST`, `NO_TAX`, `Tax` or `VAT`, so read `country.code` to find the country."
+          "tax_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "On a country tax you create without `tax_code`, the country's code. On older country taxes it can be free text such as `GST`, `NO_TAX`, `Tax` or `VAT`, so read `country.code` to find the country."
           },
           "tax_rate": {
             "type": "number",
-            "description": "The rate as a number, such as `4.5` for 4.5%."
+            "description": "The rate as a number, such as `15.0` for 15%. `0` after an update sets `tax_method` to `no_tax`."
           },
           "tax_method": {
             "type": "string",
-            "description": "The tax method, such as `FIXED_RATE`."
+            "description": "The tax method in lower case: `fixed_rate`, `api` or `no_tax`."
           },
           "is_default": {
             "type": "boolean",
             "description": "The country tax's default flag. Several country taxes can have `true` at the same time."
           },
-          "special_key": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "A key the store sets on some of its own country taxes: `rest_of_world` on the rest-of-the-world country tax, which has `country` set to `null`, and `usa_based` on the United States country tax. `null` on the others, including every country tax you create."
+          "is_rest_of_world": {
+            "type": "boolean",
+            "description": "`true` on the store's rest-of-the-world country tax, which has `country` set to `null`."
           },
           "state_rules_count": {
             "type": "integer",
-            "description": "The number of state rules the country tax has. Only [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves, as `state_rules`."
+            "description": "The number of state rules the country tax has. [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns the rules themselves, as `state_rules`."
           },
-          "rate_display": {
-            "type": "string",
-            "description": "The rate as text, worked out by the store. Usually `tax_rate` with a percent sign, such as `4.5%`. A country tax whose `tax_rate` is `0` shows `No Tax`, and one whose state rules set different rates shows `Varies`."
-          },
-          "transaction_no": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "created_at": {
+          "created_on": {
             "type": "string",
             "description": "When the country tax was created."
           },
-          "updated_at": {
+          "last_updated_on": {
             "type": "string",
             "description": "When the country tax was last changed."
+          },
+          "last_updated_by": {
+            "description": "Who last changed the country tax. The store returns `null`."
           },
           "state_rules": {
             "type": "array",
@@ -51370,9 +51571,27 @@
           }
         }
       },
+      "CountryTaxState": {
+        "type": "object",
+        "description": "The state a state rule applies to.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The state's own `id`. It is not a `country_tax_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The state's name."
+          },
+          "code": {
+            "type": "string",
+            "description": "The state's code."
+          }
+        }
+      },
       "CountryTaxStateRule": {
         "type": "object",
-        "description": "One state rule of a country tax. Only [Retrieve a country tax](/api-reference/country-taxes/retrieve-a-country-tax) returns state rules.",
+        "description": "One state rule of a country tax. Retrieve and update return state rules; the listing and the create do not.",
         "properties": {
           "id": {
             "type": "integer",
@@ -51385,16 +51604,15 @@
             ]
           },
           "state": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "state_name": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CountryTaxState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The state the rule applies to. `null` on the rules of the rest-of-the-world country tax."
           },
           "address_line_1": {
             "type": [
@@ -51432,43 +51650,81 @@
           "is_default": {
             "type": "boolean"
           },
-          "transaction_no": {
-            "type": [
-              "string",
-              "null"
-            ]
+          "created_on": {
+            "type": "string",
+            "description": "When the state rule was created."
           },
-          "created_at": {
-            "type": "string"
+          "last_updated_on": {
+            "type": "string",
+            "description": "When the state rule was last changed."
           },
-          "updated_at": {
-            "type": "string"
+          "last_updated_by": {
+            "description": "Who last changed the state rule. The store returns `null`."
           }
         }
       },
       "CountryTaxInput": {
         "type": "object",
-        "description": "The fields a create or an update can send, wrapped in `country_tax`.",
+        "description": "The fields a create or an update can send, wrapped in `country_tax`. Send `transaction_no` beside `country_tax`, not inside it.",
         "properties": {
           "country_code": {
             "type": "string",
-            "description": "Required when you create a country tax. The country's code, such as `NZ`. No response includes it: the store fills `country` and `code` from it."
+            "description": "Required when you create a country tax. The country's code, such as `NZ`, in any letter case. On an update, a new code moves the country tax to that country. No response includes it: the store fills `country` from it."
           },
           "name": {
             "type": "string",
-            "description": "The country tax's name."
+            "description": "The country tax's name. Optional."
+          },
+          "tax_code": {
+            "type": "string",
+            "description": "Optional. Defaults to the country's code on a create."
           },
           "tax_rate": {
             "type": "number",
-            "description": "The rate as a number, such as `4.5` for 4.5%. The store sets `rate_display` from it."
+            "description": "The rate as a number, such as `15.0` for 15%."
           },
           "tax_method": {
             "type": "string",
-            "description": "The tax method, such as `FIXED_RATE`."
+            "enum": [
+              "fixed_rate",
+              "api",
+              "no_tax"
+            ],
+            "description": "`fixed_rate`, `api` or `no_tax`, in any letter case. On a create, any other value is rejected with `400`. On an update, `no_tax` sets `tax_rate` to `0`."
           },
           "is_default": {
             "type": "boolean",
             "description": "The country tax's default flag. Several country taxes can have `true` at the same time."
+          }
+        }
+      },
+      "CountryTaxResourceMeta": {
+        "type": "object",
+        "description": "One entry of `group_meta`.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`resource` for `country_tax`, `collection` for `state_rules`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether the entry can be written."
+          },
+          "href": {
+            "type": "string",
+            "description": "The entry's path, with `{id}` standing for the `country_tax_id`, such as `/api/v4/admin/tax/country-taxes/{id}`."
+          }
+        }
+      },
+      "CountryTaxGroupMeta": {
+        "type": "object",
+        "description": "Describes the country tax and its state rules. Only the listing returns it.",
+        "properties": {
+          "country_tax": {
+            "$ref": "#/components/schemas/CountryTaxResourceMeta"
+          },
+          "state_rules": {
+            "$ref": "#/components/schemas/CountryTaxResourceMeta"
           }
         }
       },
@@ -51481,7 +51737,7 @@
           },
           "limit": {
             "type": "integer",
-            "description": "The page size the store applied. At most `20`."
+            "description": "The page size the store applied. At most `100`."
           },
           "offset": {
             "type": "integer",
@@ -51532,7 +51788,7 @@
             "properties": {
               "code": {
                 "type": "string",
-                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
               },
               "message": {
                 "type": "string",
@@ -51562,14 +51818,14 @@
           },
           "name": {
             "type": "string",
-            "description": "The profile's name. Required on every write."
+            "description": "The profile's name. Required on a create; an update that leaves it out keeps it."
           },
-          "code": {
+          "tax_code": {
             "type": [
               "string",
               "null"
             ],
-            "description": "Read-only. Create and update discard any `code` you send, so a profile you create has `code` set to `null`. Only a profile that already had a `code` in the store shows one."
+            "description": "The profile's tax code, or `null` when none is set. An update that leaves it out sets it to `null`. A `code` you send does not set it."
           },
           "description": {
             "type": [
@@ -51581,40 +51837,34 @@
           "is_default": {
             "type": "boolean"
           },
-          "rate_rules_count": {
+          "rules_count": {
             "type": "integer",
-            "description": "The number of rate rules the profile holds. `0` on a new profile."
+            "description": "The number of rules the profile holds. `0` on a new profile."
           },
-          "transaction_no": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "created_at": {
+          "created_on": {
             "type": "string",
             "description": "When the profile was created."
           },
-          "updated_at": {
+          "last_updated_on": {
             "type": "string",
             "description": "When the profile was last changed."
           },
-          "rate_rules": {
+          "rules": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TaxCustomProfileRateRule"
             },
-            "description": "Only when you retrieve one profile. The profile's rate rules, or an empty list when it holds none."
+            "description": "Only when you retrieve one profile. The profile's rules, or an empty list when it holds none."
           }
         }
       },
       "TaxCustomProfileRateRule": {
         "type": "object",
-        "description": "One rate rule a custom tax profile holds.",
+        "description": "One rule a custom tax profile holds.",
         "properties": {
           "id": {
             "type": "integer",
-            "description": "The rate rule's `id`."
+            "description": "The rule's own `id`. No call on these pages takes it."
           },
           "name": {
             "type": "string"
@@ -51624,35 +51874,85 @@
           },
           "zones_count": {
             "type": "integer",
-            "description": "The number of zones the rate rule has."
+            "description": "The number of zones the rule has."
           },
-          "transaction_no": {
-            "type": [
-              "string",
-              "null"
-            ]
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxCustomProfileReference"
+            },
+            "description": "Every profile the rule is filed under."
           },
-          "created_at": {
+          "created_on": {
             "type": "string"
           },
-          "updated_at": {
+          "last_updated_on": {
             "type": "string"
+          }
+        }
+      },
+      "TaxCustomProfileReference": {
+        "type": "object",
+        "description": "A profile a rule is filed under.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The profile's `id`, which the other calls take as `custom_profile_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The profile's name."
           }
         }
       },
       "TaxCustomProfileInput": {
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "description": "The fields a create or an update can send, wrapped in `custom_profile`. `name` is required on a create. Send `transaction_no` beside `custom_profile`, not inside it.",
         "properties": {
           "name": {
             "type": "string",
-            "description": "Required on create and on update."
+            "description": "Required on a create. An update that leaves it out keeps the current name; an empty `name` is rejected with `400`."
           },
           "description": {
             "type": "string",
             "description": "Optional. An update that leaves it out sets it to `null`."
+          },
+          "tax_code": {
+            "type": "string",
+            "description": "Optional. An update that leaves it out sets it to `null`."
+          },
+          "is_default": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaxCustomProfileResourceMeta": {
+        "type": "object",
+        "description": "One entry of `group_meta`.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "`resource` for `custom_profile`, `collection` for `rules`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether the entry can be written."
+          },
+          "href": {
+            "type": "string",
+            "description": "The entry's path, with `{id}` standing for the `custom_profile_id`, such as `/api/v4/admin/tax/custom-profiles/{id}`."
+          }
+        }
+      },
+      "TaxCustomProfileGroupMeta": {
+        "type": "object",
+        "description": "Describes the profile and its rules. Only the listing returns it.",
+        "properties": {
+          "custom_profile": {
+            "$ref": "#/components/schemas/TaxCustomProfileResourceMeta"
+          },
+          "rules": {
+            "$ref": "#/components/schemas/TaxCustomProfileResourceMeta"
           }
         }
       },
@@ -51665,15 +51965,15 @@
           },
           "limit": {
             "type": "integer",
-            "description": "The page size the store applied. At most `20`."
+            "description": "The page size the store applied. At most `100`."
           },
           "offset": {
             "type": "integer",
-            "description": "The number of rows skipped before this page."
+            "description": "The number of custom tax profiles skipped before this page."
           },
           "count": {
             "type": "integer",
-            "description": "The number of rows on this page."
+            "description": "The number of custom tax profiles on this page."
           },
           "current_page": {
             "type": "integer"
@@ -51711,7 +52011,7 @@
             "properties": {
               "code": {
                 "type": "string",
-                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."
               },
               "message": {
                 "type": "string"

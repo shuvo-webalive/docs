@@ -1,9 +1,9 @@
 ---
 title: "Replace a custom tax profile"
-description: "Replaces a profile's `name` and `description`; a `description` you leave out becomes `null`."
-openapi: "PUT /admin/tax/custom_profiles/{custom_profile_id}"
+description: "Replaces a profile's `description` and `tax_code`, setting any you leave out to `null`, changes `name` only when you send it, and returns the profile."
+openapi: "PUT /admin/tax/custom-profiles/{custom_profile_id}"
 ---
 
-Replaces the `name` and `description` of the profile whose `id` you pass as `custom_profile_id`, and returns the profile under `custom_profile` with the nine fields of a listing row. Wrap the record in `custom_profile` and send `name` every time, or the call is rejected with `400`. A `description` you leave out comes back `null`, so send the current `description` to keep it. Any `code` you send is discarded.
+Replaces the profile whose `id` you pass as `custom_profile_id`, and returns it under `custom_profile` with the eight fields of a listing row and an `ETag` header. Wrap the record in `custom_profile`. A `description` or `tax_code` you leave out comes back `null`, so send the current values to keep them. A `name` you leave out keeps its value, and an empty `name` is rejected with `400`. Send an `If-Match` header with the `ETag` from your last read if you want the update rejected with `409` when the profile changed since then. A `transaction_no` at the top level of the body, or in an `X-Transaction-No` header, files only a profile that has no number yet.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -4,19 +4,19 @@
   "endpoints": {
     "list_tax_country_taxes": {
       "function": "ListTaxCountryTaxesAsync",
-      "code": "var response = await client.TaxCountryTaxes.ListTaxCountryTaxesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var countryTax in ((IReadOnlyList<object?>)body[\"country_taxes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{countryTax[\"id\"]} {countryTax[\"name\"]} {countryTax[\"rate_display\"]}\");"
+      "code": "var response = await client.TaxCountryTaxes.ListTaxCountryTaxesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var countryTax in ((IReadOnlyList<object?>)body[\"country_taxes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{countryTax[\"id\"]} {countryTax[\"name\"]} {countryTax[\"tax_code\"]} {countryTax[\"tax_rate\"]}\");"
     },
     "create_tax_country_tax": {
       "function": "CreateTaxCountryTaxAsync",
-      "code": "var response = await client.TaxCountryTaxes.CreateTaxCountryTaxAsync(new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?>\n    {\n        [\"country_code\"] = \"NZ\", [\"name\"] = \"New Zealand\", [\"tax_rate\"] = 4.5, [\"tax_method\"] = \"FIXED_RATE\", [\"is_default\"] = false,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine(countryTax[\"id\"]);"
+      "code": "var response = await client.TaxCountryTaxes.CreateTaxCountryTaxAsync(new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?>\n    {\n        [\"country_code\"] = \"NZ\", [\"name\"] = \"NZ GST\", [\"tax_rate\"] = 15.0, [\"tax_method\"] = \"fixed_rate\",\n    },\n    [\"transaction_no\"] = \"TXN-IMPORT-0001\",\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"id\"]} {countryTax[\"tax_code\"]} {countryTax[\"tax_rate\"]}\");"
     },
     "get_tax_country_tax": {
       "function": "GetTaxCountryTaxAsync",
-      "code": "var response = await client.TaxCountryTaxes.GetTaxCountryTaxAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"name\"]} {countryTax[\"rate_display\"]}\");\nforeach (var stateRule in ((IReadOnlyList<object?>)countryTax[\"state_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{stateRule[\"id\"]} {stateRule[\"tax_rule\"]} {stateRule[\"effective_tax_rate\"]}\");"
+      "code": "var response = await client.TaxCountryTaxes.GetTaxCountryTaxAsync(4);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"name\"]} {countryTax[\"tax_code\"]} {countryTax[\"tax_rate\"]}\");\nforeach (var stateRule in ((IReadOnlyList<object?>)countryTax[\"state_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{stateRule[\"id\"]} {stateRule[\"tax_rule\"]} {stateRule[\"effective_tax_rate\"]}\");"
     },
     "update_tax_country_tax": {
       "function": "UpdateTaxCountryTaxAsync",
-      "code": "var response = await client.TaxCountryTaxes.UpdateTaxCountryTaxAsync(42, new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?> { [\"tax_rate\"] = 6.25 },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"tax_rate\"]} {countryTax[\"rate_display\"]}\");"
+      "code": "var response = await client.TaxCountryTaxes.UpdateTaxCountryTaxAsync(42, new Dictionary<string, object?>\n{\n    [\"country_tax\"] = new Dictionary<string, object?> { [\"tax_rate\"] = 12.5 },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar countryTax = (IReadOnlyDictionary<string, object?>)body[\"country_tax\"]!;\nConsole.WriteLine($\"{countryTax[\"name\"]} {countryTax[\"tax_rate\"]} {countryTax[\"last_updated_on\"]}\");"
     },
     "delete_tax_country_tax": {
       "function": "DeleteTaxCountryTaxAsync",
