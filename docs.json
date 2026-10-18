@@ -655,6 +655,15 @@
                 ]
               },
               {
+                "group": "Cities",
+                "expanded": false,
+                "pages": [
+                  "cities",
+                  "api-reference/cities/list-cities",
+                  "api-reference/cities/check-the-cities-list"
+                ]
+              },
+              {
                 "group": "Currencies",
                 "expanded": false,
                 "pages": [
