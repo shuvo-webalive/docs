@@ -675,6 +675,22 @@
             ]
           },
           {
+            "group": "Trash",
+            "icon": "trash-can",
+            "expanded": false,
+            "pages": [
+              "trash",
+              "api-reference/trash/list-items-in-the-trash",
+              "api-reference/trash/check-the-trash-list",
+              "api-reference/trash/list-trash-types",
+              "api-reference/trash/check-the-trash-types-list",
+              "api-reference/trash/restore-an-item-from-the-trash",
+              "api-reference/trash/delete-an-item-permanently",
+              "api-reference/trash/restore-items-in-bulk",
+              "api-reference/trash/delete-items-permanently-in-bulk"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
