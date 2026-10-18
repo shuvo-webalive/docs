@@ -1,0 +1,9 @@
+---
+title: "Create a product"
+description: "Creates a product and returns it with its `id`, which the other calls take as `product_id`."
+openapi: "POST /admin/products"
+---
+
+Send the fields at the top level of the body, not inside `product`. `name` and `base_price` are required. `sku` must not belong to another product; leave it out and the store gives the product an `sku` made of `PRODUCT-` and 12 hexadecimal characters. `name` does not have to be unique: a product with a name another product has gets a different `urls.url`. `product_type` defaults to `physical`. `parents` takes the `id` of each category to file the product under, as a number or as `{"id": <category id>}`; [List categories](/api-reference/categories/list-categories) returns each category's `id`. The body takes the same fields as [Update a product](/api-reference/products/update-a-product). To tag the product with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` in the body.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

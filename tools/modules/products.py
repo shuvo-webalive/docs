@@ -7,8 +7,13 @@ SLUG = "products"
 BASE = "/admin/products"
 ICON = "box"
 
+CREATE_PAGE = "/api-reference/products/create-a-product"
 RETRIEVE_PAGE = "/api-reference/products/retrieve-a-product"
 UPDATE_PAGE = "/api-reference/products/update-a-product"
+PATCH_PAGE = "/api-reference/products/patch-a-product"
+DELETE_PAGE = "/api-reference/products/delete-a-product"
+REVIEWS_PAGE = "/api-reference/products/import-a-products-reviews"
+IMPORT_VARIANTS_PAGE = "/api-reference/variations/import-a-products-variants"
 STOCK_PAGE = "/api-reference/products/retrieve-a-products-stock"
 SET_STOCK_PAGE = "/api-reference/products/set-a-products-stock"
 UNASSIGN_PAGE = "/api-reference/products/unassign-an-inventory-location-from-a-product"
@@ -17,8 +22,8 @@ LOCATION_STOCK_PAGE = "/api-reference/inventory-locations/list-stock-at-an-inven
 DELETE_LOCATION_PAGE = "/api-reference/inventory-locations/delete-an-inventory-location"
 CATEGORIES_PAGE = "/api-reference/categories/list-categories"
 
-OVERVIEW_DESCRIPTION = "Read and update a product, read and set its stock at each inventory location, and unassign a location from it."
-INTRO = "The Products API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
+OVERVIEW_DESCRIPTION = "Create, read, update and delete a product, import its reviews, read and set its stock at each inventory location, and unassign a location from it."
+INTRO = "The Products API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
 
 WARNING = (
     "**Setting a product's stock unassigns every location you leave out, even one that still holds stock.**\n"
@@ -29,12 +34,24 @@ WARNING = (
 
 NOTES = [
     "**Send product fields at the top level of the body, not inside `product`.** Responses return the\n"
-    "  product inside `product`, but a body wrapped in `product` is rejected with `400` and the message\n"
-    "  `product: is not a recognised product field`. Send the stock body's `note` and `locations` at the\n"
-    "  top level too.",
-    "**An update changes only the fields you send, at every level.** `{\"advanced\": {\"advance_information\": {\"mpn\": \"MPN-0001\"}}}`\n"
-    "  changes `mpn` and keeps the other eight fields of `advance_information`. A body that changes nothing\n"
-    "  returns `200` and leaves `version` and the `ETag` header as they were.",
+    "  product inside `product`, but a create or `PUT` body wrapped in `product` is rejected with `400` and\n"
+    "  the message `product: is not a recognised product field`. A `PATCH` body wrapped in `product` is\n"
+    "  rejected with `400` in a different error shape, with `code` set to `validation_error` and the rejected\n"
+    "  fields in `errors`. Send the stock body's `note` and `locations` at the top level too.\n"
+    "  [Import a product's reviews](" + REVIEWS_PAGE + ") is the exception: wrap its reviews in `product`.",
+    "**`PUT` and `PATCH` both change only the fields you send, at every level.** `{\"advanced\": {\"advance_information\": {\"mpn\": \"MPN-0001\"}}}`\n"
+    "  changes `mpn` and keeps the other eight fields of `advance_information`. A body that changes nothing,\n"
+    "  `{}` included, returns `200` and leaves `version` and the `ETag` header as they were.",
+    "**Deleting a product moves it to the trash.** [Delete a product](" + DELETE_PAGE + ") returns `204`, but\n"
+    "  [Retrieve a product](" + RETRIEVE_PAGE + ") still returns the product, with `status` set to `trashed`.\n"
+    "  Every write to a product in the trash, including `PUT`, `PATCH` and importing reviews, is rejected with\n"
+    "  `409`, and deleting it again returns `404` with the message `Product already in trash`.",
+    "**Tag a create with a transaction number in the `X-Transaction-No` header or the body.** [Create a product](" + CREATE_PAGE + "),\n"
+    "  [Import a product's reviews](" + REVIEWS_PAGE + ") and [Import a product's variants](" + IMPORT_VARIANTS_PAGE + ")\n"
+    "  take an optional `X-Transaction-No` header; in the SDKs, pass `transaction_no`. You can send\n"
+    "  `transaction_no` in the body instead. When you send both with different values, the header's value is\n"
+    "  stored and the body's is lost, with no error. On `PUT` and `PATCH` the header is ignored, and a body\n"
+    "  `transaction_no` is stored only on a product that has none: a product that has one keeps it.",
     "**Some fields you read cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,\n"
     "  `sold_out`, `sold_out_label`, `length`, `width`, `height`, `weight`, `featured`, `new`, `model`, `is_draft`,\n"
     "  `has_variations`, `urls` or `created_by` is rejected with `400` and the reason `read_only_field`; the value\n"
@@ -51,9 +68,10 @@ NOTES = [
     "  location yet, [Set a product's stock](" + SET_STOCK_PAGE + ") returns `locations: []` and stores the row.\n"
     "  Call [Retrieve a product's stock](" + STOCK_PAGE + ") to see it. A product that already has a location\n"
     "  returns its rows at once.",
-    "**Find a `product_id` in an inventory location's stock.** None of these five endpoints lists\n"
-    "  products. [List stock at an inventory location](" + LOCATION_STOCK_PAGE + ") returns the\n"
-    "  `id` of each product the location holds, as `items[].product.id`.",
+    "**Find a `product_id` in a create response or an inventory location's stock.** None of these nine\n"
+    "  endpoints lists products. [Create a product](" + CREATE_PAGE + ") returns the new product's `id` as\n"
+    "  `product.id`. For a product that already exists, [List stock at an inventory location](" + LOCATION_STOCK_PAGE + ")\n"
+    "  returns the `id` of each product the location holds, as `items[].product.id`.",
 ]
 
 
@@ -86,8 +104,15 @@ PRODUCT_ID = {
     "name": "product_id",
     "in": "path",
     "required": True,
-    "description": "The product's `id`. [List stock at an inventory location](" + LOCATION_STOCK_PAGE + ") returns it as `items[].product.id`.",
+    "description": "The product's `id`. [Create a product](" + CREATE_PAGE + ") returns it as `product.id`, and [List stock at an inventory location](" + LOCATION_STOCK_PAGE + ") returns it as `items[].product.id`.",
     "schema": {"type": "integer", "example": 101},
+}
+
+TRANSACTION_NO = {
+    "name": "X-Transaction-No",
+    "in": "header",
+    "description": "Optional. A transaction number to tag this create with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.",
+    "schema": {"type": "string", "example": "IMPORT-2026-10-18"},
 }
 
 INVENTORY_LOCATION_ID = {
@@ -175,15 +200,60 @@ STOCK_BODY = {
 
 SET_STOCK = dict(SAMPLE_STOCK, available_stock=40, locations=[LOCATION_ROWS[0], dict(LOCATION_ROWS[1], stock=30)])
 
+CREATE_BODY = {"name": "Blue Mug", "sku": "MUG-BLUE", "base_price": 12.5, "transaction_no": "IMPORT-2026-10-18"}
+CREATED_PRODUCT = {
+    "id": 102,
+    "name": "Blue Mug",
+    "sku": "MUG-BLUE",
+    "status": "active",
+    "transaction_no": "IMPORT-2026-10-18",
+    "product_type": "physical",
+    "base_price": 12.5,
+}
+
+PATCHED_PRODUCT = copy.deepcopy(SAMPLE_PRODUCT)
+PATCHED_PRODUCT["base_price"] = 27.5
+PATCHED_PRODUCT["version"] = 8
+
+REVIEWS_BODY = {"product": {"reviews": [{"name": "Sam Lee", "email": "sam@example.com", "rating": 5, "review": "Great shirt", "status": "approved"}]}}
+REVIEWS_RESULT = {"product": {"reviews": [
+    {"id": 31, "productId": 101, "name": "Alex Kim", "email": "alex@example.com", "review": None, "rating": 4.0, "status": "pending", "files": []},
+    {"id": 32, "productId": 101, "name": "Sam Lee", "email": "sam@example.com", "review": "Great shirt", "rating": 5.0, "status": "approved", "files": []},
+]}}
+
 ENDPOINTS = [
+    {
+        "key": "create_product",
+        "slug": "create-a-product",
+        "title": "Create a product",
+        "method": "POST",
+        "path": BASE,
+        "summary": "Creates a product and returns it with its `id`, which the other calls take as `product_id`.",
+        "description": "Send the fields at the top level of the body, not inside `product`. `name` and `base_price` are required. `sku` must not belong to another product; leave it out and the store gives the product an `sku` made of `PRODUCT-` and 12 hexadecimal characters. `name` does not have to be unique: a product with a name another product has gets a different `urls.url`. `product_type` defaults to `physical`. `parents` takes the `id` of each category to file the product under, as a number or as `{\"id\": <category id>}`; [List categories](" + CATEGORIES_PAGE + ") returns each category's `id`. The body takes the same fields as [Update a product](" + UPDATE_PAGE + "). To tag the product with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` in the body.",
+        "parameters": [TRANSACTION_NO],
+        "body": {"schema": ref("ProductCreateInput"), "example": CREATE_BODY},
+        "responses": {
+            "201": {
+                "description": "The new product, with all 71 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `status` is `active`, and `id` is the value the other calls take as `product_id`. `transaction_no` holds the number you sent, or `null` when you sent none. The example shows a selection of the fields.",
+                "schema": PRODUCT_RESPONSE,
+                "example": {"product": CREATED_PRODUCT},
+            },
+            "400": {
+                "description": "`name` is missing (message `Product name is required`), `base_price` is missing (message `Product base price is required`), or the body is wrapped in `product` (message `product: is not a recognised product field`).",
+                "schema": ERROR_REF,
+            },
+            "409": {"description": "Another product already has that `sku`. The message is `Product SKU already exists in another product`.", "schema": ERROR_REF},
+        },
+        "example_call": {},
+    },
     {
         "key": "get_product",
         "slug": "retrieve-a-product",
         "title": "Retrieve a product",
         "method": "GET",
         "path": BASE + "/{product_id}",
-        "summary": "Returns the product whose `id` you pass as `product_id`, with all 69 of its fields.",
-        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none.",
+        "summary": "Returns the product whose `id` you pass as `product_id`, with all 71 of its fields.",
+        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none. A product you deleted is still returned, with `status` set to `trashed`.",
         "parameters": [PRODUCT_ID, FIELD_METADATA],
         "responses": {
             "200": {
@@ -220,6 +290,70 @@ ENDPOINTS = [
                 "description": "The body is wrapped in `product` (message `product: is not a recognised product field`), or it has `status`, `reviews`, or a top-level `mpn`, `upc`, `barcode` or `hs_code` (reason `unknown_field`). Or it changes a read-only field such as `id`, `sold_out`, `model` or the top-level `weight` (reason `read_only_field`). Or a field that takes fixed values has another value (reason `invalid_enum`).",
                 "schema": ERROR_REF,
             },
+            "409": {"description": "The product is in the trash. The message is `cannot modify a product in the trash`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "patch_product",
+        "slug": "patch-a-product",
+        "title": "Patch a product",
+        "method": "PATCH",
+        "path": BASE + "/{product_id}",
+        "summary": "Changes the product fields you send, keeps every other field, and returns the product, the same way `PUT` does.",
+        "description": "Send the fields to change at the top level of the body, not inside `product`. This call takes the same body as [Update a product](" + UPDATE_PAGE + ") and merges it the same way: a field you leave out keeps its value, inside nested blocks too. A body that changes nothing, `{}` included, returns `200` with the product unchanged. A product in the trash is rejected with `409`.",
+        "parameters": [PRODUCT_ID],
+        "body": {"schema": ref("ProductInput"), "example": {"base_price": 27.5}},
+        "responses": {
+            "200": {
+                "description": "The product after the change. When something changed, `version`, `updated_at`, `last_updated_on` and `last_updated_by` change too. The example shows a selection of the fields.",
+                "schema": PRODUCT_RESPONSE,
+                "example": {"product": PATCHED_PRODUCT},
+            },
+            "400": {
+                "description": "The body is wrapped in `product`. This rejection has its own shape: `request_id`, `status` set to `400`, `code` set to `validation_error`, `message`, and an `errors` list in which each entry gives a `field` and a `code` such as `unknown_field`. Every other rejection returns the usual `error` object.",
+                "schema": {"anyOf": [ERROR_REF, ref("ProductValidationError")]},
+            },
+            "409": {"description": "The product is in the trash. The message is `cannot modify a product in the trash`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "delete_product",
+        "slug": "delete-a-product",
+        "title": "Delete a product",
+        "method": "DELETE",
+        "path": BASE + "/{product_id}",
+        "summary": "Moves the product to the trash. The product still reads back, with `status` set to `trashed`.",
+        "description": "Moves the product to the trash and returns `204` with no body. The product is not deleted permanently: [Retrieve a product](" + RETRIEVE_PAGE + ") still returns it, with `status` set to `trashed`. Every write to it is then rejected with `409`, including [Update a product](" + UPDATE_PAGE + "), [Patch a product](" + PATCH_PAGE + ") and [Import a product's reviews](" + REVIEWS_PAGE + "). Deleting it again returns `404`. Query parameters are ignored, `permanent` included.",
+        "parameters": [PRODUCT_ID],
+        "responses": {
+            "204": {"description": "The product is in the trash. No body."},
+            "404": {"description": "The product is already in the trash, for example because you already deleted it. The message is `Product already in trash`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "import_product_reviews",
+        "slug": "import-a-products-reviews",
+        "title": "Import a product's reviews",
+        "method": "POST",
+        "path": BASE + "/{product_id}/reviews",
+        "summary": "Adds the reviews you send to the product and returns every review the product now has.",
+        "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from is skipped, with no error. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
+        "parameters": [PRODUCT_ID, dict(TRANSACTION_NO, description="Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.")],
+        "body": {"schema": ref("ProductReviewsImportInput"), "example": REVIEWS_BODY},
+        "responses": {
+            "201": {
+                "description": "Every review the product has, oldest first, in `product.reviews`, not only the ones you sent. The reviews you added are last, and a skipped review adds nothing. `rating` reads back as a decimal number, such as `5.0`. In the raw response text, the `@` in each `email` is written as `\\u0040`; a JSON parser turns it back into `@`.",
+                "schema": {"type": "object", "properties": {"product": ref("ProductReviews")}},
+                "example": REVIEWS_RESULT,
+            },
+            "400": {
+                "description": "`product` is missing (message `product is required`); `reviews` is empty (message `reviews is required`); a review has no `name`, `email` or `rating` (messages `name is required`, `email is required` and `rating is required`); a `rating` is outside `1` to `5`, such as `6`; or a review sends `date`. A `date` in the `yyyy-MM-ddTHH:mm:ss` format is rejected with the message `Product reviews could not be imported`, and in any other format with the message `dateCreated must be a valid date (yyyy-MM-dd'T'HH:mm:ss)`.",
+                "schema": ERROR_REF,
+            },
+            "409": {"description": "The product is in the trash.", "schema": ERROR_REF},
         },
         "example_call": {"path": {"product_id": 101}},
     },
@@ -293,20 +427,21 @@ STAMP = "Changes when the product changes. A value you send is ignored."
 ADVANCED_CODE = "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
 
 SCHEMAS = {
-    "Product": {"type": "object", "description": "One product: 69 fields, the same set on every product.", "properties": {
+    "Product": {"type": "object", "description": "One product: 71 fields, the same set on every product.", "properties": {
         "id": typed("integer", "The product's `id`. Pass it as `product_id` in a path. " + READ_ONLY),
         "name": typed("string"),
         "sku": typed("string"),
-        "status": typed("string", "Read-only: sending it is rejected with `400` and the reason `unknown_field`."),
+        "status": typed("string", "`active` on a new product and `trashed` on a product you deleted. Read-only: sending it is rejected with `400` and the reason `unknown_field`."),
         "urls": dict(ref("ProductUrls"), description=READ_ONLY),
         "heading": typed("string"),
-        "parents": array_of("ProductParent", "The categories the product is filed under. In a write, send their ids as a list of numbers."),
+        "parents": array_of("ProductParent", "The categories the product is filed under. In a write, send the `id` of each category."),
         "created_by": dict(ref("ProductNamedReference"), description="Who created the product. " + READ_ONLY),
         "created_at": typed("string", READ_ONLY),
         "updated_at": typed("string", STAMP),
-        "transaction_no": nullable("string"),
+        "transaction_no": nullable("string", "The product's transaction number, or `null` when it has none."),
         "product_type": typed("string"),
         "custom_type": typed("string"),
+        "is_virtual": typed("boolean"),
         "invoice_note": typed("string"),
         "available": typed("boolean"),
         "product_page": dict(ref("ProductNamedReference"), description="The product's page as `id` and `name`. Some products return `{}` instead."),
@@ -356,6 +491,7 @@ SCHEMAS = {
         "advanced": ref("ProductAdvanced"),
         "related_products": array_of("ProductLink"),
         "similar_products": array_of("ProductLink"),
+        "bundle": {"oneOf": [ref("ProductBundle"), {"type": "null"}], "description": "The product's bundle settings, or `null` when the product is not a bundle."},
         "seo_configs": array_of("ProductSeoConfig"),
         "tags": array_of("ProductTag"),
         "custom_properties": array_of("ProductCustomProperty"),
@@ -498,6 +634,11 @@ SCHEMAS = {
         "id": typed("integer", "The linked product's id."),
         "name": typed("string"),
         "url": typed("string"),
+    }},
+    "ProductBundle": {"type": "object", "description": "The bundle settings of a product that is a bundle.", "properties": {
+        "price_fixed": typed("boolean"),
+        "quantity_flexible": typed("boolean"),
+        "items": typed("array"),
     }},
     "ProductSeoConfig": {"type": "object", "description": "One SEO setting on the product.", "properties": {
         "id": typed("integer", "The SEO setting's id."),
@@ -645,12 +786,14 @@ SCHEMAS = {
         "types": array_of("ProductVariationType"),
         "available_combinations": array_of("ProductCombination"),
     }},
-    "ProductInput": {"type": "object", "description": "Send these fields at the top level of the body, not inside `product`. Only the fields you send change, inside nested blocks too. A read-only field from [Retrieve a product](" + RETRIEVE_PAGE + ") is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.", "properties": {
+    "ProductInput": {"type": "object", "description": "The body of `PUT` and `PATCH`. Send these fields at the top level of the body, not inside `product`. Only the fields you send change, inside nested blocks too. A read-only field from [Retrieve a product](" + RETRIEVE_PAGE + ") is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.", "properties": {
         "name": typed("string"),
         "sku": typed("string"),
+        "transaction_no": typed("string", "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."),
         "heading": typed("string"),
         "product_type": typed("string"),
         "custom_type": typed("string"),
+        "is_virtual": typed("boolean"),
         "invoice_note": typed("string"),
         "available": typed("boolean"),
         "available_on_date_range": typed("boolean"),
@@ -679,7 +822,7 @@ SCHEMAS = {
         "product_pricing_and_stock": ref("ProductPricingAndStock"),
         "image_and_video": ref("ProductImageAndVideo"),
         "advanced": dict(ref("ProductAdvanced"), description="Write `mpn`, `upc`, `barcode` and `hs_code` in `advance_information` here."),
-        "parents": {"type": "array", "items": {"type": "integer"}, "description": "The ids of the categories to file the product under."},
+        "parents": {"type": "array", "items": {"oneOf": [{"type": "integer"}, {"type": "object", "properties": {"id": typed("integer", "The category's `id`.")}}]}, "description": "The `id` of each category to file the product under, as a number or as `{\"id\": <category id>}`."},
         "related_products": typed("array"),
         "similar_products": typed("array"),
         "tags": typed("array"),
@@ -713,7 +856,7 @@ SCHEMAS = {
         "locations": {"type": "array", "minItems": 1, "items": ref("ProductStockLocationInput"), "description": "Required and not empty. Replaces the product's whole set of locations: a location you leave out is unassigned, even while it holds stock."},
     }},
     "ProductFieldMetadata": {"type": "object", "additionalProperties": True, "description": "Returned beside `product` when you send `field_metadata=true` or `1`. An object keyed by field name, such as `id`: `{\"type\": \"integer\", \"read_only\": true}`. The `password` entry has `write_only: true`. It lists `mpn`, `upc`, `barcode`, `hs_code`, `length`, `width`, `height`, `weight` and `sold_out_label` as writable at the top level, but an update rejects each of them there."},
-    "ProductError": {"type": "object", "description": "Rejections return this shape. A method a path does not support is rejected too: `HEAD` on a product returns `404` although its `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.", "properties": {"error": {"type": "object", "properties": {
+    "ProductError": {"type": "object", "description": "Rejections return this shape, except a `PATCH` body wrapped in `product`, which returns `ProductValidationError`. A method a path does not support is rejected too: `HEAD` on `/api/v4/admin/products`, on a product and on a product's `reviews` returns `404`, although a product's `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.", "properties": {"error": {"type": "object", "properties": {
         "code": typed("string", "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."),
         "message": typed("string", "What went wrong, such as `locations is required`."),
         "details": {"type": "array", "description": "One entry per rejected field or parameter, or an empty list.", "items": {"type": "object", "properties": {
@@ -725,3 +868,37 @@ SCHEMAS = {
         "request_id": typed("string", "Identifies this request."),
     }}}},
 }
+
+SCHEMAS["ProductCreateInput"] = {"type": "object", "required": ["name", "base_price"], "description": "The body of a create. Send these fields at the top level of the body, not inside `product`: a body wrapped in `product` is rejected with `400`. `name` and `base_price` are required, and `sku` must not belong to another product.", "properties": SCHEMAS["ProductInput"]["properties"]}
+
+SCHEMAS["ProductReviewInput"] = {"type": "object", "required": ["name", "email", "rating"], "description": "One review to add. Unknown keys, such as `title`, are accepted and dropped.", "properties": {
+    "name": typed("string", "Required. The reviewer's name."),
+    "email": typed("string", "Required. The reviewer's email address. A review with an `email` the product already has a review from is skipped, with no error."),
+    "rating": {"type": "number", "minimum": 1, "maximum": 5, "description": "Required. From `1` to `5`. It reads back as a decimal number, such as `5.0`."},
+    "review": typed("string", "The review's text."),
+    "comment": typed("string", "Another name for `review`. It reads back as `review`."),
+    "status": typed("string", "`approved` is kept. Any other value, or none, is stored as `pending`."),
+    "dateCreated": typed("string", "The review's date, as `yyyy-MM-ddTHH:mm:ss`. It reads back as `date`. Sending `date` instead is rejected with `400`."),
+}}
+
+SCHEMAS["ProductReviewsImportInput"] = {"type": "object", "required": ["product"], "description": "Wrap the reviews in `product`. Send `transaction_no` beside `product`, not inside it.", "properties": {
+    "product": {"type": "object", "required": ["reviews"], "properties": {
+        "reviews": {"type": "array", "minItems": 1, "items": ref("ProductReviewInput"), "description": "Required and not empty. The reviews to add."},
+    }},
+    "transaction_no": typed("string", "Optional. A transaction number to tag the reviews with. An `X-Transaction-No` header with a different value wins over it."),
+}}
+
+SCHEMAS["ProductReviews"] = {"type": "object", "description": "Every review the product has, oldest first.", "properties": {
+    "reviews": array_of("ProductReview", "Every review the product has, the ones you just added last."),
+}}
+
+SCHEMAS["ProductValidationError"] = {"type": "object", "description": "The rejection a `PATCH` body wrapped in `product` returns. Every other rejection returns `ProductError`.", "properties": {
+    "request_id": typed("string", "Identifies this request."),
+    "status": typed("integer", "`400`."),
+    "code": typed("string", "`validation_error`."),
+    "message": typed("string", "What went wrong."),
+    "errors": {"type": "array", "description": "One entry per rejected field.", "items": {"type": "object", "properties": {
+        "field": typed("string", "The field that was rejected."),
+        "code": typed("string", "Why it was rejected, such as `unknown_field`."),
+    }}},
+}}
