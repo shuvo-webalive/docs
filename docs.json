@@ -675,6 +675,20 @@
             ]
           },
           {
+            "group": "Transactions",
+            "icon": "list-check",
+            "expanded": false,
+            "pages": [
+              "transactions",
+              "api-reference/transactions/list-transactions",
+              "api-reference/transactions/check-the-transactions-list",
+              "api-reference/transactions/retrieve-a-transaction",
+              "api-reference/transactions/check-a-transaction",
+              "api-reference/transactions/list-the-records-of-a-transaction",
+              "api-reference/transactions/check-the-records-of-a-transaction"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

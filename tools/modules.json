@@ -117,6 +117,13 @@
       ]
     },
     {
+      "name": "Transactions",
+      "icon": "list-check",
+      "modules": [
+        "transactions"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [
