@@ -16,7 +16,7 @@
     },
     "create_category": {
       "function": "create_category",
-      "code": "response = client.categories.create_category({\"category\": {\n    \"general\": {\n        \"name\": \"Seasonal Produce\", \"title\": \"Seasonal Produce\", \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\", \"parent_category\": {\"id\": 4310},\n    },\n    \"description\": {\"content\": \"<p>What is in season right now.</p>\"},\n    \"availability_visibility\": {\"visible\": True, \"custom_sorting\": True, \"default_sorting\": \"alpha_asc\"},\n    \"tax_shipping\": {\"tax_message\": \"Prices include GST\"},\n    \"assign_products\": {\"products\": [101, 102]},\n}})\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"sku\"], category[\"general\"][\"url\"])\n"
+      "code": "response = client.categories.create_category({\"category\": {\n    \"general\": {\n        \"name\": \"Seasonal Produce\", \"title\": \"Seasonal Produce\", \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\", \"parent_category\": {\"id\": 4310},\n    },\n    \"description\": {\"content\": \"<p>What is in season right now.</p>\"},\n    \"availability_visibility\": {\"visible\": True, \"custom_sorting\": True, \"default_sorting\": \"alpha_asc\"},\n    \"tax_shipping\": {\"tax_message\": \"Prices include GST\"},\n    \"assign_products\": {\"products\": [101, 102]},\n}}, transaction_no=\"TXN-IMPORT-0001\")\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"sku\"], category[\"general\"][\"url\"])\n"
     },
     "get_category": {
       "function": "get_category",

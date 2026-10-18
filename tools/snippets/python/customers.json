@@ -24,7 +24,7 @@
     },
     "create_customer": {
       "function": "create_customer",
-      "code": "response = client.admin_customers.create_customer({\n    \"customer\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane@example.com\",\n        \"company\": False,\n    },\n})\nprint(response.map[\"customer\"][\"customer_id\"])\n"
+      "code": "response = client.admin_customers.create_customer({\n    \"customer\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane@example.com\",\n        \"company\": False,\n    },\n}, transaction_no=\"TXN-IMPORT-0001\")\ncustomer = response.map[\"customer\"]\nprint(customer[\"customer_id\"], customer[\"transaction_number\"])\n"
     },
     "update_customer": {
       "function": "update_customer",

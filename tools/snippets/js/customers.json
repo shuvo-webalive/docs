@@ -24,7 +24,7 @@
     },
     "create_customer": {
       "function": "createCustomer",
-      "code": "const response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n});\nconsole.log(response.map.customer.customer_id);\n"
+      "code": "const response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.customer.customer_id, response.map.customer.transaction_number);\n"
     },
     "update_customer": {
       "function": "updateCustomer",

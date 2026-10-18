@@ -20,7 +20,7 @@
     },
     "create_currency": {
       "function": "createCurrency",
-      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::createCurrency($client, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => 'NZ',\n    'conversion_rate' => 1.2345, 'precision' => 2, 'rounding' => 'nearest', 'active' => true,\n]);\n\n$currency = $response->map['currency'];\necho $currency['id'], ' ', $currency['code'], ' ', $currency['country']['name'], PHP_EOL;"
+      "code": "use WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$response = Currencies::createCurrency($client, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => 'NZ',\n    'conversion_rate' => 1.2345, 'precision' => 2, 'rounding' => 'nearest', 'active' => true,\n], transactionNo: 'TXN-IMPORT-0001');\n\n$currency = $response->map['currency'];\necho $currency['id'], ' ', $currency['code'], ' ', $currency['country']['name'], PHP_EOL;"
     },
     "get_currency": {
       "function": "getCurrency",

@@ -12,7 +12,7 @@
     },
     "create_order": {
       "function": "createOrder",
-      "code": "const address = {\n    first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@example.com',\n    address_line_1: '1 Example Street', address_line_2: 'Level 2', city: 'Melbourne',\n    post_code: '3000', phone: '0300000000', mobile: '0400000000', country_code: 'AU', state_code: 'VIC',\n};\nconst response = await client.orders.createOrder({\n    customer_id: 512, payment_gateway: 'PIS', delivery_type: 'shipping', is_send_email: false,\n    transaction_no: 'TXN-ORDER-0001', billing_address: address, shipping_address: address,\n    products: [{product_id: 101, quantity: 1}, {product_id: 102, quantity: 1}],\n});\nconst order = response.map.order;\nconsole.log(order.order_id, order.internal_id, order.order_status, order.payment_status, order.grand_total);\n"
+      "code": "const address = {\n    first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@example.com',\n    address_line_1: '1 Example Street', address_line_2: 'Level 2', city: 'Melbourne',\n    post_code: '3000', phone: '0300000000', mobile: '0400000000', country_code: 'AU', state_code: 'VIC',\n};\nconst response = await client.orders.createOrder({\n    customer_id: 512, payment_gateway: 'PIS', delivery_type: 'shipping', is_send_email: false,\n    transaction_no: 'TXN-ORDER-0001', billing_address: address, shipping_address: address,\n    products: [{product_id: 101, quantity: 1}, {product_id: 102, quantity: 1}],\n}, {transactionNo: 'TXN-ORDER-0001'});\nconst order = response.map.order;\nconsole.log(order.order_id, order.transaction_no, order.order_status, order.payment_status, order.grand_total);\n"
     },
     "create_order_with_payment": {
       "function": "createOrderWithPayment",

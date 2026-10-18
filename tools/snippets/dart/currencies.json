@@ -20,7 +20,7 @@
     },
     "create_currency": {
       "function": "createCurrency",
-      "code": "final response = await client.currencies.createCurrency({\n  'name': 'Example Dollar',\n  'code': 'XEX',\n  'symbol': '\\$',\n  'country': 'NZ',\n  'conversion_rate': 1.2345,\n  'precision': 2,\n  'rounding': 'nearest',\n  'active': true,\n});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['id']} ${currency['code']}');"
+      "code": "final response = await client.currencies.createCurrency(\n  {\n    'name': 'Example Dollar',\n    'code': 'XEX',\n    'symbol': '\\$',\n    'country': 'NZ',\n    'conversion_rate': 1.2345,\n    'precision': 2,\n    'rounding': 'nearest',\n    'active': true,\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['id']} ${currency['code']}');"
     },
     "get_currency": {
       "function": "getCurrency",

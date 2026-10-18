@@ -92,6 +92,14 @@ SECTION = {
     "schema": {"type": "string", "enum": SECTIONS, "example": "tax_shipping"},
 }
 
+TRANSACTION_NO = {
+    "name": "X-Transaction-No",
+    "in": "header",
+    "required": False,
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new category under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `category` with `count` `1`. You can send the number as `transaction_no` inside `category` instead. If you send both with different values, the header wins: the call still returns `201`, and the category is filed only under the header's number. No response returns the number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+    "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
+}
+
 LIMIT = {"name": "limit", "in": "query", "description": "The number of categories per page. Defaults to `20`, which is also the most you can get: a larger value is capped at `20`, and `pagination.limit` shows the value applied. `0`, negative values and values that are not numbers are rejected with `400`.", "schema": {"type": "integer", "minimum": 1, "maximum": 20, "example": 10}}
 OFFSET = {"name": "offset", "in": "query", "description": "The number of categories to skip. When you send both `offset` and `page`, `offset` wins.", "schema": {"type": "integer", "example": 10}}
 PAGE = {"name": "page", "in": "query", "description": "A 1-based page number, read as `offset = (page - 1) * limit` against the `limit` applied, so `page=2` alone skips 20 categories. `pagination.next_page` and `pagination.previous_page` use `offset`, not `page`.", "schema": {"type": "integer", "example": 2}}
@@ -372,7 +380,8 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE,
         "summary": "Creates a category and returns it with its `id`, which other calls take as `category_id`.",
-        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`.",
+        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`. To file the category under a transaction number, send the `X-Transaction-No` header or `transaction_no` inside `category`, beside the sections; a `transaction_no` beside `category` is ignored and files nothing. When the header and the body differ, the header wins.",
+        "parameters": [TRANSACTION_NO],
         "body": {"schema": WRITE_BODY_REF, "example": CREATE_BODY},
         "responses": {
             "201": {
@@ -648,6 +657,7 @@ SCHEMAS = {
         "availability_visibility": ref("CategoryAvailabilityVisibilityInput"),
         "tax_shipping": ref("CategoryTaxShipping"),
         "assign_products": ref("CategoryAssignProductsInput"),
+        "transaction_no": {"type": "string", "description": "A transaction number to file the category under. Send it here, beside the sections: beside `category` it is ignored and files nothing, and inside `general` it is rejected with `400` and `details[0].code` `unknown_field`. [Create a category](" + CREATE_PAGE + ") and [Update a category](" + UPDATE_PAGE + ") file the category under it; [Replace a category](" + REPLACE_PAGE + ") ignores it. On a create, an `X-Transaction-No` header with a different value wins. No response returns it."},
     }},
     "CategoryGeneralInput": {"type": "object", "description": "The `general` fields you can write. Leave `filter_profile` out or send `null`: on a store without the filter plugin, a filter profile `id` there is rejected with `400`. Any other key is rejected with `400`, and `details[0].code` is `unknown_field`.", "properties": {
         "name": {"type": "string", "minLength": 2, "maxLength": 255, "description": "Required when you create a category. 2 to 255 characters. A create rejects a name that a top-level category has, in any letter case, even one in the trash. A `PUT` without it keeps the current name."},

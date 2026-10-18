@@ -511,11 +511,22 @@
         ],
         "summary": "Create a customer",
         "operationId": "create_customer",
-        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id`, not its `internal_id`, in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address.",
-        "parameters": [],
+        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id`, not its `internal_id`, in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address. To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the two differ, the header wins. The response returns the number in `customer.transaction_number`.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "required": false,
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the customer is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
+          }
+        ],
         "responses": {
           "201": {
-            "description": "The customer was created. Returns the new customer in `customer`, including its `customer_id`.",
+            "description": "The customer was created. Returns the new customer in `customer`, including its `customer_id`. When you send a transaction number, `customer.transaction_number` returns it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -587,37 +598,37 @@
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.admin_customers.create_customer({\n    \"customer\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane@example.com\",\n        \"company\": False,\n    },\n})\nprint(response.map[\"customer\"][\"customer_id\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.admin_customers.create_customer({\n    \"customer\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane@example.com\",\n        \"company\": False,\n    },\n}, transaction_no=\"TXN-IMPORT-0001\")\ncustomer = response.map[\"customer\"]\nprint(customer[\"customer_id\"], customer[\"transaction_number\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n});\nconsole.log(response.map.customer.customer_id);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.customer.customer_id, response.map.customer.transaction_number);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Customers\\AdminCustomers;\n\n$client = ClientRegistry::buildClient();\n\n$response = AdminCustomers::createCustomer($client, [\n    'customer' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane@example.com',\n        'company' => false,\n    ],\n]);\n\necho $response->map['customer']['customer_id'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Customers\\AdminCustomers;\n\n$client = ClientRegistry::buildClient();\n\n$response = AdminCustomers::createCustomer($client, [\n    'customer' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane@example.com',\n        'company' => false,\n    ],\n], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['customer']['customer_id'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\") + \" \" + customer.get(\"transaction_number\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AdminCustomers.CreateCustomerAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane@example.com\", [\"company\"] = false,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"customer_id\"]);\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AdminCustomers.CreateCustomerAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane@example.com\", [\"company\"] = false,\n    },\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"customer_id\"]);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.adminCustomers.createCustomer({\n  'customer': {\n    'first_name': 'Jane',\n    'last_name': 'Doe',\n    'email': 'jane@example.com',\n    'company': false,\n  },\n});\nfinal customer = (response.map as Map)['customer'] as Map;\nprint(customer['customer_id']);\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.adminCustomers.createCustomer(\n  {\n    'customer': {\n      'first_name': 'Jane',\n      'last_name': 'Doe',\n      'email': 'jane@example.com',\n      'company': false,\n    },\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal customer = (response.map as Map)['customer'] as Map;\nprint('${customer['customer_id']} ${customer['transaction_number']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])\n"
           }
         ],
         "requestBody": {
@@ -635,7 +646,7 @@
                   },
                   "transaction_no": {
                     "type": "string",
-                    "description": "Optional reference for this write."
+                    "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value, the header wins."
                   }
                 }
               }
@@ -26246,11 +26257,22 @@
         ],
         "summary": "Create an order",
         "operationId": "create_order",
-        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates.",
-        "parameters": [],
+        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "required": false,
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it, and the response returns it in `order.transaction_no`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the order is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
+          }
+        ],
         "responses": {
           "201": {
-            "description": "The new order in the flat shape under `order`, with `\"status\": \"success\"` beside it. `order_no` equals `order_id`, and `internal_id` is a different number. In this response `shipping_status` is `unshipped` and each line's `variations` is `null`; [Retrieve an order](/api-reference/orders/retrieve-an-order) shows `not_shipped` and `[]` for the same order. The response has no `Location` header.",
+            "description": "The new order in the flat shape under `order`, with `\"status\": \"success\"` beside it. `order_no` equals `order_id`, and `internal_id` is a different number. In this response `shipping_status` is `unshipped` and each line's `variations` is `null`; [Retrieve an order](/api-reference/orders/retrieve-an-order) shows `not_shipped` and `[]` for the same order. `transaction_no` is the number the order is filed under. The response has no `Location` header.",
             "content": {
               "application/json": {
                 "schema": {
@@ -26476,37 +26498,37 @@
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\naddress = {\n    \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n    \"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n    \"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresponse = client.orders.create_order({\n    \"customer_id\": 512, \"payment_gateway\": \"PIS\", \"delivery_type\": \"shipping\", \"is_send_email\": False,\n    \"transaction_no\": \"TXN-ORDER-0001\", \"billing_address\": address, \"shipping_address\": address,\n    \"products\": [{\"product_id\": 101, \"quantity\": 1}, {\"product_id\": 102, \"quantity\": 1}],\n})\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"grand_total\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\naddress = {\n    \"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n    \"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n    \"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresponse = client.orders.create_order({\n    \"customer_id\": 512, \"payment_gateway\": \"PIS\", \"delivery_type\": \"shipping\", \"is_send_email\": False,\n    \"transaction_no\": \"TXN-ORDER-0001\", \"billing_address\": address, \"shipping_address\": address,\n    \"products\": [{\"product_id\": 101, \"quantity\": 1}, {\"product_id\": 102, \"quantity\": 1}],\n}, transaction_no=\"TXN-ORDER-0001\")\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"transaction_no\"], order[\"order_status\"], order[\"grand_total\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst address = {\n    first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@example.com',\n    address_line_1: '1 Example Street', address_line_2: 'Level 2', city: 'Melbourne',\n    post_code: '3000', phone: '0300000000', mobile: '0400000000', country_code: 'AU', state_code: 'VIC',\n};\nconst response = await client.orders.createOrder({\n    customer_id: 512, payment_gateway: 'PIS', delivery_type: 'shipping', is_send_email: false,\n    transaction_no: 'TXN-ORDER-0001', billing_address: address, shipping_address: address,\n    products: [{product_id: 101, quantity: 1}, {product_id: 102, quantity: 1}],\n});\nconst order = response.map.order;\nconsole.log(order.order_id, order.internal_id, order.order_status, order.payment_status, order.grand_total);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst address = {\n    first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@example.com',\n    address_line_1: '1 Example Street', address_line_2: 'Level 2', city: 'Melbourne',\n    post_code: '3000', phone: '0300000000', mobile: '0400000000', country_code: 'AU', state_code: 'VIC',\n};\nconst response = await client.orders.createOrder({\n    customer_id: 512, payment_gateway: 'PIS', delivery_type: 'shipping', is_send_email: false,\n    transaction_no: 'TXN-ORDER-0001', billing_address: address, shipping_address: address,\n    products: [{product_id: 101, quantity: 1}, {product_id: 102, quantity: 1}],\n}, {transactionNo: 'TXN-ORDER-0001'});\nconst order = response.map.order;\nconsole.log(order.order_id, order.transaction_no, order.order_status, order.payment_status, order.grand_total);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$client = ClientRegistry::buildClient();\n\n$address = [\n    'first_name' => 'Jane', 'last_name' => 'Doe', 'email' => 'jane.doe@example.com', 'address_line_1' => '1 Example Street',\n    'address_line_2' => 'Level 2', 'city' => 'Melbourne', 'post_code' => '3000', 'phone' => '0300000000', 'mobile' => '0400000000',\n    'country_code' => 'AU', 'state_code' => 'VIC',\n];\n$response = Orders::createOrder($client, [\n    'customer_id' => 512, 'payment_gateway' => 'PIS', 'delivery_type' => 'shipping', 'is_send_email' => false,\n    'transaction_no' => 'TXN-ORDER-0001', 'billing_address' => $address, 'shipping_address' => $address,\n    'products' => [['product_id' => 101, 'quantity' => 1], ['product_id' => 102, 'quantity' => 1]],\n]);\necho $response->map['order']['order_id'], ' ', $response->map['order']['internal_id'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Orders\\Orders;\n\n$client = ClientRegistry::buildClient();\n\n$address = [\n    'first_name' => 'Jane', 'last_name' => 'Doe', 'email' => 'jane.doe@example.com', 'address_line_1' => '1 Example Street',\n    'address_line_2' => 'Level 2', 'city' => 'Melbourne', 'post_code' => '3000', 'phone' => '0300000000', 'mobile' => '0400000000',\n    'country_code' => 'AU', 'state_code' => 'VIC',\n];\n$response = Orders::createOrder($client, [\n    'customer_id' => 512, 'payment_gateway' => 'PIS', 'delivery_type' => 'shipping', 'is_send_email' => false,\n    'transaction_no' => 'TXN-ORDER-0001', 'billing_address' => $address, 'shipping_address' => $address,\n    'products' => [['product_id' => 101, 'quantity' => 1], ['product_id' => 102, 'quantity' => 1]],\n], transactionNo: 'TXN-ORDER-0001');\necho $response->map['order']['order_id'], ' ', $response->map['order']['internal_id'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Jane\"), entry(\"last_name\", \"Doe\"),\n        entry(\"email\", \"jane.doe@example.com\"), entry(\"phone\", \"0300000000\"), entry(\"mobile\", \"0400000000\"),\n        entry(\"address_line_1\", \"1 Example Street\"), entry(\"address_line_2\", \"Level 2\"), entry(\"city\", \"Melbourne\"),\n        entry(\"post_code\", \"3000\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"VIC\"));\nApiResponse response = client.orders().createOrder(Map.of(\n        \"customer_id\", 512, \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"is_send_email\", false,\n        \"transaction_no\", \"TXN-ORDER-0001\", \"billing_address\", address, \"shipping_address\", address,\n        \"products\", List.of(Map.of(\"product_id\", 101, \"quantity\", 1), Map.of(\"product_id\", 102, \"quantity\", 1))));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"internal_id\") + \" \"\n        + order.get(\"order_status\") + \" \" + order.get(\"grand_total\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\nimport static java.util.Map.entry;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nMap<String, String> address = Map.ofEntries(entry(\"first_name\", \"Jane\"), entry(\"last_name\", \"Doe\"),\n        entry(\"email\", \"jane.doe@example.com\"), entry(\"phone\", \"0300000000\"), entry(\"mobile\", \"0400000000\"),\n        entry(\"address_line_1\", \"1 Example Street\"), entry(\"address_line_2\", \"Level 2\"), entry(\"city\", \"Melbourne\"),\n        entry(\"post_code\", \"3000\"), entry(\"country_code\", \"AU\"), entry(\"state_code\", \"VIC\"));\nApiResponse response = client.orders().createOrder(Map.of(\n        \"customer_id\", 512, \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"is_send_email\", false,\n        \"transaction_no\", \"TXN-ORDER-0001\", \"billing_address\", address, \"shipping_address\", address,\n        \"products\", List.of(Map.of(\"product_id\", 101, \"quantity\", 1), Map.of(\"product_id\", 102, \"quantity\", 1))),\n        \"TXN-ORDER-0001\");\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"internal_id\") + \" \"\n        + order.get(\"order_status\") + \" \" + order.get(\"grand_total\"));\nSystem.out.println(order.get(\"transaction_no\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar address = new Dictionary<string, object?>\n{\n    [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane.doe@example.com\",\n    [\"address_line_1\"] = \"1 Example Street\", [\"address_line_2\"] = \"Level 2\", [\"city\"] = \"Melbourne\",\n    [\"post_code\"] = \"3000\", [\"phone\"] = \"0300000000\", [\"mobile\"] = \"0400000000\",\n    [\"country_code\"] = \"AU\", [\"state_code\"] = \"VIC\",\n};\nvar response = await client.Orders.CreateOrderAsync(new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512, [\"payment_gateway\"] = \"PIS\", [\"delivery_type\"] = \"shipping\", [\"is_send_email\"] = false,\n    [\"transaction_no\"] = \"TXN-ORDER-0001\", [\"billing_address\"] = address, [\"shipping_address\"] = address,\n    [\"products\"] = new List<object?>\n    {\n        new Dictionary<string, object?> { [\"product_id\"] = 101, [\"quantity\"] = 1 },\n        new Dictionary<string, object?> { [\"product_id\"] = 102, [\"quantity\"] = 1 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"internal_id\"]} {order[\"order_status\"]} {order[\"grand_total\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar address = new Dictionary<string, object?>\n{\n    [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane.doe@example.com\",\n    [\"address_line_1\"] = \"1 Example Street\", [\"address_line_2\"] = \"Level 2\", [\"city\"] = \"Melbourne\",\n    [\"post_code\"] = \"3000\", [\"phone\"] = \"0300000000\", [\"mobile\"] = \"0400000000\",\n    [\"country_code\"] = \"AU\", [\"state_code\"] = \"VIC\",\n};\nvar response = await client.Orders.CreateOrderAsync(new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512, [\"payment_gateway\"] = \"PIS\", [\"delivery_type\"] = \"shipping\", [\"is_send_email\"] = false,\n    [\"transaction_no\"] = \"TXN-ORDER-0001\", [\"billing_address\"] = address, [\"shipping_address\"] = address,\n    [\"products\"] = new List<object?>\n    {\n        new Dictionary<string, object?> { [\"product_id\"] = 101, [\"quantity\"] = 1 },\n        new Dictionary<string, object?> { [\"product_id\"] = 102, [\"quantity\"] = 1 },\n    },\n}, transactionNo: \"TXN-ORDER-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"internal_id\"]} {order[\"order_status\"]} {order[\"grand_total\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal address = {\n  'first_name': 'Jane',\n  'last_name': 'Doe',\n  'email': 'jane.doe@example.com',\n  'address_line_1': '1 Example Street',\n  'address_line_2': 'Level 2',\n  'city': 'Melbourne',\n  'post_code': '3000',\n  'phone': '0300000000',\n  'mobile': '0400000000',\n  'country_code': 'AU',\n  'state_code': 'VIC',\n};\nfinal response = await client.orders.createOrder({\n  'customer_id': 512,\n  'payment_gateway': 'PIS',\n  'delivery_type': 'shipping',\n  'is_send_email': false,\n  'transaction_no': 'TXN-ORDER-0001',\n  'billing_address': address,\n  'shipping_address': address,\n  'products': [\n    {'product_id': 101, 'quantity': 1},\n    {'product_id': 102, 'quantity': 1},\n  ],\n});\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['internal_id']}');\nprint('${order['order_status']} ${order['grand_total']}');\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal address = {\n  'first_name': 'Jane',\n  'last_name': 'Doe',\n  'email': 'jane.doe@example.com',\n  'address_line_1': '1 Example Street',\n  'address_line_2': 'Level 2',\n  'city': 'Melbourne',\n  'post_code': '3000',\n  'phone': '0300000000',\n  'mobile': '0400000000',\n  'country_code': 'AU',\n  'state_code': 'VIC',\n};\nfinal response = await client.orders.createOrder(\n  {\n    'customer_id': 512,\n    'payment_gateway': 'PIS',\n    'delivery_type': 'shipping',\n    'is_send_email': false,\n    'transaction_no': 'TXN-ORDER-0001',\n    'billing_address': address,\n    'shipping_address': address,\n    'products': [\n      {'product_id': 101, 'quantity': 1},\n      {'product_id': 102, 'quantity': 1},\n    ],\n  },\n  transactionNo: 'TXN-ORDER-0001',\n);\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['internal_id']}');\nprint(order['transaction_no']);\nprint('${order['order_status']} ${order['grand_total']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\naddress := map[string]any{\n\t\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n\t\"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n\t\"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresp, err := client.Orders().CreateOrder(ctx, map[string]any{\n\t\"customer_id\":      512,\n\t\"payment_gateway\":  \"PIS\",\n\t\"delivery_type\":    \"shipping\",\n\t\"is_send_email\":    false,\n\t\"transaction_no\":   \"TXN-ORDER-0001\",\n\t\"billing_address\":  address,\n\t\"shipping_address\": address,\n\t\"products\":         []any{map[string]any{\"product_id\": 101, \"quantity\": 1}, map[string]any{\"product_id\": 102, \"quantity\": 1}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"grand_total\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\naddress := map[string]any{\n\t\"first_name\": \"Jane\", \"last_name\": \"Doe\", \"email\": \"jane.doe@example.com\", \"address_line_1\": \"1 Example Street\",\n\t\"address_line_2\": \"Level 2\", \"city\": \"Melbourne\", \"post_code\": \"3000\", \"phone\": \"0300000000\",\n\t\"mobile\": \"0400000000\", \"country_code\": \"AU\", \"state_code\": \"VIC\",\n}\nresp, err := client.Orders().CreateOrder(ctx, map[string]any{\n\t\"customer_id\":      512,\n\t\"payment_gateway\":  \"PIS\",\n\t\"delivery_type\":    \"shipping\",\n\t\"is_send_email\":    false,\n\t\"transaction_no\":   \"TXN-ORDER-0001\",\n\t\"billing_address\":  address,\n\t\"shipping_address\": address,\n\t\"products\":         []any{map[string]any{\"product_id\": 101, \"quantity\": 1}, map[string]any{\"product_id\": 102, \"quantity\": 1}},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"internal_id\"], order[\"order_status\"], order[\"grand_total\"])\n"
           }
         ],
         "requestBody": {
@@ -26800,7 +26822,7 @@
         ],
         "summary": "Create an order with a payment",
         "operationId": "create_order_with_payment",
-        "description": "Send the same fields as [Create an order](/api-reference/orders/create-an-order) plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `\"\"`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored.",
+        "description": "Send the same fields as [Create an order](/api-reference/orders/create-an-order) plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `\"\"`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored, and an `X-Transaction-No` header does not file the order under a transaction number either.",
         "parameters": [],
         "responses": {
           "201": {
@@ -31959,7 +31981,7 @@
         ],
         "summary": "Create an order from a cart",
         "operationId": "create_order_from_cart",
-        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call.",
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
         "parameters": [
           {
             "name": "session_id",
@@ -31969,11 +31991,21 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "required": false,
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. The response to this call shows `transaction_no` as `null`; [Retrieve an order](/api-reference/orders/retrieve-an-order) shows the number. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the order is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
           }
         ],
         "responses": {
           "201": {
-            "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the value you sent. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and while it is unpaid it does not lower the product's stock.",
+            "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the number you sent; [Retrieve an order](/api-reference/orders/retrieve-an-order) shows it. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and while it is unpaid it does not lower the product's stock.",
             "content": {
               "application/json": {
                 "schema": {
@@ -32168,37 +32200,37 @@
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.create_order_from_cart(\"cart-7f3a9c2e1b\", {\n    \"customer_id\": 123,\n    \"payment_gateway\": \"PIS\",\n    \"delivery_type\": \"shipping\",\n    \"transaction_no\": \"web-order-0001\",\n})\norder = response.map[\"order\"]\nprint(response.map[\"status\"], order[\"order_id\"], order[\"order_no\"])\nprint(order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"], order[\"due\"])\nfor line in order[\"order_line_details\"]:\n    print(line[\"sku\"], line[\"quantity\"], line[\"total_amount\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.carts.create_order_from_cart(\"cart-7f3a9c2e1b\", {\n    \"customer_id\": 123,\n    \"payment_gateway\": \"PIS\",\n    \"delivery_type\": \"shipping\",\n    \"transaction_no\": \"web-order-0001\",\n}, transaction_no=\"web-order-0001\")\norder = response.map[\"order\"]\nprint(response.map[\"status\"], order[\"order_id\"], order[\"order_no\"])\nprint(order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"], order[\"due\"])\nfor line in order[\"order_line_details\"]:\n    print(line[\"sku\"], line[\"quantity\"], line[\"total_amount\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n    customer_id: 123,\n    payment_gateway: 'PIS',\n    delivery_type: 'shipping',\n    transaction_no: 'web-order-0001',\n});\nconst order = response.map.order;\nconsole.log(response.map.status, order.order_id, order.order_status, order.payment_status, order.grand_total);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n    customer_id: 123,\n    payment_gateway: 'PIS',\n    delivery_type: 'shipping',\n    transaction_no: 'web-order-0001',\n}, {transactionNo: 'web-order-0001'});\nconst order = response.map.order;\nconsole.log(response.map.status, order.order_id, order.order_status, order.payment_status, order.grand_total);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::createOrderFromCart($client, 'cart-7f3a9c2e1b', [\n    'customer_id' => 123,\n    'payment_gateway' => 'PIS',\n    'delivery_type' => 'shipping',\n    'transaction_no' => 'web-order-0001',\n]);\n\n$order = $response->map['order'];\necho $response->map['status'], ' ', $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], PHP_EOL;\necho 'Due: ', $order['due'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$client = ClientRegistry::buildClient();\n\n$response = Carts::createOrderFromCart($client, 'cart-7f3a9c2e1b', [\n    'customer_id' => 123,\n    'payment_gateway' => 'PIS',\n    'delivery_type' => 'shipping',\n    'transaction_no' => 'web-order-0001',\n], transactionNo: 'web-order-0001');\n\n$order = $response->map['order'];\necho $response->map['status'], ' ', $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], PHP_EOL;\necho 'Due: ', $order['due'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().createOrderFromCart(\"cart-7f3a9c2e1b\", Map.of(\"customer_id\", 123,\n        \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"transaction_no\", \"web-order-0001\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> order = (Map<?, ?>) body.get(\"order\");\nSystem.out.println(body.get(\"status\") + \" \" + order.get(\"order_id\") + \" \" + order.get(\"order_status\"));\nSystem.out.println(order.get(\"payment_status\") + \" \" + order.get(\"grand_total\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.carts().createOrderFromCart(\"cart-7f3a9c2e1b\", Map.of(\"customer_id\", 123,\n        \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"transaction_no\", \"web-order-0001\"),\n        \"web-order-0001\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> order = (Map<?, ?>) body.get(\"order\");\nSystem.out.println(body.get(\"status\") + \" \" + order.get(\"order_id\") + \" \" + order.get(\"order_status\"));\nSystem.out.println(order.get(\"payment_status\") + \" \" + order.get(\"grand_total\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.CreateOrderFromCartAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 123, [\"payment_gateway\"] = \"PIS\",\n    [\"delivery_type\"] = \"shipping\", [\"transaction_no\"] = \"web-order-0001\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{body[\"status\"]} {order[\"order_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]} {order[\"grand_total\"]}\");\nforeach (var orderLine in ((IReadOnlyList<object?>)order[\"order_line_details\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderLine[\"sku\"]} {orderLine[\"quantity\"]} {orderLine[\"total_amount\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Carts.CreateOrderFromCartAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 123, [\"payment_gateway\"] = \"PIS\",\n    [\"delivery_type\"] = \"shipping\", [\"transaction_no\"] = \"web-order-0001\",\n}, transactionNo: \"web-order-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{body[\"status\"]} {order[\"order_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]} {order[\"grand_total\"]}\");\nforeach (var orderLine in ((IReadOnlyList<object?>)order[\"order_line_details\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderLine[\"sku\"]} {orderLine[\"quantity\"]} {orderLine[\"total_amount\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n  'customer_id': 123,\n  'payment_gateway': 'PIS',\n  'delivery_type': 'shipping',\n  'transaction_no': 'web-order-0001',\n});\nfinal result = response.map as Map;\nfinal order = result['order'] as Map;\nprint('${result['status']} ${order['order_id']} ${order['order_status']}');\nprint('${order['payment_status']} ${order['due']}');\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.carts.createOrderFromCart(\n  'cart-7f3a9c2e1b',\n  {\n    'customer_id': 123,\n    'payment_gateway': 'PIS',\n    'delivery_type': 'shipping',\n    'transaction_no': 'web-order-0001',\n  },\n  transactionNo: 'web-order-0001',\n);\nfinal result = response.map as Map;\nfinal order = result['order'] as Map;\nprint('${result['status']} ${order['order_id']} ${order['order_status']}');\nprint('${order['payment_status']} ${order['due']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().CreateOrderFromCart(ctx, \"cart-7f3a9c2e1b\", map[string]any{\n\t\"customer_id\":     123,\n\t\"payment_gateway\": \"PIS\",\n\t\"delivery_type\":   \"shipping\",\n\t\"transaction_no\":  \"web-order-0001\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\norder := body[\"order\"].(map[string]any)\nfmt.Println(body[\"status\"], order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Carts().CreateOrderFromCart(ctx, \"cart-7f3a9c2e1b\", map[string]any{\n\t\"customer_id\":     123,\n\t\"payment_gateway\": \"PIS\",\n\t\"delivery_type\":   \"shipping\",\n\t\"transaction_no\":  \"web-order-0001\",\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\norder := body[\"order\"].(map[string]any)\nfmt.Println(body[\"status\"], order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"])\n"
           }
         ],
         "requestBody": {
@@ -32613,8 +32645,19 @@
         ],
         "summary": "Create a category",
         "operationId": "create_category",
-        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`.",
-        "parameters": [],
+        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`. To file the category under a transaction number, send the `X-Transaction-No` header or `transaction_no` inside `category`, beside the sections; a `transaction_no` beside `category` is ignored and files nothing. When the header and the body differ, the header wins.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "required": false,
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new category under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `category` with `count` `1`. You can send the number as `transaction_no` inside `category` instead. If you send both with different values, the header wins: the call still returns `201`, and the category is filed only under the header's number. No response returns the number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "The new category in `category`, with its `id`, `sku` and `url`, and `group_meta`. `parent_category` returns as `{id, name}` and each product as `{id, name, sku}`, and `created_on` equals `last_updated_on`. The response has no `Location` header.",
@@ -32784,37 +32827,37 @@
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.create_category({\"category\": {\n    \"general\": {\n        \"name\": \"Seasonal Produce\", \"title\": \"Seasonal Produce\", \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\", \"parent_category\": {\"id\": 4310},\n    },\n    \"description\": {\"content\": \"<p>What is in season right now.</p>\"},\n    \"availability_visibility\": {\"visible\": True, \"custom_sorting\": True, \"default_sorting\": \"alpha_asc\"},\n    \"tax_shipping\": {\"tax_message\": \"Prices include GST\"},\n    \"assign_products\": {\"products\": [101, 102]},\n}})\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"sku\"], category[\"general\"][\"url\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.categories.create_category({\"category\": {\n    \"general\": {\n        \"name\": \"Seasonal Produce\", \"title\": \"Seasonal Produce\", \"heading\": \"Fresh this season\",\n        \"summary\": \"Fruit and vegetables picked this week\", \"parent_category\": {\"id\": 4310},\n    },\n    \"description\": {\"content\": \"<p>What is in season right now.</p>\"},\n    \"availability_visibility\": {\"visible\": True, \"custom_sorting\": True, \"default_sorting\": \"alpha_asc\"},\n    \"tax_shipping\": {\"tax_message\": \"Prices include GST\"},\n    \"assign_products\": {\"products\": [101, 102]},\n}}, transaction_no=\"TXN-IMPORT-0001\")\ncategory = response.map[\"category\"]\nprint(category[\"id\"], category[\"general\"][\"sku\"], category[\"general\"][\"url\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::createCategory($client, ['category' => [\n    'general' => ['name' => 'Seasonal Produce', 'title' => 'Seasonal Produce', 'heading' => 'Fresh this season',\n        'summary' => 'Fruit and vegetables picked this week', 'parent_category' => ['id' => 4310]],\n    'description' => ['content' => '<p>What is in season right now.</p>'],\n    'availability_visibility' => ['visible' => true, 'custom_sorting' => true, 'default_sorting' => 'alpha_asc'],\n    'tax_shipping' => ['tax_message' => 'Prices include GST'],\n    'assign_products' => ['products' => [101, 102]],\n]]);\n\necho $response->map['category']['id'], ' ', $response->map['category']['general']['url'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$client = ClientRegistry::buildClient();\n\n$response = Categories::createCategory($client, ['category' => [\n    'general' => ['name' => 'Seasonal Produce', 'title' => 'Seasonal Produce', 'heading' => 'Fresh this season',\n        'summary' => 'Fruit and vegetables picked this week', 'parent_category' => ['id' => 4310]],\n    'description' => ['content' => '<p>What is in season right now.</p>'],\n    'availability_visibility' => ['visible' => true, 'custom_sorting' => true, 'default_sorting' => 'alpha_asc'],\n    'tax_shipping' => ['tax_message' => 'Prices include GST'],\n    'assign_products' => ['products' => [101, 102]],\n]], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['category']['id'], ' ', $response->map['category']['general']['url'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().createCategory(Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"name\", \"Seasonal Produce\", \"title\", \"Seasonal Produce\",\n                \"heading\", \"Fresh this season\", \"summary\", \"Fruit and vegetables picked this week\",\n                \"parent_category\", Map.of(\"id\", 4310)),\n        \"description\", Map.of(\"content\", \"<p>What is in season right now.</p>\"),\n        \"availability_visibility\", Map.of(\"visible\", true, \"custom_sorting\", true, \"default_sorting\", \"alpha_asc\"),\n        \"tax_shipping\", Map.of(\"tax_message\", \"Prices include GST\"),\n        \"assign_products\", Map.of(\"products\", List.of(101, 102)))));\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(category.get(\"id\") + \" \" + general.get(\"sku\") + \" \" + general.get(\"url\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.categories().createCategory(Map.of(\"category\", Map.of(\n        \"general\", Map.of(\"name\", \"Seasonal Produce\", \"title\", \"Seasonal Produce\",\n                \"heading\", \"Fresh this season\", \"summary\", \"Fruit and vegetables picked this week\",\n                \"parent_category\", Map.of(\"id\", 4310)),\n        \"description\", Map.of(\"content\", \"<p>What is in season right now.</p>\"),\n        \"availability_visibility\", Map.of(\"visible\", true, \"custom_sorting\", true, \"default_sorting\", \"alpha_asc\"),\n        \"tax_shipping\", Map.of(\"tax_message\", \"Prices include GST\"),\n        \"assign_products\", Map.of(\"products\", List.of(101, 102)))),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> category = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"category\");\nMap<?, ?> general = (Map<?, ?>) category.get(\"general\");\nSystem.out.println(category.get(\"id\") + \" \" + general.get(\"sku\") + \" \" + general.get(\"url\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.CreateCategoryAsync(new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Seasonal Produce\", [\"title\"] = \"Seasonal Produce\", [\"heading\"] = \"Fresh this season\",\n            [\"summary\"] = \"Fruit and vegetables picked this week\",\n            [\"parent_category\"] = new Dictionary<string, object?> { [\"id\"] = 4310 },\n        },\n        [\"description\"] = new Dictionary<string, object?> { [\"content\"] = \"<p>What is in season right now.</p>\" },\n        [\"availability_visibility\"] = new Dictionary<string, object?>\n        {\n            [\"visible\"] = true, [\"custom_sorting\"] = true, [\"default_sorting\"] = \"alpha_asc\",\n        },\n        [\"tax_shipping\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"Prices include GST\" },\n        [\"assign_products\"] = new Dictionary<string, object?> { [\"products\"] = new List<object?> { 101, 102 } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nConsole.WriteLine(category[\"id\"]);\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Categories.CreateCategoryAsync(new Dictionary<string, object?>\n{\n    [\"category\"] = new Dictionary<string, object?>\n    {\n        [\"general\"] = new Dictionary<string, object?>\n        {\n            [\"name\"] = \"Seasonal Produce\", [\"title\"] = \"Seasonal Produce\", [\"heading\"] = \"Fresh this season\",\n            [\"summary\"] = \"Fruit and vegetables picked this week\",\n            [\"parent_category\"] = new Dictionary<string, object?> { [\"id\"] = 4310 },\n        },\n        [\"description\"] = new Dictionary<string, object?> { [\"content\"] = \"<p>What is in season right now.</p>\" },\n        [\"availability_visibility\"] = new Dictionary<string, object?>\n        {\n            [\"visible\"] = true, [\"custom_sorting\"] = true, [\"default_sorting\"] = \"alpha_asc\",\n        },\n        [\"tax_shipping\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"Prices include GST\" },\n        [\"assign_products\"] = new Dictionary<string, object?> { [\"products\"] = new List<object?> { 101, 102 } },\n    },\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar category = (IReadOnlyDictionary<string, object?>)body[\"category\"]!;\nConsole.WriteLine(category[\"id\"]);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.createCategory({\n  'category': {\n    'general': {\n      'name': 'Seasonal Produce',\n      'title': 'Seasonal Produce',\n      'heading': 'Fresh this season',\n      'summary': 'Fruit and vegetables picked this week',\n      'parent_category': {'id': 4310},\n    },\n    'description': {'content': '<p>What is in season right now.</p>'},\n    'availability_visibility': {\n      'visible': true,\n      'custom_sorting': true,\n      'default_sorting': 'alpha_asc',\n    },\n    'tax_shipping': {'tax_message': 'Prices include GST'},\n    'assign_products': {\n      'products': [101, 102],\n    },\n  },\n});\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${category['id']} ${general['sku']} ${general['url']}');\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.categories.createCategory(\n  {\n    'category': {\n      'general': {\n        'name': 'Seasonal Produce',\n        'title': 'Seasonal Produce',\n        'heading': 'Fresh this season',\n        'summary': 'Fruit and vegetables picked this week',\n        'parent_category': {'id': 4310},\n      },\n      'description': {'content': '<p>What is in season right now.</p>'},\n      'availability_visibility': {\n        'visible': true,\n        'custom_sorting': true,\n        'default_sorting': 'alpha_asc',\n      },\n      'tax_shipping': {'tax_message': 'Prices include GST'},\n      'assign_products': {\n        'products': [101, 102],\n      },\n    },\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal category = (response.map as Map)['category'] as Map;\nfinal general = category['general'] as Map;\nprint('${category['id']} ${general['sku']} ${general['url']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().CreateCategory(ctx, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\": map[string]any{\n\t\t\t\"name\":            \"Seasonal Produce\",\n\t\t\t\"title\":           \"Seasonal Produce\",\n\t\t\t\"heading\":         \"Fresh this season\",\n\t\t\t\"summary\":         \"Fruit and vegetables picked this week\",\n\t\t\t\"parent_category\": map[string]any{\"id\": 4310},\n\t\t},\n\t\t\"description\":             map[string]any{\"content\": \"<p>What is in season right now.</p>\"},\n\t\t\"availability_visibility\": map[string]any{\"visible\": true, \"custom_sorting\": true, \"default_sorting\": \"alpha_asc\"},\n\t\t\"tax_shipping\":            map[string]any{\"tax_message\": \"Prices include GST\"},\n\t\t\"assign_products\":         map[string]any{\"products\": []any{101, 102}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\ngeneral := category[\"general\"].(map[string]any)\nfmt.Println(category[\"id\"], general[\"sku\"], general[\"url\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Categories().CreateCategory(ctx, map[string]any{\n\t\"category\": map[string]any{\n\t\t\"general\": map[string]any{\n\t\t\t\"name\":            \"Seasonal Produce\",\n\t\t\t\"title\":           \"Seasonal Produce\",\n\t\t\t\"heading\":         \"Fresh this season\",\n\t\t\t\"summary\":         \"Fruit and vegetables picked this week\",\n\t\t\t\"parent_category\": map[string]any{\"id\": 4310},\n\t\t},\n\t\t\"description\":             map[string]any{\"content\": \"<p>What is in season right now.</p>\"},\n\t\t\"availability_visibility\": map[string]any{\"visible\": true, \"custom_sorting\": true, \"default_sorting\": \"alpha_asc\"},\n\t\t\"tax_shipping\":            map[string]any{\"tax_message\": \"Prices include GST\"},\n\t\t\"assign_products\":         map[string]any{\"products\": []any{101, 102}},\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncategory := resp.Map().(map[string]any)[\"category\"].(map[string]any)\ngeneral := category[\"general\"].(map[string]any)\nfmt.Println(category[\"id\"], general[\"sku\"], general[\"url\"])\n"
           }
         ],
         "requestBody": {
@@ -41085,8 +41128,19 @@
         ],
         "summary": "Create a currency",
         "operationId": "create_currency",
-        "description": "Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`.",
-        "parameters": [],
+        "description": "Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`. To file the currency under a transaction number, send the `X-Transaction-No` header: the body has no `transaction_no` field, and sending one is rejected with `400`.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "required": false,
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new currency under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `currency` with `count` `1`. This header is the only way to send the number: a `transaction_no` in the body is rejected with `400`, reason `unknown_field` and message `is not a currency field`. Use a number in printable ASCII with no space at either end: the SDK rejects any other header value before it sends the call.",
+            "schema": {
+              "type": "string",
+              "example": "TXN-IMPORT-0001"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "The new currency, with the currency's `id`, which the other calls take as `currency_id`. The `Location` header holds the full URL of the new currency.",
@@ -41123,7 +41177,7 @@
             }
           },
           "400": {
-            "description": "The body is not valid for a currency. `name`, `code` or `symbol` is missing (reason `required`); `code` is not three letters (reason `invalid_format`); `symbol` is longer than 3 characters (reason `too_long`); `precision` is outside `1` to `9` (reason `out_of_range`); `rounding` is not `nearest`, `up` or `down` (reason `invalid_enum`); `country` is a list (reason `invalid_type`) or names a country the store does not have (reason `unknown_reference`, message `no such country`); the body has a field that is not a currency field, such as `base`, `updated_at` or a wrapping `currency` (reason `unknown_field`, message `is not a currency field`); or it sends `id` (reason `unexpected_field`, message `must not be present - the URL names the currency`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`.",
+            "description": "The body is not valid for a currency. `name`, `code` or `symbol` is missing (reason `required`); `code` is not three letters (reason `invalid_format`); `symbol` is longer than 3 characters (reason `too_long`); `precision` is outside `1` to `9` (reason `out_of_range`); `rounding` is not `nearest`, `up` or `down` (reason `invalid_enum`); `country` is a list (reason `invalid_type`) or names a country the store does not have (reason `unknown_reference`, message `no such country`); the body has a field that is not a currency field, such as `base`, `updated_at` or a wrapping `currency` (reason `unknown_field`, message `is not a currency field`); or it sends `id` (reason `unexpected_field`, message `must not be present - the URL names the currency`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`. A `transaction_no` in the body is rejected the same way, reason `unknown_field` and message `is not a currency field`: send the number in the `X-Transaction-No` header instead.",
             "content": {
               "application/json": {
                 "schema": {
@@ -41152,37 +41206,37 @@
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.create_currency({\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": True,\n})\nprint(response.map[\"currency\"][\"id\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.currencies.create_currency({\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": True,\n}, transaction_no=\"TXN-IMPORT-0001\")\nprint(response.map[\"currency\"][\"id\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.createCurrency({\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: 'NZ',\n    conversion_rate: 1.2345,\n    precision: 2,\n    rounding: 'nearest',\n    active: true,\n});\nconsole.log(response.map.currency.id, response.map.currency.code, response.map.currency.base);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.createCurrency({\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: 'NZ',\n    conversion_rate: 1.2345,\n    precision: 2,\n    rounding: 'nearest',\n    active: true,\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.currency.id, response.map.currency.code, response.map.currency.base);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::createCurrency($client, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => 'NZ',\n    'conversion_rate' => 1.2345, 'precision' => 2, 'rounding' => 'nearest', 'active' => true,\n]);\n\n$currency = $response->map['currency'];\necho $currency['id'], ' ', $currency['code'], ' ', $currency['country']['name'], PHP_EOL;\n"
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Currencies\\Currencies;\n\n$client = ClientRegistry::buildClient();\n\n$response = Currencies::createCurrency($client, [\n    'name' => 'Example Dollar', 'code' => 'XEX', 'symbol' => '$', 'country' => 'NZ',\n    'conversion_rate' => 1.2345, 'precision' => 2, 'rounding' => 'nearest', 'active' => true,\n], transactionNo: 'TXN-IMPORT-0001');\n\n$currency = $response->map['currency'];\necho $currency['id'], ' ', $currency['code'], ' ', $currency['country']['name'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));\n"
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.CreateCurrencyAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Example Dollar\", [\"code\"] = \"XEX\", [\"symbol\"] = \"$\", [\"country\"] = \"NZ\",\n    [\"conversion_rate\"] = 1.2345, [\"precision\"] = 2, [\"rounding\"] = \"nearest\", [\"active\"] = true,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"id\"]} {currency[\"code\"]} {currency[\"base\"]}\");\n"
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Currencies.CreateCurrencyAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Example Dollar\", [\"code\"] = \"XEX\", [\"symbol\"] = \"$\", [\"country\"] = \"NZ\",\n    [\"conversion_rate\"] = 1.2345, [\"precision\"] = 2, [\"rounding\"] = \"nearest\", [\"active\"] = true,\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar currency = (IReadOnlyDictionary<string, object?>)body[\"currency\"]!;\nConsole.WriteLine($\"{currency[\"id\"]} {currency[\"code\"]} {currency[\"base\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.createCurrency({\n  'name': 'Example Dollar',\n  'code': 'XEX',\n  'symbol': '\\$',\n  'country': 'NZ',\n  'conversion_rate': 1.2345,\n  'precision': 2,\n  'rounding': 'nearest',\n  'active': true,\n});\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['id']} ${currency['code']}');\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.currencies.createCurrency(\n  {\n    'name': 'Example Dollar',\n    'code': 'XEX',\n    'symbol': '\\$',\n    'country': 'NZ',\n    'conversion_rate': 1.2345,\n    'precision': 2,\n    'rounding': 'nearest',\n    'active': true,\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal currency = (response.map as Map)['currency'] as Map;\nprint('${currency['id']} ${currency['code']}');\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().CreateCurrency(ctx, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": \"NZ\",\n\t\"conversion_rate\": 1.2345, \"precision\": 2, \"rounding\": \"nearest\", \"active\": true,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"base\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().CreateCurrency(ctx, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": \"NZ\",\n\t\"conversion_rate\": 1.2345, \"precision\": 2, \"rounding\": \"nearest\", \"active\": true,\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"base\"])\n"
           }
         ],
         "requestBody": {
@@ -42547,11 +42601,11 @@
         "properties": {
           "customer_id": {
             "type": "integer",
-            "description": "The id every `{customer_id}` path takes."
+            "description": "The customer's number that every `{customer_id}` path parameter takes."
           },
           "internal_id": {
             "type": "integer",
-            "description": "A second id space over the same records. No path takes it."
+            "description": "A second number for the same customer. No path parameter takes it."
           },
           "first_name": {
             "type": "string"
@@ -42637,6 +42691,13 @@
           },
           "updated_at": {
             "type": "string"
+          },
+          "transaction_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The transaction number the customer was created under, from the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. `null` when the customer was created without one. Rows in the customer listing do not have this field."
           }
         }
       },
@@ -52727,7 +52788,7 @@
               "string",
               "null"
             ],
-            "description": "The `transaction_no` sent when the order was created."
+            "description": "The transaction number the order is filed under, sent when the order was created in the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. Empty when the order has none."
           },
           "ip_address": {
             "type": "string",
@@ -52814,7 +52875,7 @@
               "string",
               "null"
             ],
-            "description": "The `transaction_no` sent when the order was created. [Create an order with a payment](/api-reference/orders/create-an-order-with-a-payment) does not store it."
+            "description": "The transaction number the order is filed under, sent when the order was created in the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. [Create an order with a payment](/api-reference/orders/create-an-order-with-a-payment) does not store it."
           },
           "currency_code": {
             "type": "string",
@@ -54174,7 +54235,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "Your reference for the order. The store does not check it for duplicates."
+            "description": "A transaction number to file the order under. The store does not check it for duplicates. If the `X-Transaction-No` header has a different value, the header wins."
           },
           "external_reference_order_id": {
             "type": "string",
@@ -55734,7 +55795,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number to store on the order. The response shows `transaction_no` as `null`."
+            "description": "A transaction number to file the order under. The response shows `transaction_no` as `null`. If the `X-Transaction-No` header has a different value, the header wins."
           }
         },
         "required": [
@@ -55761,7 +55822,7 @@
               "string",
               "null"
             ],
-            "description": "`null` in this response, even when you sent `transaction_no`. The order stores the value you sent."
+            "description": "`null` in this response, even when you sent a transaction number in the body or in the `X-Transaction-No` header. The order stores the number you sent."
           },
           "currency_code": {
             "type": "string"
@@ -56718,6 +56779,10 @@
           },
           "assign_products": {
             "$ref": "#/components/schemas/CategoryAssignProductsInput"
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "A transaction number to file the category under. Send it here, beside the sections: beside `category` it is ignored and files nothing, and inside `general` it is rejected with `400` and `details[0].code` `unknown_field`. [Create a category](/api-reference/categories/create-a-category) and [Update a category](/api-reference/categories/update-a-category) file the category under it; [Replace a category](/api-reference/categories/replace-a-category) ignores it. On a create, an `X-Transaction-No` header with a different value wins. No response returns it."
           }
         }
       },

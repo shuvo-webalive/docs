@@ -135,6 +135,14 @@ IDEMPOTENCY_KEY = {
     "schema": {"type": "string", "example": "refund-0001"},
 }
 
+TRANSACTION_NO = {
+    "name": "X-Transaction-No",
+    "in": "header",
+    "required": False,
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it, and the response returns it in `order.transaction_no`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the order is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+    "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
+}
+
 
 def query(name, description, schema):
     return {"name": name, "in": "query", "description": description, "schema": schema}
@@ -394,7 +402,8 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE,
         "summary": "Creates an order for the products you send and returns it with its `order_id`.",
-        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates.",
+        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
+        "parameters": [TRANSACTION_NO],
         "body": {"schema": ref("OrderInput"), "example": {
             "customer_id": 512, "payment_gateway": "PIS", "delivery_type": "shipping", "is_send_email": False,
             "transaction_no": "TXN-ORDER-0001", "billing_address": ADDRESS_INPUT, "shipping_address": ADDRESS_INPUT,
@@ -402,7 +411,7 @@ ENDPOINTS = [
         }},
         "responses": {
             "201": {
-                "description": "The new order in the flat shape under `order`, with `\"status\": \"success\"` beside it. `order_no` equals `order_id`, and `internal_id` is a different number. In this response `shipping_status` is `unshipped` and each line's `variations` is `null`; [Retrieve an order](" + RETRIEVE_PAGE + ") shows `not_shipped` and `[]` for the same order. The response has no `Location` header.",
+                "description": "The new order in the flat shape under `order`, with `\"status\": \"success\"` beside it. `order_no` equals `order_id`, and `internal_id` is a different number. In this response `shipping_status` is `unshipped` and each line's `variations` is `null`; [Retrieve an order](" + RETRIEVE_PAGE + ") shows `not_shipped` and `[]` for the same order. `transaction_no` is the number the order is filed under. The response has no `Location` header.",
                 "schema": CREATED_ORDER_RESPONSE,
                 "example": {"order": FLAT_ORDER, "status": "success"},
             },
@@ -422,7 +431,7 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE + "/with-payment",
         "summary": "Creates an order and records one payment on it, returning the order with `paid` and `due`.",
-        "description": "Send the same fields as [Create an order](" + CREATE_PAGE + ") plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `\"\"`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored.",
+        "description": "Send the same fields as [Create an order](" + CREATE_PAGE + ") plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `\"\"`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored, and an `X-Transaction-No` header does not file the order under a transaction number either.",
         "body": {"schema": ref("OrderWithPaymentInput"), "example": {
             "customer_id": 512, "payment_gateway": "PIS", "delivery_type": "shipping",
             "billing_address": ADDRESS_INPUT, "shipping_address": ADDRESS_INPUT,
@@ -942,7 +951,7 @@ ORDER_INPUT_PROPERTIES = {
     "payment_gateway": {"type": "string", "enum": PAYMENT_GATEWAYS, "description": "A payment gateway code. Defaults to `PIS`, pay in store. `PAY_IN_STORE` is rejected with `400` and the reason `invalid_value`."},
     "delivery_type": {"type": "string", "enum": DELIVERY_TYPES, "description": "Lower case. Defaults to `shipping`. `SHIPPING` is rejected with `400` and the reason `invalid_value`."},
     "is_send_email": flag("Whether to send the order email."),
-    "transaction_no": text("Your reference for the order. The store does not check it for duplicates."),
+    "transaction_no": text("A transaction number to file the order under. The store does not check it for duplicates. If the `X-Transaction-No` header has a different value, the header wins."),
     "external_reference_order_id": text("An order number from another system. The listing's `externalReferenceOrderId` filter matches it."),
     "order_channel": text("The sales channel the order came from, up to 255 characters; 256 is rejected with `400`. Left out, `\"\"` or `null` stores none."),
     "ip_address": text("The IP address the order was placed from, IPv4 or IPv6; any other text is rejected with `400` and the reason `invalid_format`. Left out, the store sets `127.0.0.1`; `\"\"` or `null` stores none."),
@@ -972,7 +981,7 @@ SCHEMAS = {
         "payment_status": text("`unpaid` on a new order, and `partial` after a payment for part of the total."),
         "shipping_status": text("`not_shipped` before the first shipment, then `partial`, and `shipped` once every unit has shipped."),
         "currency_code": text("The order's currency code."),
-        "transaction_no": nullable_text("The `transaction_no` sent when the order was created."),
+        "transaction_no": nullable_text("The transaction number the order is filed under, sent when the order was created in the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. Empty when the order has none."),
         "ip_address": text("The IP address the order was placed from; `127.0.0.1` on an order created without one."),
         "order_channel": nullable_text("The sales channel the order came from, as sent on create or PATCH; `\"\"` when none was set."),
         "created_on": text("When the order was created."),
@@ -991,7 +1000,7 @@ SCHEMAS = {
         "order_id": whole("The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."),
         "order_no": whole("Equals `order_id`."),
         "internal_id": whole("A second number for the order, taken by the custom fields and invoice paths."),
-        "transaction_no": nullable_text("The `transaction_no` sent when the order was created. [Create an order with a payment](" + WITH_PAYMENT_PAGE + ") does not store it."),
+        "transaction_no": nullable_text("The transaction number the order is filed under, sent when the order was created in the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. [Create an order with a payment](" + WITH_PAYMENT_PAGE + ") does not store it."),
         "currency_code": text("The order's currency code."),
         "order_status": {"type": "string", "enum": ORDER_STATUSES},
         "payment_status": text("`unpaid` on a new order, and `partial` after a payment for part of the total."),

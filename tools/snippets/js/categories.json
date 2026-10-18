@@ -16,7 +16,7 @@
     },
     "create_category": {
       "function": "createCategory",
-      "code": "const response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
+      "code": "const response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
     },
     "get_category": {
       "function": "getCategory",
