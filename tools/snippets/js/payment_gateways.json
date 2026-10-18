@@ -1,0 +1,38 @@
+{
+  "sdk": "js",
+  "module": "payment_gateways",
+  "endpoints": {
+    "list_payment_gateways": {
+      "function": "listPaymentGateways",
+      "code": "const response = await client.paymentGateways.listPaymentGateways({limit: 20, offset: 0, promotional: 'false'});\nfor (const gateway of response.map.payment_gateways) {\n    console.log(gateway.id, gateway.code, gateway.name, gateway.enabled, gateway.default);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_payment_gateways": {
+      "function": "headPaymentGateways",
+      "code": "const response = await client.paymentGateways.headPaymentGateways();\nconsole.log(response.statusCode);\n"
+    },
+    "count_payment_gateways": {
+      "function": "countPaymentGateways",
+      "code": "const response = await client.paymentGateways.countPaymentGateways({exclude: 'PIS,CHQ'});\nconsole.log(response.map.total);\n"
+    },
+    "head_payment_gateways_count": {
+      "function": "headPaymentGatewaysCount",
+      "code": "const response = await client.paymentGateways.headPaymentGatewaysCount();\nconsole.log(response.statusCode);\n"
+    },
+    "get_payment_gateway": {
+      "function": "getPaymentGateway",
+      "code": "const response = await client.paymentGateways.getPaymentGateway(2);\nconst gateway = response.map.payment_gateway;\nconsole.log(gateway.code, gateway.name, gateway.enabled, gateway.default, gateway.visibility.type);\nconsole.log(gateway.allowed_for.store_pickup, gateway.surcharge, gateway.settings);\n"
+    },
+    "head_payment_gateway": {
+      "function": "headPaymentGateway",
+      "code": "const response = await client.paymentGateways.headPaymentGateway(2);\nconsole.log(response.statusCode);\n"
+    },
+    "update_payment_gateway": {
+      "function": "updatePaymentGateway",
+      "code": "const response = await client.paymentGateways.updatePaymentGateway(2, {\n    information: 'Make cheques payable to Example Store.',\n});\nconsole.log(response.map.payment_gateway.code, response.map.payment_gateway.information);\n"
+    },
+    "patch_payment_gateway": {
+      "function": "patchPaymentGateway",
+      "code": "const response = await client.paymentGateways.patchPaymentGateway(2, {allowed_for: {store_pickup: false}});\nconst gateway = response.map.payment_gateway;\nconsole.log(gateway.allowed_for.shipping, gateway.allowed_for.delivery, gateway.allowed_for.store_pickup);\n"
+    }
+  }
+}

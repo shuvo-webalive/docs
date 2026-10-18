@@ -1,0 +1,38 @@
+{
+  "sdk": "python",
+  "module": "payment_gateways",
+  "endpoints": {
+    "list_payment_gateways": {
+      "function": "list_payment_gateways",
+      "code": "response = client.payment_gateways.list_payment_gateways({\"limit\": 20, \"offset\": 0, \"promotional\": \"false\"})\nfor gateway in response.map[\"payment_gateways\"]:\n    print(gateway[\"id\"], gateway[\"code\"], gateway[\"name\"], gateway[\"enabled\"], gateway[\"default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_payment_gateways": {
+      "function": "head_payment_gateways",
+      "code": "response = client.payment_gateways.head_payment_gateways()\nprint(response.status_code)\n"
+    },
+    "count_payment_gateways": {
+      "function": "count_payment_gateways",
+      "code": "response = client.payment_gateways.count_payment_gateways({\"exclude\": \"PIS,CHQ\"})\nprint(response.map[\"total\"])\n"
+    },
+    "head_payment_gateways_count": {
+      "function": "head_payment_gateways_count",
+      "code": "response = client.payment_gateways.head_payment_gateways_count()\nprint(response.status_code)\n"
+    },
+    "get_payment_gateway": {
+      "function": "get_payment_gateway",
+      "code": "response = client.payment_gateways.get_payment_gateway(2)\ngateway = response.map[\"payment_gateway\"]\nprint(gateway[\"code\"], gateway[\"name\"], gateway[\"enabled\"], gateway[\"default\"])\nprint(gateway[\"visibility\"][\"type\"], gateway[\"allowed_for\"])\n"
+    },
+    "head_payment_gateway": {
+      "function": "head_payment_gateway",
+      "code": "response = client.payment_gateways.head_payment_gateway(2)\nprint(response.status_code)\n"
+    },
+    "update_payment_gateway": {
+      "function": "update_payment_gateway",
+      "code": "response = client.payment_gateways.update_payment_gateway(2, {\n    \"information\": \"Make cheques payable to Example Store.\",\n})\ngateway = response.map[\"payment_gateway\"]\nprint(gateway[\"code\"], gateway[\"information\"])\n"
+    },
+    "patch_payment_gateway": {
+      "function": "patch_payment_gateway",
+      "code": "response = client.payment_gateways.patch_payment_gateway(2, {\"allowed_for\": {\"store_pickup\": False}})\nprint(response.map[\"payment_gateway\"][\"allowed_for\"])\n"
+    }
+  }
+}
