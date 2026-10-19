@@ -1,0 +1,9 @@
+---
+title: "Delete an item permanently"
+description: "Deletes one item in the trash permanently. You cannot restore it afterwards."
+openapi: "DELETE /admin/trash/{trash_type}/{trash_item_id}"
+---
+
+Deletes the item you name by `trash_type` and `trash_item_id` permanently, and returns `204` with no body. Afterwards the item's own resource returns `404` for it, and a restore or a second delete returns `404`. An item that is not in the trash is rejected with `409`: delete it through its own resource first.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,38 @@
+{
+  "sdk": "js",
+  "module": "trash",
+  "endpoints": {
+    "list_trash": {
+      "function": "listTrash",
+      "code": "const response = await client.trash.listTrash({type: 'Category', search: 'spring', sort: 'name', order: 'asc', limit: 20});\nfor (const item of response.map.items) {\n    console.log(item.id, item.type, item.name, item.updated);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_trash": {
+      "function": "headTrash",
+      "code": "const response = await client.trash.headTrash({type: 'Category', limit: 1});\nconsole.log(response.statusCode);\n"
+    },
+    "list_trash_types": {
+      "function": "listTrashTypes",
+      "code": "const response = await client.trash.listTrashTypes();\nfor (const entry of response.map.types) {\n    console.log(entry.type);\n}\n"
+    },
+    "head_trash_types": {
+      "function": "headTrashTypes",
+      "code": "const response = await client.trash.headTrashTypes();\nconsole.log(response.statusCode);\n"
+    },
+    "restore_trash_item": {
+      "function": "restoreTrashItem",
+      "code": "const response = await client.trash.restoreTrashItem('Category', 1234);\nconsole.log(response.map.status, response.map.message);\n"
+    },
+    "delete_trash_item": {
+      "function": "deleteTrashItem",
+      "code": "const response = await client.trash.deleteTrashItem('Customer', 5678);\nconsole.log(response.statusCode);\n"
+    },
+    "bulk_restore_trash": {
+      "function": "bulkRestoreTrash",
+      "code": "const response = await client.trash.bulkRestoreTrash({\n    items: [{type: 'Category', id: 1234}, {type: 'BlogPost', id: 99}],\n});\nconsole.log(response.map.restored, response.map.failed);\nfor (const error of response.map.errors) {\n    console.log(error.type, error.id, error.reason);\n}\n"
+    },
+    "bulk_delete_trash": {
+      "function": "bulkDeleteTrash",
+      "code": "const response = await client.trash.bulkDeleteTrash({\n    items: [{type: 'Category', id: 1234}, {type: 'Category', id: 1229}],\n});\nconsole.log(response.map.deleted, response.map.failed);\nfor (const error of response.map.errors) {\n    console.log(error.type, error.id, error.reason);\n}\n"
+    }
+  }
+}

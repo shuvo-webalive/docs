@@ -1,0 +1,38 @@
+{
+  "sdk": "go",
+  "module": "trash",
+  "endpoints": {
+    "list_trash": {
+      "function": "ListTrash",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().ListTrash(ctx, map[string]any{\n\t\"type\": \"Category\", \"search\": \"spring\", \"sort\": \"name\", \"order\": \"asc\", \"limit\": 20,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"type\"], item[\"name\"], item[\"updated\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
+    },
+    "head_trash": {
+      "function": "HeadTrash",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().HeadTrash(ctx, map[string]any{\"type\": \"Category\", \"limit\": 1}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "list_trash_types": {
+      "function": "ListTrashTypes",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().ListTrashTypes(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"types\"].([]any) {\n\tfmt.Println(row.(map[string]any)[\"type\"])\n}\n"
+    },
+    "head_trash_types": {
+      "function": "HeadTrashTypes",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().HeadTrashTypes(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "restore_trash_item": {
+      "function": "RestoreTrashItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().RestoreTrashItem(ctx, \"Category\", 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"message\"])\n"
+    },
+    "delete_trash_item": {
+      "function": "DeleteTrashItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().DeleteTrashItem(ctx, \"Customer\", 5678, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "bulk_restore_trash": {
+      "function": "BulkRestoreTrash",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkRestoreTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"BlogPost\", \"id\": 99},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"restored\"], body[\"failed\"])\nfor _, row := range body[\"errors\"].([]any) {\n\tfailure := row.(map[string]any)\n\tfmt.Println(failure[\"type\"], failure[\"id\"], failure[\"reason\"])\n}\n"
+    },
+    "bulk_delete_trash": {
+      "function": "BulkDeleteTrash",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkDeleteTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1229},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"deleted\"], body[\"failed\"], body[\"errors\"])\n"
+    }
+  }
+}

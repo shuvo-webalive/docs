@@ -148,6 +148,9 @@
       "name": "Payment gateways"
     },
     {
+      "name": "Trash"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -44043,6 +44046,1034 @@
         }
       }
     },
+    "/admin/trash": {
+      "get": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "List items in the trash",
+        "operationId": "list_trash",
+        "description": "Returns the items in the trash in `items`, 20 per call unless you send `limit`, newest `updated` first, and `pagination` with the total and the URLs of the next and previous pages. Send `type` on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. Send `search` to match part of an item's `name`, and `sort` and `order` to change the order. Any query parameter the listing does not accept, such as `q`, is rejected with `400` and the reason `unknown_parameter`.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Keeps only items of this type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.",
+            "schema": {
+              "type": "string",
+              "example": "Category"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only items whose `name` contains this text. `searchText` is accepted as another name for `search`.",
+            "schema": {
+              "type": "string",
+              "example": "spring"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The field to sort by: `name`, `type`, `updated` or `removed_at`, which sorts by `updated`. Without it, items come newest `updated` first. Any other value is rejected with `400` and the message `unsupported sort '<value>'`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "type",
+                "updated",
+                "removed_at"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`, in lower case. `order=DESC` in upper case is accepted but sorts in ascending order. Any other value is rejected with `400` and the message `unsupported dir '<value>'`. `dir` is accepted as another name for `order`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "asc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of items per page, `1` or more. Defaults to `20`. A value above `100` returns `100` items, and `pagination.limit` shows the value applied. `0` is rejected with `400` and the reason `out_of_range`; text such as `all` with `400` and the reason `invalid_integer`. Send it once: sending `limit` twice returns `500`. `max` is accepted as another name for `limit`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of items to skip, `0` or more. A negative value is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page to return, counting from `1`. The store skips `(page - 1) * limit` items.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 2
+            }
+          },
+          {
+            "name": "removed_from",
+            "in": "query",
+            "description": "The start date of the range in which the items were trashed, as `yyyy-MM-dd`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-10-01"
+            }
+          },
+          {
+            "name": "removed_to",
+            "in": "query",
+            "description": "The end date of the range in which the items were trashed, as `yyyy-MM-dd`. A date in another format is rejected with `400`, and the error names the field `deletedTo`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-10-18"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The items on this page in `items`, each with its `id`, `type`, `name` and `updated`, and `pagination` with the total, the page size, the page number and the URLs of the next and previous pages. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrashItem"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TrashPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "id": 1234,
+                      "type": "Category",
+                      "name": "Spring Collection",
+                      "updated": "2026-10-18T11:16:07"
+                    },
+                    {
+                      "id": 1229,
+                      "type": "Category",
+                      "name": "Spring Sale",
+                      "updated": "2026-10-17T09:42:51"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A query parameter is not valid: an unknown `type` (message `unknown trash type '<value>'`), an unknown `sort` (message `unsupported sort '<value>'`), an `order` other than `asc` or `desc` (message `unsupported dir '<value>'`), a `limit` of `0` (reason `out_of_range`) or one that is not a number (reason `invalid_integer`), a negative `offset`, a `removed_to` that is not a `yyyy-MM-dd` date, or a parameter the listing does not accept (reason `unknown_parameter`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "You sent `limit` more than once, such as `limit=2&limit=3`. Send it once.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/trash?type=Category&search=spring&sort=name&order=asc&limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.list_trash({\n    \"type\": \"Category\",\n    \"search\": \"spring\",\n    \"sort\": \"name\",\n    \"order\": \"asc\",\n    \"limit\": 20,\n})\nfor item in response.map[\"items\"]:\n    print(item[\"id\"], item[\"type\"], item[\"name\"], item[\"updated\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.listTrash({type: 'Category', search: 'spring', sort: 'name', order: 'asc', limit: 20});\nfor (const item of response.map.items) {\n    console.log(item.id, item.type, item.name, item.updated);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::listTrash($client, ['type' => 'Category', 'search' => 'spring', 'sort' => 'name', 'order' => 'asc', 'limit' => 20]);\n\nforeach ($response->map['items'] as $item) {\n    echo $item['id'], ' ', $item['type'], ' ', $item['name'], ' ', $item['updated'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().listTrash(\n        Map.of(\"type\", \"Category\", \"search\", \"spring\", \"sort\", \"name\", \"order\", \"asc\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"type\") + \" \" + item.get(\"name\") + \" \" + item.get(\"updated\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.ListTrashAsync(new Dictionary<string, object?>\n{\n    [\"type\"] = \"Category\", [\"search\"] = \"spring\", [\"sort\"] = \"name\", [\"order\"] = \"asc\", [\"limit\"] = 20,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var item in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"type\"]} {item[\"name\"]} {item[\"updated\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.listTrash(queryParams: {\n  'type': 'Category',\n  'search': 'spring',\n  'sort': 'name',\n  'order': 'asc',\n  'limit': 20,\n});\nfinal body = response.map as Map;\nfor (final item in body['items'] as List) {\n  print('${(item as Map)['id']} ${item['type']} ${item['name']}');\n}\nprint((body['pagination'] as Map)['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().ListTrash(ctx, map[string]any{\n\t\"type\": \"Category\", \"search\": \"spring\", \"sort\": \"name\", \"order\": \"asc\", \"limit\": 20,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"type\"], item[\"name\"], item[\"updated\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "Check the trash list",
+        "operationId": "head_trash",
+        "description": "Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](/api-reference/trash/list-items-in-the-trash) and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take 90 to 100 seconds. A query parameter the listing does not accept is rejected with `400` here as well.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Keeps only items of this type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.",
+            "schema": {
+              "type": "string",
+              "example": "Category"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only items whose `name` contains this text. `searchText` is accepted as another name for `search`.",
+            "schema": {
+              "type": "string",
+              "example": "spring"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The field to sort by: `name`, `type`, `updated` or `removed_at`, which sorts by `updated`. Without it, items come newest `updated` first. Any other value is rejected with `400` and the message `unsupported sort '<value>'`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "type",
+                "updated",
+                "removed_at"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`, in lower case. `order=DESC` in upper case is accepted but sorts in ascending order. Any other value is rejected with `400` and the message `unsupported dir '<value>'`. `dir` is accepted as another name for `order`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "asc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of items per page, `1` or more. Defaults to `20`. A value above `100` returns `100` items, and `pagination.limit` shows the value applied. `0` is rejected with `400` and the reason `out_of_range`; text such as `all` with `400` and the reason `invalid_integer`. Send it once: sending `limit` twice returns `500`. `max` is accepted as another name for `limit`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of items to skip, `0` or more. A negative value is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page to return, counting from `1`. The store skips `(page - 1) * limit` items.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 2
+            }
+          },
+          {
+            "name": "removed_from",
+            "in": "query",
+            "description": "The start date of the range in which the items were trashed, as `yyyy-MM-dd`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-10-01"
+            }
+          },
+          {
+            "name": "removed_to",
+            "in": "query",
+            "description": "The end date of the range in which the items were trashed, as `yyyy-MM-dd`. A date in another format is rejected with `400`, and the error names the field `deletedTo`.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-10-18"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body."
+          },
+          "400": {
+            "description": "A query parameter is not valid, as on [List items in the trash](/api-reference/trash/list-items-in-the-trash). No body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/trash?type=Category&limit=1\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.head_trash({\"type\": \"Category\", \"limit\": 1})\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.headTrash({type: 'Category', limit: 1});\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::headTrash($client, ['type' => 'Category', 'limit' => 1]);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().headTrash(Map.of(\"type\", \"Category\", \"limit\", 1));\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.HeadTrashAsync(\n    new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"limit\"] = 1 });\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash\n    .headTrash(queryParams: {'type': 'Category', 'limit': 1});\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().HeadTrash(ctx, map[string]any{\"type\": \"Category\", \"limit\": 1}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/trash/types": {
+      "get": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "List trash types",
+        "operationId": "list_trash_types",
+        "description": "Returns the types in `types`, each as an object with a `type` field, in alphabetical order. Each value is a PascalCase name, such as `BlogPost`, that you can send as `trash_type` in a path, as `type` in a bulk item and as `type` on [List items in the trash](/api-reference/trash/list-items-in-the-trash). The call takes no query parameters: any one you send is rejected with `400`. The response has no `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The twelve types in `types`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrashType"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "types": [
+                    {
+                      "type": "Album"
+                    },
+                    {
+                      "type": "Article"
+                    },
+                    {
+                      "type": "BlogPost"
+                    },
+                    {
+                      "type": "Category"
+                    },
+                    {
+                      "type": "Customer"
+                    },
+                    {
+                      "type": "Form"
+                    },
+                    {
+                      "type": "Navigation"
+                    },
+                    {
+                      "type": "Operator"
+                    },
+                    {
+                      "type": "Order"
+                    },
+                    {
+                      "type": "Page"
+                    },
+                    {
+                      "type": "Product"
+                    },
+                    {
+                      "type": "Supplier"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a query parameter. The message is `unknown query parameter(s): <name>`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/trash/types\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.list_trash_types()\nfor entry in response.map[\"types\"]:\n    print(entry[\"type\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.listTrashTypes();\nfor (const entry of response.map.types) {\n    console.log(entry.type);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::listTrashTypes($client);\n\necho implode(', ', array_column($response->map['types'], 'type')), PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().listTrashTypes();\nfor (Object row : (List<?>) ((Map<?, ?>) response.getMap()).get(\"types\")) {\n    System.out.println(((Map<?, ?>) row).get(\"type\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.ListTrashTypesAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(string.Join(\", \", ((IReadOnlyList<object?>)body[\"types\"]!).Cast<IReadOnlyDictionary<string, object?>>().Select(trashType => trashType[\"type\"])));\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.listTrashTypes();\nfor (final type in (response.map as Map)['types'] as List) {\n  print((type as Map)['type']);\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().ListTrashTypes(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"types\"].([]any) {\n\tfmt.Println(row.(map[string]any)[\"type\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "Check the trash types list",
+        "operationId": "head_trash_types",
+        "description": "Returns `200` with headers only and no body. To read the types, use [List trash types](/api-reference/trash/list-trash-types).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/trash/types\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.head_trash_types()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.headTrashTypes();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::headTrashTypes($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().headTrashTypes();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.HeadTrashTypesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.headTrashTypes();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().HeadTrashTypes(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/trash/{trash_type}/{trash_item_id}/restore": {
+      "post": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "Restore an item from the trash",
+        "operationId": "restore_trash_item",
+        "description": "Restores the item you name by `trash_type` and `trash_item_id`, and returns `201` with `status` and `message`. The item is live again in its own resource; read it there to get its fields. Send no body: one you send is ignored, and so is any query parameter. An item that is not in the trash is rejected with `409`.",
+        "parameters": [
+          {
+            "name": "trash_type",
+            "in": "path",
+            "required": true,
+            "description": "The item's type, as returned by [List trash types](/api-reference/trash/list-trash-types), such as `Category`, `Customer` or `BlogPost`. Letter case does not matter: `Category`, `category` and `CATEGORY` all work. `blog_post` is rejected with `400`; send `BlogPost`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "trash_item_id",
+            "in": "path",
+            "required": true,
+            "description": "The id the item has in its own resource: a category's `id`, or a customer's `customer_id`. The same number is the item's `id` in [List items in the trash](/api-reference/trash/list-items-in-the-trash).",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The item is restored. The body has `status` set to `success` and a `message` such as `Category restored successfully`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashRestoreResult"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Category restored successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`trash_type` is not a trash type, such as `blog_post`. The message is `unknown trash type '<value>'`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No item of that type has that `trash_item_id`, for example because you deleted it permanently. The code is `not_found` and the message is `<Type> with id <id> not found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The item is not in the trash. The code is `conflict`, the message is `<Type> with id <id> is not in trash`, and `details` is empty.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "Category with id 1234 is not in trash",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/trash/Category/1234/restore\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.restore_trash_item(\"Category\", 1234)\nprint(response.map[\"status\"], response.map[\"message\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.restoreTrashItem('Category', 1234);\nconsole.log(response.map.status, response.map.message);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::restoreTrashItem($client, 'Category', 1234);\n\necho $response->map['status'], ': ', $response->map['message'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().restoreTrashItem(\"Category\", 1234);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"message\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.RestoreTrashItemAsync(\"Category\", 1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"message\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.restoreTrashItem('Category', 1234);\nfinal result = response.map as Map;\nprint('${result['status']} ${result['message']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().RestoreTrashItem(ctx, \"Category\", 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"message\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/trash/{trash_type}/{trash_item_id}": {
+      "delete": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "Delete an item permanently",
+        "operationId": "delete_trash_item",
+        "description": "Deletes the item you name by `trash_type` and `trash_item_id` permanently, and returns `204` with no body. Afterwards the item's own resource returns `404` for it, and a restore or a second delete returns `404`. An item that is not in the trash is rejected with `409`: delete it through its own resource first.",
+        "parameters": [
+          {
+            "name": "trash_type",
+            "in": "path",
+            "required": true,
+            "description": "The item's type, as returned by [List trash types](/api-reference/trash/list-trash-types), such as `Category`, `Customer` or `BlogPost`. Letter case does not matter: `Category`, `category` and `CATEGORY` all work. `blog_post` is rejected with `400`; send `BlogPost`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "trash_item_id",
+            "in": "path",
+            "required": true,
+            "description": "The id the item has in its own resource: a category's `id`, or a customer's `customer_id`. The same number is the item's `id` in [List items in the trash](/api-reference/trash/list-items-in-the-trash).",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted permanently. No body."
+          },
+          "400": {
+            "description": "`trash_type` is not a trash type, such as `blog_post`. The message is `unknown trash type '<value>'`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No item of that type has that `trash_item_id`, for example because you already deleted it permanently. The code is `not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The item is not in the trash. The code is `conflict` and the message is `<Type> with id <id> is not in trash`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                },
+                "example": {
+                  "error": {
+                    "code": "conflict",
+                    "message": "Category with id 1234 is not in trash",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/trash/Customer/5678\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.delete_trash_item(\"Customer\", 5678)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.deleteTrashItem('Customer', 5678);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::deleteTrashItem($client, 'Customer', 5678);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().deleteTrashItem(\"Customer\", 5678);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.DeleteTrashItemAsync(\"Customer\", 5678);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.deleteTrashItem('Customer', 5678);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().DeleteTrashItem(ctx, \"Customer\", 5678, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/trash/bulk-restore": {
+      "post": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "Restore items in bulk",
+        "operationId": "bulk_restore_trash",
+        "description": "Send `items`, a list of 1 to 100 objects, each with the item's `type` and `id`, at the top level of the body. You get `201` when at least one item is restored, even if others fail, and `400` with the same body when none is, so check `failed` and `errors` in every response. An item that is not in the trash fails with the reason `<Type> with id <id> is not in trash`, and an id the type does not have fails with `<Type> with id <id> not found`. An item listed twice is restored once, and the second copy fails.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "At least one item is restored. `restored` and `failed` count the items, and `errors` has one entry for each item that failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashBulkRestoreResult"
+                },
+                "example": {
+                  "restored": 1,
+                  "failed": 1,
+                  "errors": [
+                    {
+                      "type": "BlogPost",
+                      "id": 99,
+                      "reason": "BlogPost with id 99 not found"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No item is restored. The body has the same `restored`, `failed` and `errors` fields as a `201`. Or: The body is not valid, and nothing is restored or deleted: `items` is missing, empty or not an array (message `items array is required in request body`); an item is not an object (message `items[0] must be an object with type and id`); an item has a field other than `type` and `id` (message `items[0] has unknown field(s): <name>`, reason `unknown_parameter`); there are more than 100 items (message `a maximum of 100 items is allowed per call`, reason `out_of_range`); or an item's `type` is not a trash type (message `unknown trash type '<value>'`). In that case the body is an `error` object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TrashBulkRestoreResult"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TrashError"
+                    }
+                  ]
+                },
+                "example": {
+                  "restored": 0,
+                  "failed": 1,
+                  "errors": [
+                    {
+                      "type": "Category",
+                      "id": 1234,
+                      "reason": "Category with id 1234 is not in trash"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/trash/bulk-restore\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"items\": [\n      {\n        \"type\": \"Category\",\n        \"id\": 1234\n      },\n      {\n        \"type\": \"BlogPost\",\n        \"id\": 99\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.bulk_restore_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"BlogPost\", \"id\": 99}],\n})\nprint(response.map[\"restored\"], response.map[\"failed\"])\nfor error in response.map[\"errors\"]:\n    print(error[\"type\"], error[\"id\"], error[\"reason\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.bulkRestoreTrash({\n    items: [{type: 'Category', id: 1234}, {type: 'BlogPost', id: 99}],\n});\nconsole.log(response.map.restored, response.map.failed);\nfor (const error of response.map.errors) {\n    console.log(error.type, error.id, error.reason);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::bulkRestoreTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'BlogPost', 'id' => 99],\n]]);\n\necho $response->map['restored'], ' restored, ', $response->map['failed'], ' failed', PHP_EOL;\nforeach ($response->map['errors'] as $error) {\n    echo $error['type'], ' ', $error['id'], ': ', $error['reason'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().bulkRestoreTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"BlogPost\", \"id\", 99))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"restored\") + \" \" + body.get(\"failed\"));\nfor (Object row : (List<?>) body.get(\"errors\")) {\n    Map<?, ?> error = (Map<?, ?>) row;\n    System.out.println(error.get(\"type\") + \" \" + error.get(\"id\") + \" \" + error.get(\"reason\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.BulkRestoreTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"BlogPost\", [\"id\"] = 99 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"restored\"]} {body[\"failed\"]}\");\nforeach (var error in ((IReadOnlyList<object?>)body[\"errors\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{error[\"type\"]} {error[\"id\"]} {error[\"reason\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.bulkRestoreTrash({\n  'items': [\n    {'type': 'Category', 'id': 1234},\n    {'type': 'BlogPost', 'id': 99},\n  ],\n});\nfinal result = response.map as Map;\nprint('${result['restored']} ${result['failed']}');\nfor (final error in result['errors'] as List) {\n  print((error as Map)['reason']);\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().BulkRestoreTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"BlogPost\", \"id\": 99},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"restored\"], body[\"failed\"])\nfor _, row := range body[\"errors\"].([]any) {\n\tfailure := row.(map[string]any)\n\tfmt.Println(failure[\"type\"], failure[\"id\"], failure[\"reason\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrashBulkInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/trash/bulk-delete": {
+      "post": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "Delete items permanently in bulk",
+        "operationId": "bulk_delete_trash",
+        "description": "Send the same body as [Restore items in bulk](/api-reference/trash/restore-items-in-bulk): `items`, a list of 1 to 100 objects, each with the item's `type` and `id`. You get `201` when at least one item is deleted, even if others fail, and `400` with the same body when none is, so check `failed` and `errors` in every response. An item that is not in the trash fails with the reason `<Type> with id <id> is not in trash`, and an id the type does not have fails with `<Type> with id <id> not found`. An item listed twice is deleted once, and the second copy fails with `not found`.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "At least one item is deleted permanently. `deleted` and `failed` count the items, and `errors` has one entry for each item that failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashBulkDeleteResult"
+                },
+                "example": {
+                  "deleted": 2,
+                  "failed": 0,
+                  "errors": []
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No item is deleted. The body has the same `deleted`, `failed` and `errors` fields as a `201`. Or: The body is not valid, and nothing is restored or deleted: `items` is missing, empty or not an array (message `items array is required in request body`); an item is not an object (message `items[0] must be an object with type and id`); an item has a field other than `type` and `id` (message `items[0] has unknown field(s): <name>`, reason `unknown_parameter`); there are more than 100 items (message `a maximum of 100 items is allowed per call`, reason `out_of_range`); or an item's `type` is not a trash type (message `unknown trash type '<value>'`). In that case the body is an `error` object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TrashBulkDeleteResult"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TrashError"
+                    }
+                  ]
+                },
+                "example": {
+                  "deleted": 0,
+                  "failed": 1,
+                  "errors": [
+                    {
+                      "type": "Category",
+                      "id": 1234,
+                      "reason": "Category with id 1234 not found"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/trash/bulk-delete\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"items\": [\n      {\n        \"type\": \"Category\",\n        \"id\": 1234\n      },\n      {\n        \"type\": \"Category\",\n        \"id\": 1229\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.bulk_delete_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"Category\", \"id\": 1229}],\n})\nprint(response.map[\"deleted\"], response.map[\"failed\"])\nfor error in response.map[\"errors\"]:\n    print(error[\"type\"], error[\"id\"], error[\"reason\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.bulkDeleteTrash({\n    items: [{type: 'Category', id: 1234}, {type: 'Category', id: 1229}],\n});\nconsole.log(response.map.deleted, response.map.failed);\nfor (const error of response.map.errors) {\n    console.log(error.type, error.id, error.reason);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::bulkDeleteTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'Category', 'id' => 1229],\n]]);\n\necho $response->map['deleted'], ' deleted, ', $response->map['failed'], ' failed', PHP_EOL;\nforeach ($response->map['errors'] as $error) {\n    echo $error['type'], ' ', $error['id'], ': ', $error['reason'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().bulkDeleteTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"Category\", \"id\", 1229))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"deleted\") + \" \" + body.get(\"failed\"));\nfor (Object row : (List<?>) body.get(\"errors\")) {\n    Map<?, ?> error = (Map<?, ?>) row;\n    System.out.println(error.get(\"type\") + \" \" + error.get(\"id\") + \" \" + error.get(\"reason\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.BulkDeleteTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1229 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"deleted\"]} {body[\"failed\"]}\");\nforeach (var error in ((IReadOnlyList<object?>)body[\"errors\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{error[\"type\"]} {error[\"id\"]} {error[\"reason\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.bulkDeleteTrash({\n  'items': [\n    {'type': 'Category', 'id': 1234},\n    {'type': 'Category', 'id': 1229},\n  ],\n});\nfinal result = response.map as Map;\nprint('${result['deleted']} ${result['failed']}');\nfor (final error in result['errors'] as List) {\n  print((error as Map)['reason']);\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().BulkDeleteTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1229},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"deleted\"], body[\"failed\"], body[\"errors\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrashBulkInput"
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -64769,6 +65800,241 @@
                     },
                     "value": {
                       "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "TrashItem": {
+        "type": "object",
+        "description": "One item in the trash.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id the item has in its own resource, such as a category's `id` or a customer's `customer_id`. Pass it as `trash_item_id` in a path."
+          },
+          "type": {
+            "type": "string",
+            "description": "The item's type in PascalCase, such as `Category`. Pass it as `trash_type` in a path."
+          },
+          "name": {
+            "type": "string",
+            "description": "The item's name."
+          },
+          "updated": {
+            "type": "string",
+            "description": "When the item was moved to the trash, in UTC with no time zone designator, such as `2026-10-18T11:16:07`."
+          }
+        }
+      },
+      "TrashPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of items that match your request."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, `100` when you sent more, or `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of items skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of items on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The number of this page, counting from `1`."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "The number of pages at this page size."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there is a page after this one."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when there is a page before this one."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the previous page, or `null` on the first page."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The full URL of the next page, or `null` on the last page."
+          }
+        }
+      },
+      "TrashType": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "A type the trash holds, in PascalCase, such as `BlogPost`. Send it as `trash_type` in a path or as `type` in a bulk item."
+          }
+        }
+      },
+      "TrashRestoreResult": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`success`."
+          },
+          "message": {
+            "type": "string",
+            "description": "`<Type> restored successfully`, such as `Category restored successfully`."
+          }
+        }
+      },
+      "TrashBulkItemInput": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "description": "One item to restore or delete. Any other field is rejected with `400`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The item's type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, such as `Category`."
+          },
+          "id": {
+            "type": "integer",
+            "description": "The id the item has in its own resource, such as a category's `id` or a customer's `customer_id`."
+          }
+        }
+      },
+      "TrashBulkInput": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "description": "Send `items` at the top level of the body. Another top-level field is ignored.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "description": "1 to 100 items. An empty or missing list, or more than 100 items, is rejected with `400`.",
+            "items": {
+              "$ref": "#/components/schemas/TrashBulkItemInput"
+            }
+          }
+        }
+      },
+      "TrashBulkError": {
+        "type": "object",
+        "description": "One item a bulk call could not restore or delete.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The item's type, in PascalCase."
+          },
+          "id": {
+            "type": "integer",
+            "description": "The id the item has in its own resource, as you sent it in the bulk item's `id`."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the item failed, such as `Category with id 1234 is not in trash` or `Category with id 1234 not found`."
+          }
+        }
+      },
+      "TrashBulkRestoreResult": {
+        "type": "object",
+        "properties": {
+          "restored": {
+            "type": "integer",
+            "description": "The number of items restored."
+          },
+          "failed": {
+            "type": "integer",
+            "description": "The number of items not restored."
+          },
+          "errors": {
+            "type": "array",
+            "description": "One entry for each item that failed. Empty when every item succeeded.",
+            "items": {
+              "$ref": "#/components/schemas/TrashBulkError"
+            }
+          }
+        }
+      },
+      "TrashBulkDeleteResult": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "integer",
+            "description": "The number of items deleted permanently."
+          },
+          "failed": {
+            "type": "integer",
+            "description": "The number of items not deleted."
+          },
+          "errors": {
+            "type": "array",
+            "description": "One entry for each item that failed. Empty when every item succeeded.",
+            "items": {
+              "$ref": "#/components/schemas/TrashBulkError"
+            }
+          }
+        }
+      },
+      "TrashError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found`, `conflict` or `rate_limited`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Category with id 1234 is not in trash`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected field or query parameter, or an empty list. On a `400`, each entry's `message` is `null`: read `error.message` instead.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The field or query parameter that was rejected."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_parameter` or `out_of_range`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "`null` on a `400`."
                     }
                   }
                 }

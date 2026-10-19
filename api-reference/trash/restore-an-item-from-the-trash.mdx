@@ -1,0 +1,9 @@
+---
+title: "Restore an item from the trash"
+description: "Restores one item from the trash and returns a success message, not the item."
+openapi: "POST /admin/trash/{trash_type}/{trash_item_id}/restore"
+---
+
+Restores the item you name by `trash_type` and `trash_item_id`, and returns `201` with `status` and `message`. The item is live again in its own resource; read it there to get its fields. Send no body: one you send is ignored, and so is any query parameter. An item that is not in the trash is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
