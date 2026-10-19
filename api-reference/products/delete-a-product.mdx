@@ -1,0 +1,9 @@
+---
+title: "Delete a product"
+description: "Moves the product to the trash. The product still reads back, with `status` set to `trashed`."
+openapi: "DELETE /admin/products/{product_id}"
+---
+
+Moves the product to the trash and returns `204` with no body. The product is not deleted permanently: [Retrieve a product](/api-reference/products/retrieve-a-product) still returns it, with `status` set to `trashed`. Every write to it is then rejected with `409`, including [Update a product](/api-reference/products/update-a-product), [Patch a product](/api-reference/products/patch-a-product) and [Import a product's reviews](/api-reference/products/import-a-products-reviews). Deleting it again returns `404`. Query parameters are ignored, `permanent` included.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

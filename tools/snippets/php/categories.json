@@ -16,7 +16,7 @@
     },
     "create_category": {
       "function": "createCategory",
-      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::createCategory($client, ['category' => [\n    'general' => ['name' => 'Seasonal Produce', 'title' => 'Seasonal Produce', 'heading' => 'Fresh this season',\n        'summary' => 'Fruit and vegetables picked this week', 'parent_category' => ['id' => 4310]],\n    'description' => ['content' => '<p>What is in season right now.</p>'],\n    'availability_visibility' => ['visible' => true, 'custom_sorting' => true, 'default_sorting' => 'alpha_asc'],\n    'tax_shipping' => ['tax_message' => 'Prices include GST'],\n    'assign_products' => ['products' => [101, 102]],\n]]);\n\necho $response->map['category']['id'], ' ', $response->map['category']['general']['url'], PHP_EOL;"
+      "code": "use WebCommander\\Sdk\\Resources\\Categories\\Categories;\n\n$response = Categories::createCategory($client, ['category' => [\n    'general' => ['name' => 'Seasonal Produce', 'title' => 'Seasonal Produce', 'heading' => 'Fresh this season',\n        'summary' => 'Fruit and vegetables picked this week', 'parent_category' => ['id' => 4310]],\n    'description' => ['content' => '<p>What is in season right now.</p>'],\n    'availability_visibility' => ['visible' => true, 'custom_sorting' => true, 'default_sorting' => 'alpha_asc'],\n    'tax_shipping' => ['tax_message' => 'Prices include GST'],\n    'assign_products' => ['products' => [101, 102]],\n]], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['category']['id'], ' ', $response->map['category']['general']['url'], PHP_EOL;"
     },
     "get_category": {
       "function": "getCategory",

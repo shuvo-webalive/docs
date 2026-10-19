@@ -2,6 +2,10 @@
   "sdk": "go",
   "module": "products",
   "endpoints": {
+    "create_product": {
+      "function": "CreateProduct",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().CreateProduct(ctx, map[string]any{\n\t\"name\":           \"Blue Mug\",\n\t\"sku\":            \"MUG-BLUE\",\n\t\"base_price\":     12.5,\n\t\"transaction_no\": \"IMPORT-2026-10-18\",\n}, \"IMPORT-2026-10-18\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nfmt.Println(product[\"id\"], product[\"sku\"], product[\"status\"], product[\"transaction_no\"])\n"
+    },
     "get_product": {
       "function": "GetProduct",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().GetProduct(ctx, 101, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nstock := product[\"product_pricing_and_stock\"].(map[string]any)\nfmt.Println(product[\"name\"], product[\"sku\"], product[\"base_price\"], stock[\"available_stock\"])"
@@ -9,6 +13,18 @@
     "update_product": {
       "function": "UpdateProduct",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().UpdateProduct(ctx, 101, map[string]any{\n\t\"invoice_note\": \"Ships in 2 business days\",\n\t\"advanced\":     map[string]any{\"advance_information\": map[string]any{\"mpn\": \"MPN-0001\"}},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\ninformation := product[\"advanced\"].(map[string]any)[\"advance_information\"].(map[string]any)\nfmt.Println(product[\"invoice_note\"], information[\"mpn\"], product[\"version\"])"
+    },
+    "patch_product": {
+      "function": "PatchProduct",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().PatchProduct(ctx, 101, map[string]any{\"base_price\": 27.5}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nfmt.Println(product[\"name\"], product[\"base_price\"], product[\"version\"])\n"
+    },
+    "delete_product": {
+      "function": "DeleteProduct",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().DeleteProduct(ctx, 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "import_product_reviews": {
+      "function": "ImportProductReviews",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().ImportProductReviews(ctx, 101, map[string]any{\n\t\"product\": map[string]any{\"reviews\": []any{\n\t\tmap[string]any{\"name\": \"Sam Lee\", \"email\": \"sam@example.com\", \"rating\": 5, \"review\": \"Great shirt\", \"status\": \"approved\"},\n\t}},\n}, \"IMPORT-2026-10-18\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"product\"].(map[string]any)[\"reviews\"].([]any) {\n\treview := row.(map[string]any)\n\tfmt.Println(review[\"id\"], review[\"name\"], review[\"rating\"], review[\"status\"])\n}\n"
     },
     "get_product_stock": {
       "function": "GetProductStock",

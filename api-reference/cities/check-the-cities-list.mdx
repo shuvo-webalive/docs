@@ -1,0 +1,9 @@
+---
+title: "Check the cities list"
+description: "Returns the headers of the cities list, including its `ETag`, with no body."
+openapi: "HEAD /app/cities"
+---
+
+Returns `200` with headers only and no body. The `ETag` is the same one [List cities](/api-reference/cities/list-cities) returns when you send no query parameters, and the SDK functions send none. Compare it with the `ETag` you saved to see whether the list changed without downloading it. It counts toward the same read limit as [List cities](/api-reference/cities/list-cities).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

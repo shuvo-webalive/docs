@@ -607,8 +607,12 @@
                 "expanded": false,
                 "pages": [
                   "products",
+                  "api-reference/products/create-a-product",
                   "api-reference/products/retrieve-a-product",
                   "api-reference/products/update-a-product",
+                  "api-reference/products/patch-a-product",
+                  "api-reference/products/delete-a-product",
+                  "api-reference/products/import-a-products-reviews",
                   "api-reference/products/retrieve-a-products-stock",
                   "api-reference/products/set-a-products-stock",
                   "api-reference/products/unassign-an-inventory-location-from-a-product"
@@ -629,6 +633,7 @@
                   "api-reference/variations/delete-a-variation-type",
                   "api-reference/variations/delete-a-variation-option",
                   "api-reference/variations/list-a-products-variants",
+                  "api-reference/variations/import-a-products-variants",
                   "api-reference/variations/update-a-products-variants"
                 ]
               }
@@ -655,6 +660,15 @@
                 ]
               },
               {
+                "group": "Cities",
+                "expanded": false,
+                "pages": [
+                  "cities",
+                  "api-reference/cities/list-cities",
+                  "api-reference/cities/check-the-cities-list"
+                ]
+              },
+              {
                 "group": "Currencies",
                 "expanded": false,
                 "pages": [
@@ -672,6 +686,52 @@
                   "api-reference/currencies/set-the-base-currency"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Transactions",
+            "icon": "list-check",
+            "expanded": false,
+            "pages": [
+              "transactions",
+              "api-reference/transactions/list-transactions",
+              "api-reference/transactions/check-the-transactions-list",
+              "api-reference/transactions/retrieve-a-transaction",
+              "api-reference/transactions/check-a-transaction",
+              "api-reference/transactions/list-the-records-of-a-transaction",
+              "api-reference/transactions/check-the-records-of-a-transaction"
+            ]
+          },
+          {
+            "group": "Payment gateways",
+            "icon": "credit-card",
+            "expanded": false,
+            "pages": [
+              "payment-gateways",
+              "api-reference/payment-gateways/list-payment-gateways",
+              "api-reference/payment-gateways/check-the-payment-gateways-list",
+              "api-reference/payment-gateways/count-payment-gateways",
+              "api-reference/payment-gateways/check-the-payment-gateway-count",
+              "api-reference/payment-gateways/retrieve-a-payment-gateway",
+              "api-reference/payment-gateways/check-a-payment-gateway",
+              "api-reference/payment-gateways/update-a-payment-gateway-with-put",
+              "api-reference/payment-gateways/update-a-payment-gateway"
+            ]
+          },
+          {
+            "group": "Trash",
+            "icon": "trash-can",
+            "expanded": false,
+            "pages": [
+              "trash",
+              "api-reference/trash/list-items-in-the-trash",
+              "api-reference/trash/check-the-trash-list",
+              "api-reference/trash/list-trash-types",
+              "api-reference/trash/check-the-trash-types-list",
+              "api-reference/trash/restore-an-item-from-the-trash",
+              "api-reference/trash/delete-an-item-permanently",
+              "api-reference/trash/restore-items-in-bulk",
+              "api-reference/trash/delete-items-permanently-in-bulk"
             ]
           },
           {

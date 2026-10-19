@@ -42,6 +42,10 @@
       "function": "listProductVariations",
       "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::listProductVariations($client, 4321);\n\nforeach ($response->map['variations'] as $group) {\n    foreach ($group['variants'] as $variant) {\n        echo $variant['variation_id'], ' ', $variant['key'], ' ', $variant['pricing']['base_price'], ' ', $variant['inventory']['quantity'], PHP_EOL;\n    }\n}\n"
     },
+    "import_product_variations": {
+      "function": "importProductVariations",
+      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::importProductVariations($client, 4321, ['variations' => [['product_key' => 'Size', 'variants' => [\n    ['key' => 'Small', 'name' => 'Cotton T-Shirt Small', 'sku' => 'TSHIRT-001-S', 'pricing' => ['base_price' => 25.0]],\n    ['key' => 'Medium', 'name' => 'Cotton T-Shirt Medium', 'sku' => 'TSHIRT-001-M', 'pricing' => ['base_price' => 25.0]],\n]]]], transactionNo: 'IMPORT-2026-10-18');\n\necho $response->map['message'], ' (', $response->map['total_variants'], ' variants)', PHP_EOL;"
+    },
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::updateProductVariations($client, 4321, [\n    'variation_ids' => [91], 'available' => true, 'available_stock' => 12,\n    'min_order_quantity' => 1, 'max_order_quantity' => 5,\n]);\n\necho $response->map['message'], PHP_EOL;\nforeach ($response->map['updated'] as $variant) {\n    echo $variant['id'], ' ', $variant['name'], PHP_EOL;\n}\n"

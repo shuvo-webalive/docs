@@ -1,10 +1,10 @@
 ---
 title: "Variations"
 sidebarTitle: "Overview"
-description: "List, create, replace, update and delete variation types and their options, and read and update the variants of a product."
+description: "List, create, replace, update and delete variation types and their options, and list, import and update the variants of a product."
 ---
 
-The Variations API has eleven endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`.
+The Variations API has twelve endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`.
 
 <Warning>
   **Replacing a variation type deletes every option you leave out of the body.** `PUT` on a type
@@ -27,6 +27,7 @@ The Variations API has eleven endpoints, and you can call every one from all sev
 | [Delete a variation type](/api-reference/variations/delete-a-variation-type) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/variations/{variation_id}` | Deletes a variation type permanently. Send `cascade=true` to delete its options with it. |
 | [Delete a variation option](/api-reference/variations/delete-a-variation-option) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/variations/{variation_id}/options/{variation_option_id}` | Deletes one option from a variation type and leaves the type's other options unchanged. |
 | [List a product's variants](/api-reference/variations/list-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/admin/products/{product_id}/variations` | Returns every variant of the product whose `id` you pass as `product_id`. |
+| [Import a product's variants](/api-reference/variations/import-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/admin/products/{product_id}/variations` | Adds the variants you send to the product, changes the ones whose `key` it already has, and returns how many were imported. |
 | [Update a product's variants](/api-reference/variations/update-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/admin/products/{product_id}/variations/bulk` | Sets availability, prices, stock or order quantities on several variants of one product. |
 
 ## Before you call
@@ -40,13 +41,19 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Wrap every variation type write in `variation`.** Create, replace and update all take
   `{"variation": {...}}`. A bare record is rejected with `400`: each top-level key is reported with
   the reason `unknown_field`, and `variation` with the reason `required`.
-  [Update a product's variants](/api-reference/variations/update-a-products-variants) is the opposite: send its fields at the top level
-  of the body, with no wrapper.
+  [Update a product's variants](/api-reference/variations/update-a-products-variants) and [Import a product's variants](/api-reference/variations/import-a-products-variants)
+  are the opposite: send their fields at the top level of the body, with no wrapper.
 - **Delete a variation type with `cascade=true`.** A type you create always has at least one option,
   and you cannot delete a type's last option on its own. Without `cascade=true`,
   [Delete a variation type](/api-reference/variations/delete-a-variation-type) rejects a type that has options with `409` and the
   message `This variation type still has N option(s).` With `cascade=true`, the type and its options
-  are deleted together.
+  are deleted together. A type that a product's variants use cannot be deleted, even with `cascade=true`
+  and even after that product is moved to the trash: the call is rejected with `409`.
+- **Importing variants can add options to the store's variation types.**
+  [Import a product's variants](/api-reference/variations/import-a-products-variants) matches each `product_key` to the `name` of a
+  variation type and each variant `key` to that type's option labels. A label the type does not have
+  yet is added to the type itself, for the whole store. To add no option, use labels the type already
+  has: [List variation types](/api-reference/variations/list-variation-types) returns them.
 - **`variation_ids` takes each variant's `variation_id`, not a variation type's `id`.** Each variant that
   [List a product's variants](/api-reference/variations/list-a-products-variants) returns has its own `variation_id`.
   Send those values in `variation_ids` to [Update a product's variants](/api-reference/variations/update-a-products-variants). A variant

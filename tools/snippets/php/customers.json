@@ -24,7 +24,7 @@
     },
     "create_customer": {
       "function": "createCustomer",
-      "code": "use WebCommander\\Sdk\\Resources\\Customers\\AdminCustomers;\n\n$response = AdminCustomers::createCustomer($client, [\n    'customer' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane@example.com',\n        'company' => false,\n    ],\n]);\n\necho $response->map['customer']['customer_id'], PHP_EOL;"
+      "code": "use WebCommander\\Sdk\\Resources\\Customers\\AdminCustomers;\n\n$response = AdminCustomers::createCustomer($client, [\n    'customer' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane@example.com',\n        'company' => false,\n    ],\n], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['customer']['customer_id'], PHP_EOL;"
     },
     "update_customer": {
       "function": "updateCustomer",

@@ -2,6 +2,10 @@
   "sdk": "dotnet",
   "module": "products",
   "endpoints": {
+    "create_product": {
+      "function": "CreateProductAsync",
+      "code": "var response = await client.Products.CreateProductAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Blue Mug\", [\"sku\"] = \"MUG-BLUE\", [\"base_price\"] = 12.5, [\"transaction_no\"] = \"IMPORT-2026-10-18\",\n}, transactionNo: \"IMPORT-2026-10-18\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"id\"]} {product[\"sku\"]} {product[\"status\"]} {product[\"transaction_no\"]}\");"
+    },
     "get_product": {
       "function": "GetProductAsync",
       "code": "var response = await client.Products.GetProductAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nvar pricingAndStock = (IReadOnlyDictionary<string, object?>)product[\"product_pricing_and_stock\"]!;\nConsole.WriteLine($\"{product[\"name\"]} {product[\"sku\"]} {product[\"base_price\"]} {pricingAndStock[\"available_stock\"]}\");"
@@ -9,6 +13,18 @@
     "update_product": {
       "function": "UpdateProductAsync",
       "code": "var response = await client.Products.UpdateProductAsync(101, new Dictionary<string, object?>\n{\n    [\"invoice_note\"] = \"Ships in 2 business days\",\n    [\"advanced\"] = new Dictionary<string, object?>\n    {\n        [\"advance_information\"] = new Dictionary<string, object?> { [\"mpn\"] = \"MPN-0001\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"invoice_note\"]} {product[\"version\"]}\");"
+    },
+    "patch_product": {
+      "function": "PatchProductAsync",
+      "code": "var response = await client.Products.PatchProductAsync(101, new Dictionary<string, object?>\n{\n    [\"base_price\"] = 27.5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"name\"]} {product[\"base_price\"]} {product[\"version\"]}\");"
+    },
+    "delete_product": {
+      "function": "DeleteProductAsync",
+      "code": "var response = await client.Products.DeleteProductAsync(101);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "import_product_reviews": {
+      "function": "ImportProductReviewsAsync",
+      "code": "var response = await client.Products.ImportProductReviewsAsync(101, new Dictionary<string, object?>\n{\n    [\"product\"] = new Dictionary<string, object?>\n    {\n        [\"reviews\"] = new object[]\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Sam Lee\", [\"email\"] = \"sam@example.com\", [\"rating\"] = 5,\n                [\"review\"] = \"Great shirt\", [\"status\"] = \"approved\",\n            },\n        },\n    },\n}, transactionNo: \"IMPORT-2026-10-18\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nforeach (var review in ((IReadOnlyList<object?>)product[\"reviews\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{review[\"id\"]} {review[\"name\"]} {review[\"rating\"]} {review[\"status\"]}\");"
     },
     "get_product_stock": {
       "function": "GetProductStockAsync",

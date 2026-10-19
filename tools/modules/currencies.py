@@ -50,6 +50,14 @@ CURRENCY_ID = {
     "schema": {"type": "integer", "example": 1234},
 }
 
+TRANSACTION_NO = {
+    "name": "X-Transaction-No",
+    "in": "header",
+    "required": False,
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new currency under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `currency` with `count` `1`. This header is the only way to send the number: a `transaction_no` in the body is rejected with `400`, reason `unknown_field` and message `is not a currency field`. Use a number in printable ASCII with no space at either end: the SDK rejects any other header value before it sends the call.",
+    "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
+}
+
 SORT_FIELDS = ["id", "name", "code", "symbol", "precision", "rounding", "conversion_rate", "active", "base", "updated_at"]
 
 SEARCH = {"name": "search", "in": "query", "description": "Keeps only currencies whose `name` or `code` contains this text, in any letter case. It does not search `symbol` or the country.", "schema": {"type": "string", "example": "dollar"}}
@@ -186,7 +194,8 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE,
         "summary": "Creates a currency and returns it with its `id`, which other calls take as `currency_id`.",
-        "description": "Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`.",
+        "description": "Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`. To file the currency under a transaction number, send the `X-Transaction-No` header: the body has no `transaction_no` field, and sending one is rejected with `400`.",
+        "parameters": [TRANSACTION_NO],
         "body": {"schema": {"$ref": "#/components/schemas/CurrencyInput"}, "example": CREATE_BODY},
         "responses": {
             "201": {
@@ -194,7 +203,7 @@ ENDPOINTS = [
                 "schema": ROW_RESPONSE,
                 "example": {"currency": CREATED_ROW},
             },
-            "400": {"description": WRITE_400, "schema": ERROR_REF},
+            "400": {"description": WRITE_400 + " A `transaction_no` in the body is rejected the same way, reason `unknown_field` and message `is not a currency field`: send the number in the `X-Transaction-No` header instead.", "schema": ERROR_REF},
             "409": {"description": "Another currency already has that `name`, in any letter case (`A currency with this name already exists.`, `details[0].code` `duplicate`) or that `code` (`A currency with this code already exists.`). The reason is `conflict`.", "schema": ERROR_REF},
         },
         "example_call": {},

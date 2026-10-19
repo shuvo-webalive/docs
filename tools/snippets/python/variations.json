@@ -42,6 +42,10 @@
       "function": "list_product_variations",
       "code": "response = client.variations.list_product_variations(4321)\nfor group in response.map[\"variations\"]:\n    print(group[\"product_key\"])\n    for variant in group[\"variants\"]:\n        print(variant[\"variation_id\"], variant[\"key\"], variant[\"sku\"], variant[\"available\"])\n"
     },
+    "import_product_variations": {
+      "function": "import_product_variations",
+      "code": "response = client.variations.import_product_variations(4321, {\n    \"variations\": [{\n        \"product_key\": \"Size\",\n        \"variants\": [\n            {\"key\": \"Small\", \"name\": \"Cotton T-Shirt Small\", \"sku\": \"TSHIRT-001-S\", \"pricing\": {\"base_price\": 25.0}},\n            {\"key\": \"Medium\", \"name\": \"Cotton T-Shirt Medium\", \"sku\": \"TSHIRT-001-M\", \"pricing\": {\"base_price\": 25.0}},\n        ],\n    }],\n}, transaction_no=\"IMPORT-2026-10-18\")\nprint(response.map[\"status\"], response.map[\"message\"], response.map[\"total_variants\"])\n"
+    },
     "update_product_variations": {
       "function": "update_product_variations",
       "code": "response = client.variations.update_product_variations(4321, {\n    \"variation_ids\": [91],\n    \"available\": True,\n    \"available_stock\": 12,\n    \"min_order_quantity\": 1,\n    \"max_order_quantity\": 5,\n})\nprint(response.map[\"message\"])\nfor variant in response.map[\"updated\"]:\n    print(variant[\"id\"], variant[\"name\"])\n"

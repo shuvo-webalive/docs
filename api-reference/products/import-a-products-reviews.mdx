@@ -1,0 +1,9 @@
+---
+title: "Import a product's reviews"
+description: "Adds the reviews you send to the product and returns every review the product now has."
+openapi: "POST /admin/products/{product_id}/reviews"
+---
+
+Wrap the reviews in `product`: `{"product": {"reviews": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from is skipped, with no error. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

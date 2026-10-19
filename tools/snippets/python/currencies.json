@@ -20,7 +20,7 @@
     },
     "create_currency": {
       "function": "create_currency",
-      "code": "response = client.currencies.create_currency({\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": True,\n})\nprint(response.map[\"currency\"][\"id\"])\n"
+      "code": "response = client.currencies.create_currency({\n    \"name\": \"Example Dollar\",\n    \"code\": \"XEX\",\n    \"symbol\": \"$\",\n    \"country\": \"NZ\",\n    \"conversion_rate\": 1.2345,\n    \"precision\": 2,\n    \"rounding\": \"nearest\",\n    \"active\": True,\n}, transaction_no=\"TXN-IMPORT-0001\")\nprint(response.map[\"currency\"][\"id\"])\n"
     },
     "get_currency": {
       "function": "get_currency",

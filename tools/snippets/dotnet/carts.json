@@ -28,7 +28,7 @@
     },
     "create_order_from_cart": {
       "function": "CreateOrderFromCartAsync",
-      "code": "var response = await client.Carts.CreateOrderFromCartAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 123, [\"payment_gateway\"] = \"PIS\",\n    [\"delivery_type\"] = \"shipping\", [\"transaction_no\"] = \"web-order-0001\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{body[\"status\"]} {order[\"order_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]} {order[\"grand_total\"]}\");\nforeach (var orderLine in ((IReadOnlyList<object?>)order[\"order_line_details\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderLine[\"sku\"]} {orderLine[\"quantity\"]} {orderLine[\"total_amount\"]}\");"
+      "code": "var response = await client.Carts.CreateOrderFromCartAsync(\"cart-7f3a9c2e1b\", new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 123, [\"payment_gateway\"] = \"PIS\",\n    [\"delivery_type\"] = \"shipping\", [\"transaction_no\"] = \"web-order-0001\",\n}, transactionNo: \"web-order-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{body[\"status\"]} {order[\"order_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]} {order[\"grand_total\"]}\");\nforeach (var orderLine in ((IReadOnlyList<object?>)order[\"order_line_details\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{orderLine[\"sku\"]} {orderLine[\"quantity\"]} {orderLine[\"total_amount\"]}\");"
     }
   }
 }

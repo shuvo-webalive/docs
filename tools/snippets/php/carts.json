@@ -28,7 +28,7 @@
     },
     "create_order_from_cart": {
       "function": "createOrderFromCart",
-      "code": "use WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$response = Carts::createOrderFromCart($client, 'cart-7f3a9c2e1b', [\n    'customer_id' => 123,\n    'payment_gateway' => 'PIS',\n    'delivery_type' => 'shipping',\n    'transaction_no' => 'web-order-0001',\n]);\n\n$order = $response->map['order'];\necho $response->map['status'], ' ', $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], PHP_EOL;\necho 'Due: ', $order['due'], PHP_EOL;"
+      "code": "use WebCommander\\Sdk\\Resources\\Carts\\Carts;\n\n$response = Carts::createOrderFromCart($client, 'cart-7f3a9c2e1b', [\n    'customer_id' => 123,\n    'payment_gateway' => 'PIS',\n    'delivery_type' => 'shipping',\n    'transaction_no' => 'web-order-0001',\n], transactionNo: 'web-order-0001');\n\n$order = $response->map['order'];\necho $response->map['status'], ' ', $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], PHP_EOL;\necho 'Due: ', $order['due'], PHP_EOL;"
     }
   }
 }

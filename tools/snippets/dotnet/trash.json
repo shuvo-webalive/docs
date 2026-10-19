@@ -1,0 +1,38 @@
+{
+  "sdk": "dotnet",
+  "module": "trash",
+  "endpoints": {
+    "list_trash": {
+      "function": "ListTrashAsync",
+      "code": "var response = await client.Trash.ListTrashAsync(new Dictionary<string, object?>\n{\n    [\"type\"] = \"Category\", [\"search\"] = \"spring\", [\"sort\"] = \"name\", [\"order\"] = \"asc\", [\"limit\"] = 20,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var item in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"type\"]} {item[\"name\"]} {item[\"updated\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_trash": {
+      "function": "HeadTrashAsync",
+      "code": "var response = await client.Trash.HeadTrashAsync(\n    new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"limit\"] = 1 });\nConsole.WriteLine(response.StatusCode);"
+    },
+    "list_trash_types": {
+      "function": "ListTrashTypesAsync",
+      "code": "var response = await client.Trash.ListTrashTypesAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(string.Join(\", \", ((IReadOnlyList<object?>)body[\"types\"]!).Cast<IReadOnlyDictionary<string, object?>>().Select(trashType => trashType[\"type\"])));"
+    },
+    "head_trash_types": {
+      "function": "HeadTrashTypesAsync",
+      "code": "var response = await client.Trash.HeadTrashTypesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "restore_trash_item": {
+      "function": "RestoreTrashItemAsync",
+      "code": "var response = await client.Trash.RestoreTrashItemAsync(\"Category\", 1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"message\"]}\");"
+    },
+    "delete_trash_item": {
+      "function": "DeleteTrashItemAsync",
+      "code": "var response = await client.Trash.DeleteTrashItemAsync(\"Customer\", 5678);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "bulk_restore_trash": {
+      "function": "BulkRestoreTrashAsync",
+      "code": "var response = await client.Trash.BulkRestoreTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"BlogPost\", [\"id\"] = 99 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"restored\"]} {body[\"failed\"]}\");\nforeach (var error in ((IReadOnlyList<object?>)body[\"errors\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{error[\"type\"]} {error[\"id\"]} {error[\"reason\"]}\");"
+    },
+    "bulk_delete_trash": {
+      "function": "BulkDeleteTrashAsync",
+      "code": "var response = await client.Trash.BulkDeleteTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1229 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"deleted\"]} {body[\"failed\"]}\");\nforeach (var error in ((IReadOnlyList<object?>)body[\"errors\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{error[\"type\"]} {error[\"id\"]} {error[\"reason\"]}\");"
+    }
+  }
+}
