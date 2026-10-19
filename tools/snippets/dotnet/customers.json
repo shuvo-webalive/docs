@@ -24,7 +24,7 @@
     },
     "create_customer": {
       "function": "CreateCustomerAsync",
-      "code": "var response = await client.AdminCustomers.CreateCustomerAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane@example.com\", [\"company\"] = false,\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"customer_id\"]);"
+      "code": "var response = await client.AdminCustomers.CreateCustomerAsync(new Dictionary<string, object?>\n{\n    [\"customer\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\", [\"last_name\"] = \"Doe\", [\"email\"] = \"jane@example.com\", [\"company\"] = false,\n    },\n}, transactionNo: \"TXN-IMPORT-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar customer = (IReadOnlyDictionary<string, object?>)body[\"customer\"]!;\nConsole.WriteLine(customer[\"customer_id\"]);"
     },
     "update_customer": {
       "function": "UpdateCustomerAsync",

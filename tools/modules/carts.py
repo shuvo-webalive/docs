@@ -12,6 +12,7 @@ REMOVE_PAGE = "/api-reference/carts/remove-an-item-from-a-cart"
 ORDER_PAGE = "/api-reference/carts/create-an-order-from-a-cart"
 CREATE_CUSTOMER_PAGE = "/api-reference/customers/create-a-customer"
 STOCK_PAGE = "/api-reference/inventory-locations/list-stock-at-an-inventory-location"
+RETRIEVE_ORDER_PAGE = "/api-reference/orders/retrieve-an-order"
 
 OVERVIEW_DESCRIPTION = "Add products to a customer's cart, read it, change or remove its items, empty it, and turn it into an order."
 INTRO = (
@@ -64,6 +65,14 @@ SESSION_ID = {
     "required": True,
     "description": "The cart's `session_id`: the value you sent when you added the first product, or `cart.session_id` from that response.",
     "schema": {"type": "string", "example": "cart-7f3a9c2e1b"},
+}
+
+TRANSACTION_NO = {
+    "name": "X-Transaction-No",
+    "in": "header",
+    "required": False,
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. The response to this call shows `transaction_no` as `null`; [Retrieve an order](" + RETRIEVE_ORDER_PAGE + ") shows the number. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the order is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+    "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
 CART_ITEM_ID = {
@@ -345,12 +354,12 @@ ENDPOINTS = [
         "method": "POST",
         "path": "/admin/orders/carts/{session_id}",
         "summary": "Turns the cart into an order, empties the cart and returns the new order.",
-        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](" + ADD_PAGE + ") takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](" + UPDATE_PAGE + ") with the same `JSESSIONID` cookie as this call.",
-        "parameters": [SESSION_ID],
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](" + ADD_PAGE + ") takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](" + UPDATE_PAGE + ") with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
+        "parameters": [SESSION_ID, TRANSACTION_NO],
         "body": {"schema": ref("CartOrderInput"), "example": ORDER_BODY},
         "responses": {
             "201": {
-                "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the value you sent. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and while it is unpaid it does not lower the product's stock.",
+                "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the number you sent; [Retrieve an order](" + RETRIEVE_ORDER_PAGE + ") shows it. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and while it is unpaid it does not lower the product's stock.",
                 "schema": {"type": "object", "properties": {
                     "status": {"type": "string", "description": "`success`."},
                     "order": ref("CartOrder"),
@@ -498,13 +507,13 @@ SCHEMAS = {
         "customer_id": {"type": "integer", "description": "Required. The customer's `customer_id`, not the `internal_id` that [Add a product to a cart](" + ADD_PAGE + ") takes."},
         "payment_gateway": text("The payment gateway. Defaults to `PIS`."),
         "delivery_type": text("The delivery type, such as `shipping`."),
-        "transaction_no": text("A transaction number to store on the order. The response shows `transaction_no` as `null`."),
+        "transaction_no": text("A transaction number to file the order under. The response shows `transaction_no` as `null`. If the `X-Transaction-No` header has a different value, the header wins."),
     }, "required": ["customer_id"], "description": "Send these fields at the top level of the body."},
     "CartOrder": {"type": "object", "properties": {
         "order_id": {"type": "integer", "description": "The new order's `order_id`, assigned by the store."},
         "internal_id": {"type": "integer", "description": "The order's `internal_id`. The customer's `internal_id` is in `customer_summary.internal_id`."},
         "order_no": {"type": "integer"},
-        "transaction_no": {"type": ["string", "null"], "description": "`null` in this response, even when you sent `transaction_no`. The order stores the value you sent."},
+        "transaction_no": {"type": ["string", "null"], "description": "`null` in this response, even when you sent a transaction number in the body or in the `X-Transaction-No` header. The order stores the number you sent."},
         "currency_code": text(),
         "order_status": text("`in_progress` on an order made from a cart."),
         "payment_status": text("`unpaid` on an order made from a cart."),

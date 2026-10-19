@@ -28,7 +28,7 @@
     },
     "create_order_from_cart": {
       "function": "createOrderFromCart",
-      "code": "final response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n  'customer_id': 123,\n  'payment_gateway': 'PIS',\n  'delivery_type': 'shipping',\n  'transaction_no': 'web-order-0001',\n});\nfinal result = response.map as Map;\nfinal order = result['order'] as Map;\nprint('${result['status']} ${order['order_id']} ${order['order_status']}');\nprint('${order['payment_status']} ${order['due']}');"
+      "code": "final response = await client.carts.createOrderFromCart(\n  'cart-7f3a9c2e1b',\n  {\n    'customer_id': 123,\n    'payment_gateway': 'PIS',\n    'delivery_type': 'shipping',\n    'transaction_no': 'web-order-0001',\n  },\n  transactionNo: 'web-order-0001',\n);\nfinal result = response.map as Map;\nfinal order = result['order'] as Map;\nprint('${result['status']} ${order['order_id']} ${order['order_status']}');\nprint('${order['payment_status']} ${order['due']}');"
     }
   }
 }

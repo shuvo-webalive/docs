@@ -11,6 +11,14 @@ CUSTOMER_ID = {
     "schema": {"type": "integer", "example": 123},
 }
 
+TRANSACTION_NO = {
+    "name": "X-Transaction-No",
+    "in": "header",
+    "required": False,
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the customer is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+    "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
+}
+
 LIMIT = {"name": "limit", "in": "query", "description": "Rows per page. Capped at 20: a larger value is accepted and the cap is echoed back in `pagination.limit`.", "schema": {"type": "integer", "maximum": 20, "example": 20}}
 OFFSET = {"name": "offset", "in": "query", "description": "Number of rows to skip. Takes precedence over `page` when both are sent.", "schema": {"type": "integer", "example": 0}}
 PAGE = {"name": "page", "in": "query", "description": "1-based page number, read against the applied `limit`.", "schema": {"type": "integer", "example": 1}}
@@ -143,7 +151,8 @@ ENDPOINTS = [
         "path": BASE,
         "summary": "Add a customer and get back its new `customer_id`.",
         "description": "Creates a customer and returns it with its new `customer_id`. Without `status`, a new customer is `awaiting_verification` and has no usable login, whatever `password` was sent; send `status: \"active\"` with a `password` for a customer who can sign in. Address fields sent inline are accepted and discarded: use [Add addresses](/api-reference/customers/add-addresses) instead. The answer always carries three addresses of the store's own making: primary, shipping and billing.",
-        "body": {"schema": {"type": "object", "required": ["customer"], "properties": {"customer": {"$ref": "#/components/schemas/CustomerInput"}, "transaction_no": {"type": "string", "description": "Optional reference for this write."}}}, "example": {"customer": {"first_name": "Jane", "last_name": "Doe", "email": "jane@example.com", "company": False}}},
+        "parameters": [TRANSACTION_NO],
+        "body": {"schema": {"type": "object", "required": ["customer"], "properties": {"customer": {"$ref": "#/components/schemas/CustomerInput"}, "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value, the header wins."}}}, "example": {"customer": {"first_name": "Jane", "last_name": "Doe", "email": "jane@example.com", "company": False}}},
         "responses": {
             "201": {"description": "The new customer.", "schema": {"type": "object", "properties": {"customer": {"$ref": "#/components/schemas/Customer"}}}, "example": {"customer": SAMPLE_CUSTOMER}},
             "400": {"description": "A required field is missing, for example `Customer name is required`."},
@@ -306,8 +315,8 @@ SCHEMAS = {
     }},
     "CustomProperty": {"type": "object", "properties": {"id": {"type": "integer"}, "label": {"type": "string"}, "description": {"type": "string"}}},
     "Customer": {"type": "object", "properties": {
-        "customer_id": {"type": "integer", "description": "The id every `{customer_id}` path takes."},
-        "internal_id": {"type": "integer", "description": "A second id space over the same records. No path takes it."},
+        "customer_id": {"type": "integer", "description": "The customer's number that every `{customer_id}` path parameter takes."},
+        "internal_id": {"type": "integer", "description": "A second number for the same customer. No path parameter takes it."},
         "first_name": {"type": "string"}, "last_name": {"type": "string"}, "name": {"type": "string"},
         "email": {"type": "string"}, "status": {"type": "string", "enum": STATUS_VALUES},
         "gender": {"type": "string"}, "company_name": {"type": "string"}, "store_credit": {"type": "number"},
@@ -318,6 +327,7 @@ SCHEMAS = {
         "account_hold": {"type": "boolean"}, "hide_price": {"type": "boolean"}, "sms_subscribed": {"type": "boolean"},
         "default_tax_code": {"type": "string"}, "note": {"type": "string"}, "source": {"type": "string"},
         "timezone": {"type": "string"}, "created_at": {"type": "string"}, "updated_at": {"type": "string"},
+        "transaction_number": {"type": ["string", "null"], "description": "The transaction number the customer was created under, from the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. `null` when the customer was created without one. Rows in the customer listing do not have this field."},
     }},
     "CustomerInput": {"type": "object", "properties": {
         "first_name": {"type": "string", "description": "Required on create."},
@@ -363,13 +373,23 @@ def _apply_copy():
         words = text[endpoint["key"]]
         endpoint["summary"] = words["summary"]
         endpoint["description"] = words["description"]
-        endpoint["parameters"] = [dict(copy.deepcopy(p), description=words["parameters"][p["name"]])
+        endpoint["parameters"] = [dict(copy.deepcopy(p), description=words["parameters"].get(p["name"], p["description"]))
                                   for p in endpoint.get("parameters", [])]
         for status, response in endpoint["responses"].items():
             response["description"] = words["responses"][status]
 
 
 _apply_copy()
+
+TRANSACTION_NO_COPY = {
+    "description": "To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the two differ, the header wins. The response returns the number in `customer.transaction_number`.",
+    "201": "When you send a transaction number, `customer.transaction_number` returns it.",
+}
+
+for _endpoint in ENDPOINTS:
+    if _endpoint["key"] == "create_customer":
+        _endpoint["description"] += " " + TRANSACTION_NO_COPY["description"]
+        _endpoint["responses"]["201"]["description"] += " " + TRANSACTION_NO_COPY["201"]
 
 
 SLUG = "customers"

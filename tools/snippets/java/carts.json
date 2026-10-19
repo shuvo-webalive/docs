@@ -28,7 +28,7 @@
     },
     "create_order_from_cart": {
       "function": "createOrderFromCart",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.carts().createOrderFromCart(\"cart-7f3a9c2e1b\", Map.of(\"customer_id\", 123,\n        \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"transaction_no\", \"web-order-0001\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> order = (Map<?, ?>) body.get(\"order\");\nSystem.out.println(body.get(\"status\") + \" \" + order.get(\"order_id\") + \" \" + order.get(\"order_status\"));\nSystem.out.println(order.get(\"payment_status\") + \" \" + order.get(\"grand_total\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.carts().createOrderFromCart(\"cart-7f3a9c2e1b\", Map.of(\"customer_id\", 123,\n        \"payment_gateway\", \"PIS\", \"delivery_type\", \"shipping\", \"transaction_no\", \"web-order-0001\"),\n        \"web-order-0001\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> order = (Map<?, ?>) body.get(\"order\");\nSystem.out.println(body.get(\"status\") + \" \" + order.get(\"order_id\") + \" \" + order.get(\"order_status\"));\nSystem.out.println(order.get(\"payment_status\") + \" \" + order.get(\"grand_total\"));"
     }
   }
 }

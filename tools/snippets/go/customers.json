@@ -24,7 +24,7 @@
     },
     "create_customer": {
       "function": "CreateCustomer",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCustomers().CreateCustomer(ctx, map[string]any{\n\t\"customer\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\":  \"Doe\",\n\t\t\"email\":      \"jane@example.com\",\n\t\t\"company\":    false,\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"customer\"].(map[string]any)[\"customer_id\"])"
     },
     "update_customer": {
       "function": "UpdateCustomer",

@@ -20,7 +20,7 @@
     },
     "create_currency": {
       "function": "CreateCurrency",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().CreateCurrency(ctx, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": \"NZ\",\n\t\"conversion_rate\": 1.2345, \"precision\": 2, \"rounding\": \"nearest\", \"active\": true,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"base\"])\n"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Currencies().CreateCurrency(ctx, map[string]any{\n\t\"name\": \"Example Dollar\", \"code\": \"XEX\", \"symbol\": \"$\", \"country\": \"NZ\",\n\t\"conversion_rate\": 1.2345, \"precision\": 2, \"rounding\": \"nearest\", \"active\": true,\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncurrency := resp.Map().(map[string]any)[\"currency\"].(map[string]any)\nfmt.Println(currency[\"id\"], currency[\"code\"], currency[\"base\"])\n"
     },
     "get_currency": {
       "function": "GetCurrency",

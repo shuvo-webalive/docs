@@ -4,6 +4,6 @@ description: "Creates a currency and returns it with its `id`, which other calls
 openapi: "POST /admin/currencies"
 ---
 
-Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`.
+Send the fields at the top level of the body, not wrapped in `currency`. `name`, `code` and `symbol` are required, and the store trims spaces from all three and stores `code` in upper case. A field you leave out gets its default: `conversion_rate` `1`, `rounding` `nearest`, `precision` `2`, `active` `true` and the store's default country. A new currency always has `base` set to `false`. To file the currency under a transaction number, send the `X-Transaction-No` header: the body has no `transaction_no` field, and sending one is rejected with `400`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

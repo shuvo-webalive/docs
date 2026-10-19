@@ -28,7 +28,7 @@
     },
     "create_order_from_cart": {
       "function": "CreateOrderFromCart",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().CreateOrderFromCart(ctx, \"cart-7f3a9c2e1b\", map[string]any{\n\t\"customer_id\":     123,\n\t\"payment_gateway\": \"PIS\",\n\t\"delivery_type\":   \"shipping\",\n\t\"transaction_no\":  \"web-order-0001\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\norder := body[\"order\"].(map[string]any)\nfmt.Println(body[\"status\"], order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Carts().CreateOrderFromCart(ctx, \"cart-7f3a9c2e1b\", map[string]any{\n\t\"customer_id\":     123,\n\t\"payment_gateway\": \"PIS\",\n\t\"delivery_type\":   \"shipping\",\n\t\"transaction_no\":  \"web-order-0001\",\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\norder := body[\"order\"].(map[string]any)\nfmt.Println(body[\"status\"], order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"])"
     }
   }
 }

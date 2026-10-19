@@ -24,7 +24,7 @@
     },
     "create_customer": {
       "function": "createCustomer",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)));\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.adminCustomers().createCustomer(Map.of(\"customer\", Map.of(\n        \"first_name\", \"Jane\", \"last_name\", \"Doe\", \"email\", \"jane@example.com\", \"company\", false)),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> customer = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"customer\");\nSystem.out.println(customer.get(\"customer_id\") + \" \" + customer.get(\"transaction_number\"));"
     },
     "update_customer": {
       "function": "updateCustomer",

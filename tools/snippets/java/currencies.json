@@ -20,7 +20,7 @@
     },
     "create_currency": {
       "function": "createCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));"
     },
     "get_currency": {
       "function": "getCurrency",
