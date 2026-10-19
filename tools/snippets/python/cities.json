@@ -1,0 +1,14 @@
+{
+  "sdk": "python",
+  "module": "cities",
+  "endpoints": {
+    "list_cities": {
+      "function": "list_cities",
+      "code": "response = client.cities.list_cities({\"country\": \"AU\", \"state\": \"VIC\", \"limit\": 20})\nfor city in response.map[\"cities\"]:\n    print(city[\"id\"], city[\"name\"], city[\"post_code\"], city[\"state\"][\"code\"], city[\"country\"][\"code\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_cities": {
+      "function": "head_cities",
+      "code": "response = client.cities.head_cities()\nprint(response.status_code)\n"
+    }
+  }
+}
