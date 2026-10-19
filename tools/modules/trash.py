@@ -20,10 +20,11 @@ DELETE_BLOG_POST_PAGE = "/api-reference/blogs/delete-a-blog-post"
 
 WARNING = (
     "**Send a `type` other than `Customer` on every listing call.** Without `type`, or with\n"
-    "  `type=Customer`, [List items in the trash](" + LIST_PAGE + ") can take 90 to 100 seconds to return a\n"
-    "  page, and [Check the trash list](/api-reference/trash/check-the-trash-list) takes as long, because it runs\n"
-    "  the same query. With `type=Category`, `type=Product` or `type=BlogPost`, a page returns in about a\n"
-    "  second. If you must list customers, set your client's request timeout above 100 seconds."
+    "  `type=Customer`, [List items in the trash](" + LIST_PAGE + ") can take about 90 to 110 seconds to\n"
+    "  return a page, and [Check the trash list](/api-reference/trash/check-the-trash-list) takes as long,\n"
+    "  because it runs the same query. With `type=Category`, `type=Product` or `type=BlogPost`, a page\n"
+    "  returns in about a second. If you must list customers, set your client's request timeout above 110\n"
+    "  seconds."
 )
 
 NOTES = [
@@ -67,7 +68,7 @@ TRASH_ITEM_ID = {
     "schema": {"type": "integer", "example": 1234},
 }
 
-TYPE = {"name": "type", "in": "query", "description": "Keeps only items of this type, a value from [List trash types](" + TYPES_PAGE + ") in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.", "schema": {"type": "string", "example": "Category"}}
+TYPE = {"name": "type", "in": "query", "description": "Keeps only items of this type, a value from [List trash types](" + TYPES_PAGE + ") in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take about 90 to 110 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.", "schema": {"type": "string", "example": "Category"}}
 SEARCH = {"name": "search", "in": "query", "description": "Keeps only items whose `name` contains this text. `searchText` is accepted as another name for `search`.", "schema": {"type": "string", "example": "spring"}}
 SORT = {"name": "sort", "in": "query", "description": "The field to sort by: `name`, `type`, `updated` or `removed_at`, which sorts by `updated`. Without it, items come newest `updated` first. Any other value is rejected with `400` and the message `unsupported sort '<value>'`.", "schema": {"type": "string", "enum": ["name", "type", "updated", "removed_at"], "example": "name"}}
 ORDER = {"name": "order", "in": "query", "description": "The sort direction: `asc` or `desc`, in lower case. `order=DESC` in upper case is accepted but sorts in ascending order. Any other value is rejected with `400` and the message `unsupported dir '<value>'`. `dir` is accepted as another name for `order`.", "schema": {"type": "string", "enum": ["asc", "desc"], "example": "asc"}}
@@ -119,7 +120,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE,
         "summary": "Returns the items in the trash, newest first, 20 per call unless you send `limit`.",
-        "description": "Returns the items in the trash in `items`, 20 per call unless you send `limit`, newest `updated` first, and `pagination` with the total and the URLs of the next and previous pages. Send `type` on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. Send `search` to match part of an item's `name`, and `sort` and `order` to change the order. Any query parameter the listing does not accept, such as `q`, is rejected with `400` and the reason `unknown_parameter`.",
+        "description": "Returns the items in the trash in `items`, 20 per call unless you send `limit`, newest `updated` first, and `pagination` with the total and the URLs of the next and previous pages. Send `type` on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take about 90 to 110 seconds. Send `search` to match part of an item's `name`, and `sort` and `order` to change the order. Any query parameter the listing does not accept, such as `q`, is rejected with `400` and the reason `unknown_parameter`.",
         "parameters": LIST_QUERY,
         "responses": {
             "200": {
@@ -145,7 +146,7 @@ ENDPOINTS = [
         "method": "HEAD",
         "path": BASE,
         "summary": "Returns the headers of the trash list, with no body. Takes the listing's query parameters.",
-        "description": "Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](" + LIST_PAGE + ") and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take 90 to 100 seconds. A query parameter the listing does not accept is rejected with `400` here as well.",
+        "description": "Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](" + LIST_PAGE + ") and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take about 90 to 110 seconds. A query parameter the listing does not accept is rejected with `400` here as well.",
         "parameters": LIST_QUERY,
         "responses": {
             "200": {"description": "Headers only, no body."},

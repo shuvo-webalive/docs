@@ -340,12 +340,12 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE + "/{product_id}/reviews",
         "summary": "Adds the reviews you send to the product and returns every review the product now has.",
-        "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from is skipped, with no error. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
+        "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from replaces that review: it keeps the earlier review's `id` and takes the new text and `rating`, with the same `201` and nothing in the response to show it. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
         "parameters": [PRODUCT_ID, dict(TRANSACTION_NO, description="Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.")],
         "body": {"schema": ref("ProductReviewsImportInput"), "example": REVIEWS_BODY},
         "responses": {
             "201": {
-                "description": "Every review the product has, oldest first, in `product.reviews`, not only the ones you sent. The reviews you added are last, and a skipped review adds nothing. `rating` reads back as a decimal number, such as `5.0`. In the raw response text, the `@` in each `email` is written as `\\u0040`; a JSON parser turns it back into `@`.",
+                "description": "Every review the product has, oldest first, in `product.reviews`, not only the ones you sent. The reviews you added are last. A review that replaced an earlier one adds no entry: it shows under the earlier review's `id`, with the new text and `rating`. `rating` reads back as a decimal number, such as `5.0`. In the raw response text, the `@` in each `email` is written as `\\u0040`; a JSON parser turns it back into `@`.",
                 "schema": {"type": "object", "properties": {"product": ref("ProductReviews")}},
                 "example": REVIEWS_RESULT,
             },
@@ -873,7 +873,7 @@ SCHEMAS["ProductCreateInput"] = {"type": "object", "required": ["name", "base_pr
 
 SCHEMAS["ProductReviewInput"] = {"type": "object", "required": ["name", "email", "rating"], "description": "One review to add. Unknown keys, such as `title`, are accepted and dropped.", "properties": {
     "name": typed("string", "Required. The reviewer's name."),
-    "email": typed("string", "Required. The reviewer's email address. A review with an `email` the product already has a review from is skipped, with no error."),
+    "email": typed("string", "Required. The reviewer's email address. A review with an `email` the product already has a review from replaces that review, which keeps its `id`, with no error."),
     "rating": {"type": "number", "minimum": 1, "maximum": 5, "description": "Required. From `1` to `5`. It reads back as a decimal number, such as `5.0`."},
     "review": typed("string", "The review's text."),
     "comment": typed("string", "Another name for `review`. It reads back as `review`."),

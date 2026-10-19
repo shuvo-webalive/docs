@@ -15,11 +15,12 @@ DELETE_CATEGORY_PAGE = "/api-reference/categories/delete-a-category"
 
 WARNING = (
     "**Do not follow `url` or `items_url` for a number that contains a space or a `/`.** The store\n"
-    "  writes a space in these links as `+` and then reads a `+` in a path as a literal `+`, so the link\n"
-    "  returns `404`. Pass `transaction_no` to the SDK function instead: the SDKs percent-encode it, so a\n"
-    "  space reaches the store intact. A number that contains `/` cannot be read at all: the request is\n"
-    "  rejected with `400` and an HTML page, `Invalid URI: [The encoded slash character is not allowed]`,\n"
-    "  before it reaches the API. Do not use `/` in the transaction numbers you send."
+    "  writes a space in these links as `+` and then reads a `+` in a path as a literal `+`: `url` then\n"
+    "  returns `404`, and `items_url` returns `200` with no records. Pass `transaction_no` to the SDK\n"
+    "  function instead: the SDKs percent-encode it, so a space reaches the store intact. A number that\n"
+    "  contains `/` cannot be read at all: the request is rejected with `400` and an HTML page,\n"
+    "  `Invalid URI: [The encoded slash character is not allowed]`, before it reaches the API. Do not use\n"
+    "  `/` in the transaction numbers you send."
 )
 
 NOTES = [
@@ -28,9 +29,12 @@ NOTES = [
     "  `HEAD` and `OPTIONS`, and `OPTIONS` returns `204` with `Allow: GET, HEAD, OPTIONS`. `POST`, `PUT`,\n"
     "  `PATCH` and `DELETE` are rejected with `405 method_not_allowed` and the message\n"
     "  `HTTP method not allowed for this endpoint.`",
-    "**A record you delete stays counted.** After you delete a category stamped with a number, using\n"
-    "  [Delete a category](" + DELETE_CATEGORY_PAGE + "), the number's `total_records`, its `category`\n"
-    "  count and the category's row under `items` do not change. The number also stays in the listing.",
+    "**A record in the trash stays counted; a record deleted for good does not.** Deleting a customer,\n"
+    "  a category or a product moves it to the trash. After you delete a category stamped with a number,\n"
+    "  using [Delete a category](" + DELETE_CATEGORY_PAGE + "), the number's `total_records`, its\n"
+    "  `category` count and the category's row under `items` do not change, and the number stays in the\n"
+    "  listing. A record deleted for good leaves its number: after you delete the only custom tax profile\n"
+    "  stamped with a number, [Retrieve a transaction](" + RETRIEVE_PAGE + ") returns `404` for that number.",
     "**`transaction_no` matches exactly, letter case included.** The number in lower case returns\n"
     "  `404` when it was stored in upper case. The store trims surrounding spaces off a number when it\n"
     "  stores one, so send the number without them.",
@@ -278,13 +282,13 @@ ENDPOINTS = [
 SCHEMAS = {
     "TransactionListEntry": {"type": "object", "description": "One row of the transactions list.", "properties": {
         "transaction_no": {"type": "string", "description": "The transaction number. Pass it as `transaction_no` in a path."},
-        "total_records": {"type": "integer", "description": "How many records are stamped with the number. A record you delete stays counted."},
+        "total_records": {"type": "integer", "description": "How many records are stamped with the number. A record in the trash stays counted; a record deleted for good does not."},
         "url": {"type": "string", "description": "The path of [Retrieve a transaction](" + RETRIEVE_PAGE + ") for this number. A space in the number appears as `+`, and the link then returns `404`."},
     }},
     "TransactionTypeCount": {"type": "object", "description": "One `by_type` row: the records of one type stamped with the number.", "properties": {
         "type": {"type": "string", "enum": TYPES, "description": "The record type. Pass it as `type` to [List the records of a transaction](" + ITEMS_PAGE + ")."},
         "count": {"type": "integer", "description": "How many records of this type are stamped with the number."},
-        "items_url": {"type": "string", "description": "The path of [List the records of a transaction](" + ITEMS_PAGE + ") for this type. Present only when `count` is above `0`. A space in the number appears as `+`, and the link then returns `404`."},
+        "items_url": {"type": "string", "description": "The path of [List the records of a transaction](" + ITEMS_PAGE + ") for this type. Present only when `count` is above `0`. A space in the number appears as `+`, and the link then returns `200` with no records."},
     }},
     "Transaction": {"type": "object", "properties": {
         "transaction_no": {"type": "string", "description": "The transaction number you sent in the path."},

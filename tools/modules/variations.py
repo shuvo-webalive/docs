@@ -91,7 +91,7 @@ OFFSET = {"name": "offset", "in": "query", "description": "Number of types to sk
 PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * limit`. Sending both `page` and `offset` is rejected with `400` and the reason `conflicting_params`.", "schema": {"type": "integer", "example": 2}}
 FIELD_METADATA = {"name": "field_metadata", "in": "query", "description": "Send `true` to also get `field_metadata`, which describes each field of a variation type and of an option: its type, its limits, and whether it is read-only. Accepts `true`, `false`, `1` and `0`; any other value is rejected with `400` and the reason `invalid_boolean`.", "schema": {"type": "boolean", "example": True}}
 CASCADE = {"name": "cascade", "in": "query", "description": "Send `true` or `1` to delete the type's options with it. Without it, or with `false` or `0`, a type that has options is rejected with `409`. Any other value is rejected with `400` and the reason `invalid_boolean`.", "schema": {"type": "boolean", "example": True}}
-TRANSACTION_NO = {"name": "X-Transaction-No", "in": "header", "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. The variants you read back do not show it.", "schema": {"type": "string", "example": "IMPORT-2026-10-18"}}
+TRANSACTION_NO = {"name": "X-Transaction-No", "in": "header", "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") does not show it. `GET /api/v4/admin/products/{product_id}/variations/{variation_id}` returns it as the variant's `transaction_no`, and [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) counts the variant under `product_variation`.", "schema": {"type": "string", "example": "IMPORT-2026-10-18"}}
 RESPONSE_MODE = {"name": "response", "in": "query", "description": "`slim` (the default) returns each updated variant's `id` and `name`. `full` returns fourteen fields for each one. Any other value is rejected with `400`, the reason `invalid_enum` and the message `must be one of slim, full`.", "schema": {"type": "string", "enum": ["slim", "full"], "example": "full"}}
 
 ERROR_REF = {"$ref": "#/components/schemas/VariationError"}
@@ -369,7 +369,7 @@ ENDPOINTS = [
         "body": {"schema": {"$ref": "#/components/schemas/VariationImportInput"}, "example": IMPORT_BODY},
         "responses": {
             "201": {
-                "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](" + PRODUCT_VARIANTS_PAGE + "). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. No variant shows the transaction number.",
+                "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](" + PRODUCT_VARIANTS_PAGE + "). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. The listing does not show the transaction number; `GET /api/v4/admin/products/{product_id}/variations/{variation_id}` returns it as the variant's `transaction_no`.",
                 "schema": {"$ref": "#/components/schemas/VariationImportResult"},
                 "example": IMPORT_RESULT,
             },
@@ -396,7 +396,7 @@ ENDPOINTS = [
         "body": {"schema": {"$ref": "#/components/schemas/VariationBulkInput"}, "example": BULK_BODY},
         "responses": {
             "200": {
-                "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. The `url` in a `full` entry returns `404` if you call it, and its `sale_price` and `is_on_sale` can differ from what [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns for a product on sale: read the variant back there to check its values.",
+                "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. A `GET` on the `url` in a `full` entry returns that one variant, and the entry's `sale_price` and `is_on_sale` can differ from what [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns for a product on sale: read the variant back there to check its values.",
                 "schema": {"$ref": "#/components/schemas/VariationBulkResult"},
                 "example": BULK_SLIM_RESULT,
             },
@@ -554,7 +554,7 @@ SCHEMAS = {
         "inventory": {"$ref": "#/components/schemas/VariationBulkInventory"},
         "ordering": {"$ref": "#/components/schemas/VariationBulkOrdering"},
         "transaction_no": {"type": "string"},
-        "url": {"type": "string", "description": "A path such as `/api/v4/admin/products/4321/variations/91`. Calling it returns `404` with the message `No such endpoint`."},
+        "url": {"type": "string", "description": "A path such as `/api/v4/admin/products/4321/variations/91`. A `GET` on it returns that one variant, with its `transaction_no`."},
     }},
     "VariationBulkOption": {"type": "object", "properties": {
         "id": {"type": "integer", "description": "The variation option's `id`."},

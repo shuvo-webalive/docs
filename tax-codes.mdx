@@ -50,8 +50,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   another tax collection. The request after that works normally. A delete sent straight after a
   `404` returns that `404` and deletes nothing, so retrieve the tax code afterwards to confirm it is
   gone.
-- **A `200` does not prove that a call did anything.** `PATCH` on a tax code, `POST` to a tax
-  code's path and `OPTIONS` on the list return `200` with
-  `{"isSuccess": false, "message": "Invalid API Request"}` and change nothing. A `HEAD` returns
+- **A `200` does not prove that a call did anything.** `PATCH` on a tax code and `POST` to a tax
+  code's path return `200` with `{"isSuccess": false, "message": "Invalid API Request"}` and
+  change nothing. `OPTIONS` returns `404` on the list and on a tax code. A `HEAD` returns
   `200` even when no tax code has the `tax_code_id` you send. Use `PUT` to update a tax code, and
   [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code) to check that one exists.

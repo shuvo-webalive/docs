@@ -4,6 +4,6 @@ description: "Returns the headers of the trash list, with no body. Takes the lis
 openapi: "HEAD /admin/trash"
 ---
 
-Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](/api-reference/trash/list-items-in-the-trash) and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take 90 to 100 seconds. A query parameter the listing does not accept is rejected with `400` here as well.
+Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](/api-reference/trash/list-items-in-the-trash) and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take about 90 to 110 seconds. A query parameter the listing does not accept is rejected with `400` here as well.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

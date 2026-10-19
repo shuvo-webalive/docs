@@ -34,9 +34,10 @@ NOTES = [
     "**A listing returns at most 20 profiles per call.** A larger `limit` is capped at `20`, and\n"
     "  `pagination.limit` shows `20`. To get every profile, step `offset` by the number of profiles each\n"
     "  page returned until you reach `pagination.total`.",
-    "**A `200` does not prove that a write took effect.** A method these paths have no handler for, such as\n"
-    "  `OPTIONS`, returns `200` with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and stores\n"
-    "  nothing. Use `PUT` to update a profile, and read the profile back to confirm the change.",
+    "**A `200` does not prove that a write took effect.** A method these paths have no handler for returns\n"
+    "  `200` with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and stores nothing. `OPTIONS`\n"
+    "  returns `404` on the list and on a profile. Use `PUT` to update a profile, and read the profile back\n"
+    "  to confirm the change.",
     "**Tax profiles are not custom tax profiles.** [Custom tax profiles](" + CUSTOM_PROFILES_PAGE + ") live at\n"
     "  `/api/v4/admin/tax/custom_profiles`, a different collection with a similar name.",
 ]

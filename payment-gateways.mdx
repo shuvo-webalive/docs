@@ -9,8 +9,8 @@ The Payment gateways API has eight endpoints, and you can call every one from al
 <Warning>
   **You cannot send a retrieved gateway back unchanged.** A `PUT` or `PATCH` with the body from
   [Retrieve a payment gateway](/api-reference/payment-gateways/retrieve-a-payment-gateway) is rejected with `400`: `code` and `promotional`
-  are read-only, `surcharge: null` is rejected with `must be an object`, and empty `visibility.customers`
-  and `visibility.customer_groups` lists are rejected under `type` `everyone`. Send only the fields
+  are read-only, and `surcharge: null` is rejected with `must be an object`. Empty `visibility.customers`
+  and `visibility.customer_groups` lists are accepted under `type` `everyone`. Send only the fields
   you want to change.
 </Warning>
 
