@@ -603,7 +603,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.customer.customer_id, response.map.customer.transaction_number);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.adminCustomers.createCustomer({\n    customer: {first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com', company: false},\n}, 'TXN-IMPORT-0001');\nconsole.log(response.map.customer.customer_id, response.map.customer.transaction_number);\n"
           },
           {
             "lang": "php",
@@ -26503,7 +26503,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst address = {\n    first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@example.com',\n    address_line_1: '1 Example Street', address_line_2: 'Level 2', city: 'Melbourne',\n    post_code: '3000', phone: '0300000000', mobile: '0400000000', country_code: 'AU', state_code: 'VIC',\n};\nconst response = await client.orders.createOrder({\n    customer_id: 512, payment_gateway: 'PIS', delivery_type: 'shipping', is_send_email: false,\n    transaction_no: 'TXN-ORDER-0001', billing_address: address, shipping_address: address,\n    products: [{product_id: 101, quantity: 1}, {product_id: 102, quantity: 1}],\n}, {transactionNo: 'TXN-ORDER-0001'});\nconst order = response.map.order;\nconsole.log(order.order_id, order.transaction_no, order.order_status, order.payment_status, order.grand_total);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst address = {\n    first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@example.com',\n    address_line_1: '1 Example Street', address_line_2: 'Level 2', city: 'Melbourne',\n    post_code: '3000', phone: '0300000000', mobile: '0400000000', country_code: 'AU', state_code: 'VIC',\n};\nconst response = await client.orders.createOrder({\n    customer_id: 512, payment_gateway: 'PIS', delivery_type: 'shipping', is_send_email: false,\n    transaction_no: 'TXN-ORDER-0001', billing_address: address, shipping_address: address,\n    products: [{product_id: 101, quantity: 1}, {product_id: 102, quantity: 1}],\n}, 'TXN-ORDER-0001');\nconst order = response.map.order;\nconsole.log(order.order_id, order.transaction_no, order.order_status, order.payment_status, order.grand_total);\n"
           },
           {
             "lang": "php",
@@ -32205,7 +32205,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n    customer_id: 123,\n    payment_gateway: 'PIS',\n    delivery_type: 'shipping',\n    transaction_no: 'web-order-0001',\n}, {transactionNo: 'web-order-0001'});\nconst order = response.map.order;\nconsole.log(response.map.status, order.order_id, order.order_status, order.payment_status, order.grand_total);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.carts.createOrderFromCart('cart-7f3a9c2e1b', {\n    customer_id: 123,\n    payment_gateway: 'PIS',\n    delivery_type: 'shipping',\n    transaction_no: 'web-order-0001',\n}, 'web-order-0001');\nconst order = response.map.order;\nconsole.log(response.map.status, order.order_id, order.order_status, order.payment_status, order.grand_total);\n"
           },
           {
             "lang": "php",
@@ -32832,7 +32832,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.categories.createCategory({\n    category: {\n        general: {\n            name: 'Seasonal Produce',\n            title: 'Seasonal Produce',\n            heading: 'Fresh this season',\n            summary: 'Fruit and vegetables picked this week',\n            parent_category: {id: 4310},\n        },\n        description: {content: '<p>What is in season right now.</p>'},\n        availability_visibility: {visible: true, custom_sorting: true, default_sorting: 'alpha_asc'},\n        tax_shipping: {tax_message: 'Prices include GST'},\n        assign_products: {products: [101, 102]},\n    },\n}, 'TXN-IMPORT-0001');\nconst category = response.map.category;\nconsole.log(category.id, category.general.sku, category.general.url);\n"
           },
           {
             "lang": "php",
@@ -41211,7 +41211,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.createCurrency({\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: 'NZ',\n    conversion_rate: 1.2345,\n    precision: 2,\n    rounding: 'nearest',\n    active: true,\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.currency.id, response.map.currency.code, response.map.currency.base);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.currencies.createCurrency({\n    name: 'Example Dollar',\n    code: 'XEX',\n    symbol: '$',\n    country: 'NZ',\n    conversion_rate: 1.2345,\n    precision: 2,\n    rounding: 'nearest',\n    active: true,\n}, 'TXN-IMPORT-0001');\nconsole.log(response.map.currency.id, response.map.currency.code, response.map.currency.base);\n"
           },
           {
             "lang": "php",
