@@ -8,7 +8,7 @@
     },
     "create_tax_country_tax": {
       "function": "createTaxCountryTax",
-      "code": "const response = await client.taxCountryTaxes.createTaxCountryTax({\n    country_tax: {country_code: 'NZ', name: 'NZ GST', tax_rate: 15.0, tax_method: 'fixed_rate'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.id, countryTax.tax_code, countryTax.tax_rate, countryTax.country.code);\n"
+      "code": "const response = await client.taxCountryTaxes.createTaxCountryTax({\n    country_tax: {country_code: 'NZ', name: 'NZ GST', tax_rate: 15.0, tax_method: 'fixed_rate'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, 'TXN-IMPORT-0001');\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.id, countryTax.tax_code, countryTax.tax_rate, countryTax.country.code);\n"
     },
     "get_tax_country_tax": {
       "function": "getTaxCountryTax",

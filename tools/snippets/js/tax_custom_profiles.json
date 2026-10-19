@@ -8,7 +8,7 @@
     },
     "create_tax_custom_profile": {
       "function": "createTaxCustomProfile",
-      "code": "const response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.custom_profile.id, response.map.custom_profile.name);\n"
+      "code": "const response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, 'TXN-IMPORT-0001');\nconsole.log(response.map.custom_profile.id, response.map.custom_profile.name);\n"
     },
     "get_tax_custom_profile": {
       "function": "getTaxCustomProfile",

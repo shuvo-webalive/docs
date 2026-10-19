@@ -20363,7 +20363,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.createTaxCountryTax({\n    country_tax: {country_code: 'NZ', name: 'NZ GST', tax_rate: 15.0, tax_method: 'fixed_rate'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.id, countryTax.tax_code, countryTax.tax_rate, countryTax.country.code);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCountryTaxes.createTaxCountryTax({\n    country_tax: {country_code: 'NZ', name: 'NZ GST', tax_rate: 15.0, tax_method: 'fixed_rate'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, 'TXN-IMPORT-0001');\nconst countryTax = response.map.country_tax;\nconsole.log(countryTax.id, countryTax.tax_code, countryTax.tax_rate, countryTax.country.code);\n"
           },
           {
             "lang": "php",
@@ -21069,7 +21069,7 @@
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, {transactionNo: 'TXN-IMPORT-0001'});\nconsole.log(response.map.custom_profile.id, response.map.custom_profile.name);\n"
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxCustomProfiles.createTaxCustomProfile({\n    custom_profile: {name: 'Wholesale customers', description: 'Rates for wholesale accounts'},\n    transaction_no: 'TXN-IMPORT-0001',\n}, 'TXN-IMPORT-0001');\nconsole.log(response.map.custom_profile.id, response.map.custom_profile.name);\n"
           },
           {
             "lang": "php",
