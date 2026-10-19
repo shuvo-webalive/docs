@@ -1,0 +1,9 @@
+---
+title: "Count payment gateways"
+description: "Returns the number of payment gateways that match your filters, as `total`."
+openapi: "GET /admin/payment_gateways/count"
+---
+
+Returns the number of gateways as `total`, at the top level of the body. `search`, `exclude`, `promotional` and `added` narrow the count as they narrow the listing, so `total` matches the listing's `pagination.total` for the same filters. `limit` is checked but does not change the count, and any other parameter the count does not know is ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -1,0 +1,30 @@
+{
+  "sdk": "js",
+  "module": "transactions",
+  "endpoints": {
+    "list_transactions": {
+      "function": "listTransactions",
+      "code": "const response = await client.transactions.listTransactions({limit: 50, offset: 0});\nfor (const transaction of response.map.transactions) {\n    console.log(transaction.transaction_no, transaction.total_records);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_transactions": {
+      "function": "headTransactions",
+      "code": "const response = await client.transactions.headTransactions();\nconsole.log(response.statusCode);\n"
+    },
+    "get_transaction": {
+      "function": "getTransaction",
+      "code": "const response = await client.transactions.getTransaction('IMPORT-2026-0001');\nconsole.log(response.map.transaction_no, response.map.total_records);\nfor (const row of response.map.by_type) {\n    console.log(row.type, row.count);\n}\n"
+    },
+    "head_transaction": {
+      "function": "headTransaction",
+      "code": "const response = await client.transactions.headTransaction('IMPORT-2026-0001');\nconsole.log(response.statusCode);\n"
+    },
+    "list_transaction_items": {
+      "function": "listTransactionItems",
+      "code": "const response = await client.transactions.listTransactionItems('IMPORT-2026-0001', {\n    type: 'product',\n    limit: 20,\n    offset: 0,\n    detail: 'slim',\n});\nfor (const item of response.map.items) {\n    console.log(item.id, item.name, item.sku);\n}\nconsole.log(response.map.pagination.total);\n"
+    },
+    "head_transaction_items": {
+      "function": "headTransactionItems",
+      "code": "const response = await client.transactions.headTransactionItems('IMPORT-2026-0001', {type: 'product'});\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "sdk": "go",
+  "module": "transactions",
+  "endpoints": {
+    "list_transactions": {
+      "function": "ListTransactions",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Transactions().ListTransactions(ctx, map[string]any{\"limit\": 50, \"offset\": 0}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"transactions\"].([]any) {\n\ttransaction := row.(map[string]any)\n\tfmt.Println(transaction[\"transaction_no\"], transaction[\"total_records\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "head_transactions": {
+      "function": "HeadTransactions",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Transactions().HeadTransactions(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "get_transaction": {
+      "function": "GetTransaction",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Transactions().GetTransaction(ctx, \"IMPORT-2026-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"transaction_no\"], body[\"total_records\"])\nfor _, row := range body[\"by_type\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfmt.Println(group[\"type\"], group[\"count\"])\n}\n"
+    },
+    "head_transaction": {
+      "function": "HeadTransaction",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Transactions().HeadTransaction(ctx, \"IMPORT-2026-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "list_transaction_items": {
+      "function": "ListTransactionItems",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Transactions().ListTransactionItems(ctx, \"IMPORT-2026-0001\", map[string]any{\n\t\"type\": \"product\", \"limit\": 20, \"offset\": 0, \"detail\": \"slim\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"name\"], item[\"sku\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
+    },
+    "head_transaction_items": {
+      "function": "HeadTransactionItems",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Transactions().HeadTransactionItems(ctx, \"IMPORT-2026-0001\", map[string]any{\"type\": \"product\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    }
+  }
+}

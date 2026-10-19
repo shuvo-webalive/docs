@@ -655,6 +655,15 @@
                 ]
               },
               {
+                "group": "Cities",
+                "expanded": false,
+                "pages": [
+                  "cities",
+                  "api-reference/cities/list-cities",
+                  "api-reference/cities/check-the-cities-list"
+                ]
+              },
+              {
                 "group": "Currencies",
                 "expanded": false,
                 "pages": [
@@ -672,6 +681,36 @@
                   "api-reference/currencies/set-the-base-currency"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Transactions",
+            "icon": "list-check",
+            "expanded": false,
+            "pages": [
+              "transactions",
+              "api-reference/transactions/list-transactions",
+              "api-reference/transactions/check-the-transactions-list",
+              "api-reference/transactions/retrieve-a-transaction",
+              "api-reference/transactions/check-a-transaction",
+              "api-reference/transactions/list-the-records-of-a-transaction",
+              "api-reference/transactions/check-the-records-of-a-transaction"
+            ]
+          },
+          {
+            "group": "Payment gateways",
+            "icon": "credit-card",
+            "expanded": false,
+            "pages": [
+              "payment-gateways",
+              "api-reference/payment-gateways/list-payment-gateways",
+              "api-reference/payment-gateways/check-the-payment-gateways-list",
+              "api-reference/payment-gateways/count-payment-gateways",
+              "api-reference/payment-gateways/check-the-payment-gateway-count",
+              "api-reference/payment-gateways/retrieve-a-payment-gateway",
+              "api-reference/payment-gateways/check-a-payment-gateway",
+              "api-reference/payment-gateways/update-a-payment-gateway-with-put",
+              "api-reference/payment-gateways/update-a-payment-gateway"
             ]
           },
           {

@@ -1,0 +1,38 @@
+{
+  "sdk": "dart",
+  "module": "payment_gateways",
+  "endpoints": {
+    "list_payment_gateways": {
+      "function": "listPaymentGateways",
+      "code": "final response = await client.paymentGateways.listPaymentGateways(\n    queryParams: {'limit': 20, 'offset': 0, 'promotional': 'false'});\nfinal gateways = (response.map as Map)['payment_gateways'] as List;\nfor (final gateway in gateways) {\n  print('${(gateway as Map)['id']} ${gateway['code']} ${gateway['enabled']}');\n}"
+    },
+    "head_payment_gateways": {
+      "function": "headPaymentGateways",
+      "code": "final response = await client.paymentGateways.headPaymentGateways();\nprint(response.statusCode);"
+    },
+    "count_payment_gateways": {
+      "function": "countPaymentGateways",
+      "code": "final response = await client.paymentGateways\n    .countPaymentGateways(queryParams: {'exclude': 'PIS,CHQ'});\nprint((response.map as Map)['total']);"
+    },
+    "head_payment_gateways_count": {
+      "function": "headPaymentGatewaysCount",
+      "code": "final response =\n    await client.paymentGateways.headPaymentGatewaysCount();\nprint(response.statusCode);"
+    },
+    "get_payment_gateway": {
+      "function": "getPaymentGateway",
+      "code": "final response = await client.paymentGateways.getPaymentGateway(2);\nfinal gateway = (response.map as Map)['payment_gateway'] as Map;\nprint('${gateway['code']} ${gateway['name']} ${gateway['enabled']}');\nprint(gateway['allowed_for']);"
+    },
+    "head_payment_gateway": {
+      "function": "headPaymentGateway",
+      "code": "final response = await client.paymentGateways.headPaymentGateway(2);\nprint(response.statusCode);"
+    },
+    "update_payment_gateway": {
+      "function": "updatePaymentGateway",
+      "code": "final response = await client.paymentGateways.updatePaymentGateway(2, {\n  'information': 'Make cheques payable to Example Store.',\n});\nfinal gateway = (response.map as Map)['payment_gateway'] as Map;\nprint('${gateway['code']} ${gateway['information']}');"
+    },
+    "patch_payment_gateway": {
+      "function": "patchPaymentGateway",
+      "code": "final response = await client.paymentGateways.patchPaymentGateway(2, {\n  'allowed_for': {'store_pickup': false},\n});\nfinal gateway = (response.map as Map)['payment_gateway'] as Map;\nprint('${gateway['code']} ${gateway['allowed_for']}');"
+    }
+  }
+}

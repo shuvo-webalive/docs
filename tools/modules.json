@@ -113,7 +113,22 @@
       "icon": "globe",
       "modules": [
         "countries",
+        "cities",
         "currencies"
+      ]
+    },
+    {
+      "name": "Transactions",
+      "icon": "list-check",
+      "modules": [
+        "transactions"
+      ]
+    },
+    {
+      "name": "Payment gateways",
+      "icon": "credit-card",
+      "modules": [
+        "payment_gateways"
       ]
     },
     {

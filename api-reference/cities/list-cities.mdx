@@ -1,0 +1,9 @@
+---
+title: "List cities"
+description: "Returns up to 100 cities per call, sorted by state, post code and name."
+openapi: "GET /app/cities"
+---
+
+Returns the cities in `cities`, 100 per call unless you send a smaller `limit`, sorted by state, then post code, then city name. Send `country` and `state` to keep only the cities of one country or state, `post_code` to find the cities with an exact post code, and `search` to match part of a city name; filters you send together must all match. Send `sort` and `order` to change the order. Each city includes its `state` and its `country`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
