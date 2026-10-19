@@ -1,0 +1,14 @@
+{
+  "sdk": "java",
+  "module": "cities",
+  "endpoints": {
+    "list_cities": {
+      "function": "listCities",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.cities().listCities(Map.of(\"country\", \"AU\", \"state\", \"VIC\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"cities\")) {\n    Map<?, ?> city = (Map<?, ?>) row;\n    Map<?, ?> state = (Map<?, ?>) city.get(\"state\");\n    System.out.println(city.get(\"id\") + \" \" + city.get(\"name\") + \" \" + city.get(\"post_code\") + \" \" + state.get(\"code\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "head_cities": {
+      "function": "headCities",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.cities().headCities();\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

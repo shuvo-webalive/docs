@@ -1,0 +1,30 @@
+{
+  "sdk": "python",
+  "module": "transactions",
+  "endpoints": {
+    "list_transactions": {
+      "function": "list_transactions",
+      "code": "response = client.transactions.list_transactions({\"limit\": 50, \"offset\": 0})\nfor transaction in response.map[\"transactions\"]:\n    print(transaction[\"transaction_no\"], transaction[\"total_records\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_transactions": {
+      "function": "head_transactions",
+      "code": "response = client.transactions.head_transactions()\nprint(response.status_code)\n"
+    },
+    "get_transaction": {
+      "function": "get_transaction",
+      "code": "response = client.transactions.get_transaction(\"IMPORT-2026-0001\")\nprint(response.map[\"transaction_no\"], response.map[\"total_records\"])\nfor row in response.map[\"by_type\"]:\n    print(row[\"type\"], row[\"count\"])\n"
+    },
+    "head_transaction": {
+      "function": "head_transaction",
+      "code": "response = client.transactions.head_transaction(\"IMPORT-2026-0001\")\nprint(response.status_code)\n"
+    },
+    "list_transaction_items": {
+      "function": "list_transaction_items",
+      "code": "response = client.transactions.list_transaction_items(\"IMPORT-2026-0001\", {\n    \"type\": \"product\",\n    \"limit\": 20,\n    \"offset\": 0,\n    \"detail\": \"slim\",\n})\nfor item in response.map[\"items\"]:\n    print(item[\"id\"], item[\"name\"], item[\"sku\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_transaction_items": {
+      "function": "head_transaction_items",
+      "code": "response = client.transactions.head_transaction_items(\"IMPORT-2026-0001\", {\"type\": \"product\"})\nprint(response.status_code)\n"
+    }
+  }
+}

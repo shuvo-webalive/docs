@@ -1,0 +1,30 @@
+{
+  "sdk": "dart",
+  "module": "transactions",
+  "endpoints": {
+    "list_transactions": {
+      "function": "listTransactions",
+      "code": "final response = await client.transactions\n    .listTransactions(queryParams: {'limit': 50, 'offset': 0});\nfinal transactions = (response.map as Map)['transactions'] as List;\nfor (final transaction in transactions) {\n  final row = transaction as Map;\n  print('${row['transaction_no']} ${row['total_records']}');\n}"
+    },
+    "head_transactions": {
+      "function": "headTransactions",
+      "code": "final response = await client.transactions.headTransactions();\nprint(response.statusCode);"
+    },
+    "get_transaction": {
+      "function": "getTransaction",
+      "code": "final response =\n    await client.transactions.getTransaction('IMPORT-2026-0001');\nfinal transaction = response.map as Map;\nprint(transaction['total_records']);\nfor (final row in transaction['by_type'] as List) {\n  print('${(row as Map)['type']} ${row['count']}');\n}"
+    },
+    "head_transaction": {
+      "function": "headTransaction",
+      "code": "final response =\n    await client.transactions.headTransaction('IMPORT-2026-0001');\nprint(response.statusCode);"
+    },
+    "list_transaction_items": {
+      "function": "listTransactionItems",
+      "code": "final response = await client.transactions.listTransactionItems(\n  'IMPORT-2026-0001',\n  queryParams: {'type': 'product', 'limit': 20, 'offset': 0, 'detail': 'slim'},\n);\nfor (final item in (response.map as Map)['items'] as List) {\n  print('${(item as Map)['id']} ${item['sku']} ${item['name']}');\n}"
+    },
+    "head_transaction_items": {
+      "function": "headTransactionItems",
+      "code": "final response = await client.transactions.headTransactionItems(\n  'IMPORT-2026-0001',\n  queryParams: {'type': 'product'},\n);\nprint(response.statusCode);"
+    }
+  }
+}

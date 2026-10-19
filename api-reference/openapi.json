@@ -136,7 +136,13 @@
       "name": "Countries"
     },
     {
+      "name": "Cities"
+    },
+    {
       "name": "Currencies"
+    },
+    {
+      "name": "Transactions"
     },
     {
       "name": "Payment gateways"
@@ -40810,6 +40816,336 @@
         ]
       }
     },
+    "/app/cities": {
+      "get": {
+        "tags": [
+          "Cities"
+        ],
+        "summary": "List cities",
+        "operationId": "list_cities",
+        "description": "Returns the cities in `cities`, 100 per call unless you send a smaller `limit`, sorted by state, then post code, then city name. Send `country` and `state` to keep only the cities of one country or state, `post_code` to find the cities with an exact post code, and `search` to match part of a city name; filters you send together must all match. Send `sort` and `order` to change the order. Each city includes its `state` and its `country`.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of cities per page, from `1` to `100`. Defaults to `100`. `pagination.limit` shows the page size applied. `0`, a negative value, a value above `100`, `all` and a value that is not a whole number are rejected with `400`. `max` is another name for `limit`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of cities to skip. Defaults to `0`. A negative value or a value that is not a whole number is rejected with `400`. An `offset` past the last city returns no cities, the full `total`, `has_previous` set to `true` and `has_next` set to `false`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Keeps only cities in this country. Send the country's numeric `id` from [List countries](/api-reference/countries/list-countries) or its two-letter `code` in any letter case, such as `12`, `AU` or `au`. A country name such as `Australia`, or other text, is rejected with `400`. A country with no cities, an `id` no country has and `0` all return no cities. `countryId` is another name for `country`.",
+            "schema": {
+              "type": "string",
+              "example": "AU"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Keeps only cities in this state. Send the state's numeric `id` from [List the states of a country](/api-reference/countries/list-the-states-of-a-country), such as `72`, or its `code` in any letter case, such as `VIC`, together with `country`. A code without `country` is rejected with `400`, and so is a number with a decimal point. An `id` no state has, a code the country does not have, and a state name all return no cities. `stateId` is another name for `state`.",
+            "schema": {
+              "type": "string",
+              "example": "VIC"
+            }
+          },
+          {
+            "name": "post_code",
+            "in": "query",
+            "description": "Keeps only cities with exactly this post code. Surrounding spaces are trimmed. Part of a post code, such as `300`, returns no cities. A blank value applies no filter, and a value longer than 10 characters is rejected with `400`. `postCode` is another name for `post_code`.",
+            "schema": {
+              "type": "string",
+              "maxLength": 10,
+              "example": "3000"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Keeps only cities whose `name` contains this text, in any letter case. It does not match post codes. `%` and `_` match only themselves. A blank value applies no filter. Broken percent-encoding, such as `%zz`, is rejected with `400`. `name` and `searchText` are other names for `search`.",
+            "schema": {
+              "type": "string",
+              "example": "melb"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "The order of the cities: `state`, `name` or `post_code`. Defaults to `state`, which sorts by state, then post code, then city name. `name` sorts by city name across all states, and `post_code` by post code. Any other value, such as `id` or `-name`, is rejected with `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "state",
+                "name",
+                "post_code"
+              ],
+              "example": "name"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "The sort direction: `asc` or `desc`. Defaults to `asc`. Any other value is rejected with `400`. `dir` is ignored.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The cities on this page in `cities`, and `pagination` with `total`, `limit`, `offset`, `has_previous` and `has_next`. The response has an `ETag` header and `Cache-Control: private, max-age=3600`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cities": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/City"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/CityPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "cities": [
+                    {
+                      "id": 1001,
+                      "name": "Melbourne",
+                      "post_code": "3000",
+                      "state": {
+                        "id": 72,
+                        "code": "VIC",
+                        "name": "Victoria",
+                        "active": true,
+                        "default": false
+                      },
+                      "country": {
+                        "id": 12,
+                        "code": "AU",
+                        "name": "Australia"
+                      }
+                    },
+                    {
+                      "id": 1002,
+                      "name": "East Melbourne",
+                      "post_code": "3002",
+                      "state": {
+                        "id": 72,
+                        "code": "VIC",
+                        "name": "Victoria",
+                        "active": true,
+                        "default": false
+                      },
+                      "country": {
+                        "id": 12,
+                        "code": "AU",
+                        "name": "Australia"
+                      }
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          },
+          "400": {
+            "description": "You sent a query parameter value the listing does not accept, such as `limit=101` or `state=VIC` without `country`. The `error.code` is `invalid_request`, and each rejected parameter has a `details` entry naming it in `field`, so `message` counts them, such as `2 parameters failed validation.`. The messages are `must be a whole number from 1 to 100` for `limit`, `must be 0 or more` for a negative `offset`, `must be a country id or a 2-letter ISO code` for `country`, `a state code needs country, because codes such as WA repeat across countries` for a state code without `country`, `must be at most 10 characters, as the address form` for `post_code`, `must be one of state, name, post_code` for `sort` and `must be asc or desc` for `order`. A parameter sent twice, or sent together with its other name, has the detail code `duplicate_parameter` and a message such as `send limit or max once`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "1 parameter failed validation.",
+                    "details": [
+                      {
+                        "field": "state",
+                        "code": "country_required",
+                        "message": "a state code needs country, because codes such as WA repeat across countries",
+                        "value": "VIC"
+                      }
+                    ],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "You made more than 20 calls to the cities list, `GET` and `HEAD` counted together, within about 10 seconds. The `error.code` is `rate_limited`, and the message starts with `Too many reads to this resource` and says how many seconds to wait. The `Retry-After` header gives the same number of seconds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityError"
+                },
+                "example": {
+                  "error": {
+                    "code": "rate_limited",
+                    "message": "Too many reads to this resource — retry after 8s.",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/app/cities?country=AU&state=VIC&limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.cities.list_cities({\"country\": \"AU\", \"state\": \"VIC\", \"limit\": 20})\nfor city in response.map[\"cities\"]:\n    print(city[\"id\"], city[\"name\"], city[\"post_code\"], city[\"state\"][\"code\"], city[\"country\"][\"code\"])\nprint(response.map[\"pagination\"][\"total\"], response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.cities.listCities({country: 'AU', state: 'VIC', limit: 20});\nfor (const city of response.map.cities) {\n    console.log(city.id, city.name, city.post_code, city.state.code, city.country.code);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Cities\\Cities;\n\n$client = ClientRegistry::buildClient();\n\n$response = Cities::listCities($client, ['country' => 'AU', 'state' => 'VIC', 'limit' => 20]);\n\nforeach ($response->map['cities'] as $city) {\n    echo $city['id'], ' ', $city['name'], ' ', $city['post_code'], ' ', $city['state']['code'], ' ', $city['country']['code'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.cities().listCities(Map.of(\"country\", \"AU\", \"state\", \"VIC\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"cities\")) {\n    Map<?, ?> city = (Map<?, ?>) row;\n    Map<?, ?> state = (Map<?, ?>) city.get(\"state\");\n    System.out.println(city.get(\"id\") + \" \" + city.get(\"name\") + \" \" + city.get(\"post_code\") + \" \" + state.get(\"code\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Cities.ListCitiesAsync(\n    new Dictionary<string, object?> { [\"country\"] = \"AU\", [\"state\"] = \"VIC\", [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var city in ((IReadOnlyList<object?>)body[\"cities\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    var state = (IReadOnlyDictionary<string, object?>)city[\"state\"]!;\n    Console.WriteLine($\"{city[\"id\"]} {city[\"name\"]} {city[\"post_code\"]} {state[\"code\"]}\");\n}\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.cities\n    .listCities(queryParams: {'country': 'AU', 'state': 'VIC', 'limit': 20});\nfinal body = response.map as Map;\nfor (final city in body['cities'] as List) {\n  print('${(city as Map)['name']} ${city['post_code']}');\n}\nprint((body['pagination'] as Map)['total']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Cities().ListCities(ctx, map[string]any{\"country\": \"AU\", \"state\": \"VIC\", \"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"cities\"].([]any) {\n\tcity := row.(map[string]any)\n\tfmt.Println(city[\"id\"], city[\"name\"], city[\"post_code\"], city[\"state\"].(map[string]any)[\"code\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Cities"
+        ],
+        "summary": "Check the cities list",
+        "operationId": "head_cities",
+        "description": "Returns `200` with headers only and no body. The `ETag` is the same one [List cities](/api-reference/cities/list-cities) returns when you send no query parameters, and the SDK functions send none. Compare it with the `ETag` you saved to see whether the list changed without downloading it. It counts toward the same read limit as [List cities](/api-reference/cities/list-cities).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Headers only, including the list's `ETag` and `Cache-Control: private, max-age=3600`. No body."
+          },
+          "304": {
+            "description": "You sent the current `ETag` in `If-None-Match`. No body."
+          },
+          "429": {
+            "description": "You made more than 20 calls to the cities list, `GET` and `HEAD` counted together, within about 10 seconds. The `error.code` is `rate_limited`, and the message starts with `Too many reads to this resource` and says how many seconds to wait. The `Retry-After` header gives the same number of seconds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityError"
+                },
+                "example": {
+                  "error": {
+                    "code": "rate_limited",
+                    "message": "Too many reads to this resource — retry after 8s.",
+                    "details": [],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/app/cities\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.cities.head_cities()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.cities.headCities();\nconsole.log(response.statusCode, response.headers.etag);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Cities\\Cities;\n\n$client = ClientRegistry::buildClient();\n\n$response = Cities::headCities($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.cities().headCities();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Cities.HeadCitiesAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.cities.headCities();\nprint(response.statusCode);\nprint(response.headers['etag']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Cities().HeadCities(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+          }
+        ]
+      }
+    },
     "/admin/currencies": {
       "get": {
         "tags": [
@@ -41964,6 +42300,818 @@
             "lang": "go",
             "label": "Go",
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Currencies().SetBaseCurrency(ctx, 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ncurrency := body[\"currency\"].(map[string]any)\nprevious, _ := body[\"previous_base\"].(map[string]any)\nfmt.Println(currency[\"code\"], currency[\"base\"], previous[\"code\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/transactions": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "List transactions",
+        "operationId": "list_transactions",
+        "description": "Returns the transaction numbers stamped on your store's records, in ascending order of `transaction_no`, 20 per call unless you send `limit`. Each row gives the number, how many records it is stamped on in `total_records`, and its `url`. Send `transaction_no` to get only that number's row; the response then has no `pagination` block. `search`, `q`, `sort`, `order` and parameters the listing does not know are ignored.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of transaction numbers per page. Defaults to `20`. `max` is accepted as another name for `limit`. Values from `1` up are accepted; a value above `200` is held to `200`, and `pagination.limit` shows `200`. `0` and text such as `abc` or `all` are rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of transaction numbers to skip. A negative value is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page of transaction numbers to return, counting from `1`. It sets `offset` to `(page - 1) * limit`. Text such as `abc` is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 2
+            }
+          },
+          {
+            "name": "transaction_no",
+            "in": "query",
+            "description": "Returns only the row for this exact number, matched in the same letter case. The response then has no `pagination` block. An empty value applies no filter.",
+            "schema": {
+              "type": "string",
+              "example": "IMPORT-2026-0001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The numbers on this page in `transactions`, and `pagination` with ten keys. With a `transaction_no` filter, `transactions` alone. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transactions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TransactionListEntry"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TransactionPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "transactions": [
+                    {
+                      "transaction_no": "IMPORT-2026-0001",
+                      "total_records": 4,
+                      "url": "/api/v4/admin/transactions/IMPORT-2026-0001"
+                    },
+                    {
+                      "transaction_no": "IMPORT-2026-0002",
+                      "total_records": 1,
+                      "url": "/api/v4/admin/transactions/IMPORT-2026-0002"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 2,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 2,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`limit` or `max` is `0` or not a number, `offset` is negative, or `page` is not a number. The `error.code` is `invalid_request`, and each rejected parameter has a `details` entry naming it in `field`. A rejected `limit` returns two entries, one for `limit` and one for `max`, and the message `limit is invalid; max is invalid`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "limit is invalid; max is invalid",
+                    "details": [
+                      {
+                        "field": "limit",
+                        "code": "out_of_range",
+                        "message": null,
+                        "value": 0
+                      },
+                      {
+                        "field": "max",
+                        "code": "out_of_range",
+                        "message": null,
+                        "value": 0
+                      }
+                    ],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/transactions?limit=50&offset=0\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.transactions.list_transactions({\"limit\": 50, \"offset\": 0})\nfor transaction in response.map[\"transactions\"]:\n    print(transaction[\"transaction_no\"], transaction[\"total_records\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.transactions.listTransactions({limit: 50, offset: 0});\nfor (const transaction of response.map.transactions) {\n    console.log(transaction.transaction_no, transaction.total_records);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$client = ClientRegistry::buildClient();\n\n$response = Transactions::listTransactions($client, ['limit' => 50, 'offset' => 0]);\n\nforeach ($response->map['transactions'] as $transaction) {\n    echo $transaction['transaction_no'], ' ', $transaction['total_records'], ' records', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.transactions().listTransactions(Map.of(\"limit\", 50, \"offset\", 0));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"transactions\")) {\n    Map<?, ?> transaction = (Map<?, ?>) row;\n    System.out.println(transaction.get(\"transaction_no\") + \" \" + transaction.get(\"total_records\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Transactions.ListTransactionsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 50, [\"offset\"] = 0 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var transaction in ((IReadOnlyList<object?>)body[\"transactions\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{transaction[\"transaction_no\"]} {transaction[\"total_records\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.transactions\n    .listTransactions(queryParams: {'limit': 50, 'offset': 0});\nfinal transactions = (response.map as Map)['transactions'] as List;\nfor (final transaction in transactions) {\n  final row = transaction as Map;\n  print('${row['transaction_no']} ${row['total_records']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Transactions().ListTransactions(ctx, map[string]any{\"limit\": 50, \"offset\": 0}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"transactions\"].([]any) {\n\ttransaction := row.(map[string]any)\n\tfmt.Println(transaction[\"transaction_no\"], transaction[\"total_records\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Check the transactions list",
+        "operationId": "head_transactions",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The list is reachable. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/transactions\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.transactions.head_transactions()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.transactions.headTransactions();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$client = ClientRegistry::buildClient();\n\n$response = Transactions::headTransactions($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.transactions().headTransactions();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Transactions.HeadTransactionsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.transactions.headTransactions();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Transactions().HeadTransactions(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/transactions/{transaction_no}": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Retrieve a transaction",
+        "operationId": "get_transaction",
+        "description": "Returns the number, its `total_records` and `by_type`, at the top level of the body with no wrapping key. `by_type` always has the same 15 rows in the same order, one per record type, each with `type` and `count`. A row has `items_url` only when `count` is above `0`. To list the records of one type, use [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction).",
+        "parameters": [
+          {
+            "name": "transaction_no",
+            "in": "path",
+            "required": true,
+            "description": "The transaction number, exactly as it was sent on the create call that stamped it, in the same letter case, such as `IMPORT-2026-0001`. A listing row returns it in `transaction_no`. The SDKs percent-encode it for you, so `#`, `%`, spaces and non-ASCII letters reach the store intact. A number that contains `/` cannot be read.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number, its record count and its 15 `by_type` rows. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                },
+                "example": {
+                  "transaction_no": "IMPORT-2026-0001",
+                  "total_records": 4,
+                  "by_type": [
+                    {
+                      "type": "product",
+                      "count": 3,
+                      "items_url": "/api/v4/admin/transactions/IMPORT-2026-0001/items?type=product"
+                    },
+                    {
+                      "type": "product_variation",
+                      "count": 0
+                    },
+                    {
+                      "type": "product_review",
+                      "count": 0
+                    },
+                    {
+                      "type": "customer",
+                      "count": 0
+                    },
+                    {
+                      "type": "order",
+                      "count": 0
+                    },
+                    {
+                      "type": "category",
+                      "count": 1,
+                      "items_url": "/api/v4/admin/transactions/IMPORT-2026-0001/items?type=category"
+                    },
+                    {
+                      "type": "currency",
+                      "count": 0
+                    },
+                    {
+                      "type": "country_tax",
+                      "count": 0
+                    },
+                    {
+                      "type": "country_tax_state_rule",
+                      "count": 0
+                    },
+                    {
+                      "type": "custom_tax_profile",
+                      "count": 0
+                    },
+                    {
+                      "type": "custom_tax_rule",
+                      "count": 0
+                    },
+                    {
+                      "type": "custom_tax_rule_zone",
+                      "count": 0
+                    },
+                    {
+                      "type": "shipping_profile",
+                      "count": 0
+                    },
+                    {
+                      "type": "shipping_rule",
+                      "count": 0
+                    },
+                    {
+                      "type": "shipping_rate",
+                      "count": 0
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The number in `transaction_no` contains `/`. The web server rejects the request before it reaches the API and returns an HTML page with `Invalid URI: [The encoded slash character is not allowed]`, not a JSON error. A number that contains `/` cannot be read.",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No record is stamped with that `transaction_no`. A number in a different letter case returns this too. The `error.code` is `not_found`, the message is `transaction not found`, and `details[0].field` is `transaction_no`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionError"
+                },
+                "example": {
+                  "error": {
+                    "code": "not_found",
+                    "message": "transaction not found",
+                    "details": [
+                      {
+                        "field": "transaction_no",
+                        "code": "not_found",
+                        "message": null,
+                        "value": "import-2026-0001"
+                      }
+                    ],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/transactions/IMPORT-2026-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.transactions.get_transaction(\"IMPORT-2026-0001\")\nprint(response.map[\"transaction_no\"], response.map[\"total_records\"])\nfor row in response.map[\"by_type\"]:\n    print(row[\"type\"], row[\"count\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.transactions.getTransaction('IMPORT-2026-0001');\nconsole.log(response.map.transaction_no, response.map.total_records);\nfor (const row of response.map.by_type) {\n    console.log(row.type, row.count);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$client = ClientRegistry::buildClient();\n\n$response = Transactions::getTransaction($client, 'IMPORT-2026-0001');\n\necho $response->map['transaction_no'], ': ', $response->map['total_records'], ' records', PHP_EOL;\nforeach ($response->map['by_type'] as $row) {\n    echo $row['type'], ' ', $row['count'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.transactions().getTransaction(\"IMPORT-2026-0001\");\nMap<?, ?> transaction = (Map<?, ?>) response.getMap();\nSystem.out.println(transaction.get(\"transaction_no\") + \" \" + transaction.get(\"total_records\"));\nfor (Object row : (List<?>) transaction.get(\"by_type\")) {\n    Map<?, ?> type = (Map<?, ?>) row;\n    System.out.println(type.get(\"type\") + \" \" + type.get(\"count\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Transactions.GetTransactionAsync(\"IMPORT-2026-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"transaction_no\"]} {body[\"total_records\"]}\");\nforeach (var byType in ((IReadOnlyList<object?>)body[\"by_type\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{byType[\"type\"]} {byType[\"count\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.transactions.getTransaction('IMPORT-2026-0001');\nfinal transaction = response.map as Map;\nprint(transaction['total_records']);\nfor (final row in transaction['by_type'] as List) {\n  print('${(row as Map)['type']} ${row['count']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Transactions().GetTransaction(ctx, \"IMPORT-2026-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"transaction_no\"], body[\"total_records\"])\nfor _, row := range body[\"by_type\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfmt.Println(group[\"type\"], group[\"count\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Check a transaction",
+        "operationId": "head_transaction",
+        "description": "Returns `200` with headers only and no body when at least one record is stamped with the number, and `404` when none is. The response has no `ETag` header. To read the counts, use [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction).",
+        "parameters": [
+          {
+            "name": "transaction_no",
+            "in": "path",
+            "required": true,
+            "description": "The transaction number, exactly as it was sent on the create call that stamped it, in the same letter case, such as `IMPORT-2026-0001`. A listing row returns it in `transaction_no`. The SDKs percent-encode it for you, so `#`, `%`, spaces and non-ASCII letters reach the store intact. A number that contains `/` cannot be read.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "At least one record is stamped with the number. Headers only, no body."
+          },
+          "404": {
+            "description": "No record is stamped with that `transaction_no`. No body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/transactions/IMPORT-2026-0001\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.transactions.head_transaction(\"IMPORT-2026-0001\")\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.transactions.headTransaction('IMPORT-2026-0001');\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$client = ClientRegistry::buildClient();\n\n$response = Transactions::headTransaction($client, 'IMPORT-2026-0001');\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.transactions().headTransaction(\"IMPORT-2026-0001\");\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Transactions.HeadTransactionAsync(\"IMPORT-2026-0001\");\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.transactions.headTransaction('IMPORT-2026-0001');\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Transactions().HeadTransaction(ctx, \"IMPORT-2026-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/transactions/{transaction_no}/items": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "List the records of a transaction",
+        "operationId": "list_transaction_items",
+        "description": "Send `type` to choose the kind of record, such as `product` or `category`; the call is rejected with `400` without it. Records come newest first, 20 per call unless you send `limit`, which takes `1` to `200`; `sort` and `order` are ignored. With `detail=slim`, the default, each item has the record's `id` and a few fields that depend on `type`; with `detail=full`, each item is the record as its own retrieve call returns it. A type with no records stamped, or a number no record is stamped with, returns `200` with an empty `items` list and a `total` of `0`, not `404`.",
+        "parameters": [
+          {
+            "name": "transaction_no",
+            "in": "path",
+            "required": true,
+            "description": "The transaction number, exactly as it was sent on the create call that stamped it, in the same letter case, such as `IMPORT-2026-0001`. A listing row returns it in `transaction_no`. The SDKs percent-encode it for you, so `#`, `%`, spaces and non-ASCII letters reach the store intact. A number that contains `/` cannot be read.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "description": "Required. The kind of record to list, one of the 15 `type` names in lower case: `product`, `product_variation`, `product_review`, `customer`, `order`, `category`, `currency`, `country_tax`, `country_tax_state_rule`, `custom_tax_profile`, `custom_tax_rule`, `custom_tax_rule_zone`, `shipping_profile`, `shipping_rule`, `shipping_rate`. A missing `type` is rejected with `400`. A name in upper case, an unknown name or a comma-separated list is rejected with `400` too.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "product",
+                "product_variation",
+                "product_review",
+                "customer",
+                "order",
+                "category",
+                "currency",
+                "country_tax",
+                "country_tax_state_rule",
+                "custom_tax_profile",
+                "custom_tax_rule",
+                "custom_tax_rule_zone",
+                "shipping_profile",
+                "shipping_rule",
+                "shipping_rate"
+              ],
+              "example": "product"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of records per page. Defaults to `20`. `max` is accepted as another name for `limit`. Takes `1` to `200`. A value above `200` is rejected with `400` and the message `max cannot exceed 200`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of records to skip. A negative value is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page of records to return, counting from `1`. It sets `offset` to `(page - 1) * limit`. Text such as `abc` is rejected with `400`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 2
+            }
+          },
+          {
+            "name": "detail",
+            "in": "query",
+            "description": "`slim`, the default, returns a short form of each record: its `id` and a few fields that depend on `type`, such as `name`, `sku` and `url` for a product. `full` returns each record as its own retrieve call returns it, without the wrapping key. Any other value, `FULL` included, is rejected with `400` and the message `detail must be 'slim' or 'full'`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "slim",
+                "full"
+              ],
+              "example": "slim"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number in `transaction_no`, the `type` you sent, the records on this page in `items`, and `pagination` with ten keys. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transaction_no": {
+                      "type": "string",
+                      "description": "The number you sent in the path."
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "The `type` you sent."
+                    },
+                    "items": {
+                      "type": "array",
+                      "description": "With `detail=slim`, each item has the record's `id` and the short fields for its `type`. With `detail=full`, each item is the record's full body, which differs by `type`.",
+                      "items": {
+                        "$ref": "#/components/schemas/TransactionItem"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/TransactionPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "transaction_no": "IMPORT-2026-0001",
+                  "type": "product",
+                  "items": [
+                    {
+                      "id": 207,
+                      "name": "Linen Apron",
+                      "sku": "APRON-LIN-01",
+                      "url": "/api/v4/admin/products/207"
+                    },
+                    {
+                      "id": 206,
+                      "name": "Canvas Tote Bag",
+                      "sku": "TOTE-CNV-01",
+                      "url": "/api/v4/admin/products/206"
+                    },
+                    {
+                      "id": 205,
+                      "name": "Cotton T-Shirt",
+                      "sku": "TEE-COT-01",
+                      "url": "/api/v4/admin/products/205"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 3,
+                    "limit": 20,
+                    "offset": 0,
+                    "count": 3,
+                    "current_page": 1,
+                    "total_pages": 1,
+                    "has_next": false,
+                    "has_previous": false,
+                    "previous_page": null,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`type` is missing: the message is `type query parameter is required`. Or `type` is not one of the 15 names in lower case: the message starts `Invalid type '<value>'. Allowed:` and lists the 15 names. Or `detail` is not `slim` or `full`: the message is `detail must be 'slim' or 'full'`. Or `limit` is above `200`: the message is `max cannot exceed 200`, with one `details` entry for `max`. Or `limit`, `offset` or `page` is not accepted, as on [List transactions](/api-reference/transactions/list-transactions). The `error.code` is `invalid_request`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_request",
+                    "message": "type query parameter is required",
+                    "details": [
+                      {
+                        "field": "type",
+                        "code": "required",
+                        "message": "type query parameter is required"
+                      }
+                    ],
+                    "request_id": "3d8f1a62-7b4c-4e19-9a05-c2e6b7d41f83"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/transactions/IMPORT-2026-0001/items?type=product&limit=20&offset=0&detail=slim\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.transactions.list_transaction_items(\"IMPORT-2026-0001\", {\n    \"type\": \"product\",\n    \"limit\": 20,\n    \"offset\": 0,\n    \"detail\": \"slim\",\n})\nfor item in response.map[\"items\"]:\n    print(item[\"id\"], item[\"name\"], item[\"sku\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.transactions.listTransactionItems('IMPORT-2026-0001', {\n    type: 'product',\n    limit: 20,\n    offset: 0,\n    detail: 'slim',\n});\nfor (const item of response.map.items) {\n    console.log(item.id, item.name, item.sku);\n}\nconsole.log(response.map.pagination.total);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$client = ClientRegistry::buildClient();\n\n$response = Transactions::listTransactionItems($client, 'IMPORT-2026-0001', [\n    'type' => 'product', 'limit' => 20, 'offset' => 0, 'detail' => 'slim',\n]);\n\nforeach ($response->map['items'] as $item) {\n    echo $item['id'], ' ', $item['name'], ' ', $item['sku'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' in total', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.transactions().listTransactionItems(\"IMPORT-2026-0001\",\n        Map.of(\"type\", \"product\", \"limit\", 20, \"offset\", 0, \"detail\", \"slim\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"name\") + \" \" + item.get(\"sku\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Transactions.ListTransactionItemsAsync(\"IMPORT-2026-0001\",\n    new Dictionary<string, object?> { [\"type\"] = \"product\", [\"limit\"] = 20, [\"offset\"] = 0, [\"detail\"] = \"slim\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var item in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"name\"]} {item[\"sku\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.transactions.listTransactionItems(\n  'IMPORT-2026-0001',\n  queryParams: {'type': 'product', 'limit': 20, 'offset': 0, 'detail': 'slim'},\n);\nfor (final item in (response.map as Map)['items'] as List) {\n  print('${(item as Map)['id']} ${item['sku']} ${item['name']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Transactions().ListTransactionItems(ctx, \"IMPORT-2026-0001\", map[string]any{\n\t\"type\": \"product\", \"limit\": 20, \"offset\": 0, \"detail\": \"slim\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"name\"], item[\"sku\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Transactions"
+        ],
+        "summary": "Check the records of a transaction",
+        "operationId": "head_transaction_items",
+        "description": "Send `type` as on [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction): without it the call returns `400`. With it, the call returns `200` with headers only and no body. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "transaction_no",
+            "in": "path",
+            "required": true,
+            "description": "The transaction number, exactly as it was sent on the create call that stamped it, in the same letter case, such as `IMPORT-2026-0001`. A listing row returns it in `transaction_no`. The SDKs percent-encode it for you, so `#`, `%`, spaces and non-ASCII letters reach the store intact. A number that contains `/` cannot be read.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "description": "Required, as on [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction): one of the 15 `type` names in lower case. Without it the call returns `400`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "product",
+                "product_variation",
+                "product_review",
+                "customer",
+                "order",
+                "category",
+                "currency",
+                "country_tax",
+                "country_tax_state_rule",
+                "custom_tax_profile",
+                "custom_tax_rule",
+                "custom_tax_rule_zone",
+                "shipping_profile",
+                "shipping_rule",
+                "shipping_rate"
+              ],
+              "example": "product"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Headers only, no body."
+          },
+          "400": {
+            "description": "`type` is missing. No body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/transactions/IMPORT-2026-0001/items?type=product\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.transactions.head_transaction_items(\"IMPORT-2026-0001\", {\"type\": \"product\"})\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.transactions.headTransactionItems('IMPORT-2026-0001', {type: 'product'});\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$client = ClientRegistry::buildClient();\n\n$response = Transactions::headTransactionItems($client, 'IMPORT-2026-0001', ['type' => 'product']);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.transactions().headTransactionItems(\"IMPORT-2026-0001\", Map.of(\"type\", \"product\"));\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Transactions.HeadTransactionItemsAsync(\"IMPORT-2026-0001\",\n    new Dictionary<string, object?> { [\"type\"] = \"product\" });\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.transactions.headTransactionItems(\n  'IMPORT-2026-0001',\n  queryParams: {'type': 'product'},\n);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Transactions().HeadTransactionItems(ctx, \"IMPORT-2026-0001\", map[string]any{\"type\": \"product\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
           }
         ]
       }
@@ -62210,6 +63358,145 @@
           }
         }
       },
+      "City": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The city's numeric `id`. No endpoint takes it as a path parameter."
+          },
+          "name": {
+            "type": "string",
+            "description": "The city's name, such as `Melbourne`."
+          },
+          "post_code": {
+            "type": "string",
+            "description": "The city's post code, such as `3000`."
+          },
+          "state": {
+            "$ref": "#/components/schemas/CityState"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CityCountry"
+          }
+        }
+      },
+      "CityState": {
+        "type": "object",
+        "description": "The state the city is in.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The state's numeric `id`, the same `id` that [List the states of a country](/api-reference/countries/list-the-states-of-a-country) returns. Send it as `state` to filter the listing."
+          },
+          "code": {
+            "type": "string",
+            "description": "The state's code, such as `VIC`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The state's name, such as `Victoria`."
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the state is active."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "`true` while the state is the `default_state` in the `administration` site settings section, and `false` otherwise."
+          }
+        }
+      },
+      "CityCountry": {
+        "type": "object",
+        "description": "The country the city is in.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The country's numeric `id`, the same `id` that [List countries](/api-reference/countries/list-countries) returns. Send it, or the `code`, as `country` to filter the listing."
+          },
+          "code": {
+            "type": "string",
+            "description": "The country's two-letter code, such as `AU`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The country's name, such as `Australia`."
+          }
+        }
+      },
+      "CityPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of cities that match your filters, across all pages."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, or `100` when you sent none."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of cities skipped before this page."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when `offset` is above `0`."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when more cities follow this page."
+          }
+        }
+      },
+      "CityError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `rate_limited`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `1 parameter failed validation.`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected query parameter. Empty on a `404` or a `429`.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The query parameter that was rejected, such as `limit`."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why the parameter was rejected, such as `out_of_range`, `invalid_integer`, `invalid_value`, `country_required`, `too_long`, `invalid_enum` or `duplicate_parameter`."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "What the parameter accepts, such as `must be a whole number from 1 to 100`."
+                    },
+                    "value": {
+                      "type": "string",
+                      "description": "The value you sent. For a parameter sent twice, both values separated by a comma, such as `1, 2`."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "A 36-character identifier for this request."
+              }
+            }
+          }
+        }
+      },
       "Currency": {
         "type": "object",
         "properties": {
@@ -62626,6 +63913,268 @@
                     "value": {
                       "type": "string",
                       "description": "The value you sent for a rejected query parameter, such as `bogus` for `sort=bogus`."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "TransactionListEntry": {
+        "type": "object",
+        "description": "One row of the transactions list.",
+        "properties": {
+          "transaction_no": {
+            "type": "string",
+            "description": "The transaction number. Pass it as `transaction_no` in a path."
+          },
+          "total_records": {
+            "type": "integer",
+            "description": "How many records are stamped with the number. A record you delete stays counted."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path of [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) for this number. A space in the number appears as `+`, and the link then returns `404`."
+          }
+        }
+      },
+      "TransactionTypeCount": {
+        "type": "object",
+        "description": "One `by_type` row: the records of one type stamped with the number.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "product",
+              "product_variation",
+              "product_review",
+              "customer",
+              "order",
+              "category",
+              "currency",
+              "country_tax",
+              "country_tax_state_rule",
+              "custom_tax_profile",
+              "custom_tax_rule",
+              "custom_tax_rule_zone",
+              "shipping_profile",
+              "shipping_rule",
+              "shipping_rate"
+            ],
+            "description": "The record type. Pass it as `type` to [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction)."
+          },
+          "count": {
+            "type": "integer",
+            "description": "How many records of this type are stamped with the number."
+          },
+          "items_url": {
+            "type": "string",
+            "description": "The path of [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction) for this type. Present only when `count` is above `0`. A space in the number appears as `+`, and the link then returns `404`."
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "transaction_no": {
+            "type": "string",
+            "description": "The transaction number you sent in the path."
+          },
+          "total_records": {
+            "type": "integer",
+            "description": "How many records are stamped with the number, across all types."
+          },
+          "by_type": {
+            "type": "array",
+            "description": "Always 15 rows in this order: `product`, `product_variation`, `product_review`, `customer`, `order`, `category`, `currency`, `country_tax`, `country_tax_state_rule`, `custom_tax_profile`, `custom_tax_rule`, `custom_tax_rule_zone`, `shipping_profile`, `shipping_rule`, `shipping_rate`.",
+            "items": {
+              "$ref": "#/components/schemas/TransactionTypeCount"
+            }
+          }
+        }
+      },
+      "TransactionItem": {
+        "type": "object",
+        "description": "One record stamped with the number, as `detail=slim` returns it. Every item has `id`; the other fields depend on `type`: `category` has `name` and `url`; `product` and `product_variation` have `name`, `sku` and `url`; `product_review` has `name`, `rating` and `url`; `customer` has `email`, `first_name`, `last_name` and `url`; `order` has `order_no`, `grand_total`, `status` and `url`; `currency` has `name`, `code`, `symbol` and `url`; `custom_tax_profile` has `name`, `code` and `url`; `custom_tax_rule` has `name` only; `custom_tax_rule_zone` has `country_code`, `state_name`, `postcode`, `rate` and `priority`; `shipping_profile` has `name`, `description` and `url`; `shipping_rate` has `name`, `policy_type` and `url`. With `detail=full`, the item is the record's full body instead.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The record's `id`. Where the item has a `url`, the `id` is the last part of it, except for `order`: an order's `url` ends with its `order_no`, the value the orders API takes as `order_id`. For `category`, the `id` is the value [Retrieve a category](/api-reference/categories/retrieve-a-category) takes as `category_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "The record's name. Not returned for `customer`, `order` or `custom_tax_rule_zone`."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The SKU of a `product` or `product_variation`."
+          },
+          "rating": {
+            "type": "number",
+            "description": "The rating of a `product_review`."
+          },
+          "email": {
+            "type": "string",
+            "description": "The email address of a `customer`, such as `jane@example.com`."
+          },
+          "first_name": {
+            "type": "string",
+            "description": "The first name of a `customer`."
+          },
+          "last_name": {
+            "type": "string",
+            "description": "The last name of a `customer`."
+          },
+          "order_no": {
+            "type": "integer",
+            "description": "The order number of an `order`. The order's `url` ends with it."
+          },
+          "grand_total": {
+            "type": "number",
+            "description": "The grand total of an `order`."
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of an `order`."
+          },
+          "code": {
+            "type": "string",
+            "description": "The code of a `currency` or a `custom_tax_profile`."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The symbol of a `currency`."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "The country code of a `custom_tax_rule_zone`."
+          },
+          "state_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The state name of a `custom_tax_rule_zone`, or `null` when the zone has no state."
+          },
+          "postcode": {
+            "type": "string",
+            "description": "The post code of a `custom_tax_rule_zone`."
+          },
+          "rate": {
+            "type": "number",
+            "description": "The rate of a `custom_tax_rule_zone`."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "The priority of a `custom_tax_rule_zone`."
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of a `shipping_profile`."
+          },
+          "policy_type": {
+            "type": "string",
+            "description": "The policy type of a `shipping_rate`."
+          },
+          "url": {
+            "type": "string",
+            "description": "The path you call to retrieve the record, such as `/api/v4/admin/products/207`. Not returned for `custom_tax_rule` or `custom_tax_rule_zone`."
+          }
+        }
+      },
+      "TransactionPagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The number of rows that match your request."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The page size applied: the `limit` you sent, or `20`."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The number of rows skipped before this page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of rows on this page."
+          },
+          "current_page": {
+            "type": "integer",
+            "description": "The page number of this page, counting from `1`. Past the last row, it equals `total_pages`."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "The number of pages at this `limit`."
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "`true` when there is a page after this one."
+          },
+          "has_previous": {
+            "type": "boolean",
+            "description": "`true` when there is a page before this one. Past the last row it is `false`, even though earlier rows exist."
+          },
+          "previous_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The absolute URL of the previous page, or `null`."
+          },
+          "next_page": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The absolute URL of the next page, or `null`. A space in the number appears as `+`, and the link then returns `404`; call the SDK function with the next `offset` instead."
+          }
+        }
+      },
+      "TransactionError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `method_not_allowed`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `transaction not found` or `type query parameter is required`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected query parameter or path value. Empty on a `405`.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The query parameter or path parameter that was rejected, such as `type` or `transaction_no`."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `required`, `out_of_range`, `invalid_value` or `not_found`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "What the parameter accepts, such as `max cannot exceed 200`, or `null`."
+                    },
+                    "value": {
+                      "description": "The value you sent. Not returned when the parameter is missing."
                     }
                   }
                 }

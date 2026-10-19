@@ -1,0 +1,51 @@
+---
+title: "Cities"
+sidebarTitle: "Overview"
+description: "Look up cities and their post codes, filtered by country, state, post code or part of the city name."
+---
+
+The Cities API has two endpoints, and you can call both from all seven SDKs. Both use the path `/api/v4/app/cities`.
+
+<Warning>
+  **Send `country` with a state code.** `state=VIC` on its own is rejected with `400` and the detail code
+  `country_required`, because codes such as `WA` repeat across countries. Send `country=AU&state=VIC`, or send
+  the state's numeric `id`, such as `state=72`, which works without `country`. A state name such as `Victoria`
+  matches no cities.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List cities](/api-reference/cities/list-cities) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/cities` | Returns up to 100 cities per call, sorted by state, post code and name. |
+| [Check the cities list](/api-reference/cities/check-the-cities-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/cities` | Returns the headers of the cities list, including its `ETag`, with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **You can only read cities.** `OPTIONS` on `/api/v4/app/cities` returns `204` with
+  `Allow: GET, HEAD, OPTIONS`, and `POST`, `PUT`, `PATCH` and `DELETE` are rejected with `405`. There is no path
+  for a single city: `GET /api/v4/app/cities/{city_id}` returns `404` with the error code `not_found`.
+- **Take the `country` and `state` values from the Countries API.** A city's `country.id` is the country's `id`
+  from [List countries](/api-reference/countries/list-countries), and its `state.id` is the state's `id` from
+  [List the states of a country](/api-reference/countries/list-the-states-of-a-country).
+- **Older parameter names still work.** `max` is the same as `limit`, `countryId` as `country`, `stateId` as
+  `state`, `postCode` as `post_code`, and `searchText` and `name` as `search`. Send one name for each: a name
+  sent twice, or sent together with its other name, is rejected with `400` and the detail code
+  `duplicate_parameter`. `q`, `dir`, `page`, `field_metadata` and any other name the listing does not know
+  are ignored: you get `200` and the same cities as without them.
+- **`state.default` follows the store's default state.** A state has `default` set to `true` while it is the
+  `default_state` in the `administration` section of the site settings, which you read with
+  [Get a settings section](/api-reference/site-settings/get-a-settings-section). The default country does not filter the listing.
+- **Every read returns an `ETag`.** Each `GET` and `HEAD` response has an `ETag` and
+  `Cache-Control: private, max-age=3600`. Send that `ETag` in `If-None-Match` on a `GET` or a `HEAD`, and while
+  it is still current you get `304` with no body. The SDK functions take no headers, so they never send
+  `If-None-Match`: you get `304` only from your own HTTP calls.
+- **The cities list has a read limit.** You can make 20 calls within about 10 seconds, `GET` and `HEAD`
+  counted together. The next call is rejected with `429` and the error code `rate_limited`, and the
+  `Retry-After` header says how many seconds to wait.

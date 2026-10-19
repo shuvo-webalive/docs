@@ -113,7 +113,15 @@
       "icon": "globe",
       "modules": [
         "countries",
+        "cities",
         "currencies"
+      ]
+    },
+    {
+      "name": "Transactions",
+      "icon": "list-check",
+      "modules": [
+        "transactions"
       ]
     },
     {

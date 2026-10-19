@@ -1,0 +1,14 @@
+{
+  "sdk": "dotnet",
+  "module": "cities",
+  "endpoints": {
+    "list_cities": {
+      "function": "ListCitiesAsync",
+      "code": "var response = await client.Cities.ListCitiesAsync(\n    new Dictionary<string, object?> { [\"country\"] = \"AU\", [\"state\"] = \"VIC\", [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var city in ((IReadOnlyList<object?>)body[\"cities\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n{\n    var state = (IReadOnlyDictionary<string, object?>)city[\"state\"]!;\n    Console.WriteLine($\"{city[\"id\"]} {city[\"name\"]} {city[\"post_code\"]} {state[\"code\"]}\");\n}\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_cities": {
+      "function": "HeadCitiesAsync",
+      "code": "var response = await client.Cities.HeadCitiesAsync();\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}
