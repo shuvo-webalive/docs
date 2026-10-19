@@ -36,9 +36,9 @@ NOTES = [
     "  another tax collection. The request after that works normally. A delete sent straight after a\n"
     "  `404` returns that `404` and deletes nothing, so retrieve the tax code afterwards to confirm it is\n"
     "  gone.",
-    "**A `200` does not prove that a call did anything.** `PATCH` on a tax code, `POST` to a tax\n"
-    "  code's path and `OPTIONS` on the list return `200` with\n"
-    "  `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and change nothing. A `HEAD` returns\n"
+    "**A `200` does not prove that a call did anything.** `PATCH` on a tax code and `POST` to a tax\n"
+    "  code's path return `200` with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and\n"
+    "  change nothing. `OPTIONS` returns `404` on the list and on a tax code. A `HEAD` returns\n"
     "  `200` even when no tax code has the `tax_code_id` you send. Use `PUT` to update a tax code, and\n"
     "  [Retrieve a tax code](" + RETRIEVE_PAGE + ") to check that one exists.",
 ]

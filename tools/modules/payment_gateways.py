@@ -17,8 +17,8 @@ LIST_CUSTOMER_GROUPS_PAGE = "/api-reference/customer-groups/list-customer-groups
 WARNING = (
     "**You cannot send a retrieved gateway back unchanged.** A `PUT` or `PATCH` with the body from\n"
     "  [Retrieve a payment gateway](" + RETRIEVE_PAGE + ") is rejected with `400`: `code` and `promotional`\n"
-    "  are read-only, `surcharge: null` is rejected with `must be an object`, and empty `visibility.customers`\n"
-    "  and `visibility.customer_groups` lists are rejected under `type` `everyone`. Send only the fields\n"
+    "  are read-only, and `surcharge: null` is rejected with `must be an object`. Empty `visibility.customers`\n"
+    "  and `visibility.customer_groups` lists are accepted under `type` `everyone`. Send only the fields\n"
     "  you want to change."
 )
 
@@ -113,9 +113,8 @@ WRITE_400 = (
     "or has a field that is not a gateway field (reason `unknown_field`, message `is not a payment gateway field`); "
     "it sends `code` or `promotional`, even unchanged (two entries each, reasons `read_only` and `unknown_field`); "
     "`information` is longer than 2000 characters (reason `too_long`); `zone` names a zone the store does not have "
-    "(reason `unknown_reference`, message `no zone exists with id <id>`); `surcharge` is `null` (reason `invalid_type`, "
-    "message `must be an object`); or `visibility.customers` or `visibility.customer_groups` is sent, even as an empty list, "
-    "while `visibility.type` is `everyone` (reason `not_applicable`). `error.code` is `invalid_request`, and the "
+    "(reason `unknown_reference`, message `no zone exists with id <id>`); or `surcharge` is `null` (reason `invalid_type`, "
+    "message `must be an object`). `error.code` is `invalid_request`, and the "
     "reason for each field is in `details[].code`."
 )
 
@@ -397,8 +396,8 @@ SCHEMAS = {
     }},
     "PaymentGatewayVisibilityInput": {"type": "object", "description": "Who sees the gateway at checkout. Customers and customer groups are sent as `id` lists.", "properties": {
         "type": {"type": "string", "enum": ["everyone", "customer", "selected"]},
-        "customers": {"type": "array", "items": {"type": "integer"}, "description": "Customer `id` values, from [List customers](" + LIST_CUSTOMERS_PAGE + "). Send it with `type` `selected`. With `type` `everyone`, even an empty list is rejected with `400` and the reason `not_applicable`."},
-        "customer_groups": {"type": "array", "items": {"type": "integer"}, "description": "Customer group `id` values, from [List customer groups](" + LIST_CUSTOMER_GROUPS_PAGE + "). Send it with `type` `selected`. With `type` `everyone`, even an empty list is rejected with `400` and the reason `not_applicable`."},
+        "customers": {"type": "array", "items": {"type": "integer"}, "description": "Customer `id` values, from [List customers](" + LIST_CUSTOMERS_PAGE + "). Send it with `type` `selected`. With `type` `everyone`, an empty list is accepted."},
+        "customer_groups": {"type": "array", "items": {"type": "integer"}, "description": "Customer group `id` values, from [List customer groups](" + LIST_CUSTOMER_GROUPS_PAGE + "). Send it with `type` `selected`. With `type` `everyone`, an empty list is accepted."},
     }},
     "PaymentGatewayCount": {"type": "object", "properties": {
         "total": {"type": "integer", "description": "The number of gateways that match your filters."},
@@ -415,7 +414,7 @@ SCHEMAS = {
         "message": {"type": "string", "description": "What went wrong, such as `Payment gateway 999999 was not found.`."},
         "details": {"type": "array", "description": "One entry per rejected field or query parameter. Empty on a `404`.", "items": {"type": "object", "properties": {
             "field": {"type": "string", "description": "The field or query parameter that was rejected, such as `information` or `visibility.customers`."},
-            "code": {"type": "string", "description": "Why it was rejected, such as `unknown_field`, `read_only`, `too_long` or `not_applicable`."},
+            "code": {"type": "string", "description": "Why it was rejected, such as `unknown_field`, `read_only`, `too_long` or `invalid_type`."},
             "message": {"type": ["string", "null"], "description": "The reason in words, such as `is not a payment gateway field`. `null` when `limit` is `0` or not a whole number, or `offset` is negative or not a whole number; the top-level `message` then gives the reason."},
             "value": {"description": "The value you sent, when the API includes it."},
         }}},

@@ -33,10 +33,11 @@ NOTES = [
     "  collection. The request after that is handled normally. So a delete sent straight after a `404`\n"
     "  returns that `404` and deletes nothing. Check the status of every call, and send the delete again\n"
     "  when it returns the previous call's error.",
-    "**A `200` does not always mean the call worked.** A method these paths do not handle, such as\n"
-    "  `OPTIONS`, returns `200` with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` instead\n"
-    "  of `405`, and stores nothing. A `HEAD` request for one rule returns `200` even when no rule has the\n"
-    "  `tax_rule_id` you send; use [Retrieve a tax rule](" + RETRIEVE_PAGE + ") to check that a rule exists.",
+    "**A `200` does not always mean the call worked.** A method these paths do not handle returns `200`\n"
+    "  with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` instead of `405`, and stores\n"
+    "  nothing. `OPTIONS` returns `404` on the list and on a rule. A `HEAD` request for one rule returns\n"
+    "  `200` even when no rule has the `tax_rule_id` you send; use [Retrieve a tax rule](" + RETRIEVE_PAGE + ")\n"
+    "  to check that a rule exists.",
     "**Tax rules live at `/admin/tax_rules`, not under `/admin/tax/`.** `/admin/tax/custom_rules`, the\n"
     "  path an older API collection used, returns `404` with the error code `not_found` and a message that\n"
     "  starts `Unknown tax path`.",

@@ -8,11 +8,12 @@ The Transactions API has six endpoints, and you can call every one from all seve
 
 <Warning>
   **Do not follow `url` or `items_url` for a number that contains a space or a `/`.** The store
-  writes a space in these links as `+` and then reads a `+` in a path as a literal `+`, so the link
-  returns `404`. Pass `transaction_no` to the SDK function instead: the SDKs percent-encode it, so a
-  space reaches the store intact. A number that contains `/` cannot be read at all: the request is
-  rejected with `400` and an HTML page, `Invalid URI: [The encoded slash character is not allowed]`,
-  before it reaches the API. Do not use `/` in the transaction numbers you send.
+  writes a space in these links as `+` and then reads a `+` in a path as a literal `+`: `url` then
+  returns `404`, and `items_url` returns `200` with no records. Pass `transaction_no` to the SDK
+  function instead: the SDKs percent-encode it, so a space reaches the store intact. A number that
+  contains `/` cannot be read at all: the request is rejected with `400` and an HTML page,
+  `Invalid URI: [The encoded slash character is not allowed]`, before it reaches the API. Do not use
+  `/` in the transaction numbers you send.
 </Warning>
 
 ## At a glance
@@ -39,9 +40,12 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `HEAD` and `OPTIONS`, and `OPTIONS` returns `204` with `Allow: GET, HEAD, OPTIONS`. `POST`, `PUT`,
   `PATCH` and `DELETE` are rejected with `405 method_not_allowed` and the message
   `HTTP method not allowed for this endpoint.`
-- **A record you delete stays counted.** After you delete a category stamped with a number, using
-  [Delete a category](/api-reference/categories/delete-a-category), the number's `total_records`, its `category`
-  count and the category's row under `items` do not change. The number also stays in the listing.
+- **A record in the trash stays counted; a record deleted for good does not.** Deleting a customer,
+  a category or a product moves it to the trash. After you delete a category stamped with a number,
+  using [Delete a category](/api-reference/categories/delete-a-category), the number's `total_records`, its
+  `category` count and the category's row under `items` do not change, and the number stays in the
+  listing. A record deleted for good leaves its number: after you delete the only custom tax profile
+  stamped with a number, [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) returns `404` for that number.
 - **`transaction_no` matches exactly, letter case included.** The number in lower case returns
   `404` when it was stored in upper case. The store trims surrounding spaces off a number when it
   stores one, so send the number without them.

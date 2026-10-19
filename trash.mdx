@@ -8,10 +8,11 @@ The Trash API has eight endpoints, and you can call every one from all seven SDK
 
 <Warning>
   **Send a `type` other than `Customer` on every listing call.** Without `type`, or with
-  `type=Customer`, [List items in the trash](/api-reference/trash/list-items-in-the-trash) can take 90 to 100 seconds to return a
-  page, and [Check the trash list](/api-reference/trash/check-the-trash-list) takes as long, because it runs
-  the same query. With `type=Category`, `type=Product` or `type=BlogPost`, a page returns in about a
-  second. If you must list customers, set your client's request timeout above 100 seconds.
+  `type=Customer`, [List items in the trash](/api-reference/trash/list-items-in-the-trash) can take about 90 to 110 seconds to
+  return a page, and [Check the trash list](/api-reference/trash/check-the-trash-list) takes as long,
+  because it runs the same query. With `type=Category`, `type=Product` or `type=BlogPost`, a page
+  returns in about a second. If you must list customers, set your client's request timeout above 110
+  seconds.
 </Warning>
 
 ## At a glance

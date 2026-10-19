@@ -21289,7 +21289,7 @@
           {
             "name": "If-Match",
             "in": "header",
-            "description": "Optional. The profile's current `ETag`, from your last retrieve or update of it. If the profile changed since then, the update is rejected with `409`. The SDK functions do not send it.",
+            "description": "Optional. The profile's current `ETag`, from your last retrieve of it. If the profile changed since then, the update is rejected with `409`. The `ETag` an update returns is rejected with `409` too. The SDK functions do not send it.",
             "schema": {
               "type": "string",
               "example": "\"5d41402abc4b2a76b9719d911017c592\""
@@ -21298,7 +21298,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The custom tax profile after the replace, without `rules`. The response has an `ETag` header.",
+            "description": "The custom tax profile after the replace, without `rules`. The response has an `ETag` header, which is not the one a retrieve returns: sent back as `If-Match`, it is rejected with `409`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -21343,7 +21343,7 @@
             }
           },
           "409": {
-            "description": "Your `If-Match` value is not the profile's current `ETag`. The code is `conflict`.",
+            "description": "Your `If-Match` value is not the profile's current `ETag`, or it is the `ETag` an update returned. The code is `conflict`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38821,7 +38821,7 @@
         ],
         "summary": "Import a product's reviews",
         "operationId": "import_product_reviews",
-        "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from is skipped, with no error. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
+        "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from replaces that review: it keeps the earlier review's `id` and takes the new text and `rating`, with the same `201` and nothing in the response to show it. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
         "parameters": [
           {
             "name": "product_id",
@@ -38844,7 +38844,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Every review the product has, oldest first, in `product.reviews`, not only the ones you sent. The reviews you added are last, and a skipped review adds nothing. `rating` reads back as a decimal number, such as `5.0`. In the raw response text, the `@` in each `email` is written as `\\u0040`; a JSON parser turns it back into `@`.",
+            "description": "Every review the product has, oldest first, in `product.reviews`, not only the ones you sent. The reviews you added are last. A review that replaced an earlier one adds no entry: it shows under the earlier review's `id`, with the new text and `rating`. `rating` reads back as a decimal number, such as `5.0`. In the raw response text, the `@` in each `email` is written as `\\u0040`; a JSON parser turns it back into `@`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -40478,7 +40478,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. The variants you read back do not show it.",
+            "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. [List a product's variants](/api-reference/variations/list-a-products-variants) does not show it. `GET /api/v4/admin/products/{product_id}/variations/{variation_id}` returns it as the variant's `transaction_no`, and [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) counts the variant under `product_variation`.",
             "schema": {
               "type": "string",
               "example": "IMPORT-2026-10-18"
@@ -40487,7 +40487,7 @@
         ],
         "responses": {
           "201": {
-            "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](/api-reference/variations/list-a-products-variants). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. No variant shows the transaction number.",
+            "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](/api-reference/variations/list-a-products-variants). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. The listing does not show the transaction number; `GET /api/v4/admin/products/{product_id}/variations/{variation_id}` returns it as the variant's `transaction_no`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -40610,7 +40610,7 @@
         ],
         "responses": {
           "200": {
-            "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. The `url` in a `full` entry returns `404` if you call it, and its `sale_price` and `is_on_sale` can differ from what [List a product's variants](/api-reference/variations/list-a-products-variants) returns for a product on sale: read the variant back there to check its values.",
+            "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. A `GET` on the `url` in a `full` entry returns that one variant, and the entry's `sale_price` and `is_on_sale` can differ from what [List a product's variants](/api-reference/variations/list-a-products-variants) returns for a product on sale: read the variant back there to check its values.",
             "content": {
               "application/json": {
                 "schema": {
@@ -44765,7 +44765,7 @@
             }
           },
           "400": {
-            "description": "The body is not valid for this gateway. It is `{}` (message `request body is empty`); it is wrapped in `payment_gateway` or has a field that is not a gateway field (reason `unknown_field`, message `is not a payment gateway field`); it sends `code` or `promotional`, even unchanged (two entries each, reasons `read_only` and `unknown_field`); `information` is longer than 2000 characters (reason `too_long`); `zone` names a zone the store does not have (reason `unknown_reference`, message `no zone exists with id <id>`); `surcharge` is `null` (reason `invalid_type`, message `must be an object`); or `visibility.customers` or `visibility.customer_groups` is sent, even as an empty list, while `visibility.type` is `everyone` (reason `not_applicable`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`.",
+            "description": "The body is not valid for this gateway. It is `{}` (message `request body is empty`); it is wrapped in `payment_gateway` or has a field that is not a gateway field (reason `unknown_field`, message `is not a payment gateway field`); it sends `code` or `promotional`, even unchanged (two entries each, reasons `read_only` and `unknown_field`); `information` is longer than 2000 characters (reason `too_long`); `zone` names a zone the store does not have (reason `unknown_reference`, message `no zone exists with id <id>`); or `surcharge` is `null` (reason `invalid_type`, message `must be an object`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -44892,7 +44892,7 @@
             }
           },
           "400": {
-            "description": "The body is not valid for this gateway. It is `{}` (message `request body is empty`); it is wrapped in `payment_gateway` or has a field that is not a gateway field (reason `unknown_field`, message `is not a payment gateway field`); it sends `code` or `promotional`, even unchanged (two entries each, reasons `read_only` and `unknown_field`); `information` is longer than 2000 characters (reason `too_long`); `zone` names a zone the store does not have (reason `unknown_reference`, message `no zone exists with id <id>`); `surcharge` is `null` (reason `invalid_type`, message `must be an object`); or `visibility.customers` or `visibility.customer_groups` is sent, even as an empty list, while `visibility.type` is `everyone` (reason `not_applicable`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`.",
+            "description": "The body is not valid for this gateway. It is `{}` (message `request body is empty`); it is wrapped in `payment_gateway` or has a field that is not a gateway field (reason `unknown_field`, message `is not a payment gateway field`); it sends `code` or `promotional`, even unchanged (two entries each, reasons `read_only` and `unknown_field`); `information` is longer than 2000 characters (reason `too_long`); `zone` names a zone the store does not have (reason `unknown_reference`, message `no zone exists with id <id>`); or `surcharge` is `null` (reason `invalid_type`, message `must be an object`). `error.code` is `invalid_request`, and the reason for each field is in `details[].code`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -44963,12 +44963,12 @@
         ],
         "summary": "List items in the trash",
         "operationId": "list_trash",
-        "description": "Returns the items in the trash in `items`, 20 per call unless you send `limit`, newest `updated` first, and `pagination` with the total and the URLs of the next and previous pages. Send `type` on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. Send `search` to match part of an item's `name`, and `sort` and `order` to change the order. Any query parameter the listing does not accept, such as `q`, is rejected with `400` and the reason `unknown_parameter`.",
+        "description": "Returns the items in the trash in `items`, 20 per call unless you send `limit`, newest `updated` first, and `pagination` with the total and the URLs of the next and previous pages. Send `type` on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take about 90 to 110 seconds. Send `search` to match part of an item's `name`, and `sort` and `order` to change the order. Any query parameter the listing does not accept, such as `q`, is rejected with `400` and the reason `unknown_parameter`.",
         "parameters": [
           {
             "name": "type",
             "in": "query",
-            "description": "Keeps only items of this type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.",
+            "description": "Keeps only items of this type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take about 90 to 110 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.",
             "schema": {
               "type": "string",
               "example": "Category"
@@ -45183,12 +45183,12 @@
         ],
         "summary": "Check the trash list",
         "operationId": "head_trash",
-        "description": "Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](/api-reference/trash/list-items-in-the-trash) and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take 90 to 100 seconds. A query parameter the listing does not accept is rejected with `400` here as well.",
+        "description": "Returns `200` with headers only and no body. It takes the same query parameters as [List items in the trash](/api-reference/trash/list-items-in-the-trash) and runs the same query, so send a `type` here too: without it, or with `Customer`, the call can take about 90 to 110 seconds. A query parameter the listing does not accept is rejected with `400` here as well.",
         "parameters": [
           {
             "name": "type",
             "in": "query",
-            "description": "Keeps only items of this type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.",
+            "description": "Keeps only items of this type, a value from [List trash types](/api-reference/trash/list-trash-types) in any letter case, or several types separated by commas, such as `Product,Category`. Send it on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take about 90 to 110 seconds. An unknown type, `blog_post` included, is rejected with `400` and the message `unknown trash type '<value>'`.",
             "schema": {
               "type": "string",
               "example": "Category"
@@ -64795,7 +64795,7 @@
           },
           "email": {
             "type": "string",
-            "description": "Required. The reviewer's email address. A review with an `email` the product already has a review from is skipped, with no error."
+            "description": "Required. The reviewer's email address. A review with an `email` the product already has a review from replaces that review, which keeps its `id`, with no error."
           },
           "rating": {
             "type": "number",
@@ -65465,7 +65465,7 @@
           },
           "url": {
             "type": "string",
-            "description": "A path such as `/api/v4/admin/products/4321/variations/91`. Calling it returns `404` with the message `No such endpoint`."
+            "description": "A path such as `/api/v4/admin/products/4321/variations/91`. A `GET` on it returns that one variant, with its `transaction_no`."
           }
         }
       },
@@ -66415,7 +66415,7 @@
           },
           "total_records": {
             "type": "integer",
-            "description": "How many records are stamped with the number. A record you delete stays counted."
+            "description": "How many records are stamped with the number. A record in the trash stays counted; a record deleted for good does not."
           },
           "url": {
             "type": "string",
@@ -66454,7 +66454,7 @@
           },
           "items_url": {
             "type": "string",
-            "description": "The path of [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction) for this type. Present only when `count` is above `0`. A space in the number appears as `+`, and the link then returns `404`."
+            "description": "The path of [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction) for this type. Present only when `count` is above `0`. A space in the number appears as `+`, and the link then returns `200` with no records."
           }
         }
       },
@@ -67167,14 +67167,14 @@
             "items": {
               "type": "integer"
             },
-            "description": "Customer `id` values, from [List customers](/api-reference/customers/list-customers). Send it with `type` `selected`. With `type` `everyone`, even an empty list is rejected with `400` and the reason `not_applicable`."
+            "description": "Customer `id` values, from [List customers](/api-reference/customers/list-customers). Send it with `type` `selected`. With `type` `everyone`, an empty list is accepted."
           },
           "customer_groups": {
             "type": "array",
             "items": {
               "type": "integer"
             },
-            "description": "Customer group `id` values, from [List customer groups](/api-reference/customer-groups/list-customer-groups). Send it with `type` `selected`. With `type` `everyone`, even an empty list is rejected with `400` and the reason `not_applicable`."
+            "description": "Customer group `id` values, from [List customer groups](/api-reference/customer-groups/list-customer-groups). Send it with `type` `selected`. With `type` `everyone`, an empty list is accepted."
           }
         }
       },
@@ -67238,7 +67238,7 @@
                     },
                     "code": {
                       "type": "string",
-                      "description": "Why it was rejected, such as `unknown_field`, `read_only`, `too_long` or `not_applicable`."
+                      "description": "Why it was rejected, such as `unknown_field`, `read_only`, `too_long` or `invalid_type`."
                     },
                     "message": {
                       "type": [

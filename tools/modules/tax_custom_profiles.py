@@ -43,9 +43,11 @@ NOTES = [
     "  until `offset` reaches `pagination.total`. `sort` takes `id` or `name`, and sorts in descending order either way.\n"
     "  `q`, `search` and `field_metadata` are accepted and ignored.",
     "**Row reads and updates return an `ETag`; the store never returns `304`.** Retrieve and update return an `ETag`\n"
-    "  header. Send it as `If-Match` on an update, and the update is rejected with `409` if the profile changed since\n"
-    "  you read it. The SDK functions send no `If-Match`. `If-None-Match` is ignored: a retrieve with the current\n"
-    "  `ETag` still returns `200` and the full body. The listing and the create return no `ETag`.",
+    "  header. Send the `ETag` from a retrieve as `If-Match` on an update, and the update is rejected with `409` if\n"
+    "  the profile changed since you read it. The `ETag` an update returns is not the one a retrieve returns: sent\n"
+    "  as `If-Match`, it is rejected with `409`, so retrieve the profile again before your next update. The SDK\n"
+    "  functions send no `If-Match`. `If-None-Match` is ignored: a retrieve with the current `ETag` still returns\n"
+    "  `200` and the full body. The listing and the create return no `ETag`.",
     "**There is no `HEAD` call for custom tax profiles.** `HEAD` and `OPTIONS` return `404` on the listing and on a\n"
     "  profile, whether or not a profile has that `custom_profile_id`. The profile path also accepts `PATCH`, which\n"
     "  changes only the fields you send and returns `200` with an `ETag`; the SDKs have no function for it. A request\n"
@@ -64,7 +66,7 @@ CUSTOM_PROFILE_ID = {
 IF_MATCH = {
     "name": "If-Match",
     "in": "header",
-    "description": "Optional. The profile's current `ETag`, from your last retrieve or update of it. If the profile changed since then, the update is rejected with `409`. The SDK functions do not send it.",
+    "description": "Optional. The profile's current `ETag`, from your last retrieve of it. If the profile changed since then, the update is rejected with `409`. The `ETag` an update returns is rejected with `409` too. The SDK functions do not send it.",
     "schema": {"type": "string", "example": "\"5d41402abc4b2a76b9719d911017c592\""},
 }
 
@@ -230,7 +232,7 @@ ENDPOINTS = [
         "body": {"schema": WRITE_BODY, "example": {"custom_profile": {"name": "Wholesale and trade customers", "description": "Rates for wholesale and trade accounts"}}},
         "responses": {
             "200": {
-                "description": "The custom tax profile after the replace, without `rules`. The response has an `ETag` header.",
+                "description": "The custom tax profile after the replace, without `rules`. The response has an `ETag` header, which is not the one a retrieve returns: sent back as `If-Match`, it is rejected with `409`.",
                 "schema": ROW_RESPONSE,
                 "example": {"custom_profile": SAMPLE_REPLACED},
             },
@@ -240,7 +242,7 @@ ENDPOINTS = [
                 "example": NAME_REQUIRED,
             },
             "409": {
-                "description": "Your `If-Match` value is not the profile's current `ETag`. The code is `conflict`.",
+                "description": "Your `If-Match` value is not the profile's current `ETag`, or it is the `ETag` an update returned. The code is `conflict`.",
                 "schema": ERROR_REF,
             },
         },

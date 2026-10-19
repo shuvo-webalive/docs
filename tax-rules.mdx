@@ -48,10 +48,11 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   collection. The request after that is handled normally. So a delete sent straight after a `404`
   returns that `404` and deletes nothing. Check the status of every call, and send the delete again
   when it returns the previous call's error.
-- **A `200` does not always mean the call worked.** A method these paths do not handle, such as
-  `OPTIONS`, returns `200` with `{"isSuccess": false, "message": "Invalid API Request"}` instead
-  of `405`, and stores nothing. A `HEAD` request for one rule returns `200` even when no rule has the
-  `tax_rule_id` you send; use [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule) to check that a rule exists.
+- **A `200` does not always mean the call worked.** A method these paths do not handle returns `200`
+  with `{"isSuccess": false, "message": "Invalid API Request"}` instead of `405`, and stores
+  nothing. `OPTIONS` returns `404` on the list and on a rule. A `HEAD` request for one rule returns
+  `200` even when no rule has the `tax_rule_id` you send; use [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule)
+  to check that a rule exists.
 - **Tax rules live at `/admin/tax_rules`, not under `/admin/tax/`.** `/admin/tax/custom_rules`, the
   path an older API collection used, returns `404` with the error code `not_found` and a message that
   starts `Unknown tax path`.
