@@ -8,11 +8,11 @@
     },
     "create_tax_custom_profile": {
       "function": "createTaxCustomProfile",
-      "code": "final response = await client.taxCustomProfiles.createTaxCustomProfile({\n  'custom_profile': {\n    'name': 'Wholesale customers',\n    'description': 'Rates for wholesale accounts',\n  },\n});\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint(customProfile['id']);"
+      "code": "final response = await client.taxCustomProfiles.createTaxCustomProfile(\n  {\n    'custom_profile': {\n      'name': 'Wholesale customers',\n      'description': 'Rates for wholesale accounts',\n    },\n    'transaction_no': 'TXN-IMPORT-0001',\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint(customProfile['id']);"
     },
     "get_tax_custom_profile": {
       "function": "getTaxCustomProfile",
-      "code": "final response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['rate_rules_count']}');\nfinal rateRules = customProfile['rate_rules'] as List;\nfor (final rateRule in rateRules) {\n  print('${(rateRule as Map)['id']} ${rateRule['name']}');\n}"
+      "code": "final response = await client.taxCustomProfiles.getTaxCustomProfile(1);\nfinal customProfile = (response.map as Map)['custom_profile'] as Map;\nprint('${customProfile['name']} ${customProfile['rules_count']}');\nfinal rules = customProfile['rules'] as List;\nfor (final rule in rules) {\n  print('${(rule as Map)['id']} ${rule['name']}');\n}"
     },
     "update_tax_custom_profile": {
       "function": "updateTaxCustomProfile",

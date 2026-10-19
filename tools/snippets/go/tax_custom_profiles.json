@@ -4,23 +4,23 @@
   "endpoints": {
     "list_tax_custom_profiles": {
       "function": "ListTaxCustomProfiles",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().ListTaxCustomProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"custom_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rate_rules_count\"])\n}"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().ListTaxCustomProfiles(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"custom_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"tax_code\"], profile[\"rules_count\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
     },
     "create_tax_custom_profile": {
       "function": "CreateTaxCustomProfile",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().CreateTaxCustomProfile(ctx, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale customers\", \"description\": \"Rates for wholesale accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().CreateTaxCustomProfile(ctx, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale customers\", \"description\": \"Rates for wholesale accounts\"},\n\t\"transaction_no\": \"TXN-IMPORT-0001\",\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rules_count\"])\n"
     },
     "get_tax_custom_profile": {
       "function": "GetTaxCustomProfile",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().GetTaxCustomProfile(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], len(profile[\"rate_rules\"].([]any)))"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().GetTaxCustomProfile(ctx, 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"tax_code\"], profile[\"description\"], resp.Headers[\"Etag\"])\nfor _, row := range profile[\"rules\"].([]any) {\n\trule := row.(map[string]any)\n\tfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"zones_count\"])\n}\n"
     },
     "update_tax_custom_profile": {
       "function": "UpdateTaxCustomProfile",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().UpdateTaxCustomProfile(ctx, 7, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale and trade customers\", \"description\": \"Rates for wholesale and trade accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().UpdateTaxCustomProfile(ctx, 7, map[string]any{\n\t\"custom_profile\": map[string]any{\"name\": \"Wholesale and trade customers\", \"description\": \"Rates for wholesale and trade accounts\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"custom_profile\"].(map[string]any)\nfmt.Println(profile[\"name\"], profile[\"description\"], profile[\"last_updated_on\"])\n"
     },
     "delete_tax_custom_profile": {
       "function": "DeleteTaxCustomProfile",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().DeleteTaxCustomProfile(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxCustomProfiles().DeleteTaxCustomProfile(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
     }
   }
 }
