@@ -37837,6 +37837,127 @@
         ]
       }
     },
+    "/admin/products": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Create a product",
+        "operationId": "create_product",
+        "description": "Send the fields at the top level of the body, not inside `product`. `name` and `base_price` are required. `sku` must not belong to another product; leave it out and the store gives the product an `sku` made of `PRODUCT-` and 12 hexadecimal characters. `name` does not have to be unique: a product with a name another product has gets a different `urls.url`. `product_type` defaults to `physical`. `parents` takes the `id` of each category to file the product under, as a number or as `{\"id\": <category id>}`; [List categories](/api-reference/categories/list-categories) returns each category's `id`. The body takes the same fields as [Update a product](/api-reference/products/update-a-product). To tag the product with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` in the body.",
+        "parameters": [
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "description": "Optional. A transaction number to tag this create with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.",
+            "schema": {
+              "type": "string",
+              "example": "IMPORT-2026-10-18"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new product, with all 71 fields that [Retrieve a product](/api-reference/products/retrieve-a-product) returns. `status` is `active`, and `id` is the value the other calls take as `product_id`. `transaction_no` holds the number you sent, or `null` when you sent none. The example shows a selection of the fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                },
+                "example": {
+                  "product": {
+                    "id": 102,
+                    "name": "Blue Mug",
+                    "sku": "MUG-BLUE",
+                    "status": "active",
+                    "transaction_no": "IMPORT-2026-10-18",
+                    "product_type": "physical",
+                    "base_price": 12.5
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`name` is missing (message `Product name is required`), `base_price` is missing (message `Product base price is required`), or the body is wrapped in `product` (message `product: is not a recognised product field`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another product already has that `sku`. The message is `Product SKU already exists in another product`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/products\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Blue Mug\",\n    \"sku\": \"MUG-BLUE\",\n    \"base_price\": 12.5,\n    \"transaction_no\": \"IMPORT-2026-10-18\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.create_product({\n    \"name\": \"Blue Mug\",\n    \"sku\": \"MUG-BLUE\",\n    \"base_price\": 12.5,\n    \"transaction_no\": \"IMPORT-2026-10-18\",\n}, transaction_no=\"IMPORT-2026-10-18\")\nproduct = response.map[\"product\"]\nprint(product[\"id\"], product[\"sku\"], product[\"status\"], product[\"transaction_no\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.createProduct({\n    name: 'Blue Mug',\n    sku: 'MUG-BLUE',\n    base_price: 12.5,\n    transaction_no: 'IMPORT-2026-10-18',\n}, 'IMPORT-2026-10-18');\nconst product = response.map.product;\nconsole.log(product.id, product.sku, product.status, product.transaction_no);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::createProduct($client, [\n    'name' => 'Blue Mug', 'sku' => 'MUG-BLUE', 'base_price' => 12.5, 'transaction_no' => 'IMPORT-2026-10-18',\n], transactionNo: 'IMPORT-2026-10-18');\n\n$product = $response->map['product'];\necho $product['id'], ' ', $product['sku'], ' ', $product['status'], ' ', $product['transaction_no'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().createProduct(Map.of(\n        \"name\", \"Blue Mug\", \"sku\", \"MUG-BLUE\", \"base_price\", 12.5, \"transaction_no\", \"IMPORT-2026-10-18\"),\n        \"IMPORT-2026-10-18\");\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nSystem.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"sku\") + \" \" + product.get(\"status\"));\nSystem.out.println(product.get(\"base_price\") + \" \" + product.get(\"transaction_no\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.CreateProductAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Blue Mug\", [\"sku\"] = \"MUG-BLUE\", [\"base_price\"] = 12.5, [\"transaction_no\"] = \"IMPORT-2026-10-18\",\n}, transactionNo: \"IMPORT-2026-10-18\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"id\"]} {product[\"sku\"]} {product[\"status\"]} {product[\"transaction_no\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.createProduct(\n  {\n    'name': 'Blue Mug',\n    'sku': 'MUG-BLUE',\n    'base_price': 12.5,\n    'transaction_no': 'IMPORT-2026-10-18',\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['id']} ${product['sku']} ${product['transaction_no']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().CreateProduct(ctx, map[string]any{\n\t\"name\":           \"Blue Mug\",\n\t\"sku\":            \"MUG-BLUE\",\n\t\"base_price\":     12.5,\n\t\"transaction_no\": \"IMPORT-2026-10-18\",\n}, \"IMPORT-2026-10-18\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nfmt.Println(product[\"id\"], product[\"sku\"], product[\"status\"], product[\"transaction_no\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductCreateInput"
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/products/{product_id}": {
       "get": {
         "tags": [
@@ -37844,13 +37965,13 @@
         ],
         "summary": "Retrieve a product",
         "operationId": "get_product",
-        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none.",
+        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none. A product you deleted is still returned, with `status` set to `trashed`.",
         "parameters": [
           {
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -38032,7 +38153,7 @@
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -38121,6 +38242,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "The product is in the trash. The message is `cannot modify a product in the trash`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
           }
         },
         "x-codeSamples": [
@@ -38175,6 +38306,400 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Patch a product",
+        "operationId": "patch_product",
+        "description": "Send the fields to change at the top level of the body, not inside `product`. This call takes the same body as [Update a product](/api-reference/products/update-a-product) and merges it the same way: a field you leave out keeps its value, inside nested blocks too. A body that changes nothing, `{}` included, returns `200` with the product unchanged. A product in the trash is rejected with `409`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product after the change. When something changed, `version`, `updated_at`, `last_updated_on` and `last_updated_by` change too. The example shows a selection of the fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
+                },
+                "example": {
+                  "product": {
+                    "id": 101,
+                    "name": "Cotton T-Shirt",
+                    "sku": "TSHIRT-001",
+                    "heading": "Cotton T-Shirt",
+                    "invoice_note": "",
+                    "available": true,
+                    "password_protected": false,
+                    "password": "",
+                    "base_price": 27.5,
+                    "cost_price": 12.0,
+                    "is_on_sale": false,
+                    "sale_price": 0.0,
+                    "version": 8,
+                    "product_pricing_and_stock": {
+                      "track_inventory": true,
+                      "available_stock": 35,
+                      "low_level_stock": 2,
+                      "warehouses": [
+                        {
+                          "warehouse": "1",
+                          "stock": 10
+                        },
+                        {
+                          "warehouse": "4",
+                          "stock": 25
+                        }
+                      ],
+                      "is_multi_location_enabled": true,
+                      "locations": [
+                        {
+                          "warehouse": 1,
+                          "warehouse_name": "Sydney Warehouse",
+                          "stock": 10,
+                          "low_stock_level": 2,
+                          "is_default": true
+                        },
+                        {
+                          "warehouse": 4,
+                          "warehouse_name": "Sydney Store Room",
+                          "stock": 25,
+                          "low_stock_level": 5,
+                          "is_default": false
+                        }
+                      ]
+                    },
+                    "advanced": {
+                      "advance_information": {
+                        "mpn": "",
+                        "barcode": "",
+                        "hs_code": ""
+                      }
+                    },
+                    "product_variation": {},
+                    "has_variations": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `product`. This rejection has its own shape: `request_id`, `status` set to `400`, `code` set to `validation_error`, `message`, and an `errors` list in which each entry gives a `field` and a `code` such as `unknown_field`. Every other rejection returns the usual `error` object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ProductError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProductValidationError"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The product is in the trash. The message is `cannot modify a product in the trash`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/products/101\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"base_price\": 27.5\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.patch_product(101, {\"base_price\": 27.5})\nproduct = response.map[\"product\"]\nprint(product[\"name\"], product[\"base_price\"], product[\"version\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.patchProduct(101, {base_price: 27.5});\nconsole.log(response.map.product.base_price, response.map.product.version);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::patchProduct($client, 101, ['base_price' => 27.5]);\n\n$product = $response->map['product'];\necho $product['name'], ': ', $product['base_price'], ', version ', $product['version'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().patchProduct(101, Map.of(\"base_price\", 27.5));\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nSystem.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"base_price\") + \" \" + product.get(\"version\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.PatchProductAsync(101, new Dictionary<string, object?>\n{\n    [\"base_price\"] = 27.5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nConsole.WriteLine($\"{product[\"name\"]} {product[\"base_price\"]} {product[\"version\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.products.patchProduct(101, {'base_price': 27.5});\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['name']} ${product['base_price']} ${product['version']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().PatchProduct(ctx, 101, map[string]any{\"base_price\": 27.5}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nfmt.Println(product[\"name\"], product[\"base_price\"], product[\"version\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductInput"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Delete a product",
+        "operationId": "delete_product",
+        "description": "Moves the product to the trash and returns `204` with no body. The product is not deleted permanently: [Retrieve a product](/api-reference/products/retrieve-a-product) still returns it, with `status` set to `trashed`. Every write to it is then rejected with `409`, including [Update a product](/api-reference/products/update-a-product), [Patch a product](/api-reference/products/patch-a-product) and [Import a product's reviews](/api-reference/products/import-a-products-reviews). Deleting it again returns `404`. Query parameters are ignored, `permanent` included.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The product is in the trash. No body."
+          },
+          "404": {
+            "description": "The product is already in the trash, for example because you already deleted it. The message is `Product already in trash`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/products/101\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.delete_product(101)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.deleteProduct(101);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::deleteProduct($client, 101);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().deleteProduct(101);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.DeleteProductAsync(101);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.deleteProduct(101);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().DeleteProduct(ctx, 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
+    "/admin/products/{product_id}/reviews": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Import a product's reviews",
+        "operationId": "import_product_reviews",
+        "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from is skipped, with no error. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "description": "Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.",
+            "schema": {
+              "type": "string",
+              "example": "IMPORT-2026-10-18"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Every review the product has, oldest first, in `product.reviews`, not only the ones you sent. The reviews you added are last, and a skipped review adds nothing. `rating` reads back as a decimal number, such as `5.0`. In the raw response text, the `@` in each `email` is written as `\\u0040`; a JSON parser turns it back into `@`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/components/schemas/ProductReviews"
+                    }
+                  }
+                },
+                "example": {
+                  "product": {
+                    "reviews": [
+                      {
+                        "id": 31,
+                        "productId": 101,
+                        "name": "Alex Kim",
+                        "email": "alex@example.com",
+                        "review": null,
+                        "rating": 4.0,
+                        "status": "pending",
+                        "files": []
+                      },
+                      {
+                        "id": 32,
+                        "productId": 101,
+                        "name": "Sam Lee",
+                        "email": "sam@example.com",
+                        "review": "Great shirt",
+                        "rating": 5.0,
+                        "status": "approved",
+                        "files": []
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`product` is missing (message `product is required`); `reviews` is empty (message `reviews is required`); a review has no `name`, `email` or `rating` (messages `name is required`, `email is required` and `rating is required`); a `rating` is outside `1` to `5`, such as `6`; or a review sends `date`. A `date` in the `yyyy-MM-ddTHH:mm:ss` format is rejected with the message `Product reviews could not be imported`, and in any other format with the message `dateCreated must be a valid date (yyyy-MM-dd'T'HH:mm:ss)`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The product is in the trash.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/products/101/reviews\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product\": {\n      \"reviews\": [\n        {\n          \"name\": \"Sam Lee\",\n          \"email\": \"sam@example.com\",\n          \"rating\": 5,\n          \"review\": \"Great shirt\",\n          \"status\": \"approved\"\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.import_product_reviews(101, {\"product\": {\"reviews\": [\n    {\"name\": \"Sam Lee\", \"email\": \"sam@example.com\", \"rating\": 5, \"review\": \"Great shirt\", \"status\": \"approved\"},\n]}}, transaction_no=\"IMPORT-2026-10-18\")\nfor review in response.map[\"product\"][\"reviews\"]:\n    print(review[\"id\"], review[\"name\"], review[\"rating\"], review[\"status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.importProductReviews(101, {\n    product: {\n        reviews: [{name: 'Sam Lee', email: 'sam@example.com', rating: 5, review: 'Great shirt', status: 'approved'}],\n    },\n}, 'IMPORT-2026-10-18');\nfor (const review of response.map.product.reviews) {\n    console.log(review.id, review.name, review.rating, review.status);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::importProductReviews($client, 101, ['product' => ['reviews' => [\n    ['name' => 'Sam Lee', 'email' => 'sam@example.com', 'rating' => 5, 'review' => 'Great shirt', 'status' => 'approved'],\n]]], transactionNo: 'IMPORT-2026-10-18');\n\nforeach ($response->map['product']['reviews'] as $review) {\n    echo $review['id'], ' ', $review['name'], ' ', $review['rating'], ' ', $review['status'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().importProductReviews(101, Map.of(\"product\", Map.of(\"reviews\", List.of(\n        Map.of(\"name\", \"Sam Lee\", \"email\", \"sam@example.com\", \"rating\", 5, \"review\", \"Great shirt\", \"status\", \"approved\")))),\n        \"IMPORT-2026-10-18\");\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nfor (Object row : (List<?>) product.get(\"reviews\")) {\n    Map<?, ?> review = (Map<?, ?>) row;\n    System.out.println(review.get(\"id\") + \" \" + review.get(\"name\") + \" \" + review.get(\"rating\") + \" \" + review.get(\"status\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.ImportProductReviewsAsync(101, new Dictionary<string, object?>\n{\n    [\"product\"] = new Dictionary<string, object?>\n    {\n        [\"reviews\"] = new object[]\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Sam Lee\", [\"email\"] = \"sam@example.com\", [\"rating\"] = 5,\n                [\"review\"] = \"Great shirt\", [\"status\"] = \"approved\",\n            },\n        },\n    },\n}, transactionNo: \"IMPORT-2026-10-18\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nforeach (var review in ((IReadOnlyList<object?>)product[\"reviews\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{review[\"id\"]} {review[\"name\"]} {review[\"rating\"]} {review[\"status\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.importProductReviews(\n  101,\n  {\n    'product': {\n      'reviews': [\n        {\n          'name': 'Sam Lee',\n          'email': 'sam@example.com',\n          'rating': 5,\n          'review': 'Great shirt',\n          'status': 'approved',\n        },\n      ],\n    },\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal product = (response.map as Map)['product'] as Map;\nfor (final review in product['reviews'] as List) {\n  print('${(review as Map)['id']} ${review['name']} ${review['status']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().ImportProductReviews(ctx, 101, map[string]any{\n\t\"product\": map[string]any{\"reviews\": []any{\n\t\tmap[string]any{\"name\": \"Sam Lee\", \"email\": \"sam@example.com\", \"rating\": 5, \"review\": \"Great shirt\", \"status\": \"approved\"},\n\t}},\n}, \"IMPORT-2026-10-18\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"product\"].(map[string]any)[\"reviews\"].([]any) {\n\treview := row.(map[string]any)\n\tfmt.Println(review[\"id\"], review[\"name\"], review[\"rating\"], review[\"status\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductReviewsImportInput"
+              }
+            }
+          }
+        }
       }
     },
     "/admin/products/{product_id}/stock": {
@@ -38190,7 +38715,7 @@
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -38296,7 +38821,7 @@
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -38414,7 +38939,7 @@
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`. [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -39395,7 +39920,7 @@
         ],
         "summary": "Delete a variation type",
         "operationId": "delete_variation",
-        "description": "Deletes the type permanently and returns `204` with no body. The type leaves the listing, and retrieving or deleting it again returns `404`. A type that has options is deleted only with `cascade=true`, which deletes its options too.",
+        "description": "Deletes the type permanently and returns `204` with no body. The type leaves the listing, and retrieving or deleting it again returns `404`. A type that has options is deleted only with `cascade=true`, which deletes its options too. A type that a product's variants use cannot be deleted, even with `cascade=true` and even after that product is moved to the trash.",
         "parameters": [
           {
             "name": "variation_id",
@@ -39441,7 +39966,7 @@
             }
           },
           "409": {
-            "description": "The type still has options and you did not send `cascade=true`. The message is `This variation type still has N option(s).`, and `details[0]` names the field `options` with the reason `in_use` and the message `send ?cascade=true to delete them with the type`.",
+            "description": "The type still has options and you did not send `cascade=true`: the message is `This variation type still has N option(s).`, and `details[0]` names the field `options` with the reason `in_use` and the message `send ?cascade=true to delete them with the type`. Or a product's variants use the type: the message is `This variation type is used by N product(s).` and `details[0].code` is `in_use`, with or without `cascade=true`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -39605,7 +40130,7 @@
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -39675,6 +40200,123 @@
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().ListProductVariations(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variations\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfor _, item := range group[\"variants\"].([]any) {\n\t\tvariant := item.(map[string]any)\n\t\tfmt.Println(group[\"product_key\"], variant[\"variation_id\"], variant[\"key\"], variant[\"available\"])\n\t}\n}\n"
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Import a product's variants",
+        "operationId": "import_product_variations",
+        "description": "Send `variations` at the top level of the body, with no wrapper. Each group's `product_key` names the product's variation types, joined with `/`, such as `Size/Colour`, and each variant's `key` names one option label per type, joined the same way, such as `Small/Red`. A `key` the product already has changes that variant in place and keeps its `variation_id`; a new `key` adds a variant beside the others. `product_key` is matched to the `name` of the store's variation types and `key` to their option labels: a label a type does not have yet is added to the type itself, for the whole store. Each variant needs `key` and takes `name`, `sku`, `custom_sku`, `title`, `summary`, `description`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory`, `ordering`, `dimensions`, `badges` and `images`. Unknown keys at the top level or in a group are ignored. To tag the variants with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `variations`. Pass the product's `id` as `product_id`: [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "X-Transaction-No",
+            "in": "header",
+            "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. The variants you read back do not show it.",
+            "schema": {
+              "type": "string",
+              "example": "IMPORT-2026-10-18"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](/api-reference/variations/list-a-products-variants). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. No variant shows the transaction number.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationImportResult"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "2 of 2 variants imported successfully",
+                  "total_variants": 2
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`variations` is missing or empty, or the body is wrapped in another key (message `variations field is required`); a group's `variants` is empty (message `variations[0].variants must be a non-empty array`); a variant has no `key` (message `variations[0].variants[0].key: is required`); or a variant sends `available`, `is_base` or `tiered_pricing` (reason `unknown_field`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`product_key` names other variation types than the ones the product's variants already use, and nothing is imported. The message starts with `this product's variants use the option types`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/products/4321/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"variations\": [\n      {\n        \"product_key\": \"Size\",\n        \"variants\": [\n          {\n            \"key\": \"Small\",\n            \"name\": \"Cotton T-Shirt Small\",\n            \"sku\": \"TSHIRT-001-S\",\n            \"pricing\": {\n              \"base_price\": 25.0\n            }\n          },\n          {\n            \"key\": \"Medium\",\n            \"name\": \"Cotton T-Shirt Medium\",\n            \"sku\": \"TSHIRT-001-M\",\n            \"pricing\": {\n              \"base_price\": 25.0\n            }\n          }\n        ]\n      }\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.import_product_variations(4321, {\n    \"variations\": [{\n        \"product_key\": \"Size\",\n        \"variants\": [\n            {\"key\": \"Small\", \"name\": \"Cotton T-Shirt Small\", \"sku\": \"TSHIRT-001-S\", \"pricing\": {\"base_price\": 25.0}},\n            {\"key\": \"Medium\", \"name\": \"Cotton T-Shirt Medium\", \"sku\": \"TSHIRT-001-M\", \"pricing\": {\"base_price\": 25.0}},\n        ],\n    }],\n}, transaction_no=\"IMPORT-2026-10-18\")\nprint(response.map[\"status\"], response.map[\"message\"], response.map[\"total_variants\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.importProductVariations(4321, {\n    variations: [{\n        product_key: 'Size',\n        variants: [\n            {key: 'Small', name: 'Cotton T-Shirt Small', sku: 'TSHIRT-001-S', pricing: {base_price: 25.0}},\n            {key: 'Medium', name: 'Cotton T-Shirt Medium', sku: 'TSHIRT-001-M', pricing: {base_price: 25.0}},\n        ],\n    }],\n}, 'IMPORT-2026-10-18');\nconsole.log(response.map.status, response.map.message, response.map.total_variants);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::importProductVariations($client, 4321, ['variations' => [['product_key' => 'Size', 'variants' => [\n    ['key' => 'Small', 'name' => 'Cotton T-Shirt Small', 'sku' => 'TSHIRT-001-S', 'pricing' => ['base_price' => 25.0]],\n    ['key' => 'Medium', 'name' => 'Cotton T-Shirt Medium', 'sku' => 'TSHIRT-001-M', 'pricing' => ['base_price' => 25.0]],\n]]]], transactionNo: 'IMPORT-2026-10-18');\n\necho $response->map['message'], ' (', $response->map['total_variants'], ' variants)', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().importProductVariations(4321, Map.of(\"variations\", List.of(Map.of(\n        \"product_key\", \"Size\", \"variants\", List.of(\n                Map.of(\"key\", \"Small\", \"name\", \"Cotton T-Shirt Small\", \"sku\", \"TSHIRT-001-S\",\n                        \"pricing\", Map.of(\"base_price\", 25.0)),\n                Map.of(\"key\", \"Medium\", \"name\", \"Cotton T-Shirt Medium\", \"sku\", \"TSHIRT-001-M\",\n                        \"pricing\", Map.of(\"base_price\", 25.0)))))),\n        \"IMPORT-2026-10-18\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"total_variants\"));\nSystem.out.println(body.get(\"message\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar pricing = new Dictionary<string, object?> { [\"base_price\"] = 25.0 };\nvar response = await client.Variations.ImportProductVariationsAsync(4321, new Dictionary<string, object?>\n{\n    [\"variations\"] = new object[]\n    {\n        new Dictionary<string, object?>\n        {\n            [\"product_key\"] = \"Size\", [\"variants\"] = new object[]\n            {\n                new Dictionary<string, object?> { [\"key\"] = \"Small\", [\"name\"] = \"Cotton T-Shirt Small\", [\"sku\"] = \"TSHIRT-001-S\", [\"pricing\"] = pricing },\n                new Dictionary<string, object?> { [\"key\"] = \"Medium\", [\"name\"] = \"Cotton T-Shirt Medium\", [\"sku\"] = \"TSHIRT-001-M\", [\"pricing\"] = pricing },\n            },\n        },\n    },\n}, transactionNo: \"IMPORT-2026-10-18\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"message\"]} {body[\"total_variants\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.importProductVariations(\n  4321,\n  {\n    'variations': [\n      {\n        'product_key': 'Size',\n        'variants': [\n          {\n            'key': 'Small',\n            'name': 'Cotton T-Shirt Small',\n            'sku': 'TSHIRT-001-S',\n            'pricing': {'base_price': 25.0},\n          },\n          {\n            'key': 'Medium',\n            'name': 'Cotton T-Shirt Medium',\n            'sku': 'TSHIRT-001-M',\n            'pricing': {'base_price': 25.0},\n          },\n        ],\n      },\n    ],\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal result = response.map as Map;\nprint('${result['message']} ${result['total_variants']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().ImportProductVariations(ctx, 4321, map[string]any{\n\t\"variations\": []any{map[string]any{\n\t\t\"product_key\": \"Size\",\n\t\t\"variants\": []any{\n\t\t\tmap[string]any{\"key\": \"Small\", \"name\": \"Cotton T-Shirt Small\", \"sku\": \"TSHIRT-001-S\", \"pricing\": map[string]any{\"base_price\": 25.0}},\n\t\t\tmap[string]any{\"key\": \"Medium\", \"name\": \"Cotton T-Shirt Medium\", \"sku\": \"TSHIRT-001-M\", \"pricing\": map[string]any{\"base_price\": 25.0}},\n\t\t},\n\t}},\n}, \"IMPORT-2026-10-18\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"message\"], body[\"total_variants\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VariationImportInput"
+              }
+            }
+          }
+        }
       }
     },
     "/admin/products/{product_id}/variations/bulk": {
@@ -39690,7 +40332,7 @@
             "name": "product_id",
             "in": "path",
             "required": true,
-            "description": "The product's `id`.",
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.",
             "schema": {
               "type": "integer"
             }
@@ -62048,7 +62690,7 @@
       },
       "Product": {
         "type": "object",
-        "description": "One product: 69 fields, the same set on every product.",
+        "description": "One product: 71 fields, the same set on every product.",
         "properties": {
           "id": {
             "type": "integer",
@@ -62062,7 +62704,7 @@
           },
           "status": {
             "type": "string",
-            "description": "Read-only: sending it is rejected with `400` and the reason `unknown_field`."
+            "description": "`active` on a new product and `trashed` on a product you deleted. Read-only: sending it is rejected with `400` and the reason `unknown_field`."
           },
           "urls": {
             "$ref": "#/components/schemas/ProductUrls",
@@ -62076,7 +62718,7 @@
             "items": {
               "$ref": "#/components/schemas/ProductParent"
             },
-            "description": "The categories the product is filed under. In a write, send their ids as a list of numbers."
+            "description": "The categories the product is filed under. In a write, send the `id` of each category."
           },
           "created_by": {
             "$ref": "#/components/schemas/ProductNamedReference",
@@ -62094,13 +62736,17 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "The product's transaction number, or `null` when it has none."
           },
           "product_type": {
             "type": "string"
           },
           "custom_type": {
             "type": "string"
+          },
+          "is_virtual": {
+            "type": "boolean"
           },
           "invoice_note": {
             "type": "string"
@@ -62291,6 +62937,17 @@
             "items": {
               "$ref": "#/components/schemas/ProductLink"
             }
+          },
+          "bundle": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProductBundle"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The product's bundle settings, or `null` when the product is not a bundle."
           },
           "seo_configs": {
             "type": "array",
@@ -62773,6 +63430,21 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "ProductBundle": {
+        "type": "object",
+        "description": "The bundle settings of a product that is a bundle.",
+        "properties": {
+          "price_fixed": {
+            "type": "boolean"
+          },
+          "quantity_flexible": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array"
           }
         }
       },
@@ -63268,13 +63940,17 @@
       },
       "ProductInput": {
         "type": "object",
-        "description": "Send these fields at the top level of the body, not inside `product`. Only the fields you send change, inside nested blocks too. A read-only field from [Retrieve a product](/api-reference/products/retrieve-a-product) is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.",
+        "description": "The body of `PUT` and `PATCH`. Send these fields at the top level of the body, not inside `product`. Only the fields you send change, inside nested blocks too. A read-only field from [Retrieve a product](/api-reference/products/retrieve-a-product) is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.",
         "properties": {
           "name": {
             "type": "string"
           },
           "sku": {
             "type": "string"
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."
           },
           "heading": {
             "type": "string"
@@ -63284,6 +63960,9 @@
           },
           "custom_type": {
             "type": "string"
+          },
+          "is_virtual": {
+            "type": "boolean"
           },
           "invoice_note": {
             "type": "string"
@@ -63377,9 +64056,22 @@
           "parents": {
             "type": "array",
             "items": {
-              "type": "integer"
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "The category's `id`."
+                    }
+                  }
+                }
+              ]
             },
-            "description": "The ids of the categories to file the product under."
+            "description": "The `id` of each category to file the product under, as a number or as `{\"id\": <category id>}`."
           },
           "related_products": {
             "type": "array"
@@ -63523,7 +64215,7 @@
       },
       "ProductError": {
         "type": "object",
-        "description": "Rejections return this shape. A method a path does not support is rejected too: `HEAD` on a product returns `404` although its `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.",
+        "description": "Rejections return this shape, except a `PATCH` body wrapped in `product`, which returns `ProductValidationError`. A method a path does not support is rejected too: `HEAD` on `/api/v4/admin/products`, on a product and on a product's `reviews` returns `404`, although a product's `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.",
         "properties": {
           "error": {
             "type": "object",
@@ -63565,6 +64257,281 @@
               "request_id": {
                 "type": "string",
                 "description": "Identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "ProductCreateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "base_price"
+        ],
+        "description": "The body of a create. Send these fields at the top level of the body, not inside `product`: a body wrapped in `product` is rejected with `400`. `name` and `base_price` are required, and `sku` must not belong to another product.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."
+          },
+          "heading": {
+            "type": "string"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "custom_type": {
+            "type": "string"
+          },
+          "is_virtual": {
+            "type": "boolean"
+          },
+          "invoice_note": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "available_on_date_range": {
+            "type": "boolean"
+          },
+          "available_from_date": {
+            "type": "string",
+            "description": "Sent on its own, it is ignored."
+          },
+          "available_to_date": {
+            "type": "string",
+            "description": "Sent on its own, it is ignored."
+          },
+          "available_for": {
+            "type": "string"
+          },
+          "password_protected": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string",
+            "description": "Send `***` to keep the stored password. Sent on its own, it is ignored."
+          },
+          "available_on_weekdays": {
+            "$ref": "#/components/schemas/ProductAvailableOnWeekdays"
+          },
+          "base_price": {
+            "type": "number"
+          },
+          "cost_price": {
+            "type": "number"
+          },
+          "compare_at_price": {
+            "type": "number"
+          },
+          "is_on_sale": {
+            "type": "boolean"
+          },
+          "sale_price": {
+            "type": "number"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "featured_label": {
+            "type": "string"
+          },
+          "is_new": {
+            "type": "boolean"
+          },
+          "product_properties": {
+            "$ref": "#/components/schemas/ProductProperties",
+            "description": "Write the dimensions here."
+          },
+          "schedule_type": {
+            "type": "string"
+          },
+          "custom_schedule_option": {
+            "type": "string"
+          },
+          "tax_settings": {
+            "$ref": "#/components/schemas/ProductTaxSettings"
+          },
+          "variation_price_display": {
+            "$ref": "#/components/schemas/ProductVariationPriceDisplay"
+          },
+          "administrative_status": {
+            "type": "boolean"
+          },
+          "product_summary": {
+            "type": "string"
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "product_pricing_and_stock": {
+            "$ref": "#/components/schemas/ProductPricingAndStock"
+          },
+          "image_and_video": {
+            "$ref": "#/components/schemas/ProductImageAndVideo"
+          },
+          "advanced": {
+            "$ref": "#/components/schemas/ProductAdvanced",
+            "description": "Write `mpn`, `upc`, `barcode` and `hs_code` in `advance_information` here."
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "The category's `id`."
+                    }
+                  }
+                }
+              ]
+            },
+            "description": "The `id` of each category to file the product under, as a number or as `{\"id\": <category id>}`."
+          },
+          "related_products": {
+            "type": "array"
+          },
+          "similar_products": {
+            "type": "array"
+          },
+          "tags": {
+            "type": "array"
+          },
+          "preorder_enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductReviewInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "rating"
+        ],
+        "description": "One review to add. Unknown keys, such as `title`, are accepted and dropped.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Required. The reviewer's name."
+          },
+          "email": {
+            "type": "string",
+            "description": "Required. The reviewer's email address. A review with an `email` the product already has a review from is skipped, with no error."
+          },
+          "rating": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Required. From `1` to `5`. It reads back as a decimal number, such as `5.0`."
+          },
+          "review": {
+            "type": "string",
+            "description": "The review's text."
+          },
+          "comment": {
+            "type": "string",
+            "description": "Another name for `review`. It reads back as `review`."
+          },
+          "status": {
+            "type": "string",
+            "description": "`approved` is kept. Any other value, or none, is stored as `pending`."
+          },
+          "dateCreated": {
+            "type": "string",
+            "description": "The review's date, as `yyyy-MM-ddTHH:mm:ss`. It reads back as `date`. Sending `date` instead is rejected with `400`."
+          }
+        }
+      },
+      "ProductReviewsImportInput": {
+        "type": "object",
+        "required": [
+          "product"
+        ],
+        "description": "Wrap the reviews in `product`. Send `transaction_no` beside `product`, not inside it.",
+        "properties": {
+          "product": {
+            "type": "object",
+            "required": [
+              "reviews"
+            ],
+            "properties": {
+              "reviews": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/ProductReviewInput"
+                },
+                "description": "Required and not empty. The reviews to add."
+              }
+            }
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "Optional. A transaction number to tag the reviews with. An `X-Transaction-No` header with a different value wins over it."
+          }
+        }
+      },
+      "ProductReviews": {
+        "type": "object",
+        "description": "Every review the product has, oldest first.",
+        "properties": {
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductReview"
+            },
+            "description": "Every review the product has, the ones you just added last."
+          }
+        }
+      },
+      "ProductValidationError": {
+        "type": "object",
+        "description": "The rejection a `PATCH` body wrapped in `product` returns. Every other rejection returns `ProductError`.",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "description": "Identifies this request."
+          },
+          "status": {
+            "type": "integer",
+            "description": "`400`."
+          },
+          "code": {
+            "type": "string",
+            "description": "`validation_error`."
+          },
+          "message": {
+            "type": "string",
+            "description": "What went wrong."
+          },
+          "errors": {
+            "type": "array",
+            "description": "One entry per rejected field.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "The field that was rejected."
+                },
+                "code": {
+                  "type": "string",
+                  "description": "Why it was rejected, such as `unknown_field`."
+                }
               }
             }
           }
@@ -64194,6 +65161,123 @@
           "max_quantity": {
             "type": "integer",
             "description": "`0` means no maximum."
+          }
+        }
+      },
+      "VariationImportInput": {
+        "type": "object",
+        "required": [
+          "variations"
+        ],
+        "description": "Send these fields at the top level of the body, with no wrapper. Unknown keys are ignored.",
+        "properties": {
+          "variations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/VariationImportGroupInput"
+            },
+            "description": "Required and not empty. One group per set of variation types."
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "Optional. A transaction number to tag the variants with. An `X-Transaction-No` header with a different value wins over it."
+          }
+        }
+      },
+      "VariationImportGroupInput": {
+        "type": "object",
+        "description": "Unknown keys are ignored.",
+        "properties": {
+          "product_key": {
+            "type": "string",
+            "description": "The names of the product's variation types, joined with `/`, such as `Size/Colour`. Each name is matched to the `name` of one of the store's variation types. Names other than the ones the product's variants already use are rejected with `409`."
+          },
+          "variants": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/VariationImportVariantInput"
+            },
+            "description": "Must not be empty. The variants to add or change."
+          }
+        }
+      },
+      "VariationImportVariantInput": {
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "description": "One variant to add or change. `available`, `is_base` and `tiered_pricing` are rejected with `400` and the reason `unknown_field`.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Required. One option label per variation type in `product_key`, joined with `/`, such as `Small/Red`. A `key` the product already has changes that variant and keeps its `variation_id`; a new `key` adds a variant. A label the type does not have yet is added to the type."
+          },
+          "name": {
+            "type": "string",
+            "description": "The variant's name."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The variant's SKU."
+          },
+          "custom_sku": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "country_of_origin": {
+            "type": "string"
+          },
+          "hs_code": {
+            "type": "string"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/VariationProductVariantPricing"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/VariationProductVariantInventory"
+          },
+          "ordering": {
+            "$ref": "#/components/schemas/VariationProductVariantOrdering"
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/VariationProductVariantDimensions"
+          },
+          "badges": {
+            "$ref": "#/components/schemas/VariationProductVariantBadges"
+          },
+          "images": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "VariationImportResult": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`success`."
+          },
+          "message": {
+            "type": "string",
+            "description": "Counts the variants imported, such as `2 of 2 variants imported successfully`."
+          },
+          "total_variants": {
+            "type": "integer",
+            "description": "The number of variants imported."
           }
         }
       },

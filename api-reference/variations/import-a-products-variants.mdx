@@ -1,0 +1,9 @@
+---
+title: "Import a product's variants"
+description: "Adds the variants you send to the product, changes the ones whose `key` it already has, and returns how many were imported."
+openapi: "POST /admin/products/{product_id}/variations"
+---
+
+Send `variations` at the top level of the body, with no wrapper. Each group's `product_key` names the product's variation types, joined with `/`, such as `Size/Colour`, and each variant's `key` names one option label per type, joined the same way, such as `Small/Red`. A `key` the product already has changes that variant in place and keeps its `variation_id`; a new `key` adds a variant beside the others. `product_key` is matched to the `name` of the store's variation types and `key` to their option labels: a label a type does not have yet is added to the type itself, for the whole store. Each variant needs `key` and takes `name`, `sku`, `custom_sku`, `title`, `summary`, `description`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory`, `ordering`, `dimensions`, `badges` and `images`. Unknown keys at the top level or in a group are ignored. To tag the variants with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `variations`. Pass the product's `id` as `product_id`: [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

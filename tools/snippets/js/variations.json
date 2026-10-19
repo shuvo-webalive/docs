@@ -42,6 +42,10 @@
       "function": "listProductVariations",
       "code": "const response = await client.variations.listProductVariations(4321);\nfor (const group of response.map.variations) {\n    for (const variant of group.variants) {\n        console.log(variant.variation_id, variant.name, variant.pricing.base_price);\n    }\n}\n"
     },
+    "import_product_variations": {
+      "function": "importProductVariations",
+      "code": "const response = await client.variations.importProductVariations(4321, {\n    variations: [{\n        product_key: 'Size',\n        variants: [\n            {key: 'Small', name: 'Cotton T-Shirt Small', sku: 'TSHIRT-001-S', pricing: {base_price: 25.0}},\n            {key: 'Medium', name: 'Cotton T-Shirt Medium', sku: 'TSHIRT-001-M', pricing: {base_price: 25.0}},\n        ],\n    }],\n}, 'IMPORT-2026-10-18');\nconsole.log(response.map.status, response.map.message, response.map.total_variants);\n"
+    },
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "const response = await client.variations.updateProductVariations(4321, {\n    variation_ids: [91],\n    available: true,\n    available_stock: 12,\n    min_order_quantity: 1,\n    max_order_quantity: 5,\n});\nconsole.log(response.map.message);\nfor (const variant of response.map.updated) {\n    console.log(variant.id, variant.name);\n}\n"

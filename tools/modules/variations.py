@@ -5,8 +5,8 @@ SLUG = "variations"
 BASE = "/admin/variations"
 ICON = "swatchbook"
 
-OVERVIEW_DESCRIPTION = "List, create, replace, update and delete variation types and their options, and read and update the variants of a product."
-INTRO = "The Variations API has eleven endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`."
+OVERVIEW_DESCRIPTION = "List, create, replace, update and delete variation types and their options, and list, import and update the variants of a product."
+INTRO = "The Variations API has twelve endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`."
 
 PRODUCT_BASE = "/admin/products/{product_id}/variations"
 
@@ -18,6 +18,8 @@ DELETE_PAGE = "/api-reference/variations/delete-a-variation-type"
 DELETE_OPTION_PAGE = "/api-reference/variations/delete-a-variation-option"
 PRODUCT_VARIANTS_PAGE = "/api-reference/variations/list-a-products-variants"
 BULK_PAGE = "/api-reference/variations/update-a-products-variants"
+IMPORT_PAGE = "/api-reference/variations/import-a-products-variants"
+CREATE_PRODUCT_PAGE = "/api-reference/products/create-a-product"
 
 WARNING = (
     "**Replacing a variation type deletes every option you leave out of the body.** `PUT` on a type\n"
@@ -30,13 +32,19 @@ NOTES = [
     "**Wrap every variation type write in `variation`.** Create, replace and update all take\n"
     "  `{\"variation\": {...}}`. A bare record is rejected with `400`: each top-level key is reported with\n"
     "  the reason `unknown_field`, and `variation` with the reason `required`.\n"
-    "  [Update a product's variants](" + BULK_PAGE + ") is the opposite: send its fields at the top level\n"
-    "  of the body, with no wrapper.",
+    "  [Update a product's variants](" + BULK_PAGE + ") and [Import a product's variants](" + IMPORT_PAGE + ")\n"
+    "  are the opposite: send their fields at the top level of the body, with no wrapper.",
     "**Delete a variation type with `cascade=true`.** A type you create always has at least one option,\n"
     "  and you cannot delete a type's last option on its own. Without `cascade=true`,\n"
     "  [Delete a variation type](" + DELETE_PAGE + ") rejects a type that has options with `409` and the\n"
     "  message `This variation type still has N option(s).` With `cascade=true`, the type and its options\n"
-    "  are deleted together.",
+    "  are deleted together. A type that a product's variants use cannot be deleted, even with `cascade=true`\n"
+    "  and even after that product is moved to the trash: the call is rejected with `409`.",
+    "**Importing variants can add options to the store's variation types.**\n"
+    "  [Import a product's variants](" + IMPORT_PAGE + ") matches each `product_key` to the `name` of a\n"
+    "  variation type and each variant `key` to that type's option labels. A label the type does not have\n"
+    "  yet is added to the type itself, for the whole store. To add no option, use labels the type already\n"
+    "  has: [List variation types](" + LIST_PAGE + ") returns them.",
     "**`variation_ids` takes each variant's `variation_id`, not a variation type's `id`.** Each variant that\n"
     "  [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns has its own `variation_id`.\n"
     "  Send those values in `variation_ids` to [Update a product's variants](" + BULK_PAGE + "). A variant\n"
@@ -72,7 +80,7 @@ PRODUCT_ID = {
     "name": "product_id",
     "in": "path",
     "required": True,
-    "description": "The product's `id`.",
+    "description": "The product's `id`. [Create a product](" + CREATE_PRODUCT_PAGE + ") returns it as `product.id`.",
     "schema": {"type": "integer", "example": 4321},
 }
 
@@ -83,6 +91,7 @@ OFFSET = {"name": "offset", "in": "query", "description": "Number of types to sk
 PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * limit`. Sending both `page` and `offset` is rejected with `400` and the reason `conflicting_params`.", "schema": {"type": "integer", "example": 2}}
 FIELD_METADATA = {"name": "field_metadata", "in": "query", "description": "Send `true` to also get `field_metadata`, which describes each field of a variation type and of an option: its type, its limits, and whether it is read-only. Accepts `true`, `false`, `1` and `0`; any other value is rejected with `400` and the reason `invalid_boolean`.", "schema": {"type": "boolean", "example": True}}
 CASCADE = {"name": "cascade", "in": "query", "description": "Send `true` or `1` to delete the type's options with it. Without it, or with `false` or `0`, a type that has options is rejected with `409`. Any other value is rejected with `400` and the reason `invalid_boolean`.", "schema": {"type": "boolean", "example": True}}
+TRANSACTION_NO = {"name": "X-Transaction-No", "in": "header", "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. The variants you read back do not show it.", "schema": {"type": "string", "example": "IMPORT-2026-10-18"}}
 RESPONSE_MODE = {"name": "response", "in": "query", "description": "`slim` (the default) returns each updated variant's `id` and `name`. `full` returns fourteen fields for each one. Any other value is rejected with `400`, the reason `invalid_enum` and the message `must be one of slim, full`.", "schema": {"type": "string", "enum": ["slim", "full"], "example": "full"}}
 
 ERROR_REF = {"$ref": "#/components/schemas/VariationError"}
@@ -142,6 +151,12 @@ PATCHED_ROW = {"id": 15, "name": "Shirt Size", "standard": "text", "disposable":
 
 BULK_BODY = {"variation_ids": [91], "available": True, "available_stock": 12, "min_order_quantity": 1, "max_order_quantity": 5}
 BULK_SLIM_RESULT = {"status": "success", "message": "1 variations updated", "updated": [{"id": 91, "name": "Cotton T-Shirt"}], "failed": []}
+
+IMPORT_BODY = {"variations": [{"product_key": "Size", "variants": [
+    {"key": "Small", "name": "Cotton T-Shirt Small", "sku": "TSHIRT-001-S", "pricing": {"base_price": 25.0}},
+    {"key": "Medium", "name": "Cotton T-Shirt Medium", "sku": "TSHIRT-001-M", "pricing": {"base_price": 25.0}},
+]}]}
+IMPORT_RESULT = {"status": "success", "message": "2 of 2 variants imported successfully", "total_variants": 2}
 
 ENDPOINTS = [
     {
@@ -295,14 +310,14 @@ ENDPOINTS = [
         "method": "DELETE",
         "path": BASE + "/{variation_id}",
         "summary": "Deletes a variation type permanently. Send `cascade=true` to delete its options with it.",
-        "description": "Deletes the type permanently and returns `204` with no body. The type leaves the listing, and retrieving or deleting it again returns `404`. A type that has options is deleted only with `cascade=true`, which deletes its options too.",
+        "description": "Deletes the type permanently and returns `204` with no body. The type leaves the listing, and retrieving or deleting it again returns `404`. A type that has options is deleted only with `cascade=true`, which deletes its options too. A type that a product's variants use cannot be deleted, even with `cascade=true` and even after that product is moved to the trash.",
         "parameters": [VARIATION_ID, CASCADE],
         "responses": {
             "204": {"description": "Deleted. No body."},
             "400": {"description": "`cascade` is not a boolean. The reason is `invalid_boolean`.", "schema": ERROR_REF},
             "404": {"description": "No variation type has that `variation_id`, for example because you already deleted it.", "schema": ERROR_REF},
             "409": {
-                "description": "The type still has options and you did not send `cascade=true`. The message is `This variation type still has N option(s).`, and `details[0]` names the field `options` with the reason `in_use` and the message `send ?cascade=true to delete them with the type`.",
+                "description": "The type still has options and you did not send `cascade=true`: the message is `This variation type still has N option(s).`, and `details[0]` names the field `options` with the reason `in_use` and the message `send ?cascade=true to delete them with the type`. Or a product's variants use the type: the message is `This variation type is used by N product(s).` and `details[0].code` is `in_use`, with or without `cascade=true`.",
                 "schema": ERROR_REF,
             },
         },
@@ -339,6 +354,33 @@ ENDPOINTS = [
                 "schema": {"$ref": "#/components/schemas/VariationProductVariants"},
             },
             "404": {"description": "No product has that `product_id`. The message is `Product not found`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 4321}},
+    },
+    {
+        "key": "import_product_variations",
+        "slug": "import-a-products-variants",
+        "title": "Import a product's variants",
+        "method": "POST",
+        "path": PRODUCT_BASE,
+        "summary": "Adds the variants you send to the product, changes the ones whose `key` it already has, and returns how many were imported.",
+        "description": "Send `variations` at the top level of the body, with no wrapper. Each group's `product_key` names the product's variation types, joined with `/`, such as `Size/Colour`, and each variant's `key` names one option label per type, joined the same way, such as `Small/Red`. A `key` the product already has changes that variant in place and keeps its `variation_id`; a new `key` adds a variant beside the others. `product_key` is matched to the `name` of the store's variation types and `key` to their option labels: a label a type does not have yet is added to the type itself, for the whole store. Each variant needs `key` and takes `name`, `sku`, `custom_sku`, `title`, `summary`, `description`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory`, `ordering`, `dimensions`, `badges` and `images`. Unknown keys at the top level or in a group are ignored. To tag the variants with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `variations`. Pass the product's `id` as `product_id`: [Create a product](" + CREATE_PRODUCT_PAGE + ") returns it as `product.id`.",
+        "parameters": [PRODUCT_ID, TRANSACTION_NO],
+        "body": {"schema": {"$ref": "#/components/schemas/VariationImportInput"}, "example": IMPORT_BODY},
+        "responses": {
+            "201": {
+                "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](" + PRODUCT_VARIANTS_PAGE + "). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. No variant shows the transaction number.",
+                "schema": {"$ref": "#/components/schemas/VariationImportResult"},
+                "example": IMPORT_RESULT,
+            },
+            "400": {
+                "description": "`variations` is missing or empty, or the body is wrapped in another key (message `variations field is required`); a group's `variants` is empty (message `variations[0].variants must be a non-empty array`); a variant has no `key` (message `variations[0].variants[0].key: is required`); or a variant sends `available`, `is_base` or `tiered_pricing` (reason `unknown_field`).",
+                "schema": ERROR_REF,
+            },
+            "409": {
+                "description": "`product_key` names other variation types than the ones the product's variants already use, and nothing is imported. The message starts with `this product's variants use the option types`.",
+                "schema": ERROR_REF,
+            },
         },
         "example_call": {"path": {"product_id": 4321}},
     },
@@ -533,6 +575,37 @@ SCHEMAS = {
     "VariationBulkOrdering": {"type": "object", "properties": {
         "min_quantity": {"type": "integer"},
         "max_quantity": {"type": "integer", "description": "`0` means no maximum."},
+    }},
+    "VariationImportInput": {"type": "object", "required": ["variations"], "description": "Send these fields at the top level of the body, with no wrapper. Unknown keys are ignored.", "properties": {
+        "variations": {"type": "array", "minItems": 1, "items": {"$ref": "#/components/schemas/VariationImportGroupInput"}, "description": "Required and not empty. One group per set of variation types."},
+        "transaction_no": {"type": "string", "description": "Optional. A transaction number to tag the variants with. An `X-Transaction-No` header with a different value wins over it."},
+    }},
+    "VariationImportGroupInput": {"type": "object", "description": "Unknown keys are ignored.", "properties": {
+        "product_key": {"type": "string", "description": "The names of the product's variation types, joined with `/`, such as `Size/Colour`. Each name is matched to the `name` of one of the store's variation types. Names other than the ones the product's variants already use are rejected with `409`."},
+        "variants": {"type": "array", "minItems": 1, "items": {"$ref": "#/components/schemas/VariationImportVariantInput"}, "description": "Must not be empty. The variants to add or change."},
+    }},
+    "VariationImportVariantInput": {"type": "object", "required": ["key"], "description": "One variant to add or change. `available`, `is_base` and `tiered_pricing` are rejected with `400` and the reason `unknown_field`.", "properties": {
+        "key": {"type": "string", "description": "Required. One option label per variation type in `product_key`, joined with `/`, such as `Small/Red`. A `key` the product already has changes that variant and keeps its `variation_id`; a new `key` adds a variant. A label the type does not have yet is added to the type."},
+        "name": {"type": "string", "description": "The variant's name."},
+        "sku": {"type": "string", "description": "The variant's SKU."},
+        "custom_sku": {"type": "string"},
+        "title": {"type": "string"},
+        "summary": {"type": "string"},
+        "description": {"type": "string"},
+        "barcode": {"type": "string"},
+        "country_of_origin": {"type": "string"},
+        "hs_code": {"type": "string"},
+        "pricing": {"$ref": "#/components/schemas/VariationProductVariantPricing"},
+        "inventory": {"$ref": "#/components/schemas/VariationProductVariantInventory"},
+        "ordering": {"$ref": "#/components/schemas/VariationProductVariantOrdering"},
+        "dimensions": {"$ref": "#/components/schemas/VariationProductVariantDimensions"},
+        "badges": {"$ref": "#/components/schemas/VariationProductVariantBadges"},
+        "images": {"type": "array", "items": {}},
+    }},
+    "VariationImportResult": {"type": "object", "properties": {
+        "status": {"type": "string", "description": "`success`."},
+        "message": {"type": "string", "description": "Counts the variants imported, such as `2 of 2 variants imported successfully`."},
+        "total_variants": {"type": "integer", "description": "The number of variants imported."},
     }},
     "VariationError": {"type": "object", "properties": {"error": {"type": "object", "properties": {
         "code": {"type": "string", "description": "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."},

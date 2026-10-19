@@ -42,6 +42,10 @@
       "function": "ListProductVariations",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().ListProductVariations(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"variations\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfor _, item := range group[\"variants\"].([]any) {\n\t\tvariant := item.(map[string]any)\n\t\tfmt.Println(group[\"product_key\"], variant[\"variation_id\"], variant[\"key\"], variant[\"available\"])\n\t}\n}"
     },
+    "import_product_variations": {
+      "function": "ImportProductVariations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().ImportProductVariations(ctx, 4321, map[string]any{\n\t\"variations\": []any{map[string]any{\n\t\t\"product_key\": \"Size\",\n\t\t\"variants\": []any{\n\t\t\tmap[string]any{\"key\": \"Small\", \"name\": \"Cotton T-Shirt Small\", \"sku\": \"TSHIRT-001-S\", \"pricing\": map[string]any{\"base_price\": 25.0}},\n\t\t\tmap[string]any{\"key\": \"Medium\", \"name\": \"Cotton T-Shirt Medium\", \"sku\": \"TSHIRT-001-M\", \"pricing\": map[string]any{\"base_price\": 25.0}},\n\t\t},\n\t}},\n}, \"IMPORT-2026-10-18\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"message\"], body[\"total_variants\"])\n"
+    },
     "update_product_variations": {
       "function": "UpdateProductVariations",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().UpdateProductVariations(ctx, 4321, map[string]any{\n\t\"variation_ids\":      []any{91},\n\t\"available\":          true,\n\t\"available_stock\":    12,\n\t\"min_order_quantity\": 1,\n\t\"max_order_quantity\": 5,\n}, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"message\"], body[\"updated\"])"
