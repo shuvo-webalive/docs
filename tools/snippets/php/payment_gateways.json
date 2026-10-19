@@ -1,0 +1,38 @@
+{
+  "sdk": "php",
+  "module": "payment_gateways",
+  "endpoints": {
+    "list_payment_gateways": {
+      "function": "listPaymentGateways",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::listPaymentGateways($client, ['limit' => 20, 'offset' => 0, 'promotional' => 'false']);\n\nforeach ($response->map['payment_gateways'] as $gateway) {\n    echo $gateway['id'], ' ', $gateway['code'], ' ', $gateway['name'], $gateway['enabled'] ? ' (enabled)' : '', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
+    },
+    "head_payment_gateways": {
+      "function": "headPaymentGateways",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::headPaymentGateways($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_payment_gateways": {
+      "function": "countPaymentGateways",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::countPaymentGateways($client, ['exclude' => 'PIS,CHQ']);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "head_payment_gateways_count": {
+      "function": "headPaymentGatewaysCount",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::headPaymentGatewaysCount($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_payment_gateway": {
+      "function": "getPaymentGateway",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::getPaymentGateway($client, 2);\n\n$gateway = $response->map['payment_gateway'];\necho $gateway['code'], ' ', $gateway['name'], $gateway['enabled'] ? ' (enabled)' : ' (disabled)', PHP_EOL;"
+    },
+    "head_payment_gateway": {
+      "function": "headPaymentGateway",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::headPaymentGateway($client, 2);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_payment_gateway": {
+      "function": "updatePaymentGateway",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::updatePaymentGateway($client, 2, [\n    'information' => 'Make cheques payable to Example Store.',\n]);\n\necho $response->map['payment_gateway']['information'], PHP_EOL;"
+    },
+    "patch_payment_gateway": {
+      "function": "patchPaymentGateway",
+      "code": "use WebCommander\\Sdk\\Resources\\PaymentGateways\\PaymentGateways;\n\n$response = PaymentGateways::patchPaymentGateway($client, 2, [\n    'allowed_for' => ['store_pickup' => false],\n]);\n\n$allowedFor = $response->map['payment_gateway']['allowed_for'];\necho $allowedFor['store_pickup'] ? 'store pickup allowed' : 'store pickup not allowed', PHP_EOL;"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "sdk": "dotnet",
+  "module": "payment_gateways",
+  "endpoints": {
+    "list_payment_gateways": {
+      "function": "ListPaymentGatewaysAsync",
+      "code": "var response = await client.PaymentGateways.ListPaymentGatewaysAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20, [\"offset\"] = 0, [\"promotional\"] = \"false\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var paymentGateway in ((IReadOnlyList<object?>)body[\"payment_gateways\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{paymentGateway[\"id\"]} {paymentGateway[\"code\"]} {paymentGateway[\"name\"]} {paymentGateway[\"enabled\"]} {paymentGateway[\"default\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_payment_gateways": {
+      "function": "HeadPaymentGatewaysAsync",
+      "code": "var response = await client.PaymentGateways.HeadPaymentGatewaysAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_payment_gateways": {
+      "function": "CountPaymentGatewaysAsync",
+      "code": "var response = await client.PaymentGateways.CountPaymentGatewaysAsync(\n    new Dictionary<string, object?> { [\"exclude\"] = \"PIS,CHQ\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "head_payment_gateways_count": {
+      "function": "HeadPaymentGatewaysCountAsync",
+      "code": "var response = await client.PaymentGateways.HeadPaymentGatewaysCountAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_payment_gateway": {
+      "function": "GetPaymentGatewayAsync",
+      "code": "var response = await client.PaymentGateways.GetPaymentGatewayAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar paymentGateway = (IReadOnlyDictionary<string, object?>)body[\"payment_gateway\"]!;\nConsole.WriteLine($\"{paymentGateway[\"code\"]} {paymentGateway[\"name\"]} {paymentGateway[\"added\"]} {paymentGateway[\"enabled\"]}\");\nConsole.WriteLine(string.Join(\", \", ((IReadOnlyDictionary<string, object?>)paymentGateway[\"settings\"]!).Keys));"
+    },
+    "head_payment_gateway": {
+      "function": "HeadPaymentGatewayAsync",
+      "code": "var response = await client.PaymentGateways.HeadPaymentGatewayAsync(2);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_payment_gateway": {
+      "function": "UpdatePaymentGatewayAsync",
+      "code": "var response = await client.PaymentGateways.UpdatePaymentGatewayAsync(2, new Dictionary<string, object?>\n{\n    [\"information\"] = \"Make cheques payable to Example Store.\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar paymentGateway = (IReadOnlyDictionary<string, object?>)body[\"payment_gateway\"]!;\nConsole.WriteLine($\"{paymentGateway[\"code\"]} {paymentGateway[\"information\"]}\");"
+    },
+    "patch_payment_gateway": {
+      "function": "PatchPaymentGatewayAsync",
+      "code": "var response = await client.PaymentGateways.PatchPaymentGatewayAsync(2, new Dictionary<string, object?>\n{\n    [\"allowed_for\"] = new Dictionary<string, object?> { [\"store_pickup\"] = false },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar paymentGateway = (IReadOnlyDictionary<string, object?>)body[\"payment_gateway\"]!;\nvar allowedFor = (IReadOnlyDictionary<string, object?>)paymentGateway[\"allowed_for\"]!;\nConsole.WriteLine($\"{allowedFor[\"shipping\"]} {allowedFor[\"delivery\"]} {allowedFor[\"store_pickup\"]}\");"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "List payment gateways"
+description: "Returns up to 20 payment gateways per call, or the `limit` you send, in `id` order."
+openapi: "GET /admin/payment_gateways"
+---
+
+Returns your store's payment gateways in `payment_gateways`, in ascending `id` order, 20 per call unless you send `limit`, and `pagination` with the paging details. Rows have no `settings`; use [Retrieve a payment gateway](/api-reference/payment-gateways/retrieve-a-payment-gateway) to read them. Send `search` to match part of a `name`, `exclude` to leave out gateways by `code`, and `promotional` or `added` to filter on those fields. `sort`, `order`, `dir`, `enabled`, `code`, `q`, `field_metadata` and any other parameter the listing does not know are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

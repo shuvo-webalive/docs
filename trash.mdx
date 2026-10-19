@@ -1,0 +1,59 @@
+---
+title: "Trash"
+sidebarTitle: "Overview"
+description: "List the items in your store's trash and the types it holds, and restore items or delete them permanently, one at a time or up to 100 per call."
+---
+
+The Trash API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/trash`.
+
+<Warning>
+  **Send a `type` other than `Customer` on every listing call.** Without `type`, or with
+  `type=Customer`, [List items in the trash](/api-reference/trash/list-items-in-the-trash) can take 90 to 100 seconds to return a
+  page, and [Check the trash list](/api-reference/trash/check-the-trash-list) takes as long, because it runs
+  the same query. With `type=Category`, `type=Product` or `type=BlogPost`, a page returns in about a
+  second. If you must list customers, set your client's request timeout above 100 seconds.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List items in the trash](/api-reference/trash/list-items-in-the-trash) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/trash` | Returns the items in the trash, newest first, 20 per call unless you send `limit`. |
+| [Check the trash list](/api-reference/trash/check-the-trash-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/trash` | Returns the headers of the trash list, with no body. Takes the listing's query parameters. |
+| [List trash types](/api-reference/trash/list-trash-types) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/trash/types` | Returns every type the trash holds, in alphabetical order, such as `Category` and `Customer`. |
+| [Check the trash types list](/api-reference/trash/check-the-trash-types-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/trash/types` | Returns the headers of the trash types list, with no body. |
+| [Restore an item from the trash](/api-reference/trash/restore-an-item-from-the-trash) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/trash/{trash_type}/{trash_item_id}/restore` | Restores one item from the trash and returns a success message, not the item. |
+| [Delete an item permanently](/api-reference/trash/delete-an-item-permanently) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/trash/{trash_type}/{trash_item_id}` | Deletes one item in the trash permanently. You cannot restore it afterwards. |
+| [Restore items in bulk](/api-reference/trash/restore-items-in-bulk) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/trash/bulk-restore` | Restores up to 100 trashed items and returns how many were restored and which failed. |
+| [Delete items permanently in bulk](/api-reference/trash/delete-items-permanently-in-bulk) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/trash/bulk-delete` | Deletes up to 100 trashed items permanently and returns counts and the items that failed. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **You name an item by its type and the id it has in its own resource.** The trash has no ids of its
+  own. A category, customer, blog post or page that you delete through its own resource, such as
+  [Delete a category](/api-reference/categories/delete-a-category), [Delete a customer](/api-reference/customers/delete-a-customer) or
+  [Delete a blog post](/api-reference/blogs/delete-a-blog-post), stays in the trash until you restore it or delete it
+  permanently. A category is named by its `id` and a customer by its `customer_id`.
+- **`trash_type` takes a value from [List trash types](/api-reference/trash/list-trash-types).** `Category`, `category` and
+  `CATEGORY` all work, in a path and in a bulk item. A two-word type has no snake_case form: send
+  `BlogPost`, because `blog_post` is rejected with `400` and the message `unknown trash type 'blog_post'`.
+  Listed items and bulk `errors` entries return the type in PascalCase, whatever case you sent.
+- **Only an item in the trash can be restored or deleted permanently.** An item that is not in the trash
+  is rejected with `409` and the message `<Type> with id <id> is not in trash`. After a permanent delete
+  the item is gone: a restore, a second delete and the item's own resource all return `404`. An item
+  path accepts only `DELETE` and `OPTIONS`: `GET` on it returns `405`.
+- **A bulk call returns `201` even when some items fail.** [Restore items in bulk](/api-reference/trash/restore-items-in-bulk)
+  and [Delete items permanently in bulk](/api-reference/trash/delete-items-permanently-in-bulk) return `201` when at least one item
+  succeeds, and `400` with the same body when every item fails. Check `failed` and `errors` in every
+  response: each failed item has an `errors` entry with its `type`, its `id` and a `reason`.
+- **A listing returns 20 items per call unless you send `limit`.** A `limit` above `100` returns `100`
+  items, and `pagination.limit` shows `100`. Send `limit` once: sending it twice returns `500`. Send
+  `order` in lower case: `order=DESC` is accepted but sorts in ascending order.
+- **Many writes in a row can be rejected with `429`.** The error code is `rate_limited` and the
+  `Retry-After` header gives the seconds to wait before you retry.

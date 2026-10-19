@@ -1,0 +1,14 @@
+{
+  "sdk": "js",
+  "module": "cities",
+  "endpoints": {
+    "list_cities": {
+      "function": "listCities",
+      "code": "const response = await client.cities.listCities({country: 'AU', state: 'VIC', limit: 20});\nfor (const city of response.map.cities) {\n    console.log(city.id, city.name, city.post_code, city.state.code, city.country.code);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_cities": {
+      "function": "headCities",
+      "code": "const response = await client.cities.headCities();\nconsole.log(response.statusCode, response.headers.etag);\n"
+    }
+  }
+}

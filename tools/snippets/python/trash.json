@@ -1,0 +1,38 @@
+{
+  "sdk": "python",
+  "module": "trash",
+  "endpoints": {
+    "list_trash": {
+      "function": "list_trash",
+      "code": "response = client.trash.list_trash({\n    \"type\": \"Category\",\n    \"search\": \"spring\",\n    \"sort\": \"name\",\n    \"order\": \"asc\",\n    \"limit\": 20,\n})\nfor item in response.map[\"items\"]:\n    print(item[\"id\"], item[\"type\"], item[\"name\"], item[\"updated\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_trash": {
+      "function": "head_trash",
+      "code": "response = client.trash.head_trash({\"type\": \"Category\", \"limit\": 1})\nprint(response.status_code)\n"
+    },
+    "list_trash_types": {
+      "function": "list_trash_types",
+      "code": "response = client.trash.list_trash_types()\nfor entry in response.map[\"types\"]:\n    print(entry[\"type\"])\n"
+    },
+    "head_trash_types": {
+      "function": "head_trash_types",
+      "code": "response = client.trash.head_trash_types()\nprint(response.status_code)\n"
+    },
+    "restore_trash_item": {
+      "function": "restore_trash_item",
+      "code": "response = client.trash.restore_trash_item(\"Category\", 1234)\nprint(response.map[\"status\"], response.map[\"message\"])\n"
+    },
+    "delete_trash_item": {
+      "function": "delete_trash_item",
+      "code": "response = client.trash.delete_trash_item(\"Customer\", 5678)\nprint(response.status_code)\n"
+    },
+    "bulk_restore_trash": {
+      "function": "bulk_restore_trash",
+      "code": "response = client.trash.bulk_restore_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"BlogPost\", \"id\": 99}],\n})\nprint(response.map[\"restored\"], response.map[\"failed\"])\nfor error in response.map[\"errors\"]:\n    print(error[\"type\"], error[\"id\"], error[\"reason\"])\n"
+    },
+    "bulk_delete_trash": {
+      "function": "bulk_delete_trash",
+      "code": "response = client.trash.bulk_delete_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"Category\", \"id\": 1229}],\n})\nprint(response.map[\"deleted\"], response.map[\"failed\"])\nfor error in response.map[\"errors\"]:\n    print(error[\"type\"], error[\"id\"], error[\"reason\"])\n"
+    }
+  }
+}

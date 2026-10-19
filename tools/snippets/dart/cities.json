@@ -1,0 +1,14 @@
+{
+  "sdk": "dart",
+  "module": "cities",
+  "endpoints": {
+    "list_cities": {
+      "function": "listCities",
+      "code": "final response = await client.cities\n    .listCities(queryParams: {'country': 'AU', 'state': 'VIC', 'limit': 20});\nfinal body = response.map as Map;\nfor (final city in body['cities'] as List) {\n  print('${(city as Map)['name']} ${city['post_code']}');\n}\nprint((body['pagination'] as Map)['total']);"
+    },
+    "head_cities": {
+      "function": "headCities",
+      "code": "final response = await client.cities.headCities();\nprint(response.statusCode);\nprint(response.headers['etag']);"
+    }
+  }
+}

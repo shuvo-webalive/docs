@@ -1,0 +1,14 @@
+{
+  "sdk": "go",
+  "module": "cities",
+  "endpoints": {
+    "list_cities": {
+      "function": "ListCities",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Cities().ListCities(ctx, map[string]any{\"country\": \"AU\", \"state\": \"VIC\", \"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"cities\"].([]any) {\n\tcity := row.(map[string]any)\n\tfmt.Println(city[\"id\"], city[\"name\"], city[\"post_code\"], city[\"state\"].(map[string]any)[\"code\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "head_cities": {
+      "function": "HeadCities",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Cities().HeadCities(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+    }
+  }
+}

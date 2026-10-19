@@ -1,0 +1,9 @@
+---
+title: "List items in the trash"
+description: "Returns the items in the trash, newest first, 20 per call unless you send `limit`."
+openapi: "GET /admin/trash"
+---
+
+Returns the items in the trash in `items`, 20 per call unless you send `limit`, newest `updated` first, and `pagination` with the total and the URLs of the next and previous pages. Send `type` on every call, and not as `Customer` alone: without it, or with `Customer`, a page can take 90 to 100 seconds. Send `search` to match part of an item's `name`, and `sort` and `order` to change the order. Any query parameter the listing does not accept, such as `q`, is rejected with `400` and the reason `unknown_parameter`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

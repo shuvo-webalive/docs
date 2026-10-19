@@ -1,0 +1,38 @@
+{
+  "sdk": "go",
+  "module": "payment_gateways",
+  "endpoints": {
+    "list_payment_gateways": {
+      "function": "ListPaymentGateways",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().ListPaymentGateways(ctx, map[string]any{\"limit\": 20, \"offset\": 0, \"promotional\": \"false\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"payment_gateways\"].([]any) {\n\tgateway := row.(map[string]any)\n\tfmt.Println(gateway[\"id\"], gateway[\"code\"], gateway[\"name\"], gateway[\"enabled\"], gateway[\"default\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
+    "head_payment_gateways": {
+      "function": "HeadPaymentGateways",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().HeadPaymentGateways(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "count_payment_gateways": {
+      "function": "CountPaymentGateways",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().CountPaymentGateways(ctx, map[string]any{\"exclude\": \"PIS,CHQ\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])\n"
+    },
+    "head_payment_gateways_count": {
+      "function": "HeadPaymentGatewaysCount",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().HeadPaymentGatewaysCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "get_payment_gateway": {
+      "function": "GetPaymentGateway",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().GetPaymentGateway(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngateway := resp.Map().(map[string]any)[\"payment_gateway\"].(map[string]any)\nfmt.Println(gateway[\"code\"], gateway[\"name\"], gateway[\"enabled\"], gateway[\"information\"])\nfmt.Println(gateway[\"allowed_for\"], gateway[\"visibility\"].(map[string]any)[\"type\"])\n"
+    },
+    "head_payment_gateway": {
+      "function": "HeadPaymentGateway",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().HeadPaymentGateway(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "update_payment_gateway": {
+      "function": "UpdatePaymentGateway",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().UpdatePaymentGateway(ctx, 2, map[string]any{\n\t\"information\": \"Make cheques payable to Example Store.\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngateway := resp.Map().(map[string]any)[\"payment_gateway\"].(map[string]any)\nfmt.Println(gateway[\"code\"], gateway[\"information\"])\n"
+    },
+    "patch_payment_gateway": {
+      "function": "PatchPaymentGateway",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.PaymentGateways().PatchPaymentGateway(ctx, 2, map[string]any{\n\t\"allowed_for\": map[string]any{\"store_pickup\": false},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ngateway := resp.Map().(map[string]any)[\"payment_gateway\"].(map[string]any)\nfmt.Println(gateway[\"code\"], gateway[\"allowed_for\"].(map[string]any)[\"store_pickup\"])\n"
+    }
+  }
+}

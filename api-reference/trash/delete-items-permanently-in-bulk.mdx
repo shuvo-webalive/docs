@@ -1,0 +1,9 @@
+---
+title: "Delete items permanently in bulk"
+description: "Deletes up to 100 trashed items permanently and returns counts and the items that failed."
+openapi: "POST /admin/trash/bulk-delete"
+---
+
+Send the same body as [Restore items in bulk](/api-reference/trash/restore-items-in-bulk): `items`, a list of 1 to 100 objects, each with the item's `type` and `id`. You get `201` when at least one item is deleted, even if others fail, and `400` with the same body when none is, so check `failed` and `errors` in every response. An item that is not in the trash fails with the reason `<Type> with id <id> is not in trash`, and an id the type does not have fails with `<Type> with id <id> not found`. An item listed twice is deleted once, and the second copy fails with `not found`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

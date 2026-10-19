@@ -1,0 +1,30 @@
+{
+  "sdk": "dotnet",
+  "module": "transactions",
+  "endpoints": {
+    "list_transactions": {
+      "function": "ListTransactionsAsync",
+      "code": "var response = await client.Transactions.ListTransactionsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 50, [\"offset\"] = 0 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var transaction in ((IReadOnlyList<object?>)body[\"transactions\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{transaction[\"transaction_no\"]} {transaction[\"total_records\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_transactions": {
+      "function": "HeadTransactionsAsync",
+      "code": "var response = await client.Transactions.HeadTransactionsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_transaction": {
+      "function": "GetTransactionAsync",
+      "code": "var response = await client.Transactions.GetTransactionAsync(\"IMPORT-2026-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"transaction_no\"]} {body[\"total_records\"]}\");\nforeach (var byType in ((IReadOnlyList<object?>)body[\"by_type\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{byType[\"type\"]} {byType[\"count\"]}\");"
+    },
+    "head_transaction": {
+      "function": "HeadTransactionAsync",
+      "code": "var response = await client.Transactions.HeadTransactionAsync(\"IMPORT-2026-0001\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "list_transaction_items": {
+      "function": "ListTransactionItemsAsync",
+      "code": "var response = await client.Transactions.ListTransactionItemsAsync(\"IMPORT-2026-0001\",\n    new Dictionary<string, object?> { [\"type\"] = \"product\", [\"limit\"] = 20, [\"offset\"] = 0, [\"detail\"] = \"slim\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var item in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"name\"]} {item[\"sku\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_transaction_items": {
+      "function": "HeadTransactionItemsAsync",
+      "code": "var response = await client.Transactions.HeadTransactionItemsAsync(\"IMPORT-2026-0001\",\n    new Dictionary<string, object?> { [\"type\"] = \"product\" });\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}
