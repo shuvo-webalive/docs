@@ -1,9 +1,9 @@
 ---
 title: "Retrieve a product"
-description: "Returns the product whose `id` you pass as `product_id`, with all 69 of its fields."
+description: "Returns the product whose `id` you pass as `product_id`, with all 71 of its fields."
 openapi: "GET /admin/products/{product_id}"
 ---
 
-Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `""` when it has none.
+Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `""` when it has none. A product you deleted is still returned, with `status` set to `trashed`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

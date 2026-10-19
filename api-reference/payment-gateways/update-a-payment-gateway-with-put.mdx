@@ -1,0 +1,9 @@
+---
+title: "Update a payment gateway with PUT"
+description: "Changes the fields you send on a payment gateway and returns the whole gateway."
+openapi: "PUT /admin/payment_gateways/{payment_gateway_id}"
+---
+
+Send the fields you want to change at the top level of the body, not wrapped in `payment_gateway`. This `PUT` does not replace the gateway: every field you leave out keeps its value, as with [Update a payment gateway](/api-reference/payment-gateways/update-a-payment-gateway). `information: null` clears the text. `code` and `promotional` are read-only, so a retrieved gateway sent back unchanged is rejected with `400`; send only the fields you change.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -2,6 +2,10 @@
   "sdk": "dart",
   "module": "products",
   "endpoints": {
+    "create_product": {
+      "function": "createProduct",
+      "code": "final response = await client.products.createProduct(\n  {\n    'name': 'Blue Mug',\n    'sku': 'MUG-BLUE',\n    'base_price': 12.5,\n    'transaction_no': 'IMPORT-2026-10-18',\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['id']} ${product['sku']} ${product['transaction_no']}');"
+    },
     "get_product": {
       "function": "getProduct",
       "code": "final response = await client.products.getProduct(101);\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['name']} ${product['sku']} ${product['base_price']}');\nfinal pricingAndStock = product['product_pricing_and_stock'] as Map;\nprint(pricingAndStock['available_stock']);"
@@ -9,6 +13,18 @@
     "update_product": {
       "function": "updateProduct",
       "code": "final response = await client.products.updateProduct(101, {\n  'invoice_note': 'Ships in 2 business days',\n  'advanced': {\n    'advance_information': {'mpn': 'MPN-0001'},\n  },\n});\nfinal product = (response.map as Map)['product'] as Map;\nfinal info = (product['advanced'] as Map)['advance_information'] as Map;\nprint('${product['invoice_note']} ${info['mpn']}');\nprint(product['version']);"
+    },
+    "patch_product": {
+      "function": "patchProduct",
+      "code": "final response =\n    await client.products.patchProduct(101, {'base_price': 27.5});\nfinal product = (response.map as Map)['product'] as Map;\nprint('${product['name']} ${product['base_price']} ${product['version']}');"
+    },
+    "delete_product": {
+      "function": "deleteProduct",
+      "code": "final response = await client.products.deleteProduct(101);\nprint(response.statusCode);"
+    },
+    "import_product_reviews": {
+      "function": "importProductReviews",
+      "code": "final response = await client.products.importProductReviews(\n  101,\n  {\n    'product': {\n      'reviews': [\n        {\n          'name': 'Sam Lee',\n          'email': 'sam@example.com',\n          'rating': 5,\n          'review': 'Great shirt',\n          'status': 'approved',\n        },\n      ],\n    },\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal product = (response.map as Map)['product'] as Map;\nfor (final review in product['reviews'] as List) {\n  print('${(review as Map)['id']} ${review['name']} ${review['status']}');\n}"
     },
     "get_product_stock": {
       "function": "getProductStock",

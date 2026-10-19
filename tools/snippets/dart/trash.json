@@ -1,0 +1,38 @@
+{
+  "sdk": "dart",
+  "module": "trash",
+  "endpoints": {
+    "list_trash": {
+      "function": "listTrash",
+      "code": "final response = await client.trash.listTrash(queryParams: {\n  'type': 'Category',\n  'search': 'spring',\n  'sort': 'name',\n  'order': 'asc',\n  'limit': 20,\n});\nfinal body = response.map as Map;\nfor (final item in body['items'] as List) {\n  print('${(item as Map)['id']} ${item['type']} ${item['name']}');\n}\nprint((body['pagination'] as Map)['total']);"
+    },
+    "head_trash": {
+      "function": "headTrash",
+      "code": "final response = await client.trash\n    .headTrash(queryParams: {'type': 'Category', 'limit': 1});\nprint(response.statusCode);"
+    },
+    "list_trash_types": {
+      "function": "listTrashTypes",
+      "code": "final response = await client.trash.listTrashTypes();\nfor (final type in (response.map as Map)['types'] as List) {\n  print((type as Map)['type']);\n}"
+    },
+    "head_trash_types": {
+      "function": "headTrashTypes",
+      "code": "final response = await client.trash.headTrashTypes();\nprint(response.statusCode);"
+    },
+    "restore_trash_item": {
+      "function": "restoreTrashItem",
+      "code": "final response = await client.trash.restoreTrashItem('Category', 1234);\nfinal result = response.map as Map;\nprint('${result['status']} ${result['message']}');"
+    },
+    "delete_trash_item": {
+      "function": "deleteTrashItem",
+      "code": "final response = await client.trash.deleteTrashItem('Customer', 5678);\nprint(response.statusCode);"
+    },
+    "bulk_restore_trash": {
+      "function": "bulkRestoreTrash",
+      "code": "final response = await client.trash.bulkRestoreTrash({\n  'items': [\n    {'type': 'Category', 'id': 1234},\n    {'type': 'BlogPost', 'id': 99},\n  ],\n});\nfinal result = response.map as Map;\nprint('${result['restored']} ${result['failed']}');\nfor (final error in result['errors'] as List) {\n  print((error as Map)['reason']);\n}"
+    },
+    "bulk_delete_trash": {
+      "function": "bulkDeleteTrash",
+      "code": "final response = await client.trash.bulkDeleteTrash({\n  'items': [\n    {'type': 'Category', 'id': 1234},\n    {'type': 'Category', 'id': 1229},\n  ],\n});\nfinal result = response.map as Map;\nprint('${result['deleted']} ${result['failed']}');\nfor (final error in result['errors'] as List) {\n  print((error as Map)['reason']);\n}"
+    }
+  }
+}

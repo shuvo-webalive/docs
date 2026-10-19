@@ -42,6 +42,10 @@
       "function": "listProductVariations",
       "code": "final response = await client.variations.listProductVariations(4321);\nfor (final group in (response.map as Map)['variations'] as List) {\n  print((group as Map)['product_key']);\n  for (final variant in group['variants'] as List) {\n    print('${(variant as Map)['variation_id']} ${variant['key']} ${variant['sku']}');\n  }\n}"
     },
+    "import_product_variations": {
+      "function": "importProductVariations",
+      "code": "final response = await client.variations.importProductVariations(\n  4321,\n  {\n    'variations': [\n      {\n        'product_key': 'Size',\n        'variants': [\n          {\n            'key': 'Small',\n            'name': 'Cotton T-Shirt Small',\n            'sku': 'TSHIRT-001-S',\n            'pricing': {'base_price': 25.0},\n          },\n          {\n            'key': 'Medium',\n            'name': 'Cotton T-Shirt Medium',\n            'sku': 'TSHIRT-001-M',\n            'pricing': {'base_price': 25.0},\n          },\n        ],\n      },\n    ],\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal result = response.map as Map;\nprint('${result['message']} ${result['total_variants']}');"
+    },
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "final response = await client.variations.updateProductVariations(4321, {\n  'variation_ids': [91],\n  'available': true,\n  'available_stock': 12,\n  'min_order_quantity': 1,\n  'max_order_quantity': 5,\n});\nfinal body = response.map as Map;\nprint(body['message']);\nfor (final variant in body['updated'] as List) {\n  print('${(variant as Map)['id']} ${variant['name']}');\n}"
