@@ -1,0 +1,60 @@
+---
+title: "Payment gateways"
+sidebarTitle: "Overview"
+description: "List, count and retrieve your store's checkout payment gateways, and change their settings with `PUT` or `PATCH`."
+---
+
+The Payment gateways API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/payment_gateways`.
+
+<Warning>
+  **You cannot send a retrieved gateway back unchanged.** A `PUT` or `PATCH` with the body from
+  [Retrieve a payment gateway](/api-reference/payment-gateways/retrieve-a-payment-gateway) is rejected with `400`: `code` and `promotional`
+  are read-only, `surcharge: null` is rejected with `must be an object`, and empty `visibility.customers`
+  and `visibility.customer_groups` lists are rejected under `type` `everyone`. Send only the fields
+  you want to change.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List payment gateways](/api-reference/payment-gateways/list-payment-gateways) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/payment_gateways` | Returns up to 20 payment gateways per call, or the `limit` you send, in `id` order. |
+| [Check the payment gateways list](/api-reference/payment-gateways/check-the-payment-gateways-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/payment_gateways` | Checks that the payment gateways list is reachable. Returns headers only, with no body. |
+| [Count payment gateways](/api-reference/payment-gateways/count-payment-gateways) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/payment_gateways/count` | Returns the number of payment gateways that match your filters, as `total`. |
+| [Check the payment gateway count](/api-reference/payment-gateways/check-the-payment-gateway-count) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/payment_gateways/count` | Checks that the payment gateway count is reachable. Returns headers only, with no body. |
+| [Retrieve a payment gateway](/api-reference/payment-gateways/retrieve-a-payment-gateway) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/payment_gateways/{payment_gateway_id}` | Returns the payment gateway whose `id` you pass as `payment_gateway_id`, with its `settings`. |
+| [Check a payment gateway](/api-reference/payment-gateways/check-a-payment-gateway) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/payment_gateways/{payment_gateway_id}` | Checks whether a payment gateway exists. Returns headers only, with no body. |
+| [Update a payment gateway with PUT](/api-reference/payment-gateways/update-a-payment-gateway-with-put) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/payment_gateways/{payment_gateway_id}` | Changes the fields you send on a payment gateway and returns the whole gateway. |
+| [Update a payment gateway](/api-reference/payment-gateways/update-a-payment-gateway) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/payment_gateways/{payment_gateway_id}` | Changes only the fields you send on a payment gateway and returns the whole gateway. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send the fields at the top level of the body, not inside `payment_gateway`.** Both writes take
+  the bare record. A body wrapped in `payment_gateway`, or any field that is not a gateway field, is
+  rejected with `400`, the reason `unknown_field` and the message `is not a payment gateway field`.
+  Responses return the gateway inside `payment_gateway`.
+- **`PUT` and `PATCH` both change only the fields you send.** `PUT` does not replace the gateway: a
+  field you leave out keeps its value, as it does with `PATCH`. `allowed_for` merges key by key.
+  An empty body `{}` is rejected with `400` and the message `request body is empty`.
+- **You cannot create or delete a gateway.** The gateways already exist in your store. `POST` and
+  `DELETE` on a gateway, `POST` and `PUT` on the list, and `PATCH` on `/count` are rejected with
+  `405 method_not_allowed`. `OPTIONS` returns `204` with an `Allow` header: `GET, HEAD, OPTIONS` on
+  the list and on `/count`, and `GET, HEAD, PUT, PATCH, OPTIONS` on a gateway.
+- **A listing returns 20 gateways per call unless you send `limit`.** `limit` takes `1` to `100`;
+  `0` or a value above `100` is rejected with `400` and the reason `out_of_range`. To get the next
+  page, raise `offset` by `limit` while `pagination.has_next` is `true`. A page past the end returns
+  no gateways, and its `has_previous` is `false` even though `offset` is above `0`.
+- **`settings` holds different fields for each gateway, and only a single-gateway read or a write returns it.**
+  Listing rows have no `settings`. Offline gateways return `{}`. A stored secret, such as an API key
+  or a client secret, reads `********`. No path returns an `ETag` header.
+- **Errors have one shape.** The body is an `error` object with `code`, `message`, `details` and
+  `request_id`. Each `details` entry names the rejected `field` and gives its `code` and `message`.
+  The entry's `message` is `null` when `limit` is `0` or not a whole number, or `offset` is negative or
+  not a whole number; the top-level `message` then gives the reason.
+  A read-only field such as `code` gets two entries: `read_only` and `unknown_field`.

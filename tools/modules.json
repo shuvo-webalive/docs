@@ -125,6 +125,13 @@
       ]
     },
     {
+      "name": "Payment gateways",
+      "icon": "credit-card",
+      "modules": [
+        "payment_gateways"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [

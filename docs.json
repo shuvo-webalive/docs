@@ -698,6 +698,22 @@
             ]
           },
           {
+            "group": "Payment gateways",
+            "icon": "credit-card",
+            "expanded": false,
+            "pages": [
+              "payment-gateways",
+              "api-reference/payment-gateways/list-payment-gateways",
+              "api-reference/payment-gateways/check-the-payment-gateways-list",
+              "api-reference/payment-gateways/count-payment-gateways",
+              "api-reference/payment-gateways/check-the-payment-gateway-count",
+              "api-reference/payment-gateways/retrieve-a-payment-gateway",
+              "api-reference/payment-gateways/check-a-payment-gateway",
+              "api-reference/payment-gateways/update-a-payment-gateway-with-put",
+              "api-reference/payment-gateways/update-a-payment-gateway"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,
