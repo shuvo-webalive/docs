@@ -1,0 +1,9 @@
+---
+title: "Check the records of a transaction"
+description: "Checks that one `type` of records under a number is reachable. Returns headers only."
+openapi: "HEAD /admin/transactions/{transaction_no}/items"
+---
+
+Send `type` as on [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction): without it the call returns `400`. With it, the call returns `200` with headers only and no body. The response has no `ETag` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
