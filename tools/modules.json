@@ -139,6 +139,13 @@
       ]
     },
     {
+      "name": "Pages",
+      "icon": "file",
+      "modules": [
+        "pages"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [

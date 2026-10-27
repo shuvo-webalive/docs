@@ -1,0 +1,9 @@
+---
+title: "Replace a page"
+description: "Replaces a page with the ten required fields you send in `page`, and returns it."
+openapi: "PUT /admin/pages/{page_id}"
+---
+
+Send the whole page inside `page`. `name`, `title`, `subtitle`, `url`, `layout`, `visibility`, `body_class`, `active`, `disable_tracking` and `password_protection` are required, and `subtitle`, `body_class` and `layout` take `null`. Each required field you leave out is named in the `400` response with the code `required`. To change only some fields, use [Update a page](/api-reference/pages/update-a-page).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

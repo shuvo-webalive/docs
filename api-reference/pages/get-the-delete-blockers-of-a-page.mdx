@@ -1,0 +1,9 @@
+---
+title: "Get the delete blockers of a page"
+description: "Returns whether a page can be deleted and, if not, what stops the delete."
+openapi: "GET /admin/pages/{page_id}/delete-blockers"
+---
+
+Returns `can_delete`, a `blockers` list and a `linked` list, and changes nothing. Each blocker has a `code` and a `message`: the landing page returns `can_delete` set to `false` and a blocker with the code `landing_page` and the message `This page is the store landing page. Set another landing page first.` A page in the trash still returns `200`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
