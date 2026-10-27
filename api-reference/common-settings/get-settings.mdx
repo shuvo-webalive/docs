@@ -1,0 +1,9 @@
+---
+title: "Get settings"
+description: "Returns the settings in the group you name with `type`, as `config_key` and `value` pairs."
+openapi: "GET /settings"
+---
+
+Returns `settings`, an object keyed by group name, where each group is a list of `config_key` and `value` pairs. Send `type` to get one group and `config_key` to get one key; without `type`, the call returns every group, about 2 MB, and can take 30 seconds or more. Every value is text, except in the `notifications` group, and passwords, keys and tokens read as `***`. Only `type` and `config_key` are accepted: any other query parameter, `limit` and `offset` included, is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

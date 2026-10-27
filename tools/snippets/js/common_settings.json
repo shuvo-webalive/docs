@@ -1,0 +1,30 @@
+{
+  "sdk": "js",
+  "module": "common_settings",
+  "endpoints": {
+    "get_settings": {
+      "function": "getSettings",
+      "code": "const response = await client.commonSettings.getSettings({type: 'customer_registration_field', config_key: 'abn_placeholder'});\nfor (const setting of response.map.settings.customer_registration_field) {\n    console.log(setting.config_key, setting.value);\n}\n"
+    },
+    "head_settings": {
+      "function": "headSettings",
+      "code": "const response = await client.commonSettings.headSettings({type: 'general'});\nconsole.log(response.statusCode);\n"
+    },
+    "update_settings": {
+      "function": "updateSettings",
+      "code": "const response = await client.commonSettings.updateSettings({\n    settings: {\n        customer_registration_field: [{config_key: 'abn_placeholder', value: 'Enter your ABN'}],\n    },\n});\nfor (const setting of response.map.settings.customer_registration_field) {\n    console.log(setting.config_key, setting.value);\n}\n"
+    },
+    "save_settings": {
+      "function": "saveSettings",
+      "code": "const response = await client.commonSettings.saveSettings({\n    settings: {\n        customer_registration_field: {abn_placeholder: 'Enter your ABN'},\n    },\n});\nfor (const setting of response.map.settings.customer_registration_field) {\n    console.log(setting.config_key, setting.value);\n}\n"
+    },
+    "get_create_customer_fields": {
+      "function": "getCreateCustomerFields",
+      "code": "const response = await client.commonSettings.getCreateCustomerFields();\nconst configs = response.map.fields_configs;\nfor (const field of response.map.fields) {\n    console.log(field, configs[`${field}_label`], configs[`${field}_required`]);\n}\n"
+    },
+    "head_create_customer_fields": {
+      "function": "headCreateCustomerFields",
+      "code": "const response = await client.commonSettings.headCreateCustomerFields();\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

@@ -735,6 +735,20 @@
             ]
           },
           {
+            "group": "Common settings",
+            "icon": "gear",
+            "expanded": false,
+            "pages": [
+              "common-settings",
+              "api-reference/common-settings/get-settings",
+              "api-reference/common-settings/check-settings",
+              "api-reference/common-settings/update-settings",
+              "api-reference/common-settings/save-settings",
+              "api-reference/common-settings/get-the-customer-registration-fields",
+              "api-reference/common-settings/check-the-customer-registration-fields"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

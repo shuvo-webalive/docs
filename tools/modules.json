@@ -139,6 +139,13 @@
       ]
     },
     {
+      "name": "Common settings",
+      "icon": "gear",
+      "modules": [
+        "common_settings"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [

@@ -1,0 +1,9 @@
+---
+title: "Save settings"
+description: "Changes only the settings you send with `POST`, and returns `201` and every settings group."
+openapi: "POST /settings"
+---
+
+Takes the same body as [Update settings](/api-reference/common-settings/update-settings) and saves it the same way: only the keys you send change, and one entry that is not valid rejects the whole request with `400`. It returns `201` instead of `200`, with every group of the store, and can take from 5 to more than 50 seconds. If the call times out, read the keys back with [Get settings](/api-reference/common-settings/get-settings) before you send it again.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
