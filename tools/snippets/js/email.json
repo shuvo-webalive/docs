@@ -1,0 +1,10 @@
+{
+  "sdk": "js",
+  "module": "email",
+  "endpoints": {
+    "send_email": {
+      "function": "sendEmail",
+      "code": "const response = await client.email.sendEmail({\n    recipients: ['customer@example.com'],\n    cc: ['orders@example.com'],\n    subject: 'Your order has shipped',\n    htmlContent: '<p>Your order is on its way.</p>',\n    contentType: 'text/html',\n});\nconsole.log(response.map.status, response.map.accepted, response.map.rejected, response.map.cc);\n"
+    }
+  }
+}

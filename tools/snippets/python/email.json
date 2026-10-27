@@ -1,0 +1,10 @@
+{
+  "sdk": "python",
+  "module": "email",
+  "endpoints": {
+    "send_email": {
+      "function": "send_email",
+      "code": "response = client.email.send_email({\n    \"recipients\": [\"customer@example.com\"],\n    \"cc\": [\"orders@example.com\"],\n    \"subject\": \"Your order has shipped\",\n    \"htmlContent\": \"<p>Your order is on its way.</p>\",\n    \"contentType\": \"text/html\",\n})\nprint(response.map[\"status\"], response.map[\"accepted\"], response.map[\"cc\"])\n"
+    }
+  }
+}

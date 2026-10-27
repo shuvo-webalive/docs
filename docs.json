@@ -735,6 +735,15 @@
             ]
           },
           {
+            "group": "Email",
+            "icon": "envelope",
+            "expanded": false,
+            "pages": [
+              "email",
+              "api-reference/email/send-an-email"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

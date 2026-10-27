@@ -1,0 +1,10 @@
+{
+  "sdk": "go",
+  "module": "email",
+  "endpoints": {
+    "send_email": {
+      "function": "SendEmail",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Email().SendEmail(ctx, map[string]any{\n\t\"recipients\":  []any{\"customer@example.com\"},\n\t\"cc\":          []any{\"orders@example.com\"},\n\t\"subject\":     \"Your order has shipped\",\n\t\"htmlContent\": \"<p>Your order is on its way.</p>\",\n\t\"contentType\": \"text/html\",\n}, \"\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"accepted\"], body[\"cc\"])\n"
+    }
+  }
+}

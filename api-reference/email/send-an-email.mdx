@@ -1,0 +1,9 @@
+---
+title: "Send an email"
+description: "Sends an email to up to 100 addresses and returns the accepted and rejected addresses."
+openapi: "POST /admin/email/send"
+---
+
+Send `recipients` and `subject` at the top level of the body, with either `htmlContent` or a plugin template's `identifier` and `data`. The call returns `200` once every message is sent, with the recipients in `accepted` and the copied addresses in `cc` and `bcc`. An address you send twice, in any letter case, gets one email. Each sender can send to 500 addresses a day; past that, the call is rejected with `429` until 00:00 UTC.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>
