@@ -1,0 +1,9 @@
+---
+title: "Check the customer registration fields"
+description: "Checks that the customer registration form can be read. Returns headers only, with no body."
+openapi: "HEAD /create-customer-fields"
+---
+
+Returns `200` with headers only and no body. The response has no `ETag` header. To read the fields, use [Get the customer registration fields](/api-reference/common-settings/get-the-customer-registration-fields).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

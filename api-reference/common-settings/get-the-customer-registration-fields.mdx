@@ -1,0 +1,9 @@
+---
+title: "Get the customer registration fields"
+description: "Returns the customer registration form: the active fields in order and every field's settings."
+openapi: "GET /create-customer-fields"
+---
+
+Returns `fields`, the keys of the active registration fields in their `_order`, and `fields_configs`, six settings for each of the store's 20 registration fields, inactive ones included. Each field has `_order`, `_key`, `_label`, `_placeholder`, `_active` and `_required`, such as `first_name_label`; `_order` is text, and `_active` and `_required` are booleans. The form follows the `customer_registration_field` settings group, which you change with [Update settings](/api-reference/common-settings/update-settings). The call takes no query parameters: any query parameter is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

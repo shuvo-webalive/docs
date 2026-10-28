@@ -1,0 +1,9 @@
+---
+title: "Delete a page"
+description: "Moves a page to the trash, or deletes it permanently with `force=true`."
+openapi: "DELETE /admin/pages/{page_id}"
+---
+
+Without `force`, the page moves to the trash and the call returns `204`: [Retrieve a page](/api-reference/pages/retrieve-a-page) still returns it with `in_trash` set to `true`, and [List pages](/api-reference/pages/list-pages) leaves it out. Send `force=true` to delete the page permanently, from the trash or before it is in the trash; retrieving it then returns `404`. A second delete without `force=true` is rejected with `400`. You cannot delete the landing page: the call is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -139,10 +139,17 @@
       ]
     },
     {
-      "name": "Email",
-      "icon": "envelope",
+      "name": "Pages",
+      "icon": "file",
       "modules": [
-        "email"
+        "pages"
+      ]
+    },
+    {
+      "name": "Common settings",
+      "icon": "gear",
+      "modules": [
+        "common_settings"
       ]
     },
     {

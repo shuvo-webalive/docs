@@ -1,0 +1,9 @@
+---
+title: "Update settings"
+description: "Changes only the settings you send with `PUT` and returns every settings group of the store."
+openapi: "PUT /settings"
+---
+
+Saves the settings you send inside `settings`, keyed by group name, and returns every settings group of the store, about 2 MB. Each group is a list of `config_key` and `value` pairs, an object of `config_key` to value, or an object of any names to `config_key` and `value` pairs. Only the keys you send change, and one entry that is not valid, such as an unknown group or key, rejects the whole request with `400` and saves nothing. The call can take from 5 to more than 50 seconds, longer than the default timeout of 30 seconds: build the client with a longer timeout, such as 120 seconds.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

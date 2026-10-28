@@ -1,0 +1,30 @@
+{
+  "sdk": "dart",
+  "module": "common_settings",
+  "endpoints": {
+    "get_settings": {
+      "function": "getSettings",
+      "code": "final response = await client.commonSettings.getSettings(queryParams: {\n  'type': 'customer_registration_field',\n  'config_key': 'abn_placeholder',\n});\nfinal settings = (response.map as Map)['settings'] as Map;\nfor (final setting in settings['customer_registration_field'] as List) {\n  print('${(setting as Map)['config_key']} ${setting['value']}');\n}"
+    },
+    "head_settings": {
+      "function": "headSettings",
+      "code": "final response = await client.commonSettings\n    .headSettings(queryParams: {'type': 'general'});\nprint(response.statusCode);"
+    },
+    "update_settings": {
+      "function": "updateSettings",
+      "code": "final response = await client.commonSettings.updateSettings({\n  'settings': {\n    'customer_registration_field': [\n      {'config_key': 'abn_placeholder', 'value': 'Enter your ABN'},\n    ],\n  },\n});\nfinal settings = (response.map as Map)['settings'] as Map;\nprint(settings.keys);"
+    },
+    "save_settings": {
+      "function": "saveSettings",
+      "code": "final response = await client.commonSettings.saveSettings({\n  'settings': {\n    'customer_registration_field': {'abn_placeholder': 'Enter your ABN'},\n  },\n});\nprint(response.statusCode);\nprint(((response.map as Map)['settings'] as Map).keys);"
+    },
+    "get_create_customer_fields": {
+      "function": "getCreateCustomerFields",
+      "code": "final response = await client.commonSettings.getCreateCustomerFields();\nfinal body = response.map as Map;\nfinal configs = body['fields_configs'] as Map;\nfor (final field in body['fields'] as List) {\n  print('${configs['${field}_label']} ${configs['${field}_required']}');\n}"
+    },
+    "head_create_customer_fields": {
+      "function": "headCreateCustomerFields",
+      "code": "final response = await client.commonSettings.headCreateCustomerFields();\nprint(response.statusCode);"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Duplicate a page"
+description: "Copies a page and returns the copy, its name ending ` - Copy` and its URL `-copy`."
+openapi: "POST /admin/pages/{page_id}/duplicate"
+---
+
+Send no body, or `{}`; a body with any field is rejected with `400` and the reason `not_allowed`. The copy is named `<name> - Copy` with the URL `<url>-copy`, and the next copy `<name> - Copy 1` at `<url>-copy-1`. The copy keeps the access list and the password, and has `landing` and `menu_placement.enabled` set to `false`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

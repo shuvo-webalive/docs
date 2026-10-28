@@ -1,0 +1,66 @@
+{
+  "sdk": "js",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "listPages",
+      "code": "const response = await client.pages.listPages({search: 'about', visibility: 'open', sort: 'name', order: 'asc'});\nfor (const page of response.map.pages) {\n    console.log(page.id, page.name, page.url, page.visibility, page.active, page.landing);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_pages": {
+      "function": "headPages",
+      "code": "const response = await client.pages.headPages();\nconsole.log(response.statusCode);\n"
+    },
+    "count_pages": {
+      "function": "countPages",
+      "code": "const response = await client.pages.countPages({active: true, has_layout: true});\nconsole.log(response.map.total);\n"
+    },
+    "head_pages_count": {
+      "function": "headPagesCount",
+      "code": "const response = await client.pages.headPagesCount();\nconsole.log(response.statusCode);\n"
+    },
+    "create_page": {
+      "function": "createPage",
+      "code": "const response = await client.pages.createPage({\n    page: {\n        name: 'About us',\n        title: 'About us',\n        visibility: 'open',\n        layout: {id: 28},\n    },\n});\nconsole.log(response.map.page.id, response.map.page.url, response.map.page.full_url);\nconsole.log(response.headers.location);\n"
+    },
+    "get_page": {
+      "function": "getPage",
+      "code": "const response = await client.pages.getPage(812);\nconst page = response.map.page;\nconsole.log(page.name, page.title, page.url, page.visibility, page.layout?.name, page.in_trash);\nconsole.log(response.headers.etag);\n"
+    },
+    "head_page": {
+      "function": "headPage",
+      "code": "const response = await client.pages.headPage(812);\nconsole.log(response.statusCode, response.headers.etag);\n"
+    },
+    "update_page": {
+      "function": "updatePage",
+      "code": "const response = await client.pages.updatePage(812, {\n    page: {\n        name: 'About us', title: 'About us', subtitle: 'Who we are', url: 'about-us',\n        layout: {id: 28}, visibility: 'open', body_class: 'about-page',\n        active: true, disable_tracking: false, password_protection: {enabled: false},\n    },\n});\nconst page = response.map.page;\nconsole.log(page.subtitle, page.body_class, page.updated_at, response.headers.etag);\n"
+    },
+    "patch_page": {
+      "function": "patchPage",
+      "code": "const response = await client.pages.patchPage(812, {page: {title: 'About our company'}});\nconsole.log(response.map.page.title, response.map.page.updated_at);\n"
+    },
+    "delete_page": {
+      "function": "deletePage",
+      "code": "const response = await client.pages.deletePage(812);\nconsole.log(response.statusCode);\n"
+    },
+    "update_page_url": {
+      "function": "updatePageUrl",
+      "code": "const response = await client.pages.updatePageUrl(812, {url: 'about-our-company'});\nconsole.log(response.map.page.url, response.map.page.full_url);\n"
+    },
+    "set_landing_page": {
+      "function": "setLandingPage",
+      "code": "const response = await client.pages.setLandingPage(812);\nconsole.log(response.map.page.id, response.map.page.landing);\n"
+    },
+    "get_page_delete_blockers": {
+      "function": "getPageDeleteBlockers",
+      "code": "const response = await client.pages.getPageDeleteBlockers(812);\nconsole.log(response.map.can_delete);\nfor (const blocker of response.map.blockers) {\n    console.log(blocker.code, blocker.message);\n}\n"
+    },
+    "head_page_delete_blockers": {
+      "function": "headPageDeleteBlockers",
+      "code": "const response = await client.pages.headPageDeleteBlockers(812);\nconsole.log(response.statusCode);\n"
+    },
+    "duplicate_page": {
+      "function": "duplicatePage",
+      "code": "const response = await client.pages.duplicatePage(812);\nconsole.log(response.map.page.id, response.map.page.name, response.map.page.url);\n"
+    }
+  }
+}
