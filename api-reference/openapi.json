@@ -154,6 +154,9 @@
       "name": "Pages"
     },
     {
+      "name": "Common settings"
+    },
+    {
       "name": "Domain aliases"
     }
   ],
@@ -48060,6 +48063,688 @@
         ]
       }
     },
+    "/settings": {
+      "get": {
+        "tags": [
+          "Common settings"
+        ],
+        "summary": "Get settings",
+        "operationId": "get_settings",
+        "description": "Returns `settings`, an object keyed by group name, where each group is a list of `config_key` and `value` pairs. Send `type` to get one group and `config_key` to get one key; without `type`, the call returns every group, about 2 MB, and can take 30 seconds or more. Every value is text, except in the `notifications` group, and passwords, keys and tokens read as `***`. Only `type` and `config_key` are accepted: any other query parameter, `limit` and `offset` included, is rejected with `400`.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "The settings group to return, such as `general`, `locale`, `email`, `e_commerce`, `notifications` or `customer_registration_field`. Send it on every call: without it, the call returns every group, about 2 MB, and can take 30 seconds or more. An unknown group, or a comma list of groups, is rejected with `404` and the detail code `unknown_type`. An empty `type=` counts as no `type`, so the call returns every group.",
+            "schema": {
+              "type": "string",
+              "example": "customer_registration_field"
+            }
+          },
+          {
+            "name": "config_key",
+            "in": "query",
+            "description": "The one setting to return, such as `abn_placeholder`. It works with or without `type`; without `type`, the response places the key under the group it belongs to. A comma list of keys matches nothing and returns `{\"settings\": {}}`. An empty `config_key=` counts as no `config_key`.",
+            "schema": {
+              "type": "string",
+              "example": "abn_placeholder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings you asked for in `settings`, keyed by group name. A `config_key` that matches nothing, or a comma list of keys, returns `{\"settings\": {}}`. The response is not paginated and has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingGroups"
+                },
+                "example": {
+                  "settings": {
+                    "customer_registration_field": [
+                      {
+                        "config_key": "abn_placeholder",
+                        "value": "Enter your ABN"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a query parameter other than `type` and `config_key`, such as `limit` or `offset`: the message is `unknown query parameter(s): <name>` and the detail code `unknown_parameter`. Or you sent `type` or `config_key` twice: the message is `Send each query parameter once: <name>` and the detail code `duplicate_parameter`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No settings group has the name you sent in `type`. The message is `Unknown settings type: <type>` and the detail code `unknown_type`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/settings?type=customer_registration_field&config_key=abn_placeholder\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.common_settings.get_settings({\"type\": \"customer_registration_field\", \"config_key\": \"abn_placeholder\"})\nfor setting in response.map[\"settings\"][\"customer_registration_field\"]:\n    print(setting[\"config_key\"], setting[\"value\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.commonSettings.getSettings({type: 'customer_registration_field', config_key: 'abn_placeholder'});\nfor (const setting of response.map.settings.customer_registration_field) {\n    console.log(setting.config_key, setting.value);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = CommonSettings::getSettings($client, ['type' => 'customer_registration_field', 'config_key' => 'abn_placeholder']);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.commonSettings().getSettings(Map.of(\"type\", \"customer_registration_field\", \"config_key\", \"abn_placeholder\"));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CommonSettings.GetSettingsAsync(\n    new Dictionary<string, object?> { [\"type\"] = \"customer_registration_field\", [\"config_key\"] = \"abn_placeholder\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar settings = (IReadOnlyDictionary<string, object?>)body[\"settings\"]!;\nforeach (var setting in ((IReadOnlyList<object?>)settings[\"customer_registration_field\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{setting[\"config_key\"]} {setting[\"value\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.commonSettings.getSettings(queryParams: {\n  'type': 'customer_registration_field',\n  'config_key': 'abn_placeholder',\n});\nfinal settings = (response.map as Map)['settings'] as Map;\nfor (final setting in settings['customer_registration_field'] as List) {\n  print('${(setting as Map)['config_key']} ${setting['value']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CommonSettings().GetSettings(ctx, map[string]any{\"type\": \"customer_registration_field\", \"config_key\": \"abn_placeholder\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"settings\"].(map[string]any)[\"customer_registration_field\"].([]any) {\n\tsetting := row.(map[string]any)\n\tfmt.Println(setting[\"config_key\"], setting[\"value\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Common settings"
+        ],
+        "summary": "Check settings",
+        "operationId": "head_settings",
+        "description": "Runs the same query as [Get settings](/api-reference/common-settings/get-settings) and returns `200` with headers only and no body. Send `type`: an unknown group returns `404`, and a query parameter other than `type` and `config_key` returns `400`. Without `type`, the call still reads every group and can take about 6 seconds. The response has no `ETag` header.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "The settings group to return, such as `general`, `locale`, `email`, `e_commerce`, `notifications` or `customer_registration_field`. Send it on every call: without it, the call returns every group, about 2 MB, and can take 30 seconds or more. An unknown group, or a comma list of groups, is rejected with `404` and the detail code `unknown_type`. An empty `type=` counts as no `type`, so the call returns every group.",
+            "schema": {
+              "type": "string",
+              "example": "customer_registration_field"
+            }
+          },
+          {
+            "name": "config_key",
+            "in": "query",
+            "description": "The one setting to return, such as `abn_placeholder`. It works with or without `type`; without `type`, the response places the key under the group it belongs to. A comma list of keys matches nothing and returns `{\"settings\": {}}`. An empty `config_key=` counts as no `config_key`.",
+            "schema": {
+              "type": "string",
+              "example": "abn_placeholder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group can be read. Headers only, no body."
+          },
+          "400": {
+            "description": "You sent a query parameter other than `type` and `config_key`. Headers only, no body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No settings group has the name you sent in `type`. Headers only, no body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/settings?type=general\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.common_settings.head_settings({\"type\": \"general\"})\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.commonSettings.headSettings({type: 'general'});\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = CommonSettings::headSettings($client, ['type' => 'general']);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.commonSettings().headSettings(Map.of(\"type\", \"general\"));\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CommonSettings.HeadSettingsAsync(\n    new Dictionary<string, object?> { [\"type\"] = \"general\" });\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.commonSettings\n    .headSettings(queryParams: {'type': 'general'});\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CommonSettings().HeadSettings(ctx, map[string]any{\"type\": \"general\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Common settings"
+        ],
+        "summary": "Update settings",
+        "operationId": "update_settings",
+        "description": "Saves the settings you send inside `settings`, keyed by group name, and returns every settings group of the store, about 2 MB. Each group is a list of `config_key` and `value` pairs, an object of `config_key` to value, or an object of any names to `config_key` and `value` pairs. Only the keys you send change, and one entry that is not valid, such as an unknown group or key, rejects the whole request with `400` and saves nothing. The call can take from 5 to more than 50 seconds, longer than the default timeout of 30 seconds: build the client with a longer timeout, such as 120 seconds.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Every settings group of the store in `settings`, about 2 MB, with your changes saved. The example is cut down to one entry in each of three groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingGroups"
+                },
+                "example": {
+                  "settings": {
+                    "customer_registration_field": [
+                      {
+                        "config_key": "abn_placeholder",
+                        "value": "Enter your ABN"
+                      }
+                    ],
+                    "general": [
+                      {
+                        "config_key": "unit_weight",
+                        "value": "pounds"
+                      }
+                    ],
+                    "notifications": {
+                      "order_emails_enabled": true,
+                      "customer_emails_enabled": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid, and nothing is saved. The groups are not inside `settings` (each group is reported as `unknown_field` and `settings` as `required`); the body is `{}` (the message is `request body is empty`); an entry names a group the store does not have (detail code `unknown_group`); or an entry names a key the group does not have (detail code `unknown_key`). One entry that is not valid rejects every entry in the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"settings\": {\n      \"customer_registration_field\": [\n        {\n          \"config_key\": \"abn_placeholder\",\n          \"value\": \"Enter your ABN\"\n        }\n      ]\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.common_settings.update_settings({\"settings\": {\n    \"customer_registration_field\": [{\"config_key\": \"abn_placeholder\", \"value\": \"Enter your ABN\"}],\n}})\nfor setting in response.map[\"settings\"][\"customer_registration_field\"]:\n    print(setting[\"config_key\"], setting[\"value\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.commonSettings.updateSettings({\n    settings: {\n        customer_registration_field: [{config_key: 'abn_placeholder', value: 'Enter your ABN'}],\n    },\n});\nfor (const setting of response.map.settings.customer_registration_field) {\n    console.log(setting.config_key, setting.value);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = CommonSettings::updateSettings($client, ['settings' => [\n    'customer_registration_field' => [['config_key' => 'abn_placeholder', 'value' => 'Enter your ABN']],\n]]);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    if ($entry['config_key'] === 'abn_placeholder') {\n        echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n    }\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.commonSettings().updateSettings(Map.of(\"settings\", Map.of(\"customer_registration_field\",\n        List.of(Map.of(\"config_key\", \"abn_placeholder\", \"value\", \"Enter your ABN\")))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CommonSettings.UpdateSettingsAsync(new Dictionary<string, object?>\n{\n    [\"settings\"] = new Dictionary<string, object?>\n    {\n        [\"customer_registration_field\"] = new List<object?>\n            { new Dictionary<string, object?> { [\"config_key\"] = \"abn_placeholder\", [\"value\"] = \"Enter your ABN\" } },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar settings = (IReadOnlyDictionary<string, object?>)body[\"settings\"]!;\nforeach (var setting in ((IReadOnlyList<object?>)settings[\"customer_registration_field\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{setting[\"config_key\"]} {setting[\"value\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.commonSettings.updateSettings({\n  'settings': {\n    'customer_registration_field': [\n      {'config_key': 'abn_placeholder', 'value': 'Enter your ABN'},\n    ],\n  },\n});\nfinal settings = (response.map as Map)['settings'] as Map;\nprint(settings.keys);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CommonSettings().UpdateSettings(ctx, map[string]any{\"settings\": map[string]any{\n\t\"customer_registration_field\": []any{map[string]any{\"config_key\": \"abn_placeholder\", \"value\": \"Enter your ABN\"}},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"settings\"].(map[string]any)[\"customer_registration_field\"].([]any) {\n\tsetting := row.(map[string]any)\n\tfmt.Println(setting[\"config_key\"], setting[\"value\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommonSettingInput"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Common settings"
+        ],
+        "summary": "Save settings",
+        "operationId": "save_settings",
+        "description": "Takes the same body as [Update settings](/api-reference/common-settings/update-settings) and saves it the same way: only the keys you send change, and one entry that is not valid rejects the whole request with `400`. It returns `201` instead of `200`, with every group of the store, and can take from 5 to more than 50 seconds. If the call times out, read the keys back with [Get settings](/api-reference/common-settings/get-settings) before you send it again.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Every settings group of the store in `settings`, about 2 MB, with your changes saved. The example is cut down to one entry in each of three groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingGroups"
+                },
+                "example": {
+                  "settings": {
+                    "customer_registration_field": [
+                      {
+                        "config_key": "abn_placeholder",
+                        "value": "Enter your ABN"
+                      }
+                    ],
+                    "general": [
+                      {
+                        "config_key": "unit_weight",
+                        "value": "pounds"
+                      }
+                    ],
+                    "notifications": {
+                      "order_emails_enabled": true,
+                      "customer_emails_enabled": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid, and nothing is saved. The groups are not inside `settings` (each group is reported as `unknown_field` and `settings` as `required`); the body is `{}` (the message is `request body is empty`); an entry names a group the store does not have (detail code `unknown_group`); or an entry names a key the group does not have (detail code `unknown_key`). One entry that is not valid rejects every entry in the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"settings\": {\n      \"customer_registration_field\": {\n        \"abn_placeholder\": \"Enter your ABN\"\n      }\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.common_settings.save_settings({\"settings\": {\n    \"customer_registration_field\": {\"abn_placeholder\": \"Enter your ABN\"},\n}})\nfor setting in response.map[\"settings\"][\"customer_registration_field\"]:\n    print(setting[\"config_key\"], setting[\"value\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.commonSettings.saveSettings({\n    settings: {\n        customer_registration_field: {abn_placeholder: 'Enter your ABN'},\n    },\n});\nfor (const setting of response.map.settings.customer_registration_field) {\n    console.log(setting.config_key, setting.value);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = CommonSettings::saveSettings($client, ['settings' => [\n    'customer_registration_field' => ['abn_placeholder' => 'Enter your ABN'],\n]]);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    if ($entry['config_key'] === 'abn_placeholder') {\n        echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n    }\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.commonSettings().saveSettings(Map.of(\"settings\",\n        Map.of(\"customer_registration_field\", Map.of(\"abn_placeholder\", \"Enter your ABN\"))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CommonSettings.SaveSettingsAsync(new Dictionary<string, object?>\n{\n    [\"settings\"] = new Dictionary<string, object?>\n    {\n        [\"customer_registration_field\"] = new Dictionary<string, object?> { [\"abn_placeholder\"] = \"Enter your ABN\" },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar settings = (IReadOnlyDictionary<string, object?>)body[\"settings\"]!;\nforeach (var setting in ((IReadOnlyList<object?>)settings[\"customer_registration_field\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{setting[\"config_key\"]} {setting[\"value\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.commonSettings.saveSettings({\n  'settings': {\n    'customer_registration_field': {'abn_placeholder': 'Enter your ABN'},\n  },\n});\nprint(response.statusCode);\nprint(((response.map as Map)['settings'] as Map).keys);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CommonSettings().SaveSettings(ctx, map[string]any{\"settings\": map[string]any{\n\t\"customer_registration_field\": map[string]any{\"abn_placeholder\": \"Enter your ABN\"},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"settings\"].(map[string]any)[\"customer_registration_field\"].([]any) {\n\tsetting := row.(map[string]any)\n\tfmt.Println(setting[\"config_key\"], setting[\"value\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommonSettingInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create-customer-fields": {
+      "get": {
+        "tags": [
+          "Common settings"
+        ],
+        "summary": "Get the customer registration fields",
+        "operationId": "get_create_customer_fields",
+        "description": "Returns `fields`, the keys of the active registration fields in their `_order`, and `fields_configs`, six settings for each of the store's 20 registration fields, inactive ones included. Each field has `_order`, `_key`, `_label`, `_placeholder`, `_active` and `_required`, such as `first_name_label`; `_order` is text, and `_active` and `_required` are booleans. The form follows the `customer_registration_field` settings group, which you change with [Update settings](/api-reference/common-settings/update-settings). The call takes no query parameters: any query parameter is rejected with `400`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The active fields' keys in `fields`, and the settings of all 20 fields in `fields_configs`. The response has no `ETag` header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingCustomerFields"
+                },
+                "example": {
+                  "fields": [
+                    "first_name",
+                    "last_name",
+                    "address_line_1",
+                    "post_code",
+                    "city",
+                    "phone",
+                    "email",
+                    "password",
+                    "retype_password",
+                    "country"
+                  ],
+                  "fields_configs": {
+                    "first_name_order": "1",
+                    "first_name_key": "first_name",
+                    "first_name_label": "First Name",
+                    "first_name_placeholder": "Enter your first name",
+                    "first_name_active": true,
+                    "first_name_required": true,
+                    "last_name_order": "2",
+                    "last_name_key": "last_name",
+                    "last_name_label": "Last Name",
+                    "last_name_placeholder": "",
+                    "last_name_active": true,
+                    "last_name_required": true,
+                    "address_line_1_order": "3",
+                    "address_line_1_key": "address_line_1",
+                    "address_line_1_label": "Address Line 1",
+                    "address_line_1_placeholder": "",
+                    "address_line_1_active": true,
+                    "address_line_1_required": false,
+                    "address_line_2_order": "4",
+                    "address_line_2_key": "address_line_2",
+                    "address_line_2_label": "Address Line 2",
+                    "address_line_2_placeholder": "",
+                    "address_line_2_active": false,
+                    "address_line_2_required": false,
+                    "post_code_order": "5",
+                    "post_code_key": "post_code",
+                    "post_code_label": "Post Code",
+                    "post_code_placeholder": "",
+                    "post_code_active": true,
+                    "post_code_required": false,
+                    "city_order": "6",
+                    "city_key": "city",
+                    "city_label": "City",
+                    "city_placeholder": "",
+                    "city_active": true,
+                    "city_required": false,
+                    "phone_order": "7",
+                    "phone_key": "phone",
+                    "phone_label": "Phone",
+                    "phone_placeholder": "",
+                    "phone_active": true,
+                    "phone_required": false,
+                    "mobile_order": "8",
+                    "mobile_key": "mobile",
+                    "mobile_label": "Mobile",
+                    "mobile_placeholder": "",
+                    "mobile_active": false,
+                    "mobile_required": false,
+                    "fax_order": "9",
+                    "fax_key": "fax",
+                    "fax_label": "Fax",
+                    "fax_placeholder": "",
+                    "fax_active": false,
+                    "fax_required": false,
+                    "email_order": "10",
+                    "email_key": "email",
+                    "email_label": "Email",
+                    "email_placeholder": "",
+                    "email_active": true,
+                    "email_required": true,
+                    "confirm_email_order": "11",
+                    "confirm_email_key": "confirm_email",
+                    "confirm_email_label": "Confirm Email",
+                    "confirm_email_placeholder": "",
+                    "confirm_email_active": false,
+                    "confirm_email_required": false,
+                    "password_order": "12",
+                    "password_key": "password",
+                    "password_label": "Password",
+                    "password_placeholder": "",
+                    "password_active": true,
+                    "password_required": true,
+                    "retype_password_order": "13",
+                    "retype_password_key": "retype_password",
+                    "retype_password_label": "Retype Password",
+                    "retype_password_placeholder": "",
+                    "retype_password_active": true,
+                    "retype_password_required": true,
+                    "country_order": "14",
+                    "country_key": "country",
+                    "country_label": "Country",
+                    "country_placeholder": "",
+                    "country_active": true,
+                    "country_required": false,
+                    "customer_type_order": "15",
+                    "customer_type_key": "customer_type",
+                    "customer_type_label": "Customer Type",
+                    "customer_type_placeholder": "",
+                    "customer_type_active": false,
+                    "customer_type_required": false,
+                    "sex_order": "16",
+                    "sex_key": "sex",
+                    "sex_label": "Sex",
+                    "sex_placeholder": "",
+                    "sex_active": false,
+                    "sex_required": false,
+                    "abn_order": "17",
+                    "abn_key": "abn",
+                    "abn_label": "ABN",
+                    "abn_placeholder": "Enter your ABN",
+                    "abn_active": false,
+                    "abn_required": false,
+                    "abn_branch_order": "18",
+                    "abn_branch_key": "abn_branch",
+                    "abn_branch_label": "ABN Branch",
+                    "abn_branch_placeholder": "",
+                    "abn_branch_active": false,
+                    "abn_branch_required": false,
+                    "company_name_order": "19",
+                    "company_name_key": "company_name",
+                    "company_name_label": "Company Name",
+                    "company_name_placeholder": "",
+                    "company_name_active": false,
+                    "company_name_required": false,
+                    "date_of_birth_order": "20",
+                    "date_of_birth_key": "date_of_birth",
+                    "date_of_birth_label": "Date of Birth",
+                    "date_of_birth_placeholder": "",
+                    "date_of_birth_active": false,
+                    "date_of_birth_required": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "You sent a query parameter. The message is `unknown query parameter(s): <name>` and the detail code `unknown_parameter`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonSettingError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/create-customer-fields\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.common_settings.get_create_customer_fields()\nconfigs = response.map[\"fields_configs\"]\nfor field in response.map[\"fields\"]:\n    print(field, configs[field + \"_label\"], configs[field + \"_required\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.commonSettings.getCreateCustomerFields();\nconst configs = response.map.fields_configs;\nfor (const field of response.map.fields) {\n    console.log(field, configs[`${field}_label`], configs[`${field}_required`]);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = CommonSettings::getCreateCustomerFields($client);\n\n$configs = $response->map['fields_configs'];\nforeach ($response->map['fields'] as $field) {\n    echo $field, ' ', $configs[$field . '_label'], $configs[$field . '_required'] ? ' (required)' : '', PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.commonSettings().getCreateCustomerFields();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"fields\"));\nMap<?, ?> configs = (Map<?, ?>) body.get(\"fields_configs\");\nSystem.out.println(configs.get(\"first_name_label\") + \" \" + configs.get(\"first_name_required\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CommonSettings.GetCreateCustomerFieldsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(string.Join(\", \", (IReadOnlyList<object?>)body[\"fields\"]!));\nvar configs = (IReadOnlyDictionary<string, object?>)body[\"fields_configs\"]!;\nConsole.WriteLine($\"{configs[\"first_name_label\"]} {configs[\"first_name_required\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.commonSettings.getCreateCustomerFields();\nfinal body = response.map as Map;\nfinal configs = body['fields_configs'] as Map;\nfor (final field in body['fields'] as List) {\n  print('${configs['${field}_label']} ${configs['${field}_required']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CommonSettings().GetCreateCustomerFields(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nconfigs := body[\"fields_configs\"].(map[string]any)\nfor _, row := range body[\"fields\"].([]any) {\n\tfield := row.(string)\n\tfmt.Println(field, configs[field+\"_label\"], configs[field+\"_required\"])\n}\n"
+          }
+        ]
+      },
+      "head": {
+        "tags": [
+          "Common settings"
+        ],
+        "summary": "Check the customer registration fields",
+        "operationId": "head_create_customer_fields",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. To read the fields, use [Get the customer registration fields](/api-reference/common-settings/get-the-customer-registration-fields).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The registration form can be read. Headers only, no body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -I \"$WC_BASE_URL/api/v4/create-customer-fields\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.common_settings.head_create_customer_fields()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from 'webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.commonSettings.headCreateCustomerFields();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Sdk\\Client\\ClientRegistry;\nuse WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = CommonSettings::headCreateCustomerFields($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.sdk.client.ApiResponse;\nimport com.webcommander.sdk.client.ClientRegistry;\nimport com.webcommander.sdk.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.commonSettings().headCreateCustomerFields();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Sdk.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.CommonSettings.HeadCreateCustomerFieldsAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.commonSettings.headCreateCustomerFields();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.CommonSettings().HeadCreateCustomerFields(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
+      }
+    },
     "/admin/aliases": {
       "get": {
         "tags": [
@@ -70385,6 +71070,641 @@
               "request_id": {
                 "type": "string",
                 "description": "A value that identifies this request."
+              }
+            }
+          }
+        }
+      },
+      "CommonSetting": {
+        "type": "object",
+        "description": "One setting in a group.",
+        "properties": {
+          "config_key": {
+            "type": "string",
+            "description": "The setting's key, such as `abn_placeholder`."
+          },
+          "value": {
+            "type": "string",
+            "description": "The setting's value, always as text, such as `\"true\"` or `\"18\"`. Passwords, keys and tokens read as `***`."
+          }
+        }
+      },
+      "CommonSettingNotifications": {
+        "type": "object",
+        "description": "The `notifications` group. Unlike every other group, it is an object of names to booleans, not a list.",
+        "properties": {
+          "order_emails_enabled": {
+            "type": "boolean",
+            "description": "Whether order emails are on."
+          },
+          "customer_emails_enabled": {
+            "type": "boolean",
+            "description": "Whether customer emails are on."
+          }
+        }
+      },
+      "CommonSettingGroups": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "description": "The settings, keyed by group name, such as `general` or `customer_registration_field`. Each group is a list of `config_key` and `value` pairs, except `notifications`, which is an object of names to booleans.",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommonSetting"
+                  }
+                },
+                {
+                  "$ref": "#/components/schemas/CommonSettingNotifications"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "CommonSettingInput": {
+        "type": "object",
+        "required": [
+          "settings"
+        ],
+        "description": "The settings to change, inside `settings`. A body without the `settings` wrapper, or `{}`, is rejected with `400`.",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "description": "The groups to change, keyed by group name. Each group is a list of `config_key` and `value` pairs, an object of `config_key` to value, or an object of any names to `config_key` and `value` pairs. Only the keys you send change. An unknown group is rejected with `400 unknown_group` and an unknown key with `400 unknown_key`. A number you send as a value is stored as its text.",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommonSetting"
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/CommonSetting"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "CommonSettingCustomerFields": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The keys of the active registration fields, in their `_order`, such as `first_name`."
+          },
+          "fields_configs": {
+            "$ref": "#/components/schemas/CommonSettingCustomerFieldConfigs"
+          }
+        }
+      },
+      "CommonSettingCustomerFieldConfigs": {
+        "type": "object",
+        "description": "Six settings for each of the 20 registration fields, inactive ones included: `<field>_order`, `<field>_key`, `<field>_label`, `<field>_placeholder`, `<field>_active` and `<field>_required`. `_active` and `_required` are booleans here, though the settings read returns them as text.",
+        "properties": {
+          "first_name_order": {
+            "type": "string",
+            "description": "The position of the First Name field on the form, as text, such as `\"1\"`."
+          },
+          "first_name_key": {
+            "type": "string",
+            "description": "The First Name field's key, `first_name`."
+          },
+          "first_name_label": {
+            "type": "string",
+            "description": "The label the form shows for the First Name field."
+          },
+          "first_name_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the First Name field, or an empty string."
+          },
+          "first_name_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the First Name field."
+          },
+          "first_name_required": {
+            "type": "boolean",
+            "description": "`true` when the First Name field must be filled in."
+          },
+          "last_name_order": {
+            "type": "string",
+            "description": "The position of the Last Name field on the form, as text, such as `\"1\"`."
+          },
+          "last_name_key": {
+            "type": "string",
+            "description": "The Last Name field's key, `last_name`."
+          },
+          "last_name_label": {
+            "type": "string",
+            "description": "The label the form shows for the Last Name field."
+          },
+          "last_name_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Last Name field, or an empty string."
+          },
+          "last_name_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Last Name field."
+          },
+          "last_name_required": {
+            "type": "boolean",
+            "description": "`true` when the Last Name field must be filled in."
+          },
+          "address_line_1_order": {
+            "type": "string",
+            "description": "The position of the Address Line 1 field on the form, as text, such as `\"1\"`."
+          },
+          "address_line_1_key": {
+            "type": "string",
+            "description": "The Address Line 1 field's key, `address_line_1`."
+          },
+          "address_line_1_label": {
+            "type": "string",
+            "description": "The label the form shows for the Address Line 1 field."
+          },
+          "address_line_1_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Address Line 1 field, or an empty string."
+          },
+          "address_line_1_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Address Line 1 field."
+          },
+          "address_line_1_required": {
+            "type": "boolean",
+            "description": "`true` when the Address Line 1 field must be filled in."
+          },
+          "address_line_2_order": {
+            "type": "string",
+            "description": "The position of the Address Line 2 field on the form, as text, such as `\"1\"`."
+          },
+          "address_line_2_key": {
+            "type": "string",
+            "description": "The Address Line 2 field's key, `address_line_2`."
+          },
+          "address_line_2_label": {
+            "type": "string",
+            "description": "The label the form shows for the Address Line 2 field."
+          },
+          "address_line_2_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Address Line 2 field, or an empty string."
+          },
+          "address_line_2_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Address Line 2 field."
+          },
+          "address_line_2_required": {
+            "type": "boolean",
+            "description": "`true` when the Address Line 2 field must be filled in."
+          },
+          "post_code_order": {
+            "type": "string",
+            "description": "The position of the Post Code field on the form, as text, such as `\"1\"`."
+          },
+          "post_code_key": {
+            "type": "string",
+            "description": "The Post Code field's key, `post_code`."
+          },
+          "post_code_label": {
+            "type": "string",
+            "description": "The label the form shows for the Post Code field."
+          },
+          "post_code_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Post Code field, or an empty string."
+          },
+          "post_code_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Post Code field."
+          },
+          "post_code_required": {
+            "type": "boolean",
+            "description": "`true` when the Post Code field must be filled in."
+          },
+          "city_order": {
+            "type": "string",
+            "description": "The position of the City field on the form, as text, such as `\"1\"`."
+          },
+          "city_key": {
+            "type": "string",
+            "description": "The City field's key, `city`."
+          },
+          "city_label": {
+            "type": "string",
+            "description": "The label the form shows for the City field."
+          },
+          "city_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the City field, or an empty string."
+          },
+          "city_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the City field."
+          },
+          "city_required": {
+            "type": "boolean",
+            "description": "`true` when the City field must be filled in."
+          },
+          "phone_order": {
+            "type": "string",
+            "description": "The position of the Phone field on the form, as text, such as `\"1\"`."
+          },
+          "phone_key": {
+            "type": "string",
+            "description": "The Phone field's key, `phone`."
+          },
+          "phone_label": {
+            "type": "string",
+            "description": "The label the form shows for the Phone field."
+          },
+          "phone_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Phone field, or an empty string."
+          },
+          "phone_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Phone field."
+          },
+          "phone_required": {
+            "type": "boolean",
+            "description": "`true` when the Phone field must be filled in."
+          },
+          "mobile_order": {
+            "type": "string",
+            "description": "The position of the Mobile field on the form, as text, such as `\"1\"`."
+          },
+          "mobile_key": {
+            "type": "string",
+            "description": "The Mobile field's key, `mobile`."
+          },
+          "mobile_label": {
+            "type": "string",
+            "description": "The label the form shows for the Mobile field."
+          },
+          "mobile_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Mobile field, or an empty string."
+          },
+          "mobile_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Mobile field."
+          },
+          "mobile_required": {
+            "type": "boolean",
+            "description": "`true` when the Mobile field must be filled in."
+          },
+          "fax_order": {
+            "type": "string",
+            "description": "The position of the Fax field on the form, as text, such as `\"1\"`."
+          },
+          "fax_key": {
+            "type": "string",
+            "description": "The Fax field's key, `fax`."
+          },
+          "fax_label": {
+            "type": "string",
+            "description": "The label the form shows for the Fax field."
+          },
+          "fax_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Fax field, or an empty string."
+          },
+          "fax_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Fax field."
+          },
+          "fax_required": {
+            "type": "boolean",
+            "description": "`true` when the Fax field must be filled in."
+          },
+          "email_order": {
+            "type": "string",
+            "description": "The position of the Email field on the form, as text, such as `\"1\"`."
+          },
+          "email_key": {
+            "type": "string",
+            "description": "The Email field's key, `email`."
+          },
+          "email_label": {
+            "type": "string",
+            "description": "The label the form shows for the Email field."
+          },
+          "email_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Email field, or an empty string."
+          },
+          "email_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Email field."
+          },
+          "email_required": {
+            "type": "boolean",
+            "description": "`true` when the Email field must be filled in."
+          },
+          "confirm_email_order": {
+            "type": "string",
+            "description": "The position of the Confirm Email field on the form, as text, such as `\"1\"`."
+          },
+          "confirm_email_key": {
+            "type": "string",
+            "description": "The Confirm Email field's key, `confirm_email`."
+          },
+          "confirm_email_label": {
+            "type": "string",
+            "description": "The label the form shows for the Confirm Email field."
+          },
+          "confirm_email_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Confirm Email field, or an empty string."
+          },
+          "confirm_email_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Confirm Email field."
+          },
+          "confirm_email_required": {
+            "type": "boolean",
+            "description": "`true` when the Confirm Email field must be filled in."
+          },
+          "password_order": {
+            "type": "string",
+            "description": "The position of the Password field on the form, as text, such as `\"1\"`."
+          },
+          "password_key": {
+            "type": "string",
+            "description": "The Password field's key, `password`."
+          },
+          "password_label": {
+            "type": "string",
+            "description": "The label the form shows for the Password field."
+          },
+          "password_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Password field, or an empty string."
+          },
+          "password_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Password field."
+          },
+          "password_required": {
+            "type": "boolean",
+            "description": "`true` when the Password field must be filled in."
+          },
+          "retype_password_order": {
+            "type": "string",
+            "description": "The position of the Retype Password field on the form, as text, such as `\"1\"`."
+          },
+          "retype_password_key": {
+            "type": "string",
+            "description": "The Retype Password field's key, `retype_password`."
+          },
+          "retype_password_label": {
+            "type": "string",
+            "description": "The label the form shows for the Retype Password field."
+          },
+          "retype_password_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Retype Password field, or an empty string."
+          },
+          "retype_password_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Retype Password field."
+          },
+          "retype_password_required": {
+            "type": "boolean",
+            "description": "`true` when the Retype Password field must be filled in."
+          },
+          "country_order": {
+            "type": "string",
+            "description": "The position of the Country field on the form, as text, such as `\"1\"`."
+          },
+          "country_key": {
+            "type": "string",
+            "description": "The Country field's key, `country`."
+          },
+          "country_label": {
+            "type": "string",
+            "description": "The label the form shows for the Country field."
+          },
+          "country_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Country field, or an empty string."
+          },
+          "country_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Country field."
+          },
+          "country_required": {
+            "type": "boolean",
+            "description": "`true` when the Country field must be filled in."
+          },
+          "customer_type_order": {
+            "type": "string",
+            "description": "The position of the Customer Type field on the form, as text, such as `\"1\"`."
+          },
+          "customer_type_key": {
+            "type": "string",
+            "description": "The Customer Type field's key, `customer_type`."
+          },
+          "customer_type_label": {
+            "type": "string",
+            "description": "The label the form shows for the Customer Type field."
+          },
+          "customer_type_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Customer Type field, or an empty string."
+          },
+          "customer_type_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Customer Type field."
+          },
+          "customer_type_required": {
+            "type": "boolean",
+            "description": "`true` when the Customer Type field must be filled in."
+          },
+          "sex_order": {
+            "type": "string",
+            "description": "The position of the Sex field on the form, as text, such as `\"1\"`."
+          },
+          "sex_key": {
+            "type": "string",
+            "description": "The Sex field's key, `sex`."
+          },
+          "sex_label": {
+            "type": "string",
+            "description": "The label the form shows for the Sex field."
+          },
+          "sex_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Sex field, or an empty string."
+          },
+          "sex_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Sex field."
+          },
+          "sex_required": {
+            "type": "boolean",
+            "description": "`true` when the Sex field must be filled in."
+          },
+          "abn_order": {
+            "type": "string",
+            "description": "The position of the ABN field on the form, as text, such as `\"1\"`."
+          },
+          "abn_key": {
+            "type": "string",
+            "description": "The ABN field's key, `abn`."
+          },
+          "abn_label": {
+            "type": "string",
+            "description": "The label the form shows for the ABN field."
+          },
+          "abn_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the ABN field, or an empty string."
+          },
+          "abn_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the ABN field."
+          },
+          "abn_required": {
+            "type": "boolean",
+            "description": "`true` when the ABN field must be filled in."
+          },
+          "abn_branch_order": {
+            "type": "string",
+            "description": "The position of the ABN Branch field on the form, as text, such as `\"1\"`."
+          },
+          "abn_branch_key": {
+            "type": "string",
+            "description": "The ABN Branch field's key, `abn_branch`."
+          },
+          "abn_branch_label": {
+            "type": "string",
+            "description": "The label the form shows for the ABN Branch field."
+          },
+          "abn_branch_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the ABN Branch field, or an empty string."
+          },
+          "abn_branch_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the ABN Branch field."
+          },
+          "abn_branch_required": {
+            "type": "boolean",
+            "description": "`true` when the ABN Branch field must be filled in."
+          },
+          "company_name_order": {
+            "type": "string",
+            "description": "The position of the Company Name field on the form, as text, such as `\"1\"`."
+          },
+          "company_name_key": {
+            "type": "string",
+            "description": "The Company Name field's key, `company_name`."
+          },
+          "company_name_label": {
+            "type": "string",
+            "description": "The label the form shows for the Company Name field."
+          },
+          "company_name_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Company Name field, or an empty string."
+          },
+          "company_name_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Company Name field."
+          },
+          "company_name_required": {
+            "type": "boolean",
+            "description": "`true` when the Company Name field must be filled in."
+          },
+          "date_of_birth_order": {
+            "type": "string",
+            "description": "The position of the Date of Birth field on the form, as text, such as `\"1\"`."
+          },
+          "date_of_birth_key": {
+            "type": "string",
+            "description": "The Date of Birth field's key, `date_of_birth`."
+          },
+          "date_of_birth_label": {
+            "type": "string",
+            "description": "The label the form shows for the Date of Birth field."
+          },
+          "date_of_birth_placeholder": {
+            "type": "string",
+            "description": "The placeholder text in the Date of Birth field, or an empty string."
+          },
+          "date_of_birth_active": {
+            "type": "boolean",
+            "description": "`true` when the form shows the Date of Birth field."
+          },
+          "date_of_birth_required": {
+            "type": "boolean",
+            "description": "`true` when the Date of Birth field must be filled in."
+          }
+        }
+      },
+      "CommonSettingError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "`invalid_request` on a `400` and `not_found` on a `404`."
+              },
+              "message": {
+                "type": "string",
+                "description": "What went wrong, such as `Unknown settings type: <type>`."
+              },
+              "details": {
+                "type": "array",
+                "description": "One entry per rejected parameter or entry.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "The query parameter or body entry that was rejected, such as `type`."
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Why it was rejected, such as `unknown_parameter`, `duplicate_parameter`, `unknown_type`, `unknown_field`, `required`, `unknown_group` or `unknown_key`."
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "More detail, such as `no settings group has this name`, or `null`."
+                    },
+                    "value": {
+                      "description": "The value you sent, when the API includes it."
+                    }
+                  }
+                }
+              },
+              "request_id": {
+                "type": "string",
+                "description": "Identifies this request."
               }
             }
           }
