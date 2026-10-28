@@ -153,6 +153,13 @@
       ]
     },
     {
+      "name": "Email",
+      "icon": "envelope",
+      "modules": [
+        "email"
+      ]
+    },
+    {
       "name": "Domain aliases",
       "icon": "globe",
       "modules": [
