@@ -1,0 +1,9 @@
+---
+title: "Count pages"
+description: "Returns the number of pages that match the listing's filters, as `total`."
+openapi: "GET /admin/pages/count"
+---
+
+Returns the number of pages as `total`, at the top level of the body. The filters of [List pages](/api-reference/pages/list-pages) narrow the count the same way. `sort`, `order`, `limit` and `offset` are ignored, and any other query parameter is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

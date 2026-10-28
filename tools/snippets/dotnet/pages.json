@@ -1,0 +1,66 @@
+{
+  "sdk": "dotnet",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "ListPagesAsync",
+      "code": "var response = await client.Pages.ListPagesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"about\", [\"visibility\"] = \"open\", [\"sort\"] = \"name\", [\"order\"] = \"asc\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var page in ((IReadOnlyList<object?>)body[\"pages\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{page[\"id\"]} {page[\"name\"]} {page[\"url\"]} {page[\"visibility\"]} {page[\"landing\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_pages": {
+      "function": "HeadPagesAsync",
+      "code": "var response = await client.Pages.HeadPagesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_pages": {
+      "function": "CountPagesAsync",
+      "code": "var response = await client.Pages.CountPagesAsync(\n    new Dictionary<string, object?> { [\"active\"] = true, [\"has_layout\"] = true });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "head_pages_count": {
+      "function": "HeadPagesCountAsync",
+      "code": "var response = await client.Pages.HeadPagesCountAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_page": {
+      "function": "CreatePageAsync",
+      "code": "var response = await client.Pages.CreatePageAsync(new Dictionary<string, object?>\n{\n    [\"page\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"About us\", [\"title\"] = \"About us\", [\"visibility\"] = \"open\",\n        [\"layout\"] = new Dictionary<string, object?> { [\"id\"] = 28 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"id\"]} {page[\"url\"]} {page[\"full_url\"]}\");"
+    },
+    "get_page": {
+      "function": "GetPageAsync",
+      "code": "var response = await client.Pages.GetPageAsync(812);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"name\"]} {page[\"title\"]} {page[\"url\"]} {page[\"visibility\"]} {page[\"active\"]}\");"
+    },
+    "head_page": {
+      "function": "HeadPageAsync",
+      "code": "var response = await client.Pages.HeadPageAsync(812);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_page": {
+      "function": "UpdatePageAsync",
+      "code": "var response = await client.Pages.UpdatePageAsync(812, new Dictionary<string, object?>\n{\n    [\"page\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"About us\", [\"title\"] = \"About us\", [\"subtitle\"] = \"Who we are\", [\"url\"] = \"about-us\",\n        [\"layout\"] = new Dictionary<string, object?> { [\"id\"] = 28 }, [\"visibility\"] = \"open\", [\"body_class\"] = \"about-page\",\n        [\"active\"] = true, [\"disable_tracking\"] = false, [\"password_protection\"] = new Dictionary<string, object?> { [\"enabled\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"subtitle\"]} {page[\"body_class\"]} {page[\"active\"]}\");"
+    },
+    "patch_page": {
+      "function": "PatchPageAsync",
+      "code": "var response = await client.Pages.PatchPageAsync(812, new Dictionary<string, object?>\n{\n    [\"page\"] = new Dictionary<string, object?> { [\"title\"] = \"About our company\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"name\"]} {page[\"title\"]}\");"
+    },
+    "delete_page": {
+      "function": "DeletePageAsync",
+      "code": "var response = await client.Pages.DeletePageAsync(812);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_page_url": {
+      "function": "UpdatePageUrlAsync",
+      "code": "var response = await client.Pages.UpdatePageUrlAsync(812, new Dictionary<string, object?>\n{\n    [\"url\"] = \"about-our-company\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"url\"]} {page[\"full_url\"]}\");"
+    },
+    "set_landing_page": {
+      "function": "SetLandingPageAsync",
+      "code": "var response = await client.Pages.SetLandingPageAsync(812);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"name\"]} {page[\"landing\"]}\");"
+    },
+    "get_page_delete_blockers": {
+      "function": "GetPageDeleteBlockersAsync",
+      "code": "var response = await client.Pages.GetPageDeleteBlockersAsync(812);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"can_delete\"]);\nforeach (var blocker in ((IReadOnlyList<object?>)body[\"blockers\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{blocker[\"code\"]} {blocker[\"message\"]}\");"
+    },
+    "head_page_delete_blockers": {
+      "function": "HeadPageDeleteBlockersAsync",
+      "code": "var response = await client.Pages.HeadPageDeleteBlockersAsync(812);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "duplicate_page": {
+      "function": "DuplicatePageAsync",
+      "code": "var response = await client.Pages.DuplicatePageAsync(812);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar page = (IReadOnlyDictionary<string, object?>)body[\"page\"]!;\nConsole.WriteLine($\"{page[\"id\"]} {page[\"name\"]} {page[\"url\"]}\");"
+    }
+  }
+}

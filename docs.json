@@ -735,6 +735,29 @@
             ]
           },
           {
+            "group": "Pages",
+            "icon": "file",
+            "expanded": false,
+            "pages": [
+              "pages",
+              "api-reference/pages/list-pages",
+              "api-reference/pages/check-the-pages-list",
+              "api-reference/pages/count-pages",
+              "api-reference/pages/check-the-page-count",
+              "api-reference/pages/create-a-page",
+              "api-reference/pages/retrieve-a-page",
+              "api-reference/pages/check-a-page",
+              "api-reference/pages/replace-a-page",
+              "api-reference/pages/update-a-page",
+              "api-reference/pages/delete-a-page",
+              "api-reference/pages/change-the-url-of-a-page",
+              "api-reference/pages/set-the-landing-page",
+              "api-reference/pages/get-the-delete-blockers-of-a-page",
+              "api-reference/pages/check-the-delete-blockers-of-a-page",
+              "api-reference/pages/duplicate-a-page"
+            ]
+          },
+          {
             "group": "Domain aliases",
             "icon": "globe",
             "expanded": false,

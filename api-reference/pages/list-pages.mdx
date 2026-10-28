@@ -1,0 +1,9 @@
+---
+title: "List pages"
+description: "Returns up to 20 pages per call, newest change first, with paging details."
+openapi: "GET /admin/pages"
+---
+
+Returns the pages that are not in the trash in `pages`, 20 per call unless you send `limit`, and a `pagination` block. Pages come newest `updated_at` first unless you send `sort` and `order`. Filter with `search`, `active`, `has_layout`, `visibility`, the created and updated date ranges, `author`, `store` and `not_in_store`. Any other query parameter, or a parameter you send twice, is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

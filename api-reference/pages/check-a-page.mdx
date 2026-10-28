@@ -1,0 +1,9 @@
+---
+title: "Check a page"
+description: "Returns headers only for the page in `page_id`, including its `ETag`."
+openapi: "HEAD /admin/pages/{page_id}"
+---
+
+Returns `200` with headers only and no body. The `ETag` is the same one [Retrieve a page](/api-reference/pages/retrieve-a-page) returns, so you can check whether the page changed without reading it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
