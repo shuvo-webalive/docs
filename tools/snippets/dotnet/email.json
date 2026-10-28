@@ -1,0 +1,10 @@
+{
+  "sdk": "dotnet",
+  "module": "email",
+  "endpoints": {
+    "send_email": {
+      "function": "SendEmailAsync",
+      "code": "var response = await client.Email.SendEmailAsync(new Dictionary<string, object?>\n{\n    [\"recipients\"] = new List<object?> { \"customer@example.com\" },\n    [\"cc\"] = new List<object?> { \"orders@example.com\" },\n    [\"subject\"] = \"Your order has shipped\", [\"htmlContent\"] = \"<p>Your order is on its way.</p>\",\n    [\"contentType\"] = \"text/html\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"status\"]);\nConsole.WriteLine(string.Join(\", \", (IReadOnlyList<object?>)body[\"accepted\"]!));\nConsole.WriteLine(string.Join(\", \", (IReadOnlyList<object?>)body[\"cc\"]!));"
+    }
+  }
+}

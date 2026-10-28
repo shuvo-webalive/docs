@@ -1,0 +1,10 @@
+{
+  "sdk": "dart",
+  "module": "email",
+  "endpoints": {
+    "send_email": {
+      "function": "sendEmail",
+      "code": "final response = await client.email.sendEmail({\n  'recipients': ['customer@example.com'],\n  'cc': ['orders@example.com'],\n  'subject': 'Your order has shipped',\n  'htmlContent': '<p>Your order is on its way.</p>',\n  'contentType': 'text/html',\n});\nfinal result = response.map as Map;\nprint('${result['status']} ${result['accepted']} ${result['cc']}');"
+    }
+  }
+}

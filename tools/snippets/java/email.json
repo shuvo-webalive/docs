@@ -1,0 +1,10 @@
+{
+  "sdk": "java",
+  "module": "email",
+  "endpoints": {
+    "send_email": {
+      "function": "sendEmail",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.email().sendEmail(Map.of(\n        \"recipients\", List.of(\"customer@example.com\"), \"cc\", List.of(\"orders@example.com\"),\n        \"subject\", \"Your order has shipped\", \"htmlContent\", \"<p>Your order is on its way.</p>\",\n        \"contentType\", \"text/html\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"accepted\") + \" \" + body.get(\"rejected\"));\nSystem.out.println(body.get(\"cc\") + \" \" + body.get(\"bcc\"));"
+    }
+  }
+}

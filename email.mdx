@@ -1,0 +1,49 @@
+---
+title: "Email"
+sidebarTitle: "Overview"
+description: "Send an email from your store to up to 100 addresses, with your own HTML or text, or from a plugin's template."
+---
+
+The Email API has one endpoint, and you can call it from all seven SDKs. Its path is `/api/v4/admin/email/send`.
+
+<Warning>
+  **Each sender can send to 500 addresses a day.** Every address in `recipients`, `cc` and `bcc`
+  counts. Past the limit, a valid send is rejected with `429` and the code `rate_limited` until
+  00:00 UTC, and the `Retry-After` header gives the seconds left. The SDKs' automatic retries do not
+  wait that long, so the call still fails. A send rejected with `400` does not count toward the limit,
+  and an invalid body still gets `400` after the limit is reached.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Send an email](/api-reference/email/send-an-email) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/send` | Sends an email to up to 100 addresses and returns the accepted and rejected addresses. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send the fields at the top level of the body, in camelCase.** Write `htmlContent` and
+  `contentType`, not `html_content` or `content_type`. The store ignores any field it does not know,
+  snake_case spellings included, without an error. A body wrapped in `email` is rejected with `400`,
+  with `recipients` and `htmlContent` reported as `required`.
+- **Send your own content or a plugin's template, not both.** For your own content, send
+  `htmlContent`. You can add `contentType`: `html`, `text` or `text/html`. For a template, send its
+  `identifier`, its variables in `data`, and the `plugin_uuid` header. A body with both
+  `htmlContent` and `identifier` is rejected with `400` and the code `conflicting_value`.
+- **The `plugin_uuid` header switches the call to plugin authentication.** With an installed
+  plugin's uuid in the header, the store authenticates the call as that plugin, so an admin access
+  token gets `401`, even on an `htmlContent` send. A template send needs the plugin's own access
+  token. Leave the header out when you send your own content. A `plugin_uuid` field in the body is
+  ignored: only the header counts.
+- **One call sends to at most 100 addresses.** `recipients`, `cc` and `bcc` together hold at most
+  100 addresses; more is rejected with `400` and the code `too_many`. Each invalid address is
+  named in `details`, such as `recipients[1]` or `cc[0]`, with the code `invalid_email`.
+- **`POST` is the only method, and the store keeps no copy of the email.** `GET`, `HEAD`, `PUT`,
+  `PATCH` and `DELETE` are rejected with `405` and the header `Allow: POST, OPTIONS`. There is
+  nothing to read back or delete after a send.
