@@ -1,0 +1,30 @@
+{
+  "sdk": "go",
+  "module": "common_settings",
+  "endpoints": {
+    "get_settings": {
+      "function": "GetSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CommonSettings().GetSettings(ctx, map[string]any{\"type\": \"customer_registration_field\", \"config_key\": \"abn_placeholder\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"settings\"].(map[string]any)[\"customer_registration_field\"].([]any) {\n\tsetting := row.(map[string]any)\n\tfmt.Println(setting[\"config_key\"], setting[\"value\"])\n}\n"
+    },
+    "head_settings": {
+      "function": "HeadSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CommonSettings().HeadSettings(ctx, map[string]any{\"type\": \"general\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "update_settings": {
+      "function": "UpdateSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CommonSettings().UpdateSettings(ctx, map[string]any{\"settings\": map[string]any{\n\t\"customer_registration_field\": []any{map[string]any{\"config_key\": \"abn_placeholder\", \"value\": \"Enter your ABN\"}},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"settings\"].(map[string]any)[\"customer_registration_field\"].([]any) {\n\tsetting := row.(map[string]any)\n\tfmt.Println(setting[\"config_key\"], setting[\"value\"])\n}\n"
+    },
+    "save_settings": {
+      "function": "SaveSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CommonSettings().SaveSettings(ctx, map[string]any{\"settings\": map[string]any{\n\t\"customer_registration_field\": map[string]any{\"abn_placeholder\": \"Enter your ABN\"},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"settings\"].(map[string]any)[\"customer_registration_field\"].([]any) {\n\tsetting := row.(map[string]any)\n\tfmt.Println(setting[\"config_key\"], setting[\"value\"])\n}\n"
+    },
+    "get_create_customer_fields": {
+      "function": "GetCreateCustomerFields",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CommonSettings().GetCreateCustomerFields(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nconfigs := body[\"fields_configs\"].(map[string]any)\nfor _, row := range body[\"fields\"].([]any) {\n\tfield := row.(string)\n\tfmt.Println(field, configs[field+\"_label\"], configs[field+\"_required\"])\n}\n"
+    },
+    "head_create_customer_fields": {
+      "function": "HeadCreateCustomerFields",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.CommonSettings().HeadCreateCustomerFields(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    }
+  }
+}
