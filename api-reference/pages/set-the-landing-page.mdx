@@ -1,0 +1,9 @@
+---
+title: "Set the landing page"
+description: "Makes a page the store's landing page; the previous landing page stops being it."
+openapi: "PATCH /admin/pages/{page_id}/landing"
+---
+
+Send no body. The page you name gets `landing` set to `true`, and the page that was the landing page gets `false`, so this call changes two pages. Before you call it, note the current landing page, the row with `landing` `true` in [List pages](/api-reference/pages/list-pages) with `limit=all`, so you can set it back. The landing page cannot be deleted, so make another page the landing page before you delete this one.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

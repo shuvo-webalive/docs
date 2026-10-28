@@ -1,0 +1,72 @@
+---
+title: "Pages"
+sidebarTitle: "Overview"
+description: "List, count, create, replace, update, duplicate and delete the store's pages, change a page's URL and set the landing page."
+---
+
+The Pages API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/pages`.
+
+<Warning>
+  **[Set the landing page](/api-reference/pages/set-the-landing-page) changes the landing page for the whole store.**
+  The page you name gets `landing` `true`, and the page that was the landing page gets `false`.
+  Before you call it, find the current landing page, the row with `landing` `true` in
+  [List pages](/api-reference/pages/list-pages) with `limit=all`, so you can set it back. The landing page cannot be
+  deleted. [Delete a page](/api-reference/pages/delete-a-page) without `force=true` moves the page to the trash, and
+  with `force=true` deletes it permanently.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List pages](/api-reference/pages/list-pages) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/pages` | Returns up to 20 pages per call, newest change first, with paging details. |
+| [Check the pages list](/api-reference/pages/check-the-pages-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/pages` | Returns `200` and the headers of the pages listing, with no body. |
+| [Count pages](/api-reference/pages/count-pages) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/pages/count` | Returns the number of pages that match the listing's filters, as `total`. |
+| [Check the page count](/api-reference/pages/check-the-page-count) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/pages/count` | Returns `200` and the headers of the page count, with no body. |
+| [Create a page](/api-reference/pages/create-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/pages` | Creates a page and returns it with its `id`, which other calls take as `page_id`. |
+| [Retrieve a page](/api-reference/pages/retrieve-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/pages/{page_id}` | Returns the page whose `id` you pass as `page_id`, with an `ETag` header. |
+| [Check a page](/api-reference/pages/check-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/pages/{page_id}` | Returns headers only for the page in `page_id`, including its `ETag`. |
+| [Replace a page](/api-reference/pages/replace-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/pages/{page_id}` | Replaces a page with the ten required fields you send in `page`, and returns it. |
+| [Update a page](/api-reference/pages/update-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/pages/{page_id}` | Changes only the fields you send inside `page` and returns the page. |
+| [Delete a page](/api-reference/pages/delete-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/pages/{page_id}` | Moves a page to the trash, or deletes it permanently with `force=true`. |
+| [Change the URL of a page](/api-reference/pages/change-the-url-of-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/pages/{page_id}/url` | Sets a page's `url` from a bare `{"url": ...}` body and returns the page. |
+| [Set the landing page](/api-reference/pages/set-the-landing-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/pages/{page_id}/landing` | Makes a page the store's landing page; the previous landing page stops being it. |
+| [Get the delete blockers of a page](/api-reference/pages/get-the-delete-blockers-of-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/pages/{page_id}/delete-blockers` | Returns whether a page can be deleted and, if not, what stops the delete. |
+| [Check the delete blockers of a page](/api-reference/pages/check-the-delete-blockers-of-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/pages/{page_id}/delete-blockers` | Returns headers only, with no body, for the delete check of the page in `page_id`. |
+| [Duplicate a page](/api-reference/pages/duplicate-a-page) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/pages/{page_id}/duplicate` | Copies a page and returns the copy, its name ending ` - Copy` and its URL `-copy`. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Wrap the fields of every write in `page`, except when you change a URL.** Create, replace and update
+  take `{"page": {...}}`, and a bare record is rejected with `400` and the reason `unknown_field`.
+  [Change the URL of a page](/api-reference/pages/change-the-url-of-a-page) is the exception: it takes a bare `{"url": "..."}`, and a
+  body wrapped in `page` is rejected with `400`. Responses return the page inside `page`.
+- **`PUT` replaces a page, and `PATCH` changes only the fields you send.**
+  [Replace a page](/api-reference/pages/replace-a-page) needs ten fields: `name`, `title`, `subtitle`, `url`, `layout`,
+  `visibility`, `body_class`, `active`, `disable_tracking` and `password_protection`. Each one you leave
+  out is named in the `400` response with the code `required`. To change one field, use
+  [Update a page](/api-reference/pages/update-a-page).
+- **A deleted page stays in the trash until you delete it with `force=true`.** A page in the trash is left
+  out of [List pages](/api-reference/pages/list-pages), but [Retrieve a page](/api-reference/pages/retrieve-a-page) still returns it
+  with `in_trash` set to `true`. [Update a page](/api-reference/pages/update-a-page) on it is rejected with `409`, and a
+  second delete without `force=true` with `400`. A page in the trash is listed in
+  [List items in the trash](/api-reference/trash/list-items-in-the-trash) until you delete it permanently.
+- **Send `If-Match` to avoid overwriting someone else's change.** [Retrieve a page](/api-reference/pages/retrieve-a-page),
+  replace, update, the URL change, setting the landing page and duplicating all return the page's
+  `ETag` header; creating a page does not. Send that value, quotes included, as `If-Match` on a replace,
+  update or delete. If the page changed since, the call is rejected with `412` and the reason
+  `precondition_failed`, before the body is checked.
+- **A listing returns 20 pages per call unless you send `limit`.** `limit` takes `1` to `100`, or `all`
+  for every page in one call; with `all`, `pagination.limit` is the total. To get more, send a higher
+  `offset` while `pagination.has_next` is `true`. A query parameter the listing does not accept, or
+  one you send twice, is rejected with `400`.
+- **`visibility` is `open`, `hidden` or `restricted`, but some older pages return other values.** A page
+  can return a `visibility` such as `OPEN` or `public`, as it was stored. Treat any value other than the
+  three as unknown. The `visibility` filter on the listing matches in any letter case, so
+  `visibility=open` also returns pages stored as `OPEN`.

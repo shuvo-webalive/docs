@@ -1,0 +1,66 @@
+{
+  "sdk": "python",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "list_pages",
+      "code": "response = client.pages.list_pages({\"search\": \"about\", \"visibility\": \"open\", \"sort\": \"name\", \"order\": \"asc\"})\nfor page in response.map[\"pages\"]:\n    print(page[\"id\"], page[\"name\"], page[\"url\"], page[\"visibility\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_pages": {
+      "function": "head_pages",
+      "code": "response = client.pages.head_pages()\nprint(response.status_code)\n"
+    },
+    "count_pages": {
+      "function": "count_pages",
+      "code": "response = client.pages.count_pages({\"active\": True, \"has_layout\": True})\nprint(response.map[\"total\"])\n"
+    },
+    "head_pages_count": {
+      "function": "head_pages_count",
+      "code": "response = client.pages.head_pages_count()\nprint(response.status_code)\n"
+    },
+    "create_page": {
+      "function": "create_page",
+      "code": "response = client.pages.create_page({\"page\": {\n    \"name\": \"About us\",\n    \"title\": \"About us\",\n    \"visibility\": \"open\",\n    \"layout\": {\"id\": 28},\n}})\npage = response.map[\"page\"]\nprint(page[\"id\"], page[\"url\"])\n"
+    },
+    "get_page": {
+      "function": "get_page",
+      "code": "response = client.pages.get_page(812)\npage = response.map[\"page\"]\nprint(page[\"name\"], page[\"url\"], page[\"visibility\"], page[\"active\"], page[\"landing\"])\n"
+    },
+    "head_page": {
+      "function": "head_page",
+      "code": "response = client.pages.head_page(812)\nprint(response.status_code)\n"
+    },
+    "update_page": {
+      "function": "update_page",
+      "code": "response = client.pages.update_page(812, {\"page\": {\n    \"name\": \"About us\", \"title\": \"About us\", \"subtitle\": \"Who we are\", \"url\": \"about-us\",\n    \"layout\": {\"id\": 28}, \"visibility\": \"open\", \"body_class\": \"about-page\",\n    \"active\": True, \"disable_tracking\": False, \"password_protection\": {\"enabled\": False},\n}})\npage = response.map[\"page\"]\nprint(page[\"title\"], page[\"subtitle\"], page[\"body_class\"], page[\"active\"])\n"
+    },
+    "patch_page": {
+      "function": "patch_page",
+      "code": "response = client.pages.patch_page(812, {\"page\": {\"title\": \"About our company\"}})\nprint(response.map[\"page\"][\"title\"])\n"
+    },
+    "delete_page": {
+      "function": "delete_page",
+      "code": "response = client.pages.delete_page(812)\nprint(response.status_code)\n"
+    },
+    "update_page_url": {
+      "function": "update_page_url",
+      "code": "response = client.pages.update_page_url(812, {\"url\": \"about-our-company\"})\npage = response.map[\"page\"]\nprint(page[\"url\"], page[\"full_url\"])\n"
+    },
+    "set_landing_page": {
+      "function": "set_landing_page",
+      "code": "response = client.pages.set_landing_page(812)\npage = response.map[\"page\"]\nprint(page[\"name\"], page[\"landing\"])\n"
+    },
+    "get_page_delete_blockers": {
+      "function": "get_page_delete_blockers",
+      "code": "response = client.pages.get_page_delete_blockers(812)\nprint(response.map[\"can_delete\"])\nfor blocker in response.map[\"blockers\"]:\n    print(blocker[\"code\"], blocker[\"message\"])\n"
+    },
+    "head_page_delete_blockers": {
+      "function": "head_page_delete_blockers",
+      "code": "response = client.pages.head_page_delete_blockers(812)\nprint(response.status_code)\n"
+    },
+    "duplicate_page": {
+      "function": "duplicate_page",
+      "code": "response = client.pages.duplicate_page(812)\npage = response.map[\"page\"]\nprint(page[\"id\"], page[\"name\"], page[\"url\"])\n"
+    }
+  }
+}

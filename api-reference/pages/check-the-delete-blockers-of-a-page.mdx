@@ -1,0 +1,9 @@
+---
+title: "Check the delete blockers of a page"
+description: "Returns headers only, with no body, for the delete check of the page in `page_id`."
+openapi: "HEAD /admin/pages/{page_id}/delete-blockers"
+---
+
+Returns `200` with headers only and no body. To read `can_delete` and the blockers, use [Get the delete blockers of a page](/api-reference/pages/get-the-delete-blockers-of-a-page).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

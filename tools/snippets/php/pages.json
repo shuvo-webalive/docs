@@ -1,0 +1,66 @@
+{
+  "sdk": "php",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "listPages",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::listPages($client, ['search' => 'about', 'visibility' => 'open', 'sort' => 'name', 'order' => 'asc']);\n\nforeach ($response->map['pages'] as $page) {\n    echo $page['id'], ' ', $page['name'], ' ', $page['url'], $page['landing'] ? ' (landing)' : '', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
+    },
+    "head_pages": {
+      "function": "headPages",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::headPages($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_pages": {
+      "function": "countPages",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::countPages($client, ['active' => true, 'has_layout' => true]);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "head_pages_count": {
+      "function": "headPagesCount",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::headPagesCount($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_page": {
+      "function": "createPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::createPage($client, ['page' => [\n    'name' => 'About us', 'title' => 'About us', 'visibility' => 'open', 'layout' => ['id' => 28],\n]]);\n\n$page = $response->map['page'];\necho $page['id'], ' ', $page['url'], ' ', $page['full_url'], PHP_EOL;"
+    },
+    "get_page": {
+      "function": "getPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::getPage($client, 812);\n\n$page = $response->map['page'];\necho $page['name'], ' ', $page['url'], ' ', $page['visibility'], $page['active'] ? ' active' : ' inactive', PHP_EOL;"
+    },
+    "head_page": {
+      "function": "headPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::headPage($client, 812);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_page": {
+      "function": "updatePage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::updatePage($client, 812, ['page' => [\n    'name' => 'About us', 'title' => 'About us', 'subtitle' => 'Who we are', 'url' => 'about-us',\n    'layout' => ['id' => 28], 'visibility' => 'open', 'body_class' => 'about-page', 'active' => true,\n    'disable_tracking' => false, 'password_protection' => ['enabled' => false],\n]]);\n\n$page = $response->map['page'];\necho $page['title'], ' - ', $page['subtitle'], ' ', $page['body_class'], PHP_EOL;"
+    },
+    "patch_page": {
+      "function": "patchPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::patchPage($client, 812, ['page' => ['title' => 'About our company']]);\n\necho $response->map['page']['title'], PHP_EOL;"
+    },
+    "delete_page": {
+      "function": "deletePage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::deletePage($client, 812);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_page_url": {
+      "function": "updatePageUrl",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::updatePageUrl($client, 812, ['url' => 'about-our-company']);\n\n$page = $response->map['page'];\necho $page['url'], ' ', $page['full_url'], PHP_EOL;"
+    },
+    "set_landing_page": {
+      "function": "setLandingPage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::setLandingPage($client, 812);\n\n$page = $response->map['page'];\necho $page['name'], $page['landing'] ? ' is the landing page' : ' is not the landing page', PHP_EOL;"
+    },
+    "get_page_delete_blockers": {
+      "function": "getPageDeleteBlockers",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::getPageDeleteBlockers($client, 812);\n\necho $response->map['can_delete'] ? 'can delete' : 'cannot delete', PHP_EOL;\nforeach ($response->map['blockers'] as $blocker) {\n    echo $blocker['code'], ': ', $blocker['message'], PHP_EOL;\n}"
+    },
+    "head_page_delete_blockers": {
+      "function": "headPageDeleteBlockers",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::headPageDeleteBlockers($client, 812);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "duplicate_page": {
+      "function": "duplicatePage",
+      "code": "use WebCommander\\Sdk\\Resources\\Pages\\Pages;\n\n$response = Pages::duplicatePage($client, 812);\n\n$page = $response->map['page'];\necho $page['id'], ' ', $page['name'], ' ', $page['url'], PHP_EOL;"
+    }
+  }
+}

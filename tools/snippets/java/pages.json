@@ -1,0 +1,66 @@
+{
+  "sdk": "java",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "listPages",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.pages().listPages(Map.of(\"search\", \"about\", \"visibility\", \"open\", \"sort\", \"name\", \"order\", \"asc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"pages\")) {\n    Map<?, ?> page = (Map<?, ?>) row;\n    System.out.println(page.get(\"id\") + \" \" + page.get(\"name\") + \" \" + page.get(\"url\") + \" \" + page.get(\"visibility\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
+    "head_pages": {
+      "function": "headPages",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.pages().headPages();\nSystem.out.println(response.getStatusCode());"
+    },
+    "count_pages": {
+      "function": "countPages",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().countPages(Map.of(\"active\", true, \"has_layout\", true));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));"
+    },
+    "head_pages_count": {
+      "function": "headPagesCount",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.pages().headPagesCount();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_page": {
+      "function": "createPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().createPage(Map.of(\"page\", Map.of(\n        \"name\", \"About us\", \"title\", \"About us\", \"visibility\", \"open\", \"layout\", Map.of(\"id\", 28))));\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"id\") + \" \" + page.get(\"name\") + \" \" + page.get(\"url\"));\nSystem.out.println(((Map<?, ?>) page.get(\"layout\")).get(\"name\"));"
+    },
+    "get_page": {
+      "function": "getPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().getPage(812);\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"name\") + \" \" + page.get(\"title\") + \" \" + page.get(\"url\"));\nSystem.out.println(page.get(\"visibility\") + \" \" + page.get(\"active\") + \" \" + page.get(\"landing\") + \" \" + page.get(\"in_trash\"));"
+    },
+    "head_page": {
+      "function": "headPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.pages().headPage(812);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_page": {
+      "function": "updatePage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().updatePage(812, Map.of(\"page\", Map.of(\n        \"name\", \"About us\", \"title\", \"About us\", \"subtitle\", \"Who we are\", \"url\", \"about-us\",\n        \"layout\", Map.of(\"id\", 28), \"visibility\", \"open\", \"body_class\", \"about-page\",\n        \"active\", true, \"disable_tracking\", false, \"password_protection\", Map.of(\"enabled\", false))));\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"name\") + \" \" + page.get(\"subtitle\") + \" \" + page.get(\"body_class\"));\nSystem.out.println(page.get(\"updated_at\"));"
+    },
+    "patch_page": {
+      "function": "patchPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().patchPage(812, Map.of(\"page\", Map.of(\"title\", \"About our company\")));\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"name\") + \" \" + page.get(\"title\") + \" \" + page.get(\"updated_at\"));"
+    },
+    "delete_page": {
+      "function": "deletePage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.pages().deletePage(812);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_page_url": {
+      "function": "updatePageUrl",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().updatePageUrl(812, Map.of(\"url\", \"about-our-company\"));\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"url\") + \" \" + page.get(\"full_url\"));"
+    },
+    "set_landing_page": {
+      "function": "setLandingPage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().setLandingPage(812);\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"name\") + \" \" + page.get(\"landing\"));"
+    },
+    "get_page_delete_blockers": {
+      "function": "getPageDeleteBlockers",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().getPageDeleteBlockers(812);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"can_delete\"));\nSystem.out.println(body.get(\"blockers\") + \" \" + body.get(\"linked\"));"
+    },
+    "head_page_delete_blockers": {
+      "function": "headPageDeleteBlockers",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.pages().headPageDeleteBlockers(812);\nSystem.out.println(response.getStatusCode());"
+    },
+    "duplicate_page": {
+      "function": "duplicatePage",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.pages().duplicatePage(812);\nMap<?, ?> page = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"page\");\nSystem.out.println(page.get(\"id\") + \" \" + page.get(\"name\") + \" \" + page.get(\"url\"));"
+    }
+  }
+}

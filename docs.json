@@ -735,17 +735,26 @@
             ]
           },
           {
-            "group": "Common settings",
-            "icon": "gear",
+            "group": "Pages",
+            "icon": "file",
             "expanded": false,
             "pages": [
-              "common-settings",
-              "api-reference/common-settings/get-settings",
-              "api-reference/common-settings/check-settings",
-              "api-reference/common-settings/update-settings",
-              "api-reference/common-settings/save-settings",
-              "api-reference/common-settings/get-the-customer-registration-fields",
-              "api-reference/common-settings/check-the-customer-registration-fields"
+              "pages",
+              "api-reference/pages/list-pages",
+              "api-reference/pages/check-the-pages-list",
+              "api-reference/pages/count-pages",
+              "api-reference/pages/check-the-page-count",
+              "api-reference/pages/create-a-page",
+              "api-reference/pages/retrieve-a-page",
+              "api-reference/pages/check-a-page",
+              "api-reference/pages/replace-a-page",
+              "api-reference/pages/update-a-page",
+              "api-reference/pages/delete-a-page",
+              "api-reference/pages/change-the-url-of-a-page",
+              "api-reference/pages/set-the-landing-page",
+              "api-reference/pages/get-the-delete-blockers-of-a-page",
+              "api-reference/pages/check-the-delete-blockers-of-a-page",
+              "api-reference/pages/duplicate-a-page"
             ]
           },
           {

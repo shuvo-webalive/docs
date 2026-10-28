@@ -1,0 +1,66 @@
+{
+  "sdk": "go",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "ListPages",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().ListPages(ctx, map[string]any{\"search\": \"about\", \"visibility\": \"open\", \"sort\": \"name\", \"order\": \"asc\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"pages\"].([]any) {\n\tpage := row.(map[string]any)\n\tfmt.Println(page[\"id\"], page[\"name\"], page[\"url\"], page[\"visibility\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"has_next\"])\n"
+    },
+    "head_pages": {
+      "function": "HeadPages",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().HeadPages(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "count_pages": {
+      "function": "CountPages",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().CountPages(ctx, map[string]any{\"active\": true, \"has_layout\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"total\"])\n"
+    },
+    "head_pages_count": {
+      "function": "HeadPagesCount",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().HeadPagesCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "create_page": {
+      "function": "CreatePage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().CreatePage(ctx, map[string]any{\"page\": map[string]any{\n\t\"name\": \"About us\", \"title\": \"About us\", \"visibility\": \"open\", \"layout\": map[string]any{\"id\": 28},\n}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)[\"page\"].(map[string]any)\nfmt.Println(page[\"id\"], page[\"url\"], resp.Headers[\"Location\"])\n"
+    },
+    "get_page": {
+      "function": "GetPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().GetPage(ctx, 812, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)[\"page\"].(map[string]any)\nfmt.Println(page[\"name\"], page[\"url\"], page[\"visibility\"], page[\"active\"], page[\"landing\"])\nfmt.Println(resp.Headers[\"Etag\"])\n"
+    },
+    "head_page": {
+      "function": "HeadPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().HeadPage(ctx, 812, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
+    },
+    "update_page": {
+      "function": "UpdatePage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().UpdatePage(ctx, 812, map[string]any{\"page\": map[string]any{\n\t\"name\": \"About us\", \"title\": \"About us\", \"subtitle\": \"Who we are\", \"url\": \"about-us\",\n\t\"layout\": map[string]any{\"id\": 28}, \"visibility\": \"open\", \"body_class\": \"about-page\",\n\t\"active\": true, \"disable_tracking\": false, \"password_protection\": map[string]any{\"enabled\": false},\n}}, \"\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)[\"page\"].(map[string]any)\nfmt.Println(page[\"title\"], page[\"subtitle\"], page[\"body_class\"], page[\"active\"])\n"
+    },
+    "patch_page": {
+      "function": "PatchPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().PatchPage(ctx, 812, map[string]any{\"page\": map[string]any{\"title\": \"About our company\"}}, \"\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"page\"].(map[string]any)[\"title\"])\n"
+    },
+    "delete_page": {
+      "function": "DeletePage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().DeletePage(ctx, 812, nil, \"\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "update_page_url": {
+      "function": "UpdatePageURL",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().UpdatePageURL(ctx, 812, map[string]any{\"url\": \"about-our-company\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)[\"page\"].(map[string]any)\nfmt.Println(page[\"url\"], page[\"full_url\"])\n"
+    },
+    "set_landing_page": {
+      "function": "SetLandingPage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().SetLandingPage(ctx, 812, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)[\"page\"].(map[string]any)\nfmt.Println(page[\"name\"], page[\"landing\"])\n"
+    },
+    "get_page_delete_blockers": {
+      "function": "GetPageDeleteBlockers",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().GetPageDeleteBlockers(ctx, 812, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"can_delete\"])\nfor _, row := range body[\"blockers\"].([]any) {\n\tblocker := row.(map[string]any)\n\tfmt.Println(blocker[\"code\"], blocker[\"message\"])\n}\n"
+    },
+    "head_page_delete_blockers": {
+      "function": "HeadPageDeleteBlockers",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().HeadPageDeleteBlockers(ctx, 812, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
+    "duplicate_page": {
+      "function": "DuplicatePage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Pages().DuplicatePage(ctx, 812, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npage := resp.Map().(map[string]any)[\"page\"].(map[string]any)\nfmt.Println(page[\"id\"], page[\"name\"], page[\"url\"])\n"
+    }
+  }
+}

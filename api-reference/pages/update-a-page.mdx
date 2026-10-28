@@ -1,0 +1,9 @@
+---
+title: "Update a page"
+description: "Changes only the fields you send inside `page` and returns the page."
+openapi: "PATCH /admin/pages/{page_id}"
+---
+
+Send only the fields to change, inside `page`; every field you leave out keeps its value. An empty `page` object is rejected with `400`. A page in the trash cannot be changed: the call is rejected with `409` and the reason `in_trash`. Send `If-Match` to have the call rejected with `412` when the page changed since you read it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

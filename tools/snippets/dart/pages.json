@@ -1,0 +1,66 @@
+{
+  "sdk": "dart",
+  "module": "pages",
+  "endpoints": {
+    "list_pages": {
+      "function": "listPages",
+      "code": "final response = await client.pages.listPages(queryParams: {\n  'search': 'about',\n  'visibility': 'open',\n  'sort': 'name',\n  'order': 'asc',\n});\nfinal pages = (response.map as Map)['pages'] as List;\nfor (final page in pages) {\n  print('${(page as Map)['id']} ${page['name']} ${page['url']}');\n}"
+    },
+    "head_pages": {
+      "function": "headPages",
+      "code": "final response = await client.pages.headPages();\nprint(response.statusCode);"
+    },
+    "count_pages": {
+      "function": "countPages",
+      "code": "final response = await client.pages\n    .countPages(queryParams: {'active': true, 'has_layout': true});\nprint((response.map as Map)['total']);"
+    },
+    "head_pages_count": {
+      "function": "headPagesCount",
+      "code": "final response = await client.pages.headPagesCount();\nprint(response.statusCode);"
+    },
+    "create_page": {
+      "function": "createPage",
+      "code": "final response = await client.pages.createPage({\n  'page': {\n    'name': 'About us',\n    'title': 'About us',\n    'visibility': 'open',\n    'layout': {'id': 28},\n  },\n});\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['id']} ${page['url']}');"
+    },
+    "get_page": {
+      "function": "getPage",
+      "code": "final response = await client.pages.getPage(812);\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['name']} ${page['visibility']} ${page['in_trash']}');\nprint(response.headers['etag']);"
+    },
+    "head_page": {
+      "function": "headPage",
+      "code": "final response = await client.pages.headPage(812);\nprint(response.statusCode);\nprint(response.headers['etag']);"
+    },
+    "update_page": {
+      "function": "updatePage",
+      "code": "final response = await client.pages.updatePage(812, {\n  'page': {\n    'name': 'About us',\n    'title': 'About us',\n    'subtitle': 'Who we are',\n    'url': 'about-us',\n    'layout': {'id': 28},\n    'visibility': 'open',\n    'body_class': 'about-page',\n    'active': true,\n    'disable_tracking': false,\n    'password_protection': {'enabled': false},\n  },\n});\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['subtitle']} ${page['body_class']}');"
+    },
+    "patch_page": {
+      "function": "patchPage",
+      "code": "final response = await client.pages.patchPage(812, {\n  'page': {'title': 'About our company'},\n});\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['name']} ${page['title']}');"
+    },
+    "delete_page": {
+      "function": "deletePage",
+      "code": "final response = await client.pages.deletePage(812);\nprint(response.statusCode);"
+    },
+    "update_page_url": {
+      "function": "updatePageUrl",
+      "code": "final response =\n    await client.pages.updatePageUrl(812, {'url': 'about-our-company'});\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['url']} ${page['full_url']}');"
+    },
+    "set_landing_page": {
+      "function": "setLandingPage",
+      "code": "final response = await client.pages.setLandingPage(812);\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['name']} ${page['landing']}');"
+    },
+    "get_page_delete_blockers": {
+      "function": "getPageDeleteBlockers",
+      "code": "final response = await client.pages.getPageDeleteBlockers(812);\nfinal body = response.map as Map;\nprint(body['can_delete']);\nfor (final blocker in body['blockers'] as List) {\n  print('${(blocker as Map)['code']} ${blocker['message']}');\n}"
+    },
+    "head_page_delete_blockers": {
+      "function": "headPageDeleteBlockers",
+      "code": "final response = await client.pages.headPageDeleteBlockers(812);\nprint(response.statusCode);"
+    },
+    "duplicate_page": {
+      "function": "duplicatePage",
+      "code": "final response = await client.pages.duplicatePage(812);\nfinal page = (response.map as Map)['page'] as Map;\nprint('${page['id']} ${page['name']} ${page['url']}');"
+    }
+  }
+}

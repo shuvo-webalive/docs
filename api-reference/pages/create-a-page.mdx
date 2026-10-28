@@ -1,0 +1,9 @@
+---
+title: "Create a page"
+description: "Creates a page and returns it with its `id`, which other calls take as `page_id`."
+openapi: "POST /admin/pages"
+---
+
+Send the fields inside `page`; `name` and `visibility` are required. The store makes the page's `url` from `name` when you do not send one. A `name` or `url` that another page has is rejected with `409`. The response has a `Location` header but no `ETag`, so retrieve the page before you send `If-Match`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -1,0 +1,9 @@
+---
+title: "Check the page count"
+description: "Returns `200` and the headers of the page count, with no body."
+openapi: "HEAD /admin/pages/count"
+---
+
+Returns `200` with headers only and no body. To read the number, use [Count pages](/api-reference/pages/count-pages).
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

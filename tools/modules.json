@@ -139,10 +139,10 @@
       ]
     },
     {
-      "name": "Common settings",
-      "icon": "gear",
+      "name": "Pages",
+      "icon": "file",
       "modules": [
-        "common_settings"
+        "pages"
       ]
     },
     {
