@@ -4,51 +4,51 @@
   "endpoints": {
     "list_variations": {
       "function": "listVariations",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::listVariations($client, ['search' => 'size', 'standard' => 'text']);\n\nforeach ($response->map['variations'] as $variation) {\n    echo $variation['id'], ' ', $variation['name'], ': ', implode(', ', array_column($variation['options'], 'label')), PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::listVariations($client, ['search' => 'size', 'standard' => 'text']);\n\nforeach ($response->map['variations'] as $variation) {\n    echo $variation['id'], ' ', $variation['name'], ': ', implode(', ', array_column($variation['options'], 'label')), PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
     },
     "head_variations": {
       "function": "headVariations",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::headVariations($client);\n\necho $response->statusCode, PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::headVariations($client);\n\necho $response->statusCode, PHP_EOL;\n"
     },
     "create_variation": {
       "function": "createVariation",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::createVariation($client, ['variation' => [\n    'name' => 'Shirt Size', 'standard' => 'text',\n    'options' => [\n        ['label' => 'Small', 'value' => 'S', 'order' => 1, 'default' => true],\n        ['label' => 'Medium', 'value' => 'M', 'order' => 2],\n    ],\n]]);\n\n$variation = $response->map['variation'];\necho $variation['id'], ': ', implode(', ', array_column($variation['options'], 'id')), PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::createVariation($client, ['variation' => [\n    'name' => 'Shirt Size', 'standard' => 'text',\n    'options' => [\n        ['label' => 'Small', 'value' => 'S', 'order' => 1, 'default' => true],\n        ['label' => 'Medium', 'value' => 'M', 'order' => 2],\n    ],\n]]);\n\n$variation = $response->map['variation'];\necho $variation['id'], ': ', implode(', ', array_column($variation['options'], 'id')), PHP_EOL;\n"
     },
     "get_variation": {
       "function": "getVariation",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::getVariation($client, 12);\n\n$variation = $response->map['variation'];\necho $variation['name'], ' (', $variation['standard'], ')', PHP_EOL;\nforeach ($variation['options'] as $option) {\n    echo $option['id'], ' ', $option['label'], $option['default'] ? ' (default)' : '', PHP_EOL;\n}\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::getVariation($client, 12);\n\n$variation = $response->map['variation'];\necho $variation['name'], ' (', $variation['standard'], ')', PHP_EOL;\nforeach ($variation['options'] as $option) {\n    echo $option['id'], ' ', $option['label'], $option['default'] ? ' (default)' : '', PHP_EOL;\n}\n"
     },
     "head_variation": {
       "function": "headVariation",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::headVariation($client, 12);\n\necho $response->statusCode, PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::headVariation($client, 12);\n\necho $response->statusCode, PHP_EOL;\n"
     },
     "update_variation": {
       "function": "updateVariation",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::updateVariation($client, 15, ['variation' => [\n    'name' => 'Shirt Size',\n    'options' => [\n        ['id' => 201, 'label' => 'Small', 'value' => 'S', 'order' => 1, 'default' => true],\n        ['label' => 'Large', 'value' => 'L', 'order' => 3],\n    ],\n]]);\n\necho implode(', ', array_column($response->map['variation']['options'], 'label')), PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::updateVariation($client, 15, ['variation' => [\n    'name' => 'Shirt Size',\n    'options' => [\n        ['id' => 201, 'label' => 'Small', 'value' => 'S', 'order' => 1, 'default' => true],\n        ['label' => 'Large', 'value' => 'L', 'order' => 3],\n    ],\n]]);\n\necho implode(', ', array_column($response->map['variation']['options'], 'label')), PHP_EOL;\n"
     },
     "patch_variation": {
       "function": "patchVariation",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::patchVariation($client, 15, ['variation' => [\n    'options' => [\n        ['id' => 201, 'label' => 'Petite'],\n        ['label' => 'Extra Large', 'value' => 'XL', 'order' => 4],\n    ],\n]]);\n\nforeach ($response->map['variation']['options'] as $option) {\n    echo $option['id'], ' ', $option['label'], PHP_EOL;\n}\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::patchVariation($client, 15, ['variation' => [\n    'options' => [\n        ['id' => 201, 'label' => 'Petite'],\n        ['label' => 'Extra Large', 'value' => 'XL', 'order' => 4],\n    ],\n]]);\n\nforeach ($response->map['variation']['options'] as $option) {\n    echo $option['id'], ' ', $option['label'], PHP_EOL;\n}\n"
     },
     "delete_variation": {
       "function": "deleteVariation",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteVariation($client, 15, ['cascade' => 'true']);\n\necho $response->statusCode, PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteVariation($client, 15, ['cascade' => 'true']);\n\necho $response->statusCode, PHP_EOL;\n"
     },
     "delete_variation_option": {
       "function": "deleteVariationOption",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteVariationOption($client, 15, 204);\n\necho $response->statusCode, PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteVariationOption($client, 15, 204);\n\necho $response->statusCode, PHP_EOL;\n"
     },
     "list_product_variations": {
       "function": "listProductVariations",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::listProductVariations($client, 4321);\n\nforeach ($response->map['variations'] as $group) {\n    foreach ($group['variants'] as $variant) {\n        echo $variant['variation_id'], ' ', $variant['key'], ' ', $variant['pricing']['base_price'], ' ', $variant['inventory']['quantity'], PHP_EOL;\n    }\n}\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::listProductVariations($client, 4321);\n\nforeach ($response->map['variations'] as $group) {\n    foreach ($group['variants'] as $variant) {\n        echo $variant['variation_id'], ' ', $variant['key'], ' ', $variant['pricing']['base_price'], ' ', $variant['inventory']['quantity'], PHP_EOL;\n    }\n}\n"
     },
     "import_product_variations": {
       "function": "importProductVariations",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::importProductVariations($client, 4321, ['variations' => [['product_key' => 'Size', 'variants' => [\n    ['key' => 'Small', 'name' => 'Cotton T-Shirt Small', 'sku' => 'TSHIRT-001-S', 'pricing' => ['base_price' => 25.0]],\n    ['key' => 'Medium', 'name' => 'Cotton T-Shirt Medium', 'sku' => 'TSHIRT-001-M', 'pricing' => ['base_price' => 25.0]],\n]]]], transactionNo: 'IMPORT-2026-10-18');\n\necho $response->map['message'], ' (', $response->map['total_variants'], ' variants)', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::importProductVariations($client, 4321, ['variations' => [['product_key' => 'Size', 'variants' => [\n    ['key' => 'Small', 'name' => 'Cotton T-Shirt Small', 'sku' => 'TSHIRT-001-S', 'pricing' => ['base_price' => 25.0]],\n    ['key' => 'Medium', 'name' => 'Cotton T-Shirt Medium', 'sku' => 'TSHIRT-001-M', 'pricing' => ['base_price' => 25.0]],\n]]]], transactionNo: 'IMPORT-2026-10-18');\n\necho $response->map['message'], ' (', $response->map['total_variants'], ' variants)', PHP_EOL;"
     },
     "update_product_variations": {
       "function": "updateProductVariations",
-      "code": "use WebCommander\\Sdk\\Resources\\Variations\\Variations;\n\n$response = Variations::updateProductVariations($client, 4321, [\n    'variation_ids' => [91], 'available' => true, 'available_stock' => 12,\n    'min_order_quantity' => 1, 'max_order_quantity' => 5,\n]);\n\necho $response->map['message'], PHP_EOL;\nforeach ($response->map['updated'] as $variant) {\n    echo $variant['id'], ' ', $variant['name'], PHP_EOL;\n}\n"
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::updateProductVariations($client, 4321, [\n    'variation_ids' => [91], 'available' => true, 'available_stock' => 12,\n    'min_order_quantity' => 1, 'max_order_quantity' => 5,\n]);\n\necho $response->map['message'], PHP_EOL;\nforeach ($response->map['updated'] as $variant) {\n    echo $variant['id'], ' ', $variant['name'], PHP_EOL;\n}\n"
     }
   }
 }

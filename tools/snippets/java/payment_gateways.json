@@ -4,35 +4,35 @@
   "endpoints": {
     "list_payment_gateways": {
       "function": "listPaymentGateways",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().listPaymentGateways(\n        Map.of(\"limit\", 20, \"offset\", 0, \"promotional\", \"false\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"payment_gateways\")) {\n    Map<?, ?> gateway = (Map<?, ?>) row;\n    System.out.println(gateway.get(\"id\") + \" \" + gateway.get(\"code\") + \" \" + gateway.get(\"name\") + \" \"\n            + gateway.get(\"enabled\") + \" \" + gateway.get(\"default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().listPaymentGateways(\n        Map.of(\"limit\", 20, \"offset\", 0, \"promotional\", \"false\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"payment_gateways\")) {\n    Map<?, ?> gateway = (Map<?, ?>) row;\n    System.out.println(gateway.get(\"id\") + \" \" + gateway.get(\"code\") + \" \" + gateway.get(\"name\") + \" \"\n            + gateway.get(\"enabled\") + \" \" + gateway.get(\"default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
     "head_payment_gateways": {
       "function": "headPaymentGateways",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.paymentGateways().headPaymentGateways();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.paymentGateways().headPaymentGateways();\nSystem.out.println(response.getStatusCode());"
     },
     "count_payment_gateways": {
       "function": "countPaymentGateways",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().countPaymentGateways(Map.of(\"exclude\", \"PIS,CHQ\"));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().countPaymentGateways(Map.of(\"exclude\", \"PIS,CHQ\"));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));"
     },
     "head_payment_gateways_count": {
       "function": "headPaymentGatewaysCount",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.paymentGateways().headPaymentGatewaysCount();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.paymentGateways().headPaymentGatewaysCount();\nSystem.out.println(response.getStatusCode());"
     },
     "get_payment_gateway": {
       "function": "getPaymentGateway",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().getPaymentGateway(2);\nMap<?, ?> gateway = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment_gateway\");\nSystem.out.println(gateway.get(\"code\") + \" \" + gateway.get(\"name\") + \" \" + gateway.get(\"enabled\"));\nSystem.out.println(gateway.get(\"allowed_for\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().getPaymentGateway(2);\nMap<?, ?> gateway = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment_gateway\");\nSystem.out.println(gateway.get(\"code\") + \" \" + gateway.get(\"name\") + \" \" + gateway.get(\"enabled\"));\nSystem.out.println(gateway.get(\"allowed_for\"));"
     },
     "head_payment_gateway": {
       "function": "headPaymentGateway",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.paymentGateways().headPaymentGateway(2);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.paymentGateways().headPaymentGateway(2);\nSystem.out.println(response.getStatusCode());"
     },
     "update_payment_gateway": {
       "function": "updatePaymentGateway",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().updatePaymentGateway(2,\n        Map.of(\"information\", \"Make cheques payable to Example Store.\"));\nMap<?, ?> gateway = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment_gateway\");\nSystem.out.println(gateway.get(\"name\") + \" \" + gateway.get(\"information\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().updatePaymentGateway(2,\n        Map.of(\"information\", \"Make cheques payable to Example Store.\"));\nMap<?, ?> gateway = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment_gateway\");\nSystem.out.println(gateway.get(\"name\") + \" \" + gateway.get(\"information\"));"
     },
     "patch_payment_gateway": {
       "function": "patchPaymentGateway",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().patchPaymentGateway(2,\n        Map.of(\"allowed_for\", Map.of(\"store_pickup\", false)));\nMap<?, ?> gateway = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment_gateway\");\nSystem.out.println(gateway.get(\"name\") + \" \" + gateway.get(\"allowed_for\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.paymentGateways().patchPaymentGateway(2,\n        Map.of(\"allowed_for\", Map.of(\"store_pickup\", false)));\nMap<?, ?> gateway = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment_gateway\");\nSystem.out.println(gateway.get(\"name\") + \" \" + gateway.get(\"allowed_for\"));"
     }
   }
 }

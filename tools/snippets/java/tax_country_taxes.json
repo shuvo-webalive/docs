@@ -4,23 +4,23 @@
   "endpoints": {
     "list_tax_country_taxes": {
       "function": "listTaxCountryTaxes",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().listTaxCountryTaxes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"country_taxes\")) {\n    Map<?, ?> countryTax = (Map<?, ?>) row;\n    System.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \"\n            + countryTax.get(\"state_rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().listTaxCountryTaxes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"country_taxes\")) {\n    Map<?, ?> countryTax = (Map<?, ?>) row;\n    System.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \"\n            + countryTax.get(\"state_rules_count\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
     },
     "create_tax_country_tax": {
       "function": "createTaxCountryTax",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().createTaxCountryTax(Map.of(\n        \"country_tax\", Map.of(\"country_code\", \"NZ\", \"name\", \"NZ GST\", \"tax_rate\", 15.0, \"tax_method\", \"fixed_rate\"),\n        \"transaction_no\", \"TXN-IMPORT-0001\"), \"TXN-IMPORT-0001\");\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\"));\nSystem.out.println(((Map<?, ?>) countryTax.get(\"country\")).get(\"code\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().createTaxCountryTax(Map.of(\n        \"country_tax\", Map.of(\"country_code\", \"NZ\", \"name\", \"NZ GST\", \"tax_rate\", 15.0, \"tax_method\", \"fixed_rate\"),\n        \"transaction_no\", \"TXN-IMPORT-0001\"), \"TXN-IMPORT-0001\");\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"id\") + \" \" + countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\"));\nSystem.out.println(((Map<?, ?>) countryTax.get(\"country\")).get(\"code\"));"
     },
     "get_tax_country_tax": {
       "function": "getTaxCountryTax",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().getTaxCountryTax(4);\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"state_rules_count\"));\nfor (Object row : (List<?>) countryTax.get(\"state_rules\")) {\n    Map<?, ?> stateRule = (Map<?, ?>) row;\n    System.out.println(stateRule.get(\"id\") + \" \" + stateRule.get(\"tax_rule\") + \" \" + stateRule.get(\"effective_tax_rate\"));\n}"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().getTaxCountryTax(4);\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"state_rules_count\"));\nfor (Object row : (List<?>) countryTax.get(\"state_rules\")) {\n    Map<?, ?> stateRule = (Map<?, ?>) row;\n    System.out.println(stateRule.get(\"id\") + \" \" + stateRule.get(\"tax_rule\") + \" \" + stateRule.get(\"effective_tax_rate\"));\n}"
     },
     "update_tax_country_tax": {
       "function": "updateTaxCountryTax",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().updateTaxCountryTax(42,\n        Map.of(\"country_tax\", Map.of(\"tax_rate\", 12.5)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"last_updated_on\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCountryTaxes().updateTaxCountryTax(42,\n        Map.of(\"country_tax\", Map.of(\"tax_rate\", 12.5)));\nMap<?, ?> countryTax = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"country_tax\");\nSystem.out.println(countryTax.get(\"name\") + \" \" + countryTax.get(\"tax_rate\") + \" \" + countryTax.get(\"last_updated_on\"));"
     },
     "delete_tax_country_tax": {
       "function": "deleteTaxCountryTax",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.taxCountryTaxes().deleteTaxCountryTax(42);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.taxCountryTaxes().deleteTaxCountryTax(42);\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

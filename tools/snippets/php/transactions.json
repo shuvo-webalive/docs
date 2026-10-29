@@ -4,27 +4,27 @@
   "endpoints": {
     "list_transactions": {
       "function": "listTransactions",
-      "code": "use WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::listTransactions($client, ['limit' => 50, 'offset' => 0]);\n\nforeach ($response->map['transactions'] as $transaction) {\n    echo $transaction['transaction_no'], ' ', $transaction['total_records'], ' records', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::listTransactions($client, ['limit' => 50, 'offset' => 0]);\n\nforeach ($response->map['transactions'] as $transaction) {\n    echo $transaction['transaction_no'], ' ', $transaction['total_records'], ' records', PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
     },
     "head_transactions": {
       "function": "headTransactions",
-      "code": "use WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::headTransactions($client);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::headTransactions($client);\n\necho $response->statusCode, PHP_EOL;"
     },
     "get_transaction": {
       "function": "getTransaction",
-      "code": "use WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::getTransaction($client, 'IMPORT-2026-0001');\n\necho $response->map['transaction_no'], ': ', $response->map['total_records'], ' records', PHP_EOL;\nforeach ($response->map['by_type'] as $row) {\n    echo $row['type'], ' ', $row['count'], PHP_EOL;\n}"
+      "code": "use WebCommander\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::getTransaction($client, 'IMPORT-2026-0001');\n\necho $response->map['transaction_no'], ': ', $response->map['total_records'], ' records', PHP_EOL;\nforeach ($response->map['by_type'] as $row) {\n    echo $row['type'], ' ', $row['count'], PHP_EOL;\n}"
     },
     "head_transaction": {
       "function": "headTransaction",
-      "code": "use WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::headTransaction($client, 'IMPORT-2026-0001');\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::headTransaction($client, 'IMPORT-2026-0001');\n\necho $response->statusCode, PHP_EOL;"
     },
     "list_transaction_items": {
       "function": "listTransactionItems",
-      "code": "use WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::listTransactionItems($client, 'IMPORT-2026-0001', [\n    'type' => 'product', 'limit' => 20, 'offset' => 0, 'detail' => 'slim',\n]);\n\nforeach ($response->map['items'] as $item) {\n    echo $item['id'], ' ', $item['name'], ' ', $item['sku'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' in total', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::listTransactionItems($client, 'IMPORT-2026-0001', [\n    'type' => 'product', 'limit' => 20, 'offset' => 0, 'detail' => 'slim',\n]);\n\nforeach ($response->map['items'] as $item) {\n    echo $item['id'], ' ', $item['name'], ' ', $item['sku'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' in total', PHP_EOL;"
     },
     "head_transaction_items": {
       "function": "headTransactionItems",
-      "code": "use WebCommander\\Sdk\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::headTransactionItems($client, 'IMPORT-2026-0001', ['type' => 'product']);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Transactions\\Transactions;\n\n$response = Transactions::headTransactionItems($client, 'IMPORT-2026-0001', ['type' => 'product']);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

@@ -4,11 +4,11 @@
   "endpoints": {
     "list_cities": {
       "function": "listCities",
-      "code": "use WebCommander\\Sdk\\Resources\\Cities\\Cities;\n\n$response = Cities::listCities($client, ['country' => 'AU', 'state' => 'VIC', 'limit' => 20]);\n\nforeach ($response->map['cities'] as $city) {\n    echo $city['id'], ' ', $city['name'], ' ', $city['post_code'], ' ', $city['state']['code'], ' ', $city['country']['code'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Cities\\Cities;\n\n$response = Cities::listCities($client, ['country' => 'AU', 'state' => 'VIC', 'limit' => 20]);\n\nforeach ($response->map['cities'] as $city) {\n    echo $city['id'], ' ', $city['name'], ' ', $city['post_code'], ' ', $city['state']['code'], ' ', $city['country']['code'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
     },
     "head_cities": {
       "function": "headCities",
-      "code": "use WebCommander\\Sdk\\Resources\\Cities\\Cities;\n\n$response = Cities::headCities($client);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Cities\\Cities;\n\n$response = Cities::headCities($client);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

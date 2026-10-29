@@ -6,26 +6,26 @@ client = build_client()
 ```
 
 ```javascript JavaScript
-import {buildClient} from 'webcommander';
+import {buildClient} from '@webcommander/webcommander';
 
 const client = await buildClient();
 ```
 
 ```php PHP
-use WebCommander\Sdk\Client\ClientRegistry;
+use WebCommander\Client\ClientRegistry;
 
 $client = ClientRegistry::buildClient();
 ```
 
 ```java Java
-import com.webcommander.sdk.client.ClientRegistry;
-import com.webcommander.sdk.client.WebCommanderClient;
+import com.webcommander.client.ClientRegistry;
+import com.webcommander.client.WebCommanderClient;
 
 WebCommanderClient client = ClientRegistry.buildClient();
 ```
 
 ```csharp .NET
-using WebCommander.Sdk.Client;
+using WebCommander.Client;
 
 await using var client = WebCommanderClient.BuildClient();
 ```

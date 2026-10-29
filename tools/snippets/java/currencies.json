@@ -4,47 +4,47 @@
   "endpoints": {
     "list_currencies": {
       "function": "listCurrencies",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.currencies().listCurrencies(Map.of(\"search\", \"dollar\", \"active\", true));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"currencies\")) {\n    Map<?, ?> currency = (Map<?, ?>) row;\n    System.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"name\") + \" \" + currency.get(\"base\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.currencies().listCurrencies(Map.of(\"search\", \"dollar\", \"active\", true));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"currencies\")) {\n    Map<?, ?> currency = (Map<?, ?>) row;\n    System.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"name\") + \" \" + currency.get(\"base\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
     "head_currencies": {
       "function": "headCurrencies",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.currencies().headCurrencies();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.currencies().headCurrencies();\nSystem.out.println(response.getStatusCode());"
     },
     "count_currencies": {
       "function": "countCurrencies",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().countCurrencies(Map.of(\"search\", \"dollar\", \"active\", true));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().countCurrencies(Map.of(\"search\", \"dollar\", \"active\", true));\nSystem.out.println(((Map<?, ?>) response.getMap()).get(\"total\"));"
     },
     "head_currencies_count": {
       "function": "headCurrenciesCount",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.currencies().headCurrenciesCount();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.currencies().headCurrenciesCount();\nSystem.out.println(response.getStatusCode());"
     },
     "create_currency": {
       "function": "createCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().createCurrency(Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", \"NZ\",\n        \"conversion_rate\", 1.2345, \"precision\", 2, \"rounding\", \"nearest\", \"active\", true),\n        \"TXN-IMPORT-0001\");\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"id\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\"));"
     },
     "get_currency": {
       "function": "getCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().getCurrency(1234, Map.of(\"field_metadata\", true));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> currency = (Map<?, ?>) body.get(\"currency\");\nSystem.out.println(currency.get(\"name\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"conversion_rate\"));\nMap<?, ?> fieldMetadata = (Map<?, ?>) body.get(\"field_metadata\");\nSystem.out.println(((Map<?, ?>) fieldMetadata.get(\"rounding\")).get(\"options\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().getCurrency(1234, Map.of(\"field_metadata\", true));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> currency = (Map<?, ?>) body.get(\"currency\");\nSystem.out.println(currency.get(\"name\") + \" \" + currency.get(\"code\") + \" \" + currency.get(\"conversion_rate\"));\nMap<?, ?> fieldMetadata = (Map<?, ?>) body.get(\"field_metadata\");\nSystem.out.println(((Map<?, ?>) fieldMetadata.get(\"rounding\")).get(\"options\"));"
     },
     "head_currency": {
       "function": "headCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.currencies().headCurrency(1234);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.currencies().headCurrency(1234);\nSystem.out.println(response.getStatusCode());"
     },
     "update_currency": {
       "function": "updateCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().updateCurrency(1234, Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", Map.of(\"code\", \"US\"),\n        \"conversion_rate\", 1.5, \"precision\", 3, \"rounding\", \"up\", \"active\", false));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"conversion_rate\") + \" \" + currency.get(\"precision\") + \" \" + currency.get(\"rounding\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\") + \" \" + currency.get(\"active\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().updateCurrency(1234, Map.of(\n        \"name\", \"Example Dollar\", \"code\", \"XEX\", \"symbol\", \"$\", \"country\", Map.of(\"code\", \"US\"),\n        \"conversion_rate\", 1.5, \"precision\", 3, \"rounding\", \"up\", \"active\", false));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"conversion_rate\") + \" \" + currency.get(\"precision\") + \" \" + currency.get(\"rounding\"));\nSystem.out.println(((Map<?, ?>) currency.get(\"country\")).get(\"name\") + \" \" + currency.get(\"active\"));"
     },
     "patch_currency": {
       "function": "patchCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().patchCurrency(1234, Map.of(\"conversion_rate\", 2.5));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"code\") + \" \" + currency.get(\"conversion_rate\") + \" \" + currency.get(\"updated_at\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().patchCurrency(1234, Map.of(\"conversion_rate\", 2.5));\nMap<?, ?> currency = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"currency\");\nSystem.out.println(currency.get(\"code\") + \" \" + currency.get(\"conversion_rate\") + \" \" + currency.get(\"updated_at\"));"
     },
     "delete_currency": {
       "function": "deleteCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.currencies().deleteCurrency(1234);\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.currencies().deleteCurrency(1234);\nSystem.out.println(response.getStatusCode());"
     },
     "set_base_currency": {
       "function": "setBaseCurrency",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().setBaseCurrency(1234);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> currency = (Map<?, ?>) body.get(\"currency\");\nSystem.out.println(currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(body.get(\"previous_base\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.currencies().setBaseCurrency(1234);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> currency = (Map<?, ?>) body.get(\"currency\");\nSystem.out.println(currency.get(\"code\") + \" \" + currency.get(\"base\"));\nSystem.out.println(body.get(\"previous_base\"));"
     }
   }
 }
