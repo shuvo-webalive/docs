@@ -1,9 +1,9 @@
 ---
 title: "Update a product"
-description: "Changes the product fields you send, keeps every other field, and returns the product."
+description: "Changes the product fields you send, keeps every other field, and returns the product. The body must include ten required fields."
 openapi: "PUT /admin/products/{product_id}"
 ---
 
-Send the fields to change at the top level of the body, not inside `product`. The update merges at every level: a field you leave out keeps its value, inside nested blocks too. Write the dimensions in `product_properties`, and `mpn`, `upc`, `barcode` and `hs_code` in `advanced.advance_information`. You can send back a product you read once you remove `status` and `reviews`.
+Send the fields to change at the top level of the body, not inside `product`. The body must include `name`, `sku`, `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`, `available_for` and `selected_customers`; a missing one is rejected with `400` and the reason `required`. Apart from those, the update merges at every level: a field you leave out keeps its value, inside nested blocks too. Write the dimensions in `product_properties`, and `mpn`, `upc`, `barcode` and `hs_code` in `advanced.advance_information`. You can send back a product you read once you remove `status` and `reviews`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

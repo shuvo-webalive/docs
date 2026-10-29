@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "getSearchSettingsReindexStatus",
       "code": "final response = await client.searchSettings.getSearchSettingsReindexStatus();\nfinal status = response.map as Map;\nprint('${status['state']} ${status['finished_at']}');\nprint(status['error']);"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "headSearchSettingsReindexStatus",
+      "code": "final response =\n    await client.searchSettings.headSearchSettingsReindexStatus();\nprint(response.statusCode);"
     }
   }
 }

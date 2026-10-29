@@ -96,7 +96,7 @@ TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
     "required": False,
-    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new category under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `category` with `count` `1`. You can send the number as `transaction_no` inside `category` instead. If you send both with different values, the header wins: the call still returns `201`, and the category is filed only under the header's number. No response returns the number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new category under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `category` with `count` `1`. You can send the number as `transaction_no` inside `category` instead. If you send both with different values, the header wins: the call still returns `201`, and the category is filed only under the header's number. Every category you read returns the number as `transaction_no`, or `null` when none was set. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -209,7 +209,7 @@ CREATED_CATEGORY = {
         "summary": "Fruit and vegetables picked this week",
     },
     "description": {"content": "<p>What is in season right now.</p>"},
-    "images_media": {"image_url": "", "background_image_url": ""},
+    "images_media": {"image_url": "", "image_alt": "", "background_image_url": ""},
     "availability_visibility": dict(AVAILABILITY_DEFAULTS, custom_sorting=True, default_sorting="alpha_asc"),
     "tax_shipping": {
         "tax_exempt": False,
@@ -223,6 +223,7 @@ CREATED_CATEGORY = {
     },
     "assign_products": {"products": PRODUCTS[:2]},
     "id": 4321,
+    "transaction_no": None,
     "disposable": False,
     "in_trash": False,
     "parent_in_trash": False,
@@ -253,7 +254,7 @@ SIBLING_CATEGORY = {
         "summary": None,
     },
     "description": {"content": None},
-    "images_media": {"image_url": "", "background_image_url": ""},
+    "images_media": {"image_url": "", "image_alt": "", "background_image_url": ""},
     "availability_visibility": copy.deepcopy(AVAILABILITY_DEFAULTS),
     "tax_shipping": {
         "tax_exempt": False,
@@ -267,6 +268,7 @@ SIBLING_CATEGORY = {
     },
     "assign_products": {"products": PRODUCTS[2:]},
     "id": 4325,
+    "transaction_no": None,
     "disposable": False,
     "in_trash": False,
     "parent_in_trash": False,
@@ -552,10 +554,12 @@ READ_ONLY_PROPERTIES = {
     "last_updated_on": {"type": "string", "description": "When the category last changed. On a new category it equals `created_on`. The listing puts the most recent first unless you send `sort`."},
 }
 
+TRANSACTION_NO_FIELD = {"type": ["string", "null"], "description": "The transaction number the category was filed under, or `null` when none was set. You file a category under a number with the `X-Transaction-No` header or with `transaction_no` in a write: see `CategoryInput`."}
+
 METADATA_ENTRY_REF = ref("CategoryFieldMetadataEntry")
 
 SCHEMAS = {
-    "Category": {"type": "object", "description": "A category: six sections and eight read-only fields. A listing entry, a category read and the response to a create, replace or update have the same fields.", "properties": dict(SECTION_PROPERTIES, **READ_ONLY_PROPERTIES)},
+    "Category": {"type": "object", "description": "A category: six sections, eight read-only fields and `transaction_no`. A listing entry, a category read and the response to a create, replace or update have the same fields.", "properties": dict(SECTION_PROPERTIES, transaction_no=TRANSACTION_NO_FIELD, **READ_ONLY_PROPERTIES)},
     "CategorySection": {"type": "object", "description": "Holds only the section named in the path.", "properties": SECTION_PROPERTIES},
     "CategoryReference": {"type": ["object", "null"], "description": "A record the category links to, such as its parent category, as `{id, name}`, or `null` when none is set. In a write, send only the record's `id`.", "properties": {
         "id": {"type": "integer", "description": "The linked record's `id`, such as the parent category's `id`."},
@@ -575,8 +579,9 @@ SCHEMAS = {
     "CategoryDescription": {"type": "object", "description": "The category's description. Responses and writes use the same field.", "properties": {
         "content": {"type": ["string", "null"], "description": "The description, or `null`."},
     }},
-    "CategoryImagesMedia": {"type": "object", "description": "The URLs of the category's two images. To upload an image, send `images_media.image` or `images_media.background_image` in a write.", "properties": {
+    "CategoryImagesMedia": {"type": "object", "description": "The URLs of the category's two images and the image's alt text. To upload an image, send `images_media.image` or `images_media.background_image` in a write.", "properties": {
         "image_url": {"type": "string", "description": "The category image's URL, ending in the file name you uploaded, or `\"\"` when no image is set."},
+        "image_alt": {"type": "string", "description": "The category image's alt text, or `\"\"` when none is set."},
         "background_image_url": {"type": "string", "description": "The background image's URL, in a `background/` folder and ending in the file name you uploaded, or `\"\"` when no background image is set."},
     }},
     "CategorySelectedCustomers": {"type": "object", "description": "The customers and groups the category is available to when `available_for` is `selected`.", "properties": {
@@ -657,7 +662,7 @@ SCHEMAS = {
         "availability_visibility": ref("CategoryAvailabilityVisibilityInput"),
         "tax_shipping": ref("CategoryTaxShipping"),
         "assign_products": ref("CategoryAssignProductsInput"),
-        "transaction_no": {"type": "string", "description": "A transaction number to file the category under. Send it here, beside the sections: beside `category` it is ignored and files nothing, and inside `general` it is rejected with `400` and `details[0].code` `unknown_field`. [Create a category](" + CREATE_PAGE + ") and [Update a category](" + UPDATE_PAGE + ") file the category under it; [Replace a category](" + REPLACE_PAGE + ") ignores it. On a create, an `X-Transaction-No` header with a different value wins. No response returns it."},
+        "transaction_no": {"type": "string", "description": "A transaction number to file the category under. Send it here, beside the sections: beside `category` it is ignored and files nothing, and inside `general` it is rejected with `400` and `details[0].code` `unknown_field`. [Create a category](" + CREATE_PAGE + ") and [Update a category](" + UPDATE_PAGE + ") file the category under it; [Replace a category](" + REPLACE_PAGE + ") ignores it. On a create, an `X-Transaction-No` header with a different value wins. A category you read returns the number as `transaction_no`, or `null` when none was set."},
     }},
     "CategoryGeneralInput": {"type": "object", "description": "The `general` fields you can write. Leave `filter_profile` out or send `null`: on a store without the filter plugin, a filter profile `id` there is rejected with `400`. Any other key is rejected with `400`, and `details[0].code` is `unknown_field`.", "properties": {
         "name": {"type": "string", "minLength": 2, "maxLength": 255, "description": "Required when you create a category. 2 to 255 characters. A create rejects a name that a top-level category has, in any letter case, even one in the trash. A `PUT` without it keeps the current name."},
@@ -669,8 +674,9 @@ SCHEMAS = {
         "layout": dict(ref("CategoryReference"), description="Send `{\"id\": ...}` with the layout's `id`; a `name` beside the `id` is ignored."),
         "summary": {"type": "string", "maxLength": 500, "description": "At most 500 characters."},
     }},
-    "CategoryImagesMediaInput": {"type": "object", "description": "The images you can upload. Each returns as a URL in `image_url` or `background_image_url`. Sending `null` or `\"\"` does not remove a stored image, and sending `image_url` is rejected with `400`.", "properties": {
+    "CategoryImagesMediaInput": {"type": "object", "description": "The images you can upload, and the category image's alt text. Each image returns as a URL in `image_url` or `background_image_url`. Sending `null` or `\"\"` does not remove a stored image, and sending `image_url` is rejected with `400`.", "properties": {
         "image": dict(ref("CategoryImage"), description="The category image."),
+        "image_alt": {"type": "string", "description": "The category image's alt text, as plain text. A create, a `PATCH` and a section `PATCH` write it."},
         "background_image": dict(ref("CategoryImage"), description="The background image, stored in a `background/` folder."),
     }},
     "CategoryImage": {"type": "object", "description": "One image upload. A `data:` URI string in place of this object returns `500`.", "properties": {

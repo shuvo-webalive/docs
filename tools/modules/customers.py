@@ -53,6 +53,7 @@ EXPORT_COLUMNS = [
 SAMPLE_CUSTOMER = {
     "customer_id": 123,
     "internal_id": 45,
+    "uuid": "5f3c1b7e-8a2d-4c6e-9b1f-0d2e3a4b5c6d",
     "first_name": "Jane",
     "last_name": "Doe",
     "name": "Jane Doe",
@@ -100,7 +101,7 @@ ENDPOINTS = [
         "description": "Returns one customer. Use the `customer_id` from a listing. `internal_id` is a second id space over the same records: sending it can return a different customer with a `200` rather than a `404`, so check the record you get back is the one you asked for.",
         "parameters": [CUSTOMER_ID],
         "responses": {
-            "200": {"description": "The customer.", "schema": {"type": "object", "properties": {"customer": {"$ref": "#/components/schemas/Customer"}}}, "example": {"customer": SAMPLE_CUSTOMER}},
+            "200": {"description": "The customer.", "schema": {"type": "object", "properties": {"customer": {"$ref": "#/components/schemas/Customer"}}}, "example": {"customer": dict(SAMPLE_CUSTOMER, email_verified=True)}},
             "404": {"description": "No customer has that id."},
         },
     },
@@ -317,6 +318,8 @@ SCHEMAS = {
     "Customer": {"type": "object", "properties": {
         "customer_id": {"type": "integer", "description": "The customer's number that every `{customer_id}` path parameter takes."},
         "internal_id": {"type": "integer", "description": "A second number for the same customer. No path parameter takes it."},
+        "uuid": {"type": "string", "description": "A UUID the store assigns to the customer. Every customer in a listing has one. A `uuid` you send in a write is ignored."},
+        "email_verified": {"type": "boolean", "description": "Whether the customer's email address is verified. Only a single customer read returns it; listing rows do not have it. It does not change `status`."},
         "first_name": {"type": "string"}, "last_name": {"type": "string"}, "name": {"type": "string"},
         "email": {"type": "string"}, "status": {"type": "string", "enum": STATUS_VALUES},
         "gender": {"type": "string"}, "company_name": {"type": "string"}, "store_credit": {"type": "number"},
@@ -333,6 +336,7 @@ SCHEMAS = {
         "first_name": {"type": "string", "description": "Required on create."},
         "last_name": {"type": "string"}, "email": {"type": "string", "format": "email"},
         "password": {"type": "string"},
+        "email_verified": {"type": "boolean", "description": "Whether the customer's email address is verified. A create and an update write it. It does not change `status`."},
         "status": {"type": "string", "enum": STATUS_VALUES, "description": "Omit on create and the customer is `awaiting_verification`."},
         "company": {"type": "boolean"}, "company_name": {"type": "string"},
         "custom_properties": {"type": "array", "description": "Replaces the whole list.", "items": {"type": "object", "properties": {"label": {"type": "string"}, "description": {"type": "string"}}}},

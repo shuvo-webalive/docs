@@ -4,7 +4,7 @@
   "endpoints": {
     "list_trash": {
       "function": "listTrash",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().listTrash(\n        Map.of(\"type\", \"Category\", \"search\", \"spring\", \"sort\", \"name\", \"order\", \"asc\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"type\") + \" \" + item.get(\"name\") + \" \" + item.get(\"updated\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().listTrash(\n        Map.of(\"type\", \"Category\", \"search\", \"spring\", \"sort\", \"name\", \"order\", \"asc\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"type\") + \" \" + item.get(\"name\") + \" \" + item.get(\"removed_at\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
     },
     "head_trash": {
       "function": "headTrash",
@@ -28,11 +28,11 @@
     },
     "bulk_restore_trash": {
       "function": "bulkRestoreTrash",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().bulkRestoreTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"BlogPost\", \"id\", 99))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"restored\") + \" \" + body.get(\"failed\"));\nfor (Object row : (List<?>) body.get(\"errors\")) {\n    Map<?, ?> error = (Map<?, ?>) row;\n    System.out.println(error.get(\"type\") + \" \" + error.get(\"id\") + \" \" + error.get(\"reason\"));\n}"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().bulkRestoreTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"BlogPost\", \"id\", 99))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((List<?>) body.get(\"restored\")).size());\nfor (Object row : (List<?>) body.get(\"failed\")) {\n    Map<?, ?> failure = (Map<?, ?>) row;\n    System.out.println(failure.get(\"type\") + \" \" + failure.get(\"id\") + \" \" + failure.get(\"code\") + \" \" + failure.get(\"message\"));\n}"
     },
     "bulk_delete_trash": {
       "function": "bulkDeleteTrash",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().bulkDeleteTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"Category\", \"id\", 1229))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"deleted\") + \" \" + body.get(\"failed\"));\nfor (Object row : (List<?>) body.get(\"errors\")) {\n    Map<?, ?> error = (Map<?, ?>) row;\n    System.out.println(error.get(\"type\") + \" \" + error.get(\"id\") + \" \" + error.get(\"reason\"));\n}"
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().bulkDeleteTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"Category\", \"id\", 1229))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((List<?>) body.get(\"deleted\")).size());\nfor (Object row : (List<?>) body.get(\"failed\")) {\n    Map<?, ?> failure = (Map<?, ?>) row;\n    System.out.println(failure.get(\"type\") + \" \" + failure.get(\"id\") + \" \" + failure.get(\"code\") + \" \" + failure.get(\"message\"));\n}"
     }
   }
 }

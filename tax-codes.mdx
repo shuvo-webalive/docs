@@ -17,7 +17,7 @@ The Tax codes API has seven endpoints, and you can call every one from all seven
 
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
-| [List tax codes](/api-reference/tax-codes/list-tax-codes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_codes` | Returns up to 20 tax codes per call, and how many the store has in `pagination.total`. |
+| [List tax codes](/api-reference/tax-codes/list-tax-codes) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_codes` | Returns up to 100 tax codes per call, and how many the store has in `pagination.total`. |
 | [Check the tax codes list](/api-reference/tax-codes/check-the-tax-codes-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_codes` | Checks that the tax codes list is reachable. Returns headers only, with no body. |
 | [Create a tax code](/api-reference/tax-codes/create-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_codes` | Creates a tax code and returns it with its `id`, which other calls take as `tax_code_id`. |
 | [Retrieve a tax code](/api-reference/tax-codes/retrieve-a-tax-code) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_codes/{tax_code_id}` | Returns the tax code whose `id` you pass as `tax_code_id`. |
@@ -39,8 +39,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   it is rejected with `500`, not `400`.
 - **`default` is read-only, and more than one tax code can have it.** `default: true` marks a tax
   code the store built. A create or an update that sends `default: true` stores `false`.
-- **A listing returns at most 20 tax codes per call.** A larger `limit` is capped at `20`, and
-  `pagination.limit` shows `20`. To get every tax code, raise `offset` by the number of tax codes
+- **A listing returns at most 100 tax codes per call.** A larger `limit` is capped at `100`, and
+  `pagination.limit` shows `100`. To get every tax code, raise `offset` by the number of tax codes
   each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted
   and ignored: `q` does not filter the listing, and `field_metadata` returns no field descriptions.
 - **A rejected request can make the next request on the same connection fail too.** Straight after

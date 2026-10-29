@@ -2,6 +2,10 @@
   "sdk": "php",
   "module": "products",
   "endpoints": {
+    "list_products": {
+      "function": "listProducts",
+      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::listProducts($client, ['limit' => 20]);\n\nforeach ($response->map['products'] as $product) {\n    echo $product['id'], ' ', $product['name'], ' (', $product['sku'], '): ', $product['base_price'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' products in total', PHP_EOL;"
+    },
     "create_product": {
       "function": "createProduct",
       "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::createProduct($client, [\n    'name' => 'Blue Mug', 'sku' => 'MUG-BLUE', 'base_price' => 12.5, 'transaction_no' => 'IMPORT-2026-10-18',\n], transactionNo: 'IMPORT-2026-10-18');\n\n$product = $response->map['product'];\necho $product['id'], ' ', $product['sku'], ' ', $product['status'], ' ', $product['transaction_no'], PHP_EOL;"
@@ -12,7 +16,7 @@
     },
     "update_product": {
       "function": "updateProduct",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::updateProduct($client, 101, [\n    'invoice_note' => 'Ships in 2 business days',\n    'advanced' => ['advance_information' => ['mpn' => 'MPN-0001']],\n]);\n\n$product = $response->map['product'];\necho $product['invoice_note'], ', ', $product['advanced']['advance_information']['mpn'], ', version ', $product['version'], PHP_EOL;\n"
+      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::updateProduct($client, 101, [\n    'name' => 'Cotton T-Shirt', 'sku' => 'TSHIRT-001', 'base_price' => 25.0, 'product_type' => 'physical',\n    'available' => true, 'is_on_sale' => false, 'available_on_date_range' => false,\n    'available_on_weekdays' => ['enabled' => false, 'weekdays' => []],\n    'available_for' => 'all', 'selected_customers' => ['customers' => [], 'groups' => []],\n    'invoice_note' => 'Ships in 2 business days',\n    'advanced' => ['advance_information' => ['mpn' => 'MPN-0001']],\n]);\n\n$product = $response->map['product'];\necho $product['invoice_note'], ', ', $product['advanced']['advance_information']['mpn'], ', version ', $product['version'], PHP_EOL;\n"
     },
     "patch_product": {
       "function": "patchProduct",

@@ -58,6 +58,10 @@
       "function": "createOrderPayment",
       "code": "final response = await client.orders.createOrderPayment(1043, {\n  'transaction_no': 'TXN-PAY-0001',\n  'payment': {\n    'amount': 20.0,\n    'payment_method': 'manual',\n    'payment_status': 'success',\n    'track_info': 'Bank transfer',\n    'payer_info': 'Jane Doe',\n    'transaction_date': '2026-10-07T09:30:00Z',\n    'transaction_reference': 'BT-0001',\n    'surcharge': 0.0,\n  },\n});\nfinal payment = (response.map as Map)['payment'] as Map;\nprint('${payment['id']} ${payment['paid_amount']} ${payment['due_amount']}');"
     },
+    "list_order_refunds": {
+      "function": "listOrderRefunds",
+      "code": "final response =\n    await client.orders.listOrderRefunds(1043, queryParams: {'limit': 10});\nfinal result = response.map as Map;\nfor (final refund in result['refunds'] as List) {\n  print('${(refund as Map)['refund_id']} ${refund['amount']}');\n}\nfinal pagination = result['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
     "create_order_refund": {
       "function": "createOrderRefund",
       "code": "final response = await client.orders.createOrderRefund(1043, {\n  'refund': {\n    'amount': '3.00',\n    'refund_date': '2026-10-07T14:00:00Z',\n    'reason': 'One item returned',\n    'line_items': [\n      {'order_item_id': 3302, 'quantity': 1, 'amount': 3.0},\n    ],\n  },\n});\nfinal result = response.map as Map;\nprint('${result['status']} ${result['refund_id']} ${result['amount']}');"

@@ -31,7 +31,7 @@ ECOMMERCE_SETTINGS_PAGE = "/api-reference/ecommerce-settings/get-ecommerce-setti
 
 OVERVIEW_DESCRIPTION = "List, count, create, change, cancel and delete orders, add comments, record payments, refunds and shipments, and email invoices."
 INTRO = (
-    "The Orders API has 24 endpoints, and you can call every one from all seven SDKs. Most paths start with"
+    "The Orders API has 25 endpoints, and you can call every one from all seven SDKs. Most paths start with"
     " `/api/v4/admin/orders`; [Refund a payment](" + PAYMENT_REFUND_PAGE + ") uses `/api/v4/admin/payment`,"
     " [Add a custom order status](" + CUSTOM_STATUS_PAGE + ") uses `/api/v4/admin/order`, and"
     " [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") uses `/api/v4/admin/customers`."
@@ -175,6 +175,9 @@ DIR = query("dir", "The sort direction: `asc` or `desc`. Sent without `sort`, it
 LIMIT = query("limit", "Orders per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. `0` is rejected with `400` and the message `'limit' must be a positive integer`.", {"type": "integer", "minimum": 1, "maximum": 20, "example": 20})
 PAGE = query("page", "The page to return, counting from `1`, at the page size applied: `limit=1&page=2` skips one order. When you also send `offset`, `offset` wins, even `offset=0`.", {"type": "integer", "minimum": 1, "example": 1})
 OFFSET = query("offset", "Number of orders to skip.", {"type": "integer", "minimum": 0, "example": 0})
+REFUNDS_LIMIT = query("limit", "Refunds per page, from `1` to `20`. A larger value is capped at `20`, and `0` is rejected with `400`.", {"type": "integer", "minimum": 1, "maximum": 20, "example": 10})
+REFUNDS_PAGE = query("page", "The page to return, counting from `1`.", {"type": "integer", "minimum": 1, "example": 1})
+REFUNDS_OFFSET = query("offset", "Number of refunds to skip. A negative value is rejected with `400`.", {"type": "integer", "minimum": 0, "example": 0})
 FIELD_METADATA = query("field_metadata", "Send `true` or `1` to add `field_metadata`, which describes every order field. `false` adds nothing.", {"type": "boolean", "example": True})
 
 ERROR_REF = ref("OrderError")
@@ -244,7 +247,7 @@ FULFILLMENT = {
 }
 
 ORDER = {
-    "order_id": 1043, "order_no": 1043, "internal_id": 2187, "order_status": "in_progress",
+    "order_id": 1043, "order_no": 1043, "internal_id": 2187, "uuid": "3f2b8c1e-6d4a-4e7b-9a15-0c8d2e6f7a41", "order_status": "in_progress",
     "payment_status": "unpaid", "shipping_status": "not_shipped", "currency_code": "AUD",
     "transaction_no": "TXN-ORDER-0001", "ip_address": "203.0.113.10", "order_channel": "",
     "created_on": "2026-10-07T09:15:02Z", "last_updated_on": "2026-10-07T09:15:02Z",
@@ -276,7 +279,7 @@ PATCHED_ORDER = dict(
 )
 
 FLAT_ORDER = {
-    "order_id": 1043, "order_no": 1043, "internal_id": 2187, "transaction_no": "TXN-ORDER-0001",
+    "order_id": 1043, "order_no": 1043, "internal_id": 2187, "uuid": "3f2b8c1e-6d4a-4e7b-9a15-0c8d2e6f7a41", "transaction_no": "TXN-ORDER-0001",
     "currency_code": "AUD", "order_status": "in_progress", "payment_status": "unpaid", "shipping_status": "unshipped",
     "sub_total": 40.0, "shipping_cost": 0.0, "shipping_tax": 0.0, "handling_cost": 0.0, "total_surcharge": 0.0,
     "total_discount": 0.0, "total_tax": 0.0, "grand_total": 40.0, "paid": 0.0, "due": 40.0, "items_total": 2,
@@ -315,6 +318,19 @@ ORDER_GROUP_META = {
 SAMPLE_PAGINATION = {
     "total": 2, "limit": 20, "offset": 0, "count": 2, "current_page": 1, "total_pages": 1,
     "has_next": False, "has_previous": False, "previous_page": None, "next_page": None,
+}
+
+SAMPLE_REFUND_PAGINATION = {
+    "total": 1, "limit": 10, "offset": 0, "count": 1, "current_page": 1, "total_pages": 1,
+    "has_next": False, "has_previous": False, "previous_page": None, "next_page": None,
+}
+
+REFUND_RECORD = {
+    "gateway": "pis", "gateway_charge_id": None, "gateway_refund_id": None, "record_only": None,
+    "initiated_by": None, "cancelled_with_order": None, "notify_customer": None, "allocation": None,
+    "other_amount": None, "lines": [], "refund_id": 61, "payment_id": 7713, "order_id": 2187, "amount": 3.0,
+    "status": "success", "transaction_status": None, "transaction_id": None, "reason": "One item returned",
+    "failure_cause": None, "created_at": "2026-10-07T14:00:00Z", "updated_at": "2026-10-07T14:00:00Z",
 }
 
 COMMENT = {"id": 4410, "content": "Called to confirm the address.", "admin_name": "Store Admin", "visible_to_customer": False, "admin": True, "created": "10/7/2026  14:05:09"}
@@ -502,7 +518,7 @@ ENDPOINTS = [
         "method": "PATCH",
         "path": BASE + "/{order_id}",
         "summary": "Changes the order fields you send: status, addresses, purchase order number, payment term, sales channel or IP address.",
-        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term`, `order_channel` and `ip_address` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
+        "description": "Send any of `order_status`, `billing_address`, `shipping_address`, `customer_po_number`, `payment_term`, `order_channel` and `ip_address`, wrapped in `order` or at the top level; only those fields change, and any other field is rejected with `400` and the reason `unknown_field`. That includes `uuid`, which the store assigns and returns on every order. Inside the `order` wrapper you can also send `customer_po_number`, `payment_term`, `order_channel` and `ip_address` in a `fulfillment` record; a top-level `fulfillment` key is rejected with `400`. `order_status` takes `cancelled`, `completed`, `draft`, `in_progress`, `paused` or `reopened`. An address you send replaces the stored one, so a field you leave out becomes `\"\"`.",
         "parameters": [ORDER_ID],
         "body": {"schema": wrapped("OrderPatchInput", "Wrap the fields in `order`, or send them at the top level. `fulfillment` is accepted only inside the `order` wrapper."), "example": {"order": {"customer_po_number": "PO-0001", "payment_term": "NET30"}}},
         "responses": {
@@ -512,7 +528,7 @@ ENDPOINTS = [
                 "example": {"order": PATCHED_ORDER},
             },
             "400": {
-                "description": "A field other than the five listed is in the body (reason `unknown_field`), or `fulfillment` is sent at the top level.",
+                "description": "A field other than the five listed, `uuid` included, is in the body (reason `unknown_field`), or `fulfillment` is sent at the top level.",
                 "schema": ERROR_REF,
             },
             "500": ADDRESS_500,
@@ -675,6 +691,26 @@ ENDPOINTS = [
             "400": {"description": "The body has no `payment` wrapper (message `payment info missing`), or `payment_method` is missing (message `payment_method is required`).", "schema": ERROR_REF},
         },
         "example_call": {"path": {"order_id": 1043}},
+    },
+    {
+        "key": "list_order_refunds",
+        "slug": "list-an-orders-refunds",
+        "title": "List an order's refunds",
+        "method": "GET",
+        "path": BASE + "/{order_id}/refunds",
+        "summary": "Returns the refunds recorded against an order, newest first, with paging details.",
+        "description": "Returns the order's refunds under `refunds`, newest first, with `order_id`, `order_no` and a `pagination` block. `order_id` in the response is the order's `internal_id`, and `order_no` is the `order_id` you passed in the path. `limit` takes `1` to `20`: a larger value is capped at `20`, and `0` is rejected with `400`. Page with `offset`, which a negative value makes `400`, or with `page`. Any other query parameter, `sort` and `dir` included, is ignored. [Refund a payment](" + PAYMENT_REFUND_PAGE + ") fills `record_only`, `initiated_by`, `cancelled_with_order`, `notify_customer`, `allocation` and `other_amount`, and lists one `lines` entry for each order line it was spread over, with the money as decimal text. [Refund an order](" + ORDER_REFUND_PAGE + ") records the refund on a separate `pis` payment, leaves those fields `null` and `lines` empty, whatever `line_items` you sent. An unknown order returns `404`, and a `HEAD` request returns `404`.",
+        "parameters": [ORDER_ID, REFUNDS_LIMIT, REFUNDS_PAGE, REFUNDS_OFFSET],
+        "responses": {
+            "200": {
+                "description": "The order's refunds in `refunds`, newest first, and the paging details in `pagination`.",
+                "schema": ref("OrderRefundPage"),
+                "example": {"order_id": 2187, "order_no": 1043, "refunds": [REFUND_RECORD], "pagination": SAMPLE_REFUND_PAGINATION},
+            },
+            "400": {"description": "`limit` is `0`, or `offset` is negative.", "schema": ERROR_REF},
+            "404": {"description": "No order has this `order_id`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"order_id": 1043}, "query": "limit=10"},
     },
     {
         "key": "create_order_refund",
@@ -977,6 +1013,7 @@ SCHEMAS = {
         "order_id": whole("The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."),
         "order_no": whole("Equals `order_id`."),
         "internal_id": whole("A second number for the order. [Retrieve an order's custom fields](" + CUSTOM_FIELDS_PAGE + ") and [Send an order's invoice](" + INVOICE_PAGE + ") take it, and the listing's `orderIds` filter matches it."),
+        "uuid": text("A UUID the store assigns to the order. You cannot set it: [Update selected order fields](" + PATCH_PAGE + ") rejects a body that names `uuid` with `400` and the reason `unknown_field`."),
         "order_status": {"type": "string", "enum": ORDER_STATUSES, "description": "`in_progress` on a new order."},
         "payment_status": text("`unpaid` on a new order, and `partial` after a payment for part of the total."),
         "shipping_status": text("`not_shipped` before the first shipment, then `partial`, and `shipped` once every unit has shipped."),
@@ -1000,6 +1037,7 @@ SCHEMAS = {
         "order_id": whole("The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."),
         "order_no": whole("Equals `order_id`."),
         "internal_id": whole("A second number for the order, taken by the custom fields and invoice paths."),
+        "uuid": text("A UUID the store assigns to the order."),
         "transaction_no": nullable_text("The transaction number the order is filed under, sent when the order was created in the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. [Create an order with a payment](" + WITH_PAYMENT_PAGE + ") does not store it."),
         "currency_code": text("The order's currency code."),
         "order_status": {"type": "string", "enum": ORDER_STATUSES},
@@ -1224,6 +1262,58 @@ SCHEMAS = {
         "order_id": whole("The order's `order_id`."),
         "internal_id": whole("The order's `internal_id`."),
         "amount": text("The `amount` you sent, as text."),
+    }},
+    "OrderRefundPage": {"type": "object", "properties": {
+        "order_id": whole("The order's `internal_id`."),
+        "order_no": whole("The `order_id` you passed in the path."),
+        "refunds": {"type": "array", "items": ref("OrderRefundRecord"), "description": "The refunds on this page, newest first."},
+        "pagination": ref("OrderRefundPagination"),
+    }},
+    "OrderRefundRecord": {"type": "object", "description": "One refund the order holds. A refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + ") fills `record_only` to `lines`. A refund made with [Refund an order](" + ORDER_REFUND_PAGE + ") leaves them `null` and `lines` empty.", "properties": {
+        "gateway": text("The gateway code of the payment the refund is filed on."),
+        "gateway_charge_id": nullable_text("`null` on every refund read."),
+        "gateway_refund_id": nullable_text("`null` on every refund read."),
+        "record_only": {"type": ["boolean", "null"], "description": "Whether the refund is only recorded. Set on a refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + "), `null` on one made with [Refund an order](" + ORDER_REFUND_PAGE + ")."},
+        "initiated_by": nullable_text("Who started the refund. Set on a refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + "), `null` on one made with [Refund an order](" + ORDER_REFUND_PAGE + ")."),
+        "cancelled_with_order": {"type": ["boolean", "null"], "description": "Whether the refund was made with the order's cancellation. Set on a refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + "), `null` on one made with [Refund an order](" + ORDER_REFUND_PAGE + ")."},
+        "notify_customer": {"type": ["boolean", "null"], "description": "Whether the customer is notified. Set on a refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + "), `null` on one made with [Refund an order](" + ORDER_REFUND_PAGE + ")."},
+        "allocation": nullable_text("How the refund was spread over the order's lines. Set on a refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + "), `null` on one made with [Refund an order](" + ORDER_REFUND_PAGE + ")."),
+        "other_amount": nullable_text("Decimal text, such as `\"1.00\"`. Set on a refund made with [Refund a payment](" + PAYMENT_REFUND_PAGE + "), `null` on one made with [Refund an order](" + ORDER_REFUND_PAGE + ")."),
+        "lines": {"type": "array", "items": ref("OrderRefundRecordLine"), "description": "One entry for each order line the refund was spread over. Empty for a refund made with [Refund an order](" + ORDER_REFUND_PAGE + ")."},
+        "refund_id": whole("Identifies the refund."),
+        "payment_id": whole("Identifies the payment the refund is filed on."),
+        "order_id": whole("The order's `internal_id`."),
+        "amount": number("The amount refunded, as a number."),
+        "status": text("The refund's status."),
+        "transaction_status": nullable_text("The refund's transaction status."),
+        "transaction_id": nullable_text("The refund's transaction id."),
+        "reason": nullable_text("The reason you gave for the refund."),
+        "failure_cause": nullable_text("`null` on every refund read."),
+        "created_at": text("When the refund was created."),
+        "updated_at": text("When the refund was last changed."),
+    }},
+    "OrderRefundRecordLine": {"type": "object", "description": "One order line a refund was spread over. The money fields are decimal text, such as `\"1.00\"`.", "properties": {
+        "order_item_id": whole("The order line's `item_id`."),
+        "product_sku": text("The product's SKU."),
+        "product_name": text("The product's name."),
+        "plugin_line": {"type": "boolean", "description": "Whether the line is a plugin line."},
+        "quantity": whole("How many units of the line the refund covers."),
+        "line_paid": text("What was paid for the line."),
+        "amount": text("The amount refunded for the line."),
+        "line_refunded_total": text("The total refunded for the line so far."),
+        "line_fully_refunded": {"type": "boolean", "description": "Whether the line is fully refunded."},
+    }},
+    "OrderRefundPagination": {"type": "object", "properties": {
+        "total": whole("The number of refunds the order holds."),
+        "limit": whole("The page size applied."),
+        "offset": whole("The number of refunds skipped before this page."),
+        "count": whole("The number of refunds on this page."),
+        "current_page": whole("The number of this page, counting from `1`."),
+        "total_pages": whole("The number of pages."),
+        "has_next": flag("`true` when there is a page after this one."),
+        "has_previous": flag("`true` when there is a page before this one."),
+        "previous_page": nullable_text("The previous page, or `null` on the first page."),
+        "next_page": nullable_text("The next page, or `null` on the last page."),
     }},
     "OrderPaymentRefund": {"type": "object", "description": "A payment refund. `order_id` and `order_no` are named the other way round from every other response.", "properties": {
         "status": text("`success`."),

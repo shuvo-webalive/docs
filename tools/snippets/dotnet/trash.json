@@ -4,7 +4,7 @@
   "endpoints": {
     "list_trash": {
       "function": "ListTrashAsync",
-      "code": "var response = await client.Trash.ListTrashAsync(new Dictionary<string, object?>\n{\n    [\"type\"] = \"Category\", [\"search\"] = \"spring\", [\"sort\"] = \"name\", [\"order\"] = \"asc\", [\"limit\"] = 20,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var item in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"type\"]} {item[\"name\"]} {item[\"updated\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+      "code": "var response = await client.Trash.ListTrashAsync(new Dictionary<string, object?>\n{\n    [\"type\"] = \"Category\", [\"search\"] = \"spring\", [\"sort\"] = \"name\", [\"order\"] = \"asc\", [\"limit\"] = 20,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var item in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{item[\"id\"]} {item[\"type\"]} {item[\"name\"]} {item[\"removed_at\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
     },
     "head_trash": {
       "function": "HeadTrashAsync",
@@ -20,7 +20,7 @@
     },
     "restore_trash_item": {
       "function": "RestoreTrashItemAsync",
-      "code": "var response = await client.Trash.RestoreTrashItemAsync(\"Category\", 1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"message\"]}\");"
+      "code": "var response = await client.Trash.RestoreTrashItemAsync(\"Category\", 1234);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar item = (IReadOnlyDictionary<string, object?>)body[\"item\"]!;\nConsole.WriteLine($\"{item[\"type\"]} {item[\"id\"]} {item[\"name\"]} {item[\"url\"]}\");"
     },
     "delete_trash_item": {
       "function": "DeleteTrashItemAsync",
@@ -28,11 +28,11 @@
     },
     "bulk_restore_trash": {
       "function": "BulkRestoreTrashAsync",
-      "code": "var response = await client.Trash.BulkRestoreTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"BlogPost\", [\"id\"] = 99 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"restored\"]} {body[\"failed\"]}\");\nforeach (var error in ((IReadOnlyList<object?>)body[\"errors\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{error[\"type\"]} {error[\"id\"]} {error[\"reason\"]}\");"
+      "code": "var response = await client.Trash.BulkRestoreTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"BlogPost\", [\"id\"] = 99 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var restoredItem in ((IReadOnlyList<object?>)body[\"restored\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{restoredItem[\"type\"]} {restoredItem[\"id\"]} {restoredItem[\"name\"]} {restoredItem[\"url\"]}\");\nforeach (var failure in ((IReadOnlyList<object?>)body[\"failed\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{failure[\"type\"]} {failure[\"id\"]} {failure[\"code\"]} {failure[\"message\"]}\");"
     },
     "bulk_delete_trash": {
       "function": "BulkDeleteTrashAsync",
-      "code": "var response = await client.Trash.BulkDeleteTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1229 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"deleted\"]} {body[\"failed\"]}\");\nforeach (var error in ((IReadOnlyList<object?>)body[\"errors\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{error[\"type\"]} {error[\"id\"]} {error[\"reason\"]}\");"
+      "code": "var response = await client.Trash.BulkDeleteTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1229 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var deletedItem in ((IReadOnlyList<object?>)body[\"deleted\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{deletedItem[\"type\"]} {deletedItem[\"id\"]} {deletedItem[\"name\"]}\");\nforeach (var failure in ((IReadOnlyList<object?>)body[\"failed\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{failure[\"type\"]} {failure[\"id\"]} {failure[\"code\"]} {failure[\"message\"]}\");"
     }
   }
 }

@@ -58,6 +58,10 @@
       "function": "create_order_payment",
       "code": "response = client.orders.create_order_payment(1043, {\n    \"transaction_no\": \"TXN-PAY-0001\",\n    \"payment\": {\n        \"amount\": 20.0, \"payment_method\": \"manual\", \"payment_status\": \"success\", \"track_info\": \"Bank transfer\",\n        \"payer_info\": \"Jane Doe\", \"transaction_date\": \"2026-10-07T09:30:00Z\", \"transaction_reference\": \"BT-0001\",\n        \"surcharge\": 0.0,\n    },\n})\npayment = response.map[\"payment\"]\nprint(payment[\"id\"], payment[\"paid_amount\"], payment[\"due_amount\"])\n"
     },
+    "list_order_refunds": {
+      "function": "list_order_refunds",
+      "code": "response = client.orders.list_order_refunds(1043, {\"limit\": 10})\nfor refund in response.map[\"refunds\"]:\n    print(refund[\"refund_id\"], refund[\"amount\"], refund[\"status\"], refund[\"reason\"])\npagination = response.map[\"pagination\"]\nprint(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
     "create_order_refund": {
       "function": "create_order_refund",
       "code": "response = client.orders.create_order_refund(1043, {\"refund\": {\n    \"amount\": \"3.00\",\n    \"refund_date\": \"2026-10-07T14:00:00Z\",\n    \"reason\": \"One item returned\",\n    \"line_items\": [{\"order_item_id\": 3302, \"quantity\": 1, \"amount\": 3.0}],\n}})\nprint(response.map[\"status\"], response.map[\"refund_id\"], response.map[\"amount\"])\n"

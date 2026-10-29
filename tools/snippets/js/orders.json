@@ -58,6 +58,10 @@
       "function": "createOrderPayment",
       "code": "const response = await client.orders.createOrderPayment(1043, {\n    transaction_no: 'TXN-PAY-0001',\n    payment: {\n        amount: 20.0, payment_method: 'manual', payment_status: 'success', track_info: 'Bank transfer',\n        payer_info: 'Jane Doe', transaction_date: '2026-10-07T09:30:00Z',\n        transaction_reference: 'BT-0001', surcharge: 0.0,\n    },\n});\nconst payment = response.map.payment;\nconsole.log(payment.id, payment.payment_applied, payment.paid_amount, payment.due_amount);\n"
     },
+    "list_order_refunds": {
+      "function": "listOrderRefunds",
+      "code": "const response = await client.orders.listOrderRefunds(1043, {limit: 10});\nfor (const refund of response.map.refunds) {\n    console.log(refund.refund_id, refund.amount, refund.status, refund.reason);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
     "create_order_refund": {
       "function": "createOrderRefund",
       "code": "const response = await client.orders.createOrderRefund(1043, {refund: {\n    amount: '3.00',\n    refund_date: '2026-10-07T14:00:00Z',\n    reason: 'One item returned',\n    line_items: [{order_item_id: 3302, quantity: 1, amount: 3.0}],\n}});\nconsole.log(response.map.status, response.map.refund_id, response.map.amount);\n"

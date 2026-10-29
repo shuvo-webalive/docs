@@ -22,8 +22,8 @@ NOTES = [
     "  update a rule. A bare record is rejected with `400` and the message `tax_rule missing`. On create,\n"
     "  `name` is required and a body without it fails with `500`; `description` is the only other field\n"
     "  the store reads. An update changes only the fields you send.",
-    "**A listing returns at most 20 rules per call.** A larger `limit` is capped at `20`, and\n"
-    "  `pagination.limit` shows `20`. To read every rule, step `offset` by the number of rules each page\n"
+    "**A listing returns at most 100 rules per call.** A larger `limit` is capped at `100`, and\n"
+    "  `pagination.limit` shows `100`. To read every rule, step `offset` by the number of rules each page\n"
     "  returned until you reach `pagination.total`. A `limit` below `1`, or a `limit` or `offset` that is\n"
     "  not a number, is rejected with `400` and the error `invalid_pagination`.",
     "**A rejected request can make the next request on the same connection fail too.** Straight after a\n"
@@ -51,7 +51,7 @@ TAX_RULE_ID = {
     "schema": {"type": "integer", "example": 42},
 }
 
-LIMIT = {"name": "limit", "in": "query", "description": "Rules per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. A value below `1`, or one that is not a number, is rejected with `400` and the error `invalid_pagination`.", "schema": {"type": "integer", "minimum": 1, "maximum": 20, "example": 20}}
+LIMIT = {"name": "limit", "in": "query", "description": "Rules per page. The maximum is `100`: a larger value is capped at `100`, and `pagination.limit` shows `100`. A value below `1`, or one that is not a number, is rejected with `400` and the error `invalid_pagination`.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 20}}
 OFFSET = {"name": "offset", "in": "query", "description": "Number of rules to skip. A value that is not a number is rejected with `400` and the error `invalid_pagination`.", "schema": {"type": "integer", "example": 0}}
 PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * limit` against the `limit` you send with it.", "schema": {"type": "integer", "example": 1}}
 
@@ -103,12 +103,12 @@ ENDPOINTS = [
         "title": "List tax rules",
         "method": "GET",
         "path": BASE,
-        "summary": "Returns up to 20 tax rules per call, each with its tax code and tax zones.",
-        "description": "Returns up to 20 tax rules under `tax_rules`, and the rule count and page position under `pagination`. Each rule has ten fields, including its tax code in `code` and its tax zones in `zones`. To read every rule, step `offset` by the number of rules each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored: `q` does not filter the rules.",
+        "summary": "Returns up to 100 tax rules per call, each with its tax code and tax zones.",
+        "description": "Returns up to 100 tax rules under `tax_rules`, and the rule count and page position under `pagination`. Each rule has ten fields, including its tax code in `code` and its tax zones in `zones`. To read every rule, step `offset` by the number of rules each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored: `q` does not filter the rules.",
         "parameters": [LIMIT, OFFSET, PAGE],
         "responses": {
             "200": {
-                "description": "Up to 20 tax rules under `tax_rules`. `pagination.total` is the number of rules in the store. No `ETag` or `Last-Modified` header.",
+                "description": "Up to 100 tax rules under `tax_rules`. `pagination.total` is the number of rules in the store. No `ETag` or `Last-Modified` header.",
                 "schema": {"type": "object", "properties": {
                     "tax_rules": {"type": "array", "items": ROW_REF},
                     "pagination": {"$ref": "#/components/schemas/TaxRulePagination"},
@@ -252,7 +252,7 @@ SCHEMAS = {
     }},
     "TaxRulePagination": {"type": "object", "properties": {
         "total": {"type": "integer", "description": "The number of tax rules in the store."},
-        "limit": {"type": "integer", "description": "The page size the store applied. At most `20`, even when you send a larger `limit`."},
+        "limit": {"type": "integer", "description": "The page size the store applied. At most `100`, even when you send a larger `limit`."},
         "offset": {"type": "integer", "description": "The number of rules skipped before this page."},
         "count": {"type": "integer", "description": "The number of rules on this page."},
         "current_page": {"type": "integer"},

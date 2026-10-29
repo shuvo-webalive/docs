@@ -4,6 +4,6 @@ description: "Returns up to 20 transaction numbers per call, with each number's 
 openapi: "GET /admin/transactions"
 ---
 
-Returns the transaction numbers stamped on your store's records, in ascending order of `transaction_no`, 20 per call unless you send `limit`. Each row gives the number, how many records it is stamped on in `total_records`, and its `url`. Send `transaction_no` to get only that number's row; the response then has no `pagination` block. `search`, `q`, `sort`, `order` and parameters the listing does not know are ignored.
+Returns the transaction numbers stamped on your store's records, in ascending order of `transaction_no`, 20 per call unless you send `limit`. Each row gives the number, how many records it is stamped on in `total_records`, and its `url`. Send `transaction_no` to get only that number's row; the response still has `pagination`. `search`, `q`, `sort`, `order` and parameters the listing does not know are ignored.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

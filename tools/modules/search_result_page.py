@@ -319,6 +319,19 @@ ENDPOINTS = [
         "example_call": {},
     },
     {
+        "key": "head_search_result_page_product_promotions",
+        "slug": "get-product-promotions-headers",
+        "title": "Get product promotions headers",
+        "method": "HEAD",
+        "path": BASE + "/product_promotion",
+        "summary": "Returns the headers for the product promotions listing, with no body.",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. Use it to check that the promotions are reachable without downloading them.",
+        "responses": {
+            "200": {"description": "Headers only. No `ETag` header and no body."},
+        },
+        "example_call": {},
+    },
+    {
         "key": "create_search_result_page_product_promotion",
         "slug": "create-a-product-promotion",
         "title": "Create a product promotion",
@@ -352,6 +365,21 @@ ENDPOINTS = [
         "responses": {
             "200": {"description": "The promotion.", "schema": PROMOTION_RESPONSE, "example": {"product_promotion": SAMPLE_PROMOTION}},
             "404": {"description": "No promotion has that `promotion_id`. The message is `Product promotion not found: <promotion_id>`, ending with the `promotion_id` you sent.", "schema": ERROR, "example": RETRIEVE_NOT_FOUND},
+        },
+        "example_call": {"path": {"promotion_id": 4}},
+    },
+    {
+        "key": "head_search_result_page_product_promotion",
+        "slug": "get-a-product-promotion-headers",
+        "title": "Get a product promotion headers",
+        "method": "HEAD",
+        "path": BASE + "/product_promotion/{promotion_id}",
+        "summary": "Returns the headers for the product promotion whose `id` you pass as `promotion_id`, with no body.",
+        "description": "Returns `200` with headers only and no body. The response includes an `ETag` header. Returns `404` when no promotion has that `promotion_id`. Use it to check that a promotion exists without downloading it.",
+        "parameters": [PROMOTION_ID],
+        "responses": {
+            "200": {"description": "Headers only, including an `ETag`. No body."},
+            "404": {"description": "No promotion has that `promotion_id`."},
         },
         "example_call": {"path": {"promotion_id": 4}},
     },
@@ -561,7 +589,7 @@ SCHEMAS = {
 }
 
 OVERVIEW_DESCRIPTION = "Read and change how your store's search result page shows products, and create, change and delete its product promotions."
-INTRO = "The Search result page API has eleven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/search_result_page`."
+INTRO = "The Search result page API has thirteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/search_result_page`."
 WARNING = (
     "A section read and a section write use different wrappers. `GET /search_result_page/{section}`\n"
     "  returns the section inside `search_result_page`, such as `{\"search_result_page\": {\"seo\": {...}}}`,\n"

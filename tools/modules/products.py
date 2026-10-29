@@ -7,6 +7,7 @@ SLUG = "products"
 BASE = "/admin/products"
 ICON = "box"
 
+LIST_PAGE = "/api-reference/products/list-products"
 CREATE_PAGE = "/api-reference/products/create-a-product"
 RETRIEVE_PAGE = "/api-reference/products/retrieve-a-product"
 UPDATE_PAGE = "/api-reference/products/update-a-product"
@@ -22,8 +23,8 @@ LOCATION_STOCK_PAGE = "/api-reference/inventory-locations/list-stock-at-an-inven
 DELETE_LOCATION_PAGE = "/api-reference/inventory-locations/delete-an-inventory-location"
 CATEGORIES_PAGE = "/api-reference/categories/list-categories"
 
-OVERVIEW_DESCRIPTION = "Create, read, update and delete a product, import its reviews, read and set its stock at each inventory location, and unassign a location from it."
-INTRO = "The Products API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
+OVERVIEW_DESCRIPTION = "List products, create, read, update and delete a product, import its reviews, read and set its stock at each inventory location, and unassign a location from it."
+INTRO = "The Products API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
 
 WARNING = (
     "**Setting a product's stock unassigns every location you leave out, even one that still holds stock.**\n"
@@ -68,10 +69,33 @@ NOTES = [
     "  location yet, [Set a product's stock](" + SET_STOCK_PAGE + ") returns `locations: []` and stores the row.\n"
     "  Call [Retrieve a product's stock](" + STOCK_PAGE + ") to see it. A product that already has a location\n"
     "  returns its rows at once.",
-    "**Find a `product_id` in a create response or an inventory location's stock.** None of these nine\n"
-    "  endpoints lists products. [Create a product](" + CREATE_PAGE + ") returns the new product's `id` as\n"
-    "  `product.id`. For a product that already exists, [List stock at an inventory location](" + LOCATION_STOCK_PAGE + ")\n"
+    "**Find a `product_id` in the product list, a create response or an inventory location's stock.**\n"
+    "  [List products](" + LIST_PAGE + ") returns every product with its `id`. [Create a product](" + CREATE_PAGE + ") returns the new product's `id` as\n"
+    "  `product.id`. [List stock at an inventory location](" + LOCATION_STOCK_PAGE + ")\n"
     "  returns the `id` of each product the location holds, as `items[].product.id`.",
+    "**A `PUT` must include ten fields.** [Update a product](" + UPDATE_PAGE + ") rejects a body that leaves out `name`, `sku`,\n"
+    "  `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`,\n"
+    "  `available_for` or `selected_customers` with `400` and the reason `required`. Every other field you leave out\n"
+    "  keeps its value. [Patch a product](" + PATCH_PAGE + ") has no required fields.",
+    "**A product's fields also come in blocks.** Alongside the flat fields, a product returns `pricing`, `inventory`,\n"
+    "  `ordering`, `restrictions`, `tax`, `shipping`, `available_for_purchase`, `media`, `categories`,\n"
+    "  `up_sell_products`, `summary`, `description`, `virtual`, `product_url`, `updated_by` and `links`, and\n"
+    "  `advanced` also holds `product_flags`, `product_dimension`, `product_identifiers` and `webtool`. A block holds\n"
+    "  the same values as the flat fields, and a write to either one changes both, on a create, a `PUT` and a `PATCH`.\n"
+    "  These block fields are read-only: `product_url`, `links`, `restrictions.enabled`, `restrictions.display_only`,\n"
+    "  `restrictions.price.enabled`, `restrictions.purchase.enabled`, `shipping.enabled`, the two units in\n"
+    "  `advanced.product_dimension`, `advanced.product_flags.sold_out` and `advanced.webtool`. A value you send in\n"
+    "  `updated_by`, `restrictions.price.customers` or `restrictions.purchase.customers` returns `200` and is not kept.",
+    "**Some block fields behave differently from the flat ones.** `up_sell_products` takes `{\"id\": ...}` records: a list\n"
+    "  of bare ids returns `200` and leaves `up_sell_products` empty. `categories` takes category ids or\n"
+    "  `{\"id\": ...}` records, and `[]` changes nothing. `media` names files the product already holds. `shipping.profile`\n"
+    "  (an id or `{\"id\": ...}`) is kept by an update and dropped by a create. `tax.custom_tax_profile` takes the id of a\n"
+    "  custom tax profile. While `available_for_purchase.enabled` is `false`, a value you write in its `who_can_view`,\n"
+    "  `schedule` or `password_protection` returns `200` and is not kept.",
+    "**`selected_customers` and `restrict_for_selected_customers` are objects.** Each reads\n"
+    "  `{\"customers\": [], \"groups\": []}` when nobody is named. To write `selected_customers`, send the customer ids in\n"
+    "  `customers` and the customer group ids in `groups`; a group sent as `{\"id\": ...}` is rejected with `400`.\n"
+    "  `restrict_for_selected_customers` is read-only.",
 ]
 
 
@@ -176,6 +200,21 @@ SAMPLE_PRODUCT = {
     "has_variations": False,
 }
 
+UPDATE_BODY = {
+    "name": "Cotton T-Shirt",
+    "sku": "TSHIRT-001",
+    "base_price": 25.0,
+    "product_type": "physical",
+    "available": True,
+    "is_on_sale": False,
+    "available_on_date_range": False,
+    "available_on_weekdays": {"enabled": False, "weekdays": []},
+    "available_for": "all",
+    "selected_customers": {"customers": [], "groups": []},
+    "invoice_note": "Ships in 2 business days",
+    "advanced": {"advance_information": {"mpn": "MPN-0001"}},
+}
+
 UPDATED_PRODUCT = copy.deepcopy(SAMPLE_PRODUCT)
 UPDATED_PRODUCT["invoice_note"] = "Ships in 2 business days"
 UPDATED_PRODUCT["advanced"]["advance_information"]["mpn"] = "MPN-0001"
@@ -221,7 +260,59 @@ REVIEWS_RESULT = {"product": {"reviews": [
     {"id": 32, "productId": 101, "name": "Sam Lee", "email": "sam@example.com", "review": "Great shirt", "rating": 5.0, "status": "approved", "files": []},
 ]}}
 
+LIST_PARAMETERS = [
+    {"name": "limit", "in": "query", "description": "The number of products to return, from `1` to `100`. The default is `20`. `0` or a number above `100` is rejected with `400`.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 20}},
+    {"name": "offset", "in": "query", "description": "The number of products to skip. When you send both `offset` and `page`, `offset` wins.", "schema": {"type": "integer", "minimum": 0, "example": 0}},
+    {"name": "page", "in": "query", "description": "The page number, counted from `1`.", "schema": {"type": "integer", "minimum": 1, "example": 1}},
+    {"name": "search_text", "in": "query", "description": "Returns the products whose `name` or `sku` contains this text. `searchText` works too.", "schema": {"type": "string", "example": "shirt"}},
+    {"name": "name", "in": "query", "description": "Filters by product `name`.", "schema": {"type": "string"}},
+    {"name": "sku", "in": "query", "description": "Filters by product `sku`.", "schema": {"type": "string"}},
+    {"name": "ids", "in": "query", "description": "Returns the products with these `id` values. Repeat the name for several products, such as `ids=101&ids=102`. A comma-separated list is rejected with `500`.", "schema": {"type": "integer", "example": 101}},
+    {"name": "parent", "in": "query", "description": "A category's `id`. [List categories](" + CATEGORIES_PAGE + ") returns it. Returns the products filed under that category.", "schema": {"type": "integer"}},
+    {"name": "product_type", "in": "query", "description": "Returns one type of product: `physical`, `downloadable` or `gift_card`.", "schema": {"type": "string", "enum": ["physical", "downloadable", "gift_card"]}},
+    {"name": "stock", "in": "query", "description": "Filters by stock level: `in`, `out` or `low`.", "schema": {"type": "string", "enum": ["in", "out", "low"]}},
+    {"name": "is_available", "in": "query", "description": "Filters by whether the product is available.", "schema": {"type": "boolean"}},
+    {"name": "is_inventory_enabled", "in": "query", "description": "Filters by whether the product tracks inventory.", "schema": {"type": "boolean"}},
+    {"name": "created_by", "in": "query", "description": "Filters by who created the product.", "schema": {"type": "string"}},
+    {"name": "price_from", "in": "query", "description": "Returns products priced from this amount.", "schema": {"type": "number"}},
+    {"name": "price_to", "in": "query", "description": "Returns products priced up to this amount.", "schema": {"type": "number"}},
+    {"name": "created_from", "in": "query", "description": "Returns products created from this date. Send `yyyy-MM-dd` or an ISO instant.", "schema": {"type": "string", "example": "2026-10-01"}},
+    {"name": "created_to", "in": "query", "description": "Returns products created up to this date. Send `yyyy-MM-dd` or an ISO instant.", "schema": {"type": "string"}},
+    {"name": "updated_from", "in": "query", "description": "Returns products updated from this date. Send `yyyy-MM-dd` or an ISO instant.", "schema": {"type": "string"}},
+    {"name": "updated_to", "in": "query", "description": "Returns products updated up to this date. Send `yyyy-MM-dd` or an ISO instant.", "schema": {"type": "string"}},
+    {"name": "sort", "in": "query", "description": "The field to sort by: `name`, `isAvailable`, `sku`, `parent`, `basePrice`, `isInventoryEnabled`, `createdBy`, `created`, `updated` or `id`.", "schema": {"type": "string", "example": "name"}},
+    {"name": "dir", "in": "query", "description": "The sort direction: `asc` or `desc`.", "schema": {"type": "string", "enum": ["asc", "desc"]}},
+    {"name": "category", "in": "query", "description": "The store accepts it and filters nothing. Use `parent` to filter by category.", "schema": {"type": "string"}},
+    {"name": "field_metadata", "in": "query", "description": "Send `true` to add `field_metadata` beside `products`, a schema of the product fields.", "schema": {"type": "boolean", "example": True}},
+]
+
+LIST_PAGINATION = {"total": 2, "limit": 20, "offset": 0, "has_previous": False, "has_next": False}
+
 ENDPOINTS = [
+    {
+        "key": "list_products",
+        "slug": "list-products",
+        "title": "List products",
+        "method": "GET",
+        "path": BASE,
+        "summary": "Returns the store's products, 20 per call by default and up to 100, each as the full product record, with paging details.",
+        "description": "Returns your store's products under `products`, the most recently updated first, with a `pagination` block. Each row is the full record [Retrieve a product](" + RETRIEVE_PAGE + ") returns, and a product in the trash is not listed. `limit` is `1` to `100` and defaults to `20`. Page with `offset`, or with `page` counted from `1`; `offset` wins when you send both. Filter with `search_text`, `name`, `sku`, `ids`, `parent`, `product_type`, `stock`, `is_available`, `is_inventory_enabled`, `created_by`, `price_from`, `price_to`, `created_from`, `created_to`, `updated_from` and `updated_to`. Sort with `sort` and `dir`. `category` is accepted and filters nothing. Any other parameter is rejected with `400` and the reason `unknown_parameter`. `HEAD` on this path returns `404`.",
+        "parameters": LIST_PARAMETERS,
+        "responses": {
+            "200": {
+                "description": "`products` holds the products on this page, each with all 87 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `pagination` has five keys: `total`, `limit`, `offset`, `has_previous` and `has_next`. With `field_metadata=true`, a `field_metadata` key is added beside `products`. The example shows a selection of the fields.",
+                "schema": ref("ProductPage"),
+                "example": {"products": [SAMPLE_PRODUCT, CREATED_PRODUCT], "pagination": LIST_PAGINATION},
+            },
+            "400": {
+                "description": "`limit` is `0` or above `100`, or you sent a parameter the listing does not accept: `details[0].code` is `unknown_parameter`.",
+                "schema": ERROR_REF,
+                "example": UNKNOWN_PARAMETER,
+            },
+            "500": {"description": "`ids` is a comma-separated list. Repeat `ids` for each product instead.", "schema": ERROR_REF},
+        },
+        "example_call": {"query": "limit=20"},
+    },
     {
         "key": "create_product",
         "slug": "create-a-product",
@@ -234,7 +325,7 @@ ENDPOINTS = [
         "body": {"schema": ref("ProductCreateInput"), "example": CREATE_BODY},
         "responses": {
             "201": {
-                "description": "The new product, with all 71 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `status` is `active`, and `id` is the value the other calls take as `product_id`. `transaction_no` holds the number you sent, or `null` when you sent none. The example shows a selection of the fields.",
+                "description": "The new product, with all 87 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `status` is `active`, and `id` is the value the other calls take as `product_id`. `transaction_no` holds the number you sent, or `null` when you sent none. The example shows a selection of the fields.",
                 "schema": PRODUCT_RESPONSE,
                 "example": {"product": CREATED_PRODUCT},
             },
@@ -252,7 +343,7 @@ ENDPOINTS = [
         "title": "Retrieve a product",
         "method": "GET",
         "path": BASE + "/{product_id}",
-        "summary": "Returns the product whose `id` you pass as `product_id`, with all 71 of its fields.",
+        "summary": "Returns the product whose `id` you pass as `product_id`, with all 87 of its fields.",
         "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none. A product you deleted is still returned, with `status` set to `trashed`.",
         "parameters": [PRODUCT_ID, FIELD_METADATA],
         "responses": {
@@ -276,10 +367,10 @@ ENDPOINTS = [
         "title": "Update a product",
         "method": "PUT",
         "path": BASE + "/{product_id}",
-        "summary": "Changes the product fields you send, keeps every other field, and returns the product.",
-        "description": "Send the fields to change at the top level of the body, not inside `product`. The update merges at every level: a field you leave out keeps its value, inside nested blocks too. Write the dimensions in `product_properties`, and `mpn`, `upc`, `barcode` and `hs_code` in `advanced.advance_information`. You can send back a product you read once you remove `status` and `reviews`.",
+        "summary": "Changes the product fields you send, keeps every other field, and returns the product. The body must include ten required fields.",
+        "description": "Send the fields to change at the top level of the body, not inside `product`. The body must include `name`, `sku`, `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`, `available_for` and `selected_customers`; a missing one is rejected with `400` and the reason `required`. Apart from those, the update merges at every level: a field you leave out keeps its value, inside nested blocks too. Write the dimensions in `product_properties`, and `mpn`, `upc`, `barcode` and `hs_code` in `advanced.advance_information`. You can send back a product you read once you remove `status` and `reviews`.",
         "parameters": [PRODUCT_ID],
-        "body": {"schema": ref("ProductInput"), "example": {"invoice_note": "Ships in 2 business days", "advanced": {"advance_information": {"mpn": "MPN-0001"}}}},
+        "body": {"schema": ref("ProductInput"), "example": UPDATE_BODY},
         "responses": {
             "200": {
                 "description": "The product after the update, with an `ETag` header. When something changed, `version`, `updated_at`, `last_updated_on` and `last_updated_by` change too. The example shows a selection of the fields.",
@@ -287,7 +378,7 @@ ENDPOINTS = [
                 "example": {"product": UPDATED_PRODUCT},
             },
             "400": {
-                "description": "The body is wrapped in `product` (message `product: is not a recognised product field`), or it has `status`, `reviews`, or a top-level `mpn`, `upc`, `barcode` or `hs_code` (reason `unknown_field`). Or it changes a read-only field such as `id`, `sold_out`, `model` or the top-level `weight` (reason `read_only_field`). Or a field that takes fixed values has another value (reason `invalid_enum`).",
+                "description": "One of the ten required fields is missing (reason `required`). Or the body is wrapped in `product` (message `product: is not a recognised product field`), or it has `status`, `reviews`, or a top-level `mpn`, `upc`, `barcode` or `hs_code` (reason `unknown_field`). Or it changes a read-only field such as `id`, `sold_out`, `model` or the top-level `weight` (reason `read_only_field`). Or a field that takes fixed values has another value (reason `invalid_enum`).",
                 "schema": ERROR_REF,
             },
             "409": {"description": "The product is in the trash. The message is `cannot modify a product in the trash`.", "schema": ERROR_REF},
@@ -427,7 +518,7 @@ STAMP = "Changes when the product changes. A value you send is ignored."
 ADVANCED_CODE = "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
 
 SCHEMAS = {
-    "Product": {"type": "object", "description": "One product: 71 fields, the same set on every product.", "properties": {
+    "Product": {"type": "object", "description": "One product: 87 fields, the same set on every product.", "properties": {
         "id": typed("integer", "The product's `id`. Pass it as `product_id` in a path. " + READ_ONLY),
         "name": typed("string"),
         "sku": typed("string"),
@@ -451,8 +542,8 @@ SCHEMAS = {
         "available_from_date": typed("string"),
         "available_to_date": typed("string"),
         "available_for": typed("string", "Who can buy the product. `selected` limits it to the customers and groups in `selected_customers`."),
-        "selected_customers": {"description": "The customers and customer groups the product is available to, as an object with `customers` and `groups`, or `[]` when the product names none.", "anyOf": [ref("ProductSelectedCustomers"), {"type": "array", "maxItems": 0}]},
-        "restrict_for_selected_customers": typed("array"),
+        "selected_customers": dict(ref("ProductSelectedCustomers"), description="The customers and customer groups the product is available to, as an object with `customers` and `groups`. Both lists are empty when the product names nobody. In a write, send ids: see `ProductSelectedCustomersInput`."),
+        "restrict_for_selected_customers": dict(ref("ProductSelectedCustomers"), description="The customers and groups a restriction names, as an object with `customers` and `groups`. Both lists are empty when nobody is named. Read-only."),
         "password_protected": typed("boolean"),
         "password": typed("string", "`***` when the product has a password, `\"\"` when it has none. Sending back `***` keeps the stored password."),
         "available_on_weekdays": ref("ProductAvailableOnWeekdays"),
@@ -499,6 +590,22 @@ SCHEMAS = {
         "product_variation": dict(ref("ProductVariation"), description="The product's variation types and variants, or `{}` on a product with no variations."),
         "preorder_enabled": typed("boolean"),
         "has_variations": typed("boolean", READ_ONLY),
+        "available_for_purchase": dict(ref("ProductAvailableForPurchase"), description="Availability in one block: `enabled` is `available`, `active` is `administrative_status` and `who_can_view` is `available_for`."),
+        "categories": array_of("ProductCategory", "The categories the product is filed under, the same ones as `parents`."),
+        "description": typed("string", "The same text as `product_description`."),
+        "inventory": dict(ref("ProductInventory"), description="Stock settings in one block, with the same values as `product_pricing_and_stock` and `preorder_enabled`."),
+        "links": dict(ref("ProductLinks"), description="The API paths of the product and its sub-paths. Read-only."),
+        "media": dict(ref("ProductMedia"), description="The product's images and videos, the same files as `image_and_video`."),
+        "ordering": dict(ref("ProductOrdering"), description="The smallest and largest quantity a customer can order."),
+        "pricing": dict(ref("ProductPricing"), description="Prices in one block, with the same values as `base_price`, `cost_price`, `compare_at_price` and the sale and advanced pricing settings."),
+        "product_url": typed("string", "The product's full storefront address. Read-only."),
+        "restrictions": dict(ref("ProductRestrictions"), description="Who can see the price and who can buy, in one block."),
+        "shipping": dict(ref("ProductShipping"), description="The product's shipping profile."),
+        "summary": typed("string", "The same text as `product_summary`."),
+        "tax": dict(ref("ProductTax"), description="The same settings as `tax_settings`, in one block."),
+        "up_sell_products": array_of("ProductLink", "The products offered as an up-sell. In a write, send `{\"id\": ...}` records."),
+        "updated_by": dict(ref("ProductNamedReference"), description="Who last changed the product. A value you send returns `200` and is not kept."),
+        "virtual": typed("boolean", "The same value as `is_virtual`."),
     }},
     "ProductUrls": {"type": "object", "properties": {
         "url": typed("string", "The product's URL slug."),
@@ -515,8 +622,17 @@ SCHEMAS = {
         "is_parent_in_trash": typed("boolean"),
         "is_disposable": typed("boolean"),
     }},
-    "ProductSelectedCustomers": {"type": "object", "properties": {
-        "customers": array_of("ProductNamedReference", "The customers the product is available to."),
+    "ProductSelectedCustomer": {"type": "object", "description": "One customer an audience names.", "properties": {
+        "id": typed("integer", "The customer's `customer_id`."),
+        "internal_id": typed("integer", "The customer's `internal_id`."),
+        "name": typed("string"),
+    }},
+    "ProductSelectedCustomersInput": {"type": "object", "description": "An audience to write: customer and group ids.", "properties": {
+        "customers": {"type": "array", "items": {"type": "integer"}, "description": "The `customer_id` of each customer."},
+        "groups": {"type": "array", "items": {"type": "integer"}, "description": "The `id` of each customer group. A group sent as `{\"id\": ...}` is rejected with `400`."},
+    }},
+    "ProductSelectedCustomers": {"type": "object", "description": "Who the product is available to, or whom a restriction names. Both lists are empty when nobody is named.", "properties": {
+        "customers": array_of("ProductSelectedCustomer", "The customers named."),
         "groups": array_of("ProductNamedReference", "The customer groups the product is available to."),
     }},
     "ProductWeekday": {"type": "object", "description": "One day of the weekday schedule.", "properties": {
@@ -555,6 +671,8 @@ SCHEMAS = {
         "method": typed("string"),
         "label_for_lowest_price": typed("string"),
         "label_for_highest_price": typed("string"),
+        "lowest_price_label": typed("string", "A second name for `label_for_lowest_price`."),
+        "highest_price_label": typed("string", "A second name for `label_for_highest_price`."),
     }},
     "ProductWarehouseStock": {"type": "object", "description": "One location's units, in an older format.", "properties": {
         "warehouse": typed("string", "The inventory location's id, as text, such as `\"4\"`. Every other location id in these responses is a number."),
@@ -616,6 +734,7 @@ SCHEMAS = {
     }},
     "ProductAdvanceInformation": {"type": "object", "description": "The product's identifiers and origin. An update that names one of these fields keeps the others.", "properties": {
         "global_trade_item_number": typed("string"),
+        "enable_product_identifiers": typed("boolean"),
         "gtin": typed("string"),
         "mpn": typed("string", ADVANCED_CODE),
         "upc": typed("string", ADVANCED_CODE),
@@ -625,15 +744,54 @@ SCHEMAS = {
         "product_condition": typed("string"),
         "model": typed("string"),
     }},
+    "ProductFlag": {"type": "object", "description": "A flag and the label shown with it.", "properties": {
+        "enabled": typed("boolean"),
+        "label": typed("string"),
+    }},
+    "ProductFlags": {"type": "object", "description": "The product's flags in one block.", "properties": {
+        "featured": dict(ref("ProductFlag"), description="The same values as `is_featured` and `featured_label`."),
+        "new_product": typed("boolean", "The same value as `is_new`."),
+        "sold_out": dict(ref("ProductFlag"), description="The same values as `sold_out` and `sold_out_label`. Read-only."),
+        "model_number": typed("string", "The same value as `model`."),
+    }},
+    "ProductDimension": {"type": "object", "description": "The same values as `product_properties`. The two units are read-only here.", "properties": {
+        "length_unit": typed("string", "Read-only here."),
+        "weight_unit": typed("string", "Read-only here."),
+        "width": typed("number"),
+        "height": typed("number"),
+        "length": typed("number"),
+        "weight": typed("number"),
+    }},
+    "ProductIdentifiers": {"type": "object", "description": "The same values as `advance_information`: a write here changes it there.", "properties": {
+        "enabled": typed("boolean", "The same value as `enable_product_identifiers`."),
+        "gtin": typed("string"),
+        "condition": typed("string", "The same value as `product_condition`."),
+        "barcode": typed("string"),
+        "hs_code": typed("string"),
+        "country_of_origin": typed("string"),
+        "mpn": typed("string"),
+        "upc": typed("string"),
+    }},
+    "ProductWebtool": {"type": "object", "description": "Read-only.", "properties": {
+        "disable_tracking": typed("boolean", "The same value as `webtool_disable_tracking`."),
+    }},
     "ProductAdvanced": {"type": "object", "properties": {
         "advance_information": ref("ProductAdvanceInformation"),
         "webtool_disable_tracking": typed("boolean"),
         "meta_tags": typed("array"),
+        "product_flags": ref("ProductFlags"),
+        "product_dimension": ref("ProductDimension"),
+        "product_identifiers": ref("ProductIdentifiers"),
+        "webtool": ref("ProductWebtool"),
     }},
-    "ProductLink": {"type": "object", "description": "A related or similar product.", "properties": {
+    "ProductLink": {"type": "object", "description": "A related, similar or up-sell product. A write takes `{\"id\": ...}`; a bare id in `up_sell_products` returns `200` and is dropped.", "properties": {
         "id": typed("integer", "The linked product's id."),
         "name": typed("string"),
         "url": typed("string"),
+        "status": typed("string"),
+        "sku": typed("string"),
+        "in_stock": typed("boolean"),
+        "price": typed("number"),
     }},
     "ProductBundle": {"type": "object", "description": "The bundle settings of a product that is a bundle.", "properties": {
         "price_fixed": typed("boolean"),
@@ -666,6 +824,10 @@ SCHEMAS = {
         "label": typed("string"),
         "description": typed("string"),
     }},
+    "ProductReviewer": {"type": "object", "description": "Who wrote a review: the same `name` and `email` as the review.", "properties": {
+        "name": typed("string"),
+        "email": typed("string"),
+    }},
     "ProductReview": {"type": "object", "description": "One review of the product.", "properties": {
         "id": typed("integer", "The review's id."),
         "productId": typed("integer", "The reviewed product's id. This is the only camelCase field name in the product."),
@@ -676,6 +838,10 @@ SCHEMAS = {
         "date": typed("string"),
         "status": typed("string"),
         "files": typed("array"),
+        "product_id": typed("integer", "The same value as `productId`."),
+        "reviewer": ref("ProductReviewer"),
+        "comment": nullable("string", "The same text as `review`."),
+        "created_at": typed("string", "The same date as `date`, ending in `Z`."),
     }},
     "ProductVariationTypeOption": {"type": "object", "properties": {
         "id": typed("integer", "The option's id."),
@@ -758,6 +924,7 @@ SCHEMAS = {
         "featured_label": typed("string"),
         "base_price": typed("number"),
         "cost_price": typed("number"),
+        "compare_at_price": typed("number"),
         "sale_price": typed("number"),
         "expect_to_pay_price": typed("number"),
         "weight": {"type": ["number", "string"], "description": "A number on some products and text on others."},
@@ -786,7 +953,169 @@ SCHEMAS = {
         "types": array_of("ProductVariationType"),
         "available_combinations": array_of("ProductCombination"),
     }},
-    "ProductInput": {"type": "object", "description": "The body of `PUT` and `PATCH`. Send these fields at the top level of the body, not inside `product`. Only the fields you send change, inside nested blocks too. A read-only field from [Retrieve a product](" + RETRIEVE_PAGE + ") is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.", "properties": {
+    "ProductCategory": {"type": "object", "description": "One category the product is filed under, as `categories` lists it. [List categories](" + CATEGORIES_PAGE + ") returns the store's categories.", "properties": {
+        "id": typed("integer", "The category's id."),
+        "name": typed("string"),
+        "in_trash": typed("boolean"),
+        "parent_in_trash": typed("boolean"),
+        "disposable": typed("boolean"),
+    }},
+    "ProductMediaImage": {"type": "object", "properties": {
+        "id": typed("integer", "The image's id."),
+        "filename": typed("string"),
+        "position": typed("integer"),
+        "primary": typed("boolean"),
+        "alt_text": typed("string"),
+        "url": typed("string"),
+        "thumbnail_url": typed("string"),
+    }},
+    "ProductMediaVideo": {"type": "object", "properties": {
+        "id": typed("integer", "The video's id."),
+        "filename": typed("string"),
+        "position": typed("integer"),
+        "url": typed("string"),
+        "thumbnail_url": typed("string"),
+    }},
+    "ProductMedia": {"type": "object", "description": "The product's images and videos. A write names files the product already holds, by `id`; any other `id` is rejected with `400`.", "properties": {
+        "images": array_of("ProductMediaImage"),
+        "videos": array_of("ProductMediaVideo"),
+        "specification_file": {"description": "`null` on every product read."},
+    }},
+    "ProductWeekdayWindow": {"type": "object", "description": "One day of the schedule. Times are `HH:mm`.", "properties": {
+        "enabled": typed("boolean"),
+        "full_day": typed("boolean"),
+        "start_time": typed("string"),
+        "end_time": typed("string"),
+    }},
+    "ProductScheduleWeekdays": {"type": "object", "description": "The seven days of the schedule, each always present.", "properties": {
+        "monday": ref("ProductWeekdayWindow"),
+        "tuesday": ref("ProductWeekdayWindow"),
+        "wednesday": ref("ProductWeekdayWindow"),
+        "thursday": ref("ProductWeekdayWindow"),
+        "friday": ref("ProductWeekdayWindow"),
+        "saturday": ref("ProductWeekdayWindow"),
+        "sunday": ref("ProductWeekdayWindow"),
+    }},
+    "ProductSchedule": {"type": "object", "description": "When the product is available.", "properties": {
+        "enabled": typed("boolean"),
+        "type": typed("string", "The same value as `schedule_type`: `date_range` or `custom_schedule`."),
+        "start_date": typed("string"),
+        "end_date": typed("string"),
+        "preset": typed("string", "The same value as `custom_schedule_option`: `all_days`, `weekdays`, `business_hour`, `weekends` or `custom`."),
+        "weekdays": ref("ProductScheduleWeekdays"),
+    }},
+    "ProductPasswordProtection": {"type": "object", "description": "The same values as `password_protected` and `password`. A password that is set reads `***`.", "properties": {
+        "enabled": typed("boolean"),
+        "password": typed("string"),
+    }},
+    "ProductAvailableForPurchase": {"type": "object", "description": "Availability in one block.", "properties": {
+        "enabled": typed("boolean", "The same value as `available`."),
+        "active": typed("boolean", "The same value as `administrative_status`."),
+        "who_can_view": typed("string", "The same value as `available_for`."),
+        "selected_customers": ref("ProductSelectedCustomers"),
+        "restrict_for_selected_customers": dict(ref("ProductSelectedCustomers"), description="Read-only."),
+        "schedule": ref("ProductSchedule"),
+        "password_protection": ref("ProductPasswordProtection"),
+    }},
+    "ProductAvailableForPurchaseInput": {"type": "object", "description": "The availability block to write. While `enabled` is `false`, a write to `who_can_view`, `schedule` or `password_protection` returns `200` and is not kept.", "properties": {
+        "enabled": typed("boolean"),
+        "active": typed("boolean"),
+        "who_can_view": typed("string"),
+        "selected_customers": ref("ProductSelectedCustomersInput"),
+        "schedule": ref("ProductSchedule"),
+        "password_protection": ref("ProductPasswordProtection"),
+    }},
+    "ProductOnSale": {"type": "object", "description": "The sale price.", "properties": {
+        "enabled": typed("boolean"),
+        "discounted_price": typed("number"),
+        "amount_type": typed("string", "The same value as `on_sale_price_type`."),
+    }},
+    "ProductQuantityMultiple": {"type": "object", "description": "Order in multiples of `multiple_of`.", "properties": {
+        "enabled": typed("boolean"),
+        "multiple_of": typed("integer"),
+    }},
+    "ProductExpectToPay": {"type": "object", "description": "The expect-to-pay price.", "properties": {
+        "enabled": typed("boolean"),
+        "price": typed("number"),
+    }},
+    "ProductAdvancedPricing": {"type": "object", "description": "The advanced pricing switches.", "properties": {
+        "enabled": typed("boolean"),
+        "quantity_multiple": ref("ProductQuantityMultiple"),
+        "expect_to_pay": ref("ProductExpectToPay"),
+        "call_for_price": typed("boolean"),
+    }},
+    "ProductPricing": {"type": "object", "description": "Prices in one block. On a create, `base_price` here is accepted in place of the top-level `base_price`.", "properties": {
+        "base_price": typed("number"),
+        "cost_price": typed("number"),
+        "rrp_price": typed("number", "The same value as `compare_at_price`."),
+        "on_sale": ref("ProductOnSale"),
+        "advanced_pricing": ref("ProductAdvancedPricing"),
+    }},
+    "ProductInventoryTracking": {"type": "object", "description": "Stock tracking.", "properties": {
+        "enabled": typed("boolean"),
+        "available_stock": typed("integer"),
+        "low_stock_level": typed("integer"),
+        "suppliers": {"type": "array", "description": "The supplier ids you wrote."},
+    }},
+    "ProductCombinedStockLimit": {"type": "object", "description": "The combined stock selling limit.", "properties": {
+        "enabled": typed("boolean"),
+        "units": typed("integer"),
+    }},
+    "ProductInventory": {"type": "object", "description": "Stock settings in one block.", "properties": {
+        "tracking": ref("ProductInventoryTracking"),
+        "combined_stock_limit": ref("ProductCombinedStockLimit"),
+        "preorder": typed("boolean", "The same value as `preorder_enabled`."),
+    }},
+    "ProductOrdering": {"type": "object", "description": "The order quantity limits.", "properties": {
+        "min_quantity": typed("integer"),
+        "max_quantity": typed("integer", "`0` means no maximum."),
+    }},
+    "ProductRestriction": {"type": "object", "description": "A price or purchase restriction. Write only `mode`: `enabled` is read-only, and a value you send in `customers` returns `200` and is not kept.", "properties": {
+        "enabled": typed("boolean", "Read-only."),
+        "mode": typed("string"),
+        "customers": {"type": "array"},
+    }},
+    "ProductRestrictions": {"type": "object", "description": "The same values as `restrict_price_for` and `restrict_purchase_for`, in one block. `enabled` and `display_only` are read-only.", "properties": {
+        "enabled": typed("boolean", "Read-only."),
+        "price": ref("ProductRestriction"),
+        "purchase": ref("ProductRestriction"),
+        "display_only": typed("boolean", "Read-only."),
+    }},
+    "ProductPriceIncludesTax": {"type": "object", "description": "Whether `base_price` includes tax, and how it is rounded.", "properties": {
+        "enabled": typed("boolean"),
+        "base_price_rounding": typed("string"),
+    }},
+    "ProductTax": {"type": "object", "description": "The same settings as `tax_settings`, in one block.", "properties": {
+        "enabled": typed("boolean", "The same value as `overwrite_default_config`."),
+        "exempt": typed("boolean"),
+        "custom_tax_profile": dict(ref("ProductNamedReference"), description="The custom tax profile. In a write, send its id or `{\"id\": ...}`."),
+        "message": typed("string"),
+        "show_price_with_tax": typed("boolean"),
+        "price_includes_tax": ref("ProductPriceIncludesTax"),
+    }},
+    "ProductShipping": {"type": "object", "description": "The product's shipping profile.", "properties": {
+        "enabled": typed("boolean", "`true` while a profile is set. Read-only."),
+        "profile": dict(ref("ProductNamedReference"), description="The shipping profile. An update takes its id or `{\"id\": ...}`; a create drops it."),
+    }},
+    "ProductLinks": {"type": "object", "description": "The API paths of the product and its sub-paths. Read-only.", "properties": {
+        "self": typed("string"),
+        "variations": typed("string"),
+        "stock": typed("string"),
+        "reviews": typed("string"),
+    }},
+    "ProductPagination": {"type": "object", "properties": {
+        "total": typed("integer", "The number of products that match."),
+        "limit": typed("integer", "The page size the store applied."),
+        "offset": typed("integer", "The number of products skipped before this page."),
+        "has_previous": typed("boolean", "`true` when products come before this page."),
+        "has_next": typed("boolean", "`true` when more products follow this page."),
+    }},
+    "ProductPage": {"type": "object", "description": "One page of the product list.", "properties": {
+        "products": array_of("Product", "The products on this page, each the full record."),
+        "pagination": ref("ProductPagination"),
+        "field_metadata": ref("ProductFieldMetadata"),
+    }},
+    "ProductInput": {"type": "object", "description": "The body of `PUT` and `PATCH`. Send these fields at the top level of the body, not inside `product`. A `PUT` must include `name`, `sku`, `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`, `available_for` and `selected_customers`. Apart from those, only the fields you send change, inside nested blocks too. `product_url`, `links` and `restrict_for_selected_customers` are read-only, and a value you send in `updated_by` returns `200` and is not kept. A read-only field from [Retrieve a product](" + RETRIEVE_PAGE + ") is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.", "properties": {
         "name": typed("string"),
         "sku": typed("string"),
         "transaction_no": typed("string", "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."),
@@ -827,6 +1156,20 @@ SCHEMAS = {
         "similar_products": typed("array"),
         "tags": typed("array"),
         "preorder_enabled": typed("boolean"),
+        "selected_customers": dict(ref("ProductSelectedCustomersInput"), description="The customers and groups the product is available to, as ids."),
+        "virtual": typed("boolean", "The same value as `is_virtual`."),
+        "summary": typed("string", "The same text as `product_summary`."),
+        "description": typed("string", "The same text as `product_description`."),
+        "categories": {"type": "array", "items": {"oneOf": [{"type": "integer"}, {"type": "object", "properties": {"id": typed("integer", "The category's `id`.")}}]}, "description": "The `id` of each category, as a number or as `{\"id\": <category id>}`. `[]` returns `200` and changes nothing."},
+        "up_sell_products": array_of("ProductLink", "The up-sell products, as `{\"id\": ...}` records. A list of bare ids returns `200` and leaves `up_sell_products` empty."),
+        "media": ref("ProductMedia"),
+        "available_for_purchase": ref("ProductAvailableForPurchaseInput"),
+        "pricing": ref("ProductPricing"),
+        "inventory": ref("ProductInventory"),
+        "ordering": ref("ProductOrdering"),
+        "restrictions": ref("ProductRestrictions"),
+        "tax": ref("ProductTax"),
+        "shipping": ref("ProductShipping"),
     }},
     "ProductStockVariation": {"type": "object", "description": "One variant's stock, on a product with variations.", "properties": {
         "variation_id": typed("integer", "The variant's id."),

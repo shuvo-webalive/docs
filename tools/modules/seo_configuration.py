@@ -17,7 +17,7 @@ RETRIEVE_REDIRECT_PAGE = "/api-reference/seo-configuration/retrieve-a-redirect"
 PUT_PAGE = "/api-reference/seo-configuration/replace-seo-configuration-sections"
 
 OVERVIEW_DESCRIPTION = "Read and change your store's SEO title and description templates, custom header and footer code and URL settings, and manage its redirects and document root files."
-INTRO = "The SEO configuration API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/seo_configuration`."
+INTRO = "The SEO configuration API has eighteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/seo_configuration`."
 
 WARNING = (
     "**A `PUT` resets every field you leave out of a section you send.** This applies on\n"
@@ -379,6 +379,19 @@ ENDPOINTS = [
         "example_call": {"query": "limit=100"},
     },
     {
+        "key": "head_seo_configuration_document_root",
+        "slug": "get-document-root-files-headers",
+        "title": "Get document root files headers",
+        "method": "HEAD",
+        "path": BASE + "/document_root",
+        "summary": "Returns the headers for the document root files listing, with no body.",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. Use it to check that the document root files are reachable without downloading them.",
+        "responses": {
+            "200": {"description": "Headers only. No `ETag` header and no body."},
+        },
+        "example_call": {},
+    },
+    {
         "key": "upload_seo_configuration_document_root",
         "slug": "upload-a-document-root-file",
         "title": "Upload a document root file",
@@ -448,6 +461,19 @@ ENDPOINTS = [
         "example_call": {"query": "limit=100"},
     },
     {
+        "key": "head_seo_configuration_redirects",
+        "slug": "get-redirects-headers",
+        "title": "Get redirects headers",
+        "method": "HEAD",
+        "path": BASE + "/redirects",
+        "summary": "Returns the headers for the redirects listing, with no body.",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. Use it to check that the redirects are reachable without downloading them.",
+        "responses": {
+            "200": {"description": "Headers only. No `ETag` header and no body."},
+        },
+        "example_call": {},
+    },
+    {
         "key": "create_seo_configuration_redirect",
         "slug": "create-a-redirect",
         "title": "Create a redirect",
@@ -488,6 +514,21 @@ ENDPOINTS = [
                 "schema": SECTION_ERROR,
                 "example": section_error("not_found", "redirect not found: 99999999", [], "a31f2acf-3ee8-4ef9-b1d9-eb1abf236b61"),
             },
+        },
+        "example_call": {"path": {"redirect_id": 16}},
+    },
+    {
+        "key": "head_seo_configuration_redirect",
+        "slug": "get-a-redirect-headers",
+        "title": "Get a redirect headers",
+        "method": "HEAD",
+        "path": BASE + "/redirects/{redirect_id}",
+        "summary": "Returns the headers for the redirect whose `id` you pass as `redirect_id`, with no body.",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. Returns `404` when no redirect has that `redirect_id`. Use it to check that a redirect exists without downloading it.",
+        "parameters": [LISTED_REDIRECT_ID],
+        "responses": {
+            "200": {"description": "Headers only. No `ETag` header and no body."},
+            "404": {"description": "No redirect has that `redirect_id`."},
         },
         "example_call": {"path": {"redirect_id": 16}},
     },

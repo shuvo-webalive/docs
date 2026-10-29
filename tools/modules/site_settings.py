@@ -201,6 +201,7 @@ SAMPLE_STORE_LOGO = {
         "width": 200,
         "height": 60,
     },
+    "variants": {"dark_background": None, "sticky_header": None},
 }
 
 SAMPLE_SECTIONS = {
@@ -582,10 +583,15 @@ SCHEMAS = {
         "image_base64": text("A new favicon as a data URI, such as `data:image/png;base64,...`: a transparent PNG or JPEG of up to 10 KB and at most 256 x 256 pixels.", writeOnly=True),
         "remove": flag("Send `true` to remove the current favicon.", writeOnly=True),
     }},
-    "SiteSettingsStoreLogo": {"type": "object", "description": "The store logo. A read returns `image`; a write sends `image_base64`.", "properties": {
+    "SiteSettingsStoreLogo": {"type": "object", "description": "The store logo. A read returns `image` and `variants`; a write sends `image_base64`.", "properties": {
         "image": dict(ref("SiteSettingsMediaImage"), readOnly=True, description="The stored logo."),
+        "variants": dict(ref("SiteSettingsStoreLogoVariants"), readOnly=True, description="The logos for a dark background and for the sticky header. `field_metadata` marks both read-only."),
         "image_base64": text("A new logo as a data URI, such as `data:image/png;base64,...`: a PNG or JPEG of up to 200 KB.", writeOnly=True),
         "remove": flag("Listed in `field_metadata`, but `remove: true` is rejected with `400`: the logo can only be replaced with a new `image_base64`.", writeOnly=True),
+    }},
+    "SiteSettingsStoreLogoVariants": {"type": "object", "description": "The other logos the store uses. Both are `null` while the main logo is used.", "properties": {
+        "dark_background": {"description": "The logo for a dark background, or `null` while the main logo is used."},
+        "sticky_header": {"description": "The logo for the sticky header, or `null` while the main logo is used."},
     }},
     "SiteSettingsMediaImage": {"type": "object", "description": "A stored image and where it is served from.", "properties": {
         "file_name": text("The stored file's name."),

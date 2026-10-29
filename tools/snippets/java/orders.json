@@ -58,6 +58,10 @@
       "function": "createOrderPayment",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderPayment(1043, Map.of(\n        \"transaction_no\", \"TXN-PAY-0001\",\n        \"payment\", Map.of(\"amount\", 20.0, \"payment_method\", \"manual\", \"payment_status\", \"success\",\n                \"track_info\", \"Bank transfer\", \"payer_info\", \"Jane Doe\", \"transaction_date\", \"2026-10-07T09:30:00Z\",\n                \"transaction_reference\", \"BT-0001\", \"surcharge\", 0.0)));\nMap<?, ?> payment = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"payment\");\nSystem.out.println(payment.get(\"id\") + \" \" + payment.get(\"paid_amount\") + \" \" + payment.get(\"due_amount\"));"
     },
+    "list_order_refunds": {
+      "function": "listOrderRefunds",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().listOrderRefunds(1043, Map.of(\"limit\", 10));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"order_id\") + \" \" + body.get(\"order_no\"));\nfor (Object row : (List<?>) body.get(\"refunds\")) {\n    Map<?, ?> refund = (Map<?, ?>) row;\n    System.out.println(refund.get(\"refund_id\") + \" \" + refund.get(\"amount\") + \" \" + refund.get(\"status\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+    },
     "create_order_refund": {
       "function": "createOrderRefund",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orders().createOrderRefund(1043, Map.of(\"refund\", Map.of(\n        \"amount\", \"3.00\", \"refund_date\", \"2026-10-07T14:00:00Z\", \"reason\", \"One item returned\",\n        \"line_items\", List.of(Map.of(\"order_item_id\", 3302, \"quantity\", 1, \"amount\", 3.0)))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"refund_id\") + \" \" + body.get(\"amount\"));"

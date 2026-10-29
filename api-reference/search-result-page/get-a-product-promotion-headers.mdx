@@ -1,0 +1,9 @@
+---
+title: "Get a product promotion headers"
+description: "Returns the headers for the product promotion whose `id` you pass as `promotion_id`, with no body."
+openapi: "HEAD /admin/settings/page_settings/search_result_page/product_promotion/{promotion_id}"
+---
+
+Returns `200` with headers only and no body. The response includes an `ETag` header. Returns `404` when no promotion has that `promotion_id`. Use it to check that a promotion exists without downloading it.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

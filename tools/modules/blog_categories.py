@@ -98,11 +98,11 @@ def image(stamp):
     return {"title": "Seasonal promotions", "alternative_text": "Seasonal promotions banner", "file_name": "seasonal-promotions.png", "link": IMAGE_LINK + "?" + stamp}
 
 
-CREATED_ROW = {"id": 15, "name": "Seasonal Promotions", "url": "seasonal-promotions", "description": "Sale announcements and limited-time offers.", "is_disposable": False, "is_in_trash": False, "image": image("20261007091502113+1100"), "created_on": "2026-10-06T22:15:02", "last_updated_on": "2026-10-06T22:15:02", "seo_configs": []}
+CREATED_ROW = {"id": 15, "uuid": "5d8f2a31-7c4e-4b96-a0d3-6e1c9f8b2a47", "name": "Seasonal Promotions", "url": "seasonal-promotions", "description": "Sale announcements and limited-time offers.", "is_disposable": False, "is_in_trash": False, "image": image("20261007091502113+1100"), "created_on": "2026-10-06T22:15:02", "last_updated_on": "2026-10-06T22:15:02", "seo_configs": []}
 
 SAMPLE_ROWS = [
-    {"id": 12, "name": "Product News", "url": "product-news", "description": "New arrivals and product updates.", "is_disposable": False, "is_in_trash": False, "image": {}, "created_on": "2026-07-16T06:24:24", "last_updated_on": "2026-08-19T11:14:38", "seo_configs": []},
-    {"id": 9, "name": "Recipes", "url": "recipes", "description": "Cooking with our products.", "is_disposable": False, "is_in_trash": False, "image": {}, "created_on": "2026-07-14T02:10:51", "last_updated_on": "2026-07-14T02:10:51", "seo_configs": []},
+    {"id": 12, "uuid": "e2a6b9c4-1f38-4d75-8b0e-3a7d5c1f9e62", "name": "Product News", "url": "product-news", "description": "New arrivals and product updates.", "is_disposable": False, "is_in_trash": False, "image": {}, "created_on": "2026-07-16T06:24:24", "last_updated_on": "2026-08-19T11:14:38", "seo_configs": []},
+    {"id": 9, "uuid": "0f7c3d85-9a2b-4e61-b4d8-8c5e2a6f1b39", "name": "Recipes", "url": "recipes", "description": "Cooking with our products.", "is_disposable": False, "is_in_trash": False, "image": {}, "created_on": "2026-07-14T02:10:51", "last_updated_on": "2026-07-14T02:10:51", "seo_configs": []},
     dict(CREATED_ROW, image=image("20261007091544871+1100")),
 ]
 
@@ -183,7 +183,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{blog_category_id}",
         "summary": "Returns the blog category whose `id` you pass as `blog_category_id`.",
-        "description": "Returns the blog category whose `id` you pass as `blog_category_id`, under the `blog_category` key, with the same ten fields as a listing entry. Query parameters are ignored, and the response has no `ETag` or `Last-Modified` header. `HEAD` on this path returns `404` even for a category that exists, so use this call to check that a category exists.",
+        "description": "Returns the blog category whose `id` you pass as `blog_category_id`, under the `blog_category` key, with the same eleven fields as a listing entry. Query parameters are ignored, and the response has no `ETag` or `Last-Modified` header. `HEAD` on this path returns `404` even for a category that exists, so use this call to check that a category exists.",
         "parameters": [BLOG_CATEGORY_ID],
         "responses": {
             "200": {
@@ -249,8 +249,9 @@ ENDPOINTS = [
 ]
 
 SCHEMAS = {
-    "BlogCategory": {"type": "object", "description": "One blog category. A listing entry, a retrieve, a create and an update return the same ten fields.", "properties": {
+    "BlogCategory": {"type": "object", "description": "One blog category. A listing entry, a retrieve, a create and an update return the same eleven fields.", "properties": {
         "id": {"type": "integer", "description": "The blog category's `id`, assigned by the store. Pass it as `blog_category_id` in a path."},
+        "uuid": {"type": "string", "description": "A UUID the store assigns to the blog category. A create or update that names another `uuid` is processed as usual and the stored `uuid` stays the same."},
         "name": {"type": "string", "minLength": 2, "maxLength": 255, "description": "The category's name, 2 to 255 characters. No two blog categories have the same name."},
         "url": {"type": "string", "description": "The category's URL slug, such as `seasonal-promotions`. A create without one gets a `url` made from `name`, and a `url` another category already has is saved with `-1` added to the end."},
         "description": {"type": "string", "description": "The category's description, saved as sent, HTML included. `\"\"` when none is set."},

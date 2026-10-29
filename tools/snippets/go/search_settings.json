@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "GetSearchSettingsReindexStatus",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().GetSearchSettingsReindexStatus(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nstatus := resp.Map().(map[string]any)\nfmt.Println(status[\"state\"], status[\"started_at\"], status[\"finished_at\"], status[\"error\"])"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "HeadSearchSettingsReindexStatus",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchSettings().HeadSearchSettingsReindexStatus(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
     }
   }
 }

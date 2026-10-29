@@ -17,7 +17,7 @@ The Tax rules API has seven endpoints, and you can call every one from all seven
 
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
-| [List tax rules](/api-reference/tax-rules/list-tax-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules` | Returns up to 20 tax rules per call, each with its tax code and tax zones. |
+| [List tax rules](/api-reference/tax-rules/list-tax-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules` | Returns up to 100 tax rules per call, each with its tax code and tax zones. |
 | [Check the tax rules list](/api-reference/tax-rules/check-the-tax-rules-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_rules` | Checks that the tax rules path exists. Returns headers only, with no body. |
 | [Create a tax rule](/api-reference/tax-rules/create-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_rules` | Creates a tax rule and returns the new rule, whose `id` other calls take as `tax_rule_id`. |
 | [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules/{tax_rule_id}` | Returns the tax rule whose `id` you pass as `tax_rule_id`, with its tax code and zones. |
@@ -37,8 +37,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   update a rule. A bare record is rejected with `400` and the message `tax_rule missing`. On create,
   `name` is required and a body without it fails with `500`; `description` is the only other field
   the store reads. An update changes only the fields you send.
-- **A listing returns at most 20 rules per call.** A larger `limit` is capped at `20`, and
-  `pagination.limit` shows `20`. To read every rule, step `offset` by the number of rules each page
+- **A listing returns at most 100 rules per call.** A larger `limit` is capped at `100`, and
+  `pagination.limit` shows `100`. To read every rule, step `offset` by the number of rules each page
   returned until you reach `pagination.total`. A `limit` below `1`, or a `limit` or `offset` that is
   not a number, is rejected with `400` and the error `invalid_pagination`.
 - **A rejected request can make the next request on the same connection fail too.** Straight after a

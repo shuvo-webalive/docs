@@ -34,6 +34,10 @@
       "function": "getSeoConfigurationDocumentRoot",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationDocumentRoot($client, ['limit' => 100]);\n\nforeach ($response->map['items'] as $file) {\n    echo $file['config_key'], ' ', $file['file_name'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' files', PHP_EOL;"
     },
+    "head_seo_configuration_document_root": {
+      "function": "headSeoConfigurationDocumentRoot",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::headSeoConfigurationDocumentRoot($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
     "upload_seo_configuration_document_root": {
       "function": "uploadSeoConfigurationDocumentRoot",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::uploadSeoConfigurationDocumentRoot($client, [\n    'file' => ['verification.txt', file_get_contents('verification.txt'), 'text/plain'],\n]);\n\n$file = $response->map['document_root_file'];\necho $file['config_key'], ' ', $file['file_path'], PHP_EOL;"
@@ -46,6 +50,10 @@
       "function": "getSeoConfigurationRedirects",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationRedirects($client, ['limit' => 100]);\n\nforeach ($response->map['items'] as $redirect) {\n    echo $redirect['id'], ' ', $redirect['source_url'], ' -> ', $redirect['destination_url'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more to fetch' : 'all fetched', PHP_EOL;"
     },
+    "head_seo_configuration_redirects": {
+      "function": "headSeoConfigurationRedirects",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::headSeoConfigurationRedirects($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
     "create_seo_configuration_redirect": {
       "function": "createSeoConfigurationRedirect",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::createSeoConfigurationRedirect($client, [\n    'source_url' => '/old-page',\n    'destination_url' => 'https://your-store.example.com/new-page',\n]);\n\necho $response->map['redirect']['id'], PHP_EOL;"
@@ -53,6 +61,10 @@
     "get_seo_configuration_redirect": {
       "function": "getSeoConfigurationRedirect",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::getSeoConfigurationRedirect($client, 16);\n\n$redirect = $response->map['redirect'];\necho $redirect['source_url'], ' -> ', $redirect['destination_url'], PHP_EOL;"
+    },
+    "head_seo_configuration_redirect": {
+      "function": "headSeoConfigurationRedirect",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SeoConfiguration\\SeoConfiguration;\n\n$response = SeoConfiguration::headSeoConfigurationRedirect($client, 16);\n\necho $response->statusCode, PHP_EOL;"
     },
     "patch_seo_configuration_redirect": {
       "function": "patchSeoConfigurationRedirect",

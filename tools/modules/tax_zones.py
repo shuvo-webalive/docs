@@ -28,8 +28,8 @@ NOTES = [
     "  record with only a `code`, or an `id` that matches no country or state fails with `500`. The store\n"
     "  saves a new zone before it checks these records, so after that `500` on a create the zone can still\n"
     "  be in the listing. The `500` does not include the zone's `id`: look for the zone by `name`.",
-    "**You send `post_code` as a flat list and get it back nested.** Send `[\"2000\", \"3000\"]`, and the zone\n"
-    "  returns `[[\"2000\"], [\"3000\"]]`. Sending the nested form fails with `500` and the message\n"
+    "**`post_code` is a flat list of strings on writes and on reads.** Send `[\"2000\", \"3000\"]`, and the zone\n"
+    "  returns `[\"2000\", \"3000\"]`. Sending a nested list fails with `500` and the message\n"
     "  `JSONArray cannot be cast to String`.",
     "**After a `400` or `404` from a tax endpoint, the next request on the same connection can fail too.**\n"
     "  Straight after a `404`, the next retrieve returns `404`, even for a zone that exists. A retrieve from\n"
@@ -99,7 +99,7 @@ CREATE_BODY = {"tax_zone": {
 CREATED_ZONE = {
     "id": 83, "name": "Sydney Metro", "system_generated": False, "default": False,
     "use_radius": False, "radius": 0.0, "start_location": "",
-    "countries": [AUSTRALIA], "states": [NEW_SOUTH_WALES], "post_code": [["2000"], ["3000"]],
+    "countries": [AUSTRALIA], "states": [NEW_SOUTH_WALES], "post_code": ["2000", "3000"],
     "created_at": "2026-09-22T04:15:00", "updated_at": "2026-09-22T04:15:00",
 }
 
@@ -113,7 +113,7 @@ UPDATE_BODY = {"tax_zone": {
 UPDATED_ZONE = dict(
     CREATED_ZONE,
     name="Sydney Metro and Parramatta",
-    post_code=[["2000"], ["2150"]],
+    post_code=["2000", "2150"],
     updated_at="2026-09-22T04:30:00",
 )
 
@@ -166,7 +166,7 @@ ENDPOINTS = [
         "body": {"schema": WRITE_BODY, "example": CREATE_BODY},
         "responses": {
             "201": {
-                "description": "The new tax zone under `tax_zone`, with each post code in `post_code` in a list of its own.",
+                "description": "The new tax zone under `tax_zone`, with its post codes in `post_code` as a flat list.",
                 "schema": ROW_RESPONSE,
                 "example": {"tax_zone": CREATED_ZONE},
             },
@@ -182,7 +182,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{tax_zone_id}",
         "summary": "Returns the tax zone whose `id` you pass as `tax_zone_id`.",
-        "description": "Returns one tax zone under the `tax_zone` key, with the same twelve fields a listing row has. `post_code` comes back as a list of lists, such as `[[\"2000\"], [\"3000\"]]`. The response has no `ETag` or `Last-Modified` header.",
+        "description": "Returns one tax zone under the `tax_zone` key, with the same twelve fields a listing row has. `post_code` comes back as a flat list of strings, such as `[\"2000\", \"3000\"]`. The response has no `ETag` or `Last-Modified` header.",
         "parameters": [TAX_ZONE_ID],
         "responses": {
             "200": {
@@ -272,7 +272,7 @@ SCHEMAS = {
         "start_location": {"type": "string", "description": "A write saves it only when you also send `use_radius: true`; a create without `use_radius: true` stores `\"\"`."},
         "countries": {"type": "array", "items": ref("TaxZoneCountry"), "description": "The countries in the zone. An update that leaves it out empties it."},
         "states": {"type": "array", "items": ref("TaxZoneState"), "description": "The states in the zone. An update that leaves it out empties it."},
-        "post_code": {"type": "array", "items": {"type": "array", "items": {"type": "string"}}, "description": "The zone's post codes, each in a list of its own: `[[\"2000\"], [\"3000\"]]`. You send them as a flat list. An update that leaves it out empties it."},
+        "post_code": {"type": "array", "items": {"type": "string"}, "description": "The zone's post codes as a flat list: `[\"2000\", \"3000\"]`, the same form you send. An update that leaves it out empties it."},
         "created_at": {"type": "string", "description": "When the zone was created."},
         "updated_at": {"type": "string", "description": "When the zone was last changed."},
     }},
@@ -282,7 +282,7 @@ SCHEMAS = {
         "name": {"type": "string", "description": "Required on a create and on every update. A body without it fails with `500`."},
         "countries": {"type": "array", "items": ref("TaxZoneCountryInput"), "description": "The countries in the zone, such as `[{\"id\": 12}]`. On an update, leaving it out empties the list."},
         "states": {"type": "array", "items": ref("TaxZoneStateInput"), "description": "The states in the zone, such as `[{\"id\": 67}]`. On an update, leaving it out empties the list."},
-        "post_code": {"type": "array", "items": {"type": "string"}, "description": "A flat list, such as `[\"2000\", \"3000\"]`. The nested form a zone returns fails with `500`. On an update, leaving it out empties the list."},
+        "post_code": {"type": "array", "items": {"type": "string"}, "description": "A flat list, such as `[\"2000\", \"3000\"]`. A nested list fails with `500`. On an update, leaving it out empties the list."},
         "radius": {"type": "number", "description": "Saved only when you also send `use_radius: true`. Stored as a whole number, so `7.5` reads back as `7`."},
         "start_location": {"type": "string", "description": "Saved only when you also send `use_radius: true`."},
         "use_radius": {"type": "boolean", "description": "Send `true` to store `radius` and `start_location`. On an update, leaving it out sets it to `false`."},

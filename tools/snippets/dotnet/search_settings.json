@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "GetSearchSettingsReindexStatusAsync",
       "code": "var response = await client.SearchSettings.GetSearchSettingsReindexStatusAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"state\"]} {body[\"started_at\"]} {body[\"finished_at\"]}\");"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "HeadSearchSettingsReindexStatusAsync",
+      "code": "var response = await client.SearchSettings.HeadSearchSettingsReindexStatusAsync();\nConsole.WriteLine(response.StatusCode);"
     }
   }
 }

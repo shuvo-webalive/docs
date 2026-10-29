@@ -34,6 +34,10 @@
       "function": "GetSeoConfigurationDocumentRootAsync",
       "code": "var response = await client.SeoConfiguration.GetSeoConfigurationDocumentRootAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 100 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var file in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{file[\"config_key\"]} {file[\"file_name\"]}\");"
     },
+    "head_seo_configuration_document_root": {
+      "function": "HeadSeoConfigurationDocumentRootAsync",
+      "code": "var response = await client.SeoConfiguration.HeadSeoConfigurationDocumentRootAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
     "upload_seo_configuration_document_root": {
       "function": "UploadSeoConfigurationDocumentRootAsync",
       "code": "var response = await client.SeoConfiguration.UploadSeoConfigurationDocumentRootAsync(new Dictionary<string, object?>\n{\n    [\"file\"] = new List<object?> { \"verification.txt\", File.ReadAllBytes(\"verification.txt\"), \"text/plain\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar documentRootFile = (IReadOnlyDictionary<string, object?>)body[\"document_root_file\"]!;\nConsole.WriteLine($\"{documentRootFile[\"config_key\"]} {documentRootFile[\"file_path\"]}\");"
@@ -46,6 +50,10 @@
       "function": "GetSeoConfigurationRedirectsAsync",
       "code": "var response = await client.SeoConfiguration.GetSeoConfigurationRedirectsAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 100 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var redirect in ((IReadOnlyList<object?>)body[\"items\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{redirect[\"id\"]} {redirect[\"source_url\"]} {redirect[\"destination_url\"]}\");"
     },
+    "head_seo_configuration_redirects": {
+      "function": "HeadSeoConfigurationRedirectsAsync",
+      "code": "var response = await client.SeoConfiguration.HeadSeoConfigurationRedirectsAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
     "create_seo_configuration_redirect": {
       "function": "CreateSeoConfigurationRedirectAsync",
       "code": "var response = await client.SeoConfiguration.CreateSeoConfigurationRedirectAsync(new Dictionary<string, object?>\n{\n    [\"source_url\"] = \"/old-page\", [\"destination_url\"] = \"https://your-store.example.com/new-page\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar redirect = (IReadOnlyDictionary<string, object?>)body[\"redirect\"]!;\nConsole.WriteLine(redirect[\"id\"]);"
@@ -53,6 +61,10 @@
     "get_seo_configuration_redirect": {
       "function": "GetSeoConfigurationRedirectAsync",
       "code": "var response = await client.SeoConfiguration.GetSeoConfigurationRedirectAsync(16);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar redirect = (IReadOnlyDictionary<string, object?>)body[\"redirect\"]!;\nConsole.WriteLine($\"{redirect[\"source_url\"]} {redirect[\"destination_url\"]}\");"
+    },
+    "head_seo_configuration_redirect": {
+      "function": "HeadSeoConfigurationRedirectAsync",
+      "code": "var response = await client.SeoConfiguration.HeadSeoConfigurationRedirectAsync(16);\nConsole.WriteLine(response.StatusCode);"
     },
     "patch_seo_configuration_redirect": {
       "function": "PatchSeoConfigurationRedirectAsync",

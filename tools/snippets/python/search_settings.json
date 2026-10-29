@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "get_search_settings_reindex_status",
       "code": "response = client.search_settings.get_search_settings_reindex_status()\nstatus = response.map\nprint(status[\"state\"], status[\"started_at\"], status[\"finished_at\"])\nprint(status[\"error\"])\n"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "head_search_settings_reindex_status",
+      "code": "response = client.search_settings.head_search_settings_reindex_status()\nprint(response.status_code)\n"
     }
   }
 }

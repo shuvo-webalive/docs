@@ -4,7 +4,7 @@
   "endpoints": {
     "list_trash": {
       "function": "list_trash",
-      "code": "response = client.trash.list_trash({\n    \"type\": \"Category\",\n    \"search\": \"spring\",\n    \"sort\": \"name\",\n    \"order\": \"asc\",\n    \"limit\": 20,\n})\nfor item in response.map[\"items\"]:\n    print(item[\"id\"], item[\"type\"], item[\"name\"], item[\"updated\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+      "code": "response = client.trash.list_trash({\n    \"type\": \"Category\",\n    \"search\": \"spring\",\n    \"sort\": \"name\",\n    \"order\": \"asc\",\n    \"limit\": 20,\n})\nfor item in response.map[\"items\"]:\n    print(item[\"id\"], item[\"type\"], item[\"name\"], item[\"removed_at\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
     },
     "head_trash": {
       "function": "head_trash",
@@ -20,7 +20,7 @@
     },
     "restore_trash_item": {
       "function": "restore_trash_item",
-      "code": "response = client.trash.restore_trash_item(\"Category\", 1234)\nprint(response.map[\"status\"], response.map[\"message\"])\n"
+      "code": "response = client.trash.restore_trash_item(\"Category\", 1234)\nitem = response.map[\"item\"]\nprint(item[\"type\"], item[\"id\"], item[\"name\"], item[\"url\"])\n"
     },
     "delete_trash_item": {
       "function": "delete_trash_item",
@@ -28,11 +28,11 @@
     },
     "bulk_restore_trash": {
       "function": "bulk_restore_trash",
-      "code": "response = client.trash.bulk_restore_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"BlogPost\", \"id\": 99}],\n})\nprint(response.map[\"restored\"], response.map[\"failed\"])\nfor error in response.map[\"errors\"]:\n    print(error[\"type\"], error[\"id\"], error[\"reason\"])\n"
+      "code": "response = client.trash.bulk_restore_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"BlogPost\", \"id\": 99}],\n})\nfor item in response.map[\"restored\"]:\n    print(item[\"type\"], item[\"id\"], item[\"name\"])\nfor failure in response.map[\"failed\"]:\n    print(failure[\"type\"], failure[\"id\"], failure[\"code\"], failure[\"message\"])\n"
     },
     "bulk_delete_trash": {
       "function": "bulk_delete_trash",
-      "code": "response = client.trash.bulk_delete_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"Category\", \"id\": 1229}],\n})\nprint(response.map[\"deleted\"], response.map[\"failed\"])\nfor error in response.map[\"errors\"]:\n    print(error[\"type\"], error[\"id\"], error[\"reason\"])\n"
+      "code": "response = client.trash.bulk_delete_trash({\n    \"items\": [{\"type\": \"Category\", \"id\": 1234}, {\"type\": \"Category\", \"id\": 1229}],\n})\nfor item in response.map[\"deleted\"]:\n    print(item[\"type\"], item[\"id\"], item[\"name\"])\nfor failure in response.map[\"failed\"]:\n    print(failure[\"type\"], failure[\"id\"], failure[\"code\"], failure[\"message\"])\n"
     }
   }
 }

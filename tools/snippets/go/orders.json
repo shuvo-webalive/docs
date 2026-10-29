@@ -58,6 +58,10 @@
       "function": "CreateOrderPayment",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderPayment(ctx, 1043, map[string]any{\n\t\"transaction_no\": \"TXN-PAY-0001\",\n\t\"payment\": map[string]any{\n\t\t\"amount\":                20.0,\n\t\t\"payment_method\":        \"manual\",\n\t\t\"payment_status\":        \"success\",\n\t\t\"track_info\":            \"Bank transfer\",\n\t\t\"payer_info\":            \"Jane Doe\",\n\t\t\"transaction_date\":      \"2026-10-07T09:30:00Z\",\n\t\t\"transaction_reference\": \"BT-0001\",\n\t\t\"surcharge\":             0.0,\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npayment := resp.Map().(map[string]any)[\"payment\"].(map[string]any)\nfmt.Println(payment[\"id\"], payment[\"paid_amount\"], payment[\"due_amount\"])"
     },
+    "list_order_refunds": {
+      "function": "ListOrderRefunds",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().ListOrderRefunds(ctx, 1043, map[string]any{\"limit\": 10}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"refunds\"].([]any) {\n\trefund := row.(map[string]any)\n\tfmt.Println(refund[\"refund_id\"], refund[\"payment_id\"], refund[\"amount\"], refund[\"status\"], refund[\"reason\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])\n"
+    },
     "create_order_refund": {
       "function": "CreateOrderRefund",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Orders().CreateOrderRefund(ctx, 1043, map[string]any{\n\t\"refund\": map[string]any{\n\t\t\"amount\":      \"3.00\",\n\t\t\"refund_date\": \"2026-10-07T14:00:00Z\",\n\t\t\"reason\":      \"One item returned\",\n\t\t\"line_items\":  []any{map[string]any{\"order_item_id\": 3302, \"quantity\": 1, \"amount\": 3.0}},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"refund_id\"], body[\"amount\"])"
