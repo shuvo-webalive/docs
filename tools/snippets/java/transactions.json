@@ -4,27 +4,27 @@
   "endpoints": {
     "list_transactions": {
       "function": "listTransactions",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.transactions().listTransactions(Map.of(\"limit\", 50, \"offset\", 0));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"transactions\")) {\n    Map<?, ?> transaction = (Map<?, ?>) row;\n    System.out.println(transaction.get(\"transaction_no\") + \" \" + transaction.get(\"total_records\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.transactions().listTransactions(Map.of(\"limit\", 50, \"offset\", 0));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"transactions\")) {\n    Map<?, ?> transaction = (Map<?, ?>) row;\n    System.out.println(transaction.get(\"transaction_no\") + \" \" + transaction.get(\"total_records\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
     },
     "head_transactions": {
       "function": "headTransactions",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.transactions().headTransactions();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.transactions().headTransactions();\nSystem.out.println(response.getStatusCode());"
     },
     "get_transaction": {
       "function": "getTransaction",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.transactions().getTransaction(\"IMPORT-2026-0001\");\nMap<?, ?> transaction = (Map<?, ?>) response.getMap();\nSystem.out.println(transaction.get(\"transaction_no\") + \" \" + transaction.get(\"total_records\"));\nfor (Object row : (List<?>) transaction.get(\"by_type\")) {\n    Map<?, ?> type = (Map<?, ?>) row;\n    System.out.println(type.get(\"type\") + \" \" + type.get(\"count\"));\n}"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.transactions().getTransaction(\"IMPORT-2026-0001\");\nMap<?, ?> transaction = (Map<?, ?>) response.getMap();\nSystem.out.println(transaction.get(\"transaction_no\") + \" \" + transaction.get(\"total_records\"));\nfor (Object row : (List<?>) transaction.get(\"by_type\")) {\n    Map<?, ?> type = (Map<?, ?>) row;\n    System.out.println(type.get(\"type\") + \" \" + type.get(\"count\"));\n}"
     },
     "head_transaction": {
       "function": "headTransaction",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.transactions().headTransaction(\"IMPORT-2026-0001\");\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.transactions().headTransaction(\"IMPORT-2026-0001\");\nSystem.out.println(response.getStatusCode());"
     },
     "list_transaction_items": {
       "function": "listTransactionItems",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.transactions().listTransactionItems(\"IMPORT-2026-0001\",\n        Map.of(\"type\", \"product\", \"limit\", 20, \"offset\", 0, \"detail\", \"slim\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"name\") + \" \" + item.get(\"sku\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.transactions().listTransactionItems(\"IMPORT-2026-0001\",\n        Map.of(\"type\", \"product\", \"limit\", 20, \"offset\", 0, \"detail\", \"slim\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> item = (Map<?, ?>) row;\n    System.out.println(item.get(\"id\") + \" \" + item.get(\"name\") + \" \" + item.get(\"sku\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
     },
     "head_transaction_items": {
       "function": "headTransactionItems",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.transactions().headTransactionItems(\"IMPORT-2026-0001\", Map.of(\"type\", \"product\"));\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.transactions().headTransactionItems(\"IMPORT-2026-0001\", Map.of(\"type\", \"product\"));\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

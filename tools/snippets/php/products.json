@@ -4,43 +4,43 @@
   "endpoints": {
     "list_products": {
       "function": "listProducts",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::listProducts($client, ['limit' => 20]);\n\nforeach ($response->map['products'] as $product) {\n    echo $product['id'], ' ', $product['name'], ' (', $product['sku'], '): ', $product['base_price'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' products in total', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::listProducts($client, ['limit' => 20]);\n\nforeach ($response->map['products'] as $product) {\n    echo $product['id'], ' ', $product['name'], ' (', $product['sku'], '): ', $product['base_price'], PHP_EOL;\n}\necho $response->map['pagination']['total'], ' products in total', PHP_EOL;"
     },
     "create_product": {
       "function": "createProduct",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::createProduct($client, [\n    'name' => 'Blue Mug', 'sku' => 'MUG-BLUE', 'base_price' => 12.5, 'transaction_no' => 'IMPORT-2026-10-18',\n], transactionNo: 'IMPORT-2026-10-18');\n\n$product = $response->map['product'];\necho $product['id'], ' ', $product['sku'], ' ', $product['status'], ' ', $product['transaction_no'], PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::createProduct($client, [\n    'name' => 'Blue Mug', 'sku' => 'MUG-BLUE', 'base_price' => 12.5, 'transaction_no' => 'IMPORT-2026-10-18',\n], transactionNo: 'IMPORT-2026-10-18');\n\n$product = $response->map['product'];\necho $product['id'], ' ', $product['sku'], ' ', $product['status'], ' ', $product['transaction_no'], PHP_EOL;"
     },
     "get_product": {
       "function": "getProduct",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::getProduct($client, 101);\n\n$product = $response->map['product'];\necho $product['name'], ' (', $product['sku'], '): ', $product['base_price'], PHP_EOL;\necho $product['product_pricing_and_stock']['available_stock'], ' in stock', PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::getProduct($client, 101);\n\n$product = $response->map['product'];\necho $product['name'], ' (', $product['sku'], '): ', $product['base_price'], PHP_EOL;\necho $product['product_pricing_and_stock']['available_stock'], ' in stock', PHP_EOL;\n"
     },
     "update_product": {
       "function": "updateProduct",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::updateProduct($client, 101, [\n    'name' => 'Cotton T-Shirt', 'sku' => 'TSHIRT-001', 'base_price' => 25.0, 'product_type' => 'physical',\n    'available' => true, 'is_on_sale' => false, 'available_on_date_range' => false,\n    'available_on_weekdays' => ['enabled' => false, 'weekdays' => []],\n    'available_for' => 'all', 'selected_customers' => ['customers' => [], 'groups' => []],\n    'invoice_note' => 'Ships in 2 business days',\n    'advanced' => ['advance_information' => ['mpn' => 'MPN-0001']],\n]);\n\n$product = $response->map['product'];\necho $product['invoice_note'], ', ', $product['advanced']['advance_information']['mpn'], ', version ', $product['version'], PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::updateProduct($client, 101, [\n    'name' => 'Cotton T-Shirt', 'sku' => 'TSHIRT-001', 'base_price' => 25.0, 'product_type' => 'physical',\n    'available' => true, 'is_on_sale' => false, 'available_on_date_range' => false,\n    'available_on_weekdays' => ['enabled' => false, 'weekdays' => []],\n    'available_for' => 'all', 'selected_customers' => ['customers' => [], 'groups' => []],\n    'invoice_note' => 'Ships in 2 business days',\n    'advanced' => ['advance_information' => ['mpn' => 'MPN-0001']],\n]);\n\n$product = $response->map['product'];\necho $product['invoice_note'], ', ', $product['advanced']['advance_information']['mpn'], ', version ', $product['version'], PHP_EOL;\n"
     },
     "patch_product": {
       "function": "patchProduct",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::patchProduct($client, 101, ['base_price' => 27.5]);\n\n$product = $response->map['product'];\necho $product['name'], ': ', $product['base_price'], ', version ', $product['version'], PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::patchProduct($client, 101, ['base_price' => 27.5]);\n\n$product = $response->map['product'];\necho $product['name'], ': ', $product['base_price'], ', version ', $product['version'], PHP_EOL;"
     },
     "delete_product": {
       "function": "deleteProduct",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::deleteProduct($client, 101);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::deleteProduct($client, 101);\n\necho $response->statusCode, PHP_EOL;"
     },
     "import_product_reviews": {
       "function": "importProductReviews",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::importProductReviews($client, 101, ['product' => ['reviews' => [\n    ['name' => 'Sam Lee', 'email' => 'sam@example.com', 'rating' => 5, 'review' => 'Great shirt', 'status' => 'approved'],\n]]], transactionNo: 'IMPORT-2026-10-18');\n\nforeach ($response->map['product']['reviews'] as $review) {\n    echo $review['id'], ' ', $review['name'], ' ', $review['rating'], ' ', $review['status'], PHP_EOL;\n}"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::importProductReviews($client, 101, ['product' => ['reviews' => [\n    ['name' => 'Sam Lee', 'email' => 'sam@example.com', 'rating' => 5, 'review' => 'Great shirt', 'status' => 'approved'],\n]]], transactionNo: 'IMPORT-2026-10-18');\n\nforeach ($response->map['product']['reviews'] as $review) {\n    echo $review['id'], ' ', $review['name'], ' ', $review['rating'], ' ', $review['status'], PHP_EOL;\n}"
     },
     "get_product_stock": {
       "function": "getProductStock",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::getProductStock($client, 101);\n\nforeach ($response->map['locations'] as $location) {\n    echo $location['warehouse'], ' ', $location['warehouse_name'], ': ', $location['stock'], $location['is_default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['available_stock'], ' in total', PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::getProductStock($client, 101);\n\nforeach ($response->map['locations'] as $location) {\n    echo $location['warehouse'], ' ', $location['warehouse_name'], ': ', $location['stock'], $location['is_default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['available_stock'], ' in total', PHP_EOL;\n"
     },
     "update_product_stock": {
       "function": "updateProductStock",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::updateProductStock($client, 101, [\n    'note' => 'Restock',\n    'locations' => [\n        ['warehouse' => 1, 'stock' => 10, 'low_stock_level' => 2, 'is_default' => true],\n        ['warehouse' => 4, 'stock' => 30, 'low_stock_level' => 5, 'is_default' => false],\n    ],\n]);\n\necho $response->map['available_stock'], ' in total', PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::updateProductStock($client, 101, [\n    'note' => 'Restock',\n    'locations' => [\n        ['warehouse' => 1, 'stock' => 10, 'low_stock_level' => 2, 'is_default' => true],\n        ['warehouse' => 4, 'stock' => 30, 'low_stock_level' => 5, 'is_default' => false],\n    ],\n]);\n\necho $response->map['available_stock'], ' in total', PHP_EOL;\n"
     },
     "delete_product_stock_location": {
       "function": "deleteProductStockLocation",
-      "code": "use WebCommander\\Sdk\\Resources\\Products\\Products;\n\n$response = Products::deleteProductStockLocation($client, 101, 19);\n\necho $response->statusCode, PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::deleteProductStockLocation($client, 101, 19);\n\necho $response->statusCode, PHP_EOL;\n"
     }
   }
 }

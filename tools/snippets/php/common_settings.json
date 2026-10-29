@@ -4,27 +4,27 @@
   "endpoints": {
     "get_settings": {
       "function": "getSettings",
-      "code": "use WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::getSettings($client, ['type' => 'customer_registration_field', 'config_key' => 'abn_placeholder']);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n}"
+      "code": "use WebCommander\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::getSettings($client, ['type' => 'customer_registration_field', 'config_key' => 'abn_placeholder']);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n}"
     },
     "head_settings": {
       "function": "headSettings",
-      "code": "use WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::headSettings($client, ['type' => 'general']);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::headSettings($client, ['type' => 'general']);\n\necho $response->statusCode, PHP_EOL;"
     },
     "update_settings": {
       "function": "updateSettings",
-      "code": "use WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::updateSettings($client, ['settings' => [\n    'customer_registration_field' => [['config_key' => 'abn_placeholder', 'value' => 'Enter your ABN']],\n]]);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    if ($entry['config_key'] === 'abn_placeholder') {\n        echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n    }\n}"
+      "code": "use WebCommander\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::updateSettings($client, ['settings' => [\n    'customer_registration_field' => [['config_key' => 'abn_placeholder', 'value' => 'Enter your ABN']],\n]]);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    if ($entry['config_key'] === 'abn_placeholder') {\n        echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n    }\n}"
     },
     "save_settings": {
       "function": "saveSettings",
-      "code": "use WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::saveSettings($client, ['settings' => [\n    'customer_registration_field' => ['abn_placeholder' => 'Enter your ABN'],\n]]);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    if ($entry['config_key'] === 'abn_placeholder') {\n        echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n    }\n}"
+      "code": "use WebCommander\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::saveSettings($client, ['settings' => [\n    'customer_registration_field' => ['abn_placeholder' => 'Enter your ABN'],\n]]);\n\nforeach ($response->map['settings']['customer_registration_field'] as $entry) {\n    if ($entry['config_key'] === 'abn_placeholder') {\n        echo $entry['config_key'], ': ', $entry['value'], PHP_EOL;\n    }\n}"
     },
     "get_create_customer_fields": {
       "function": "getCreateCustomerFields",
-      "code": "use WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::getCreateCustomerFields($client);\n\n$configs = $response->map['fields_configs'];\nforeach ($response->map['fields'] as $field) {\n    echo $field, ' ', $configs[$field . '_label'], $configs[$field . '_required'] ? ' (required)' : '', PHP_EOL;\n}"
+      "code": "use WebCommander\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::getCreateCustomerFields($client);\n\n$configs = $response->map['fields_configs'];\nforeach ($response->map['fields'] as $field) {\n    echo $field, ' ', $configs[$field . '_label'], $configs[$field . '_required'] ? ' (required)' : '', PHP_EOL;\n}"
     },
     "head_create_customer_fields": {
       "function": "headCreateCustomerFields",
-      "code": "use WebCommander\\Sdk\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::headCreateCustomerFields($client);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\CommonSettings\\CommonSettings;\n\n$response = CommonSettings::headCreateCustomerFields($client);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

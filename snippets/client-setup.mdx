@@ -32,7 +32,7 @@ register_instances([
 ```
 
 ```javascript JavaScript
-import {AuthConfig, SdkConfig, registerInstances} from 'webcommander';
+import {AuthConfig, SdkConfig, registerInstances} from '@webcommander/webcommander';
 
 registerInstances([
     new SdkConfig(
@@ -55,9 +55,9 @@ registerInstances([
 
 require __DIR__ . '/vendor/autoload.php';
 
-use WebCommander\Sdk\Client\ClientRegistry;
-use WebCommander\Sdk\Config\AuthConfig;
-use WebCommander\Sdk\Config\SdkConfig;
+use WebCommander\Client\ClientRegistry;
+use WebCommander\Config\AuthConfig;
+use WebCommander\Config\SdkConfig;
 
 $auth = new AuthConfig(
     baseUrl: (string) getenv('WC_BASE_URL'),
@@ -73,9 +73,9 @@ ClientRegistry::registerInstances([new SdkConfig($auth, raiseOnError: true)]);
 ```
 
 ```java Java
-import com.webcommander.sdk.client.ClientRegistry;
-import com.webcommander.sdk.config.AuthConfig;
-import com.webcommander.sdk.config.SdkConfig;
+import com.webcommander.client.ClientRegistry;
+import com.webcommander.config.AuthConfig;
+import com.webcommander.config.SdkConfig;
 import java.util.List;
 
 public class Main {
@@ -95,8 +95,8 @@ public class Main {
 ```
 
 ```csharp .NET
-using WebCommander.Sdk.Client;
-using WebCommander.Sdk.Config;
+using WebCommander.Client;
+using WebCommander.Config;
 
 var auth = new AuthConfig(
     baseUrl: Environment.GetEnvironmentVariable("WC_BASE_URL")!,

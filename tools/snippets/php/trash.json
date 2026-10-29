@@ -4,35 +4,35 @@
   "endpoints": {
     "list_trash": {
       "function": "listTrash",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::listTrash($client, ['type' => 'Category', 'search' => 'spring', 'sort' => 'name', 'order' => 'asc', 'limit' => 20]);\n\nforeach ($response->map['items'] as $item) {\n    echo $item['id'], ' ', $item['type'], ' ', $item['name'], ' ', $item['removed_at'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::listTrash($client, ['type' => 'Category', 'search' => 'spring', 'sort' => 'name', 'order' => 'asc', 'limit' => 20]);\n\nforeach ($response->map['items'] as $item) {\n    echo $item['id'], ' ', $item['type'], ' ', $item['name'], ' ', $item['removed_at'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;"
     },
     "head_trash": {
       "function": "headTrash",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::headTrash($client, ['type' => 'Category', 'limit' => 1]);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::headTrash($client, ['type' => 'Category', 'limit' => 1]);\n\necho $response->statusCode, PHP_EOL;"
     },
     "list_trash_types": {
       "function": "listTrashTypes",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::listTrashTypes($client);\n\necho implode(', ', array_column($response->map['types'], 'type')), PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::listTrashTypes($client);\n\necho implode(', ', array_column($response->map['types'], 'type')), PHP_EOL;"
     },
     "head_trash_types": {
       "function": "headTrashTypes",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::headTrashTypes($client);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::headTrashTypes($client);\n\necho $response->statusCode, PHP_EOL;"
     },
     "restore_trash_item": {
       "function": "restoreTrashItem",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::restoreTrashItem($client, 'Category', 1234);\n\n$item = $response->map['item'];\necho $item['type'], ' ', $item['id'], ' ', $item['name'], ' restored', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::restoreTrashItem($client, 'Category', 1234);\n\n$item = $response->map['item'];\necho $item['type'], ' ', $item['id'], ' ', $item['name'], ' restored', PHP_EOL;"
     },
     "delete_trash_item": {
       "function": "deleteTrashItem",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::deleteTrashItem($client, 'Customer', 5678);\n\necho $response->statusCode, PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::deleteTrashItem($client, 'Customer', 5678);\n\necho $response->statusCode, PHP_EOL;"
     },
     "bulk_restore_trash": {
       "function": "bulkRestoreTrash",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::bulkRestoreTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'BlogPost', 'id' => 99],\n]]);\n\necho count($response->map['restored']), ' restored, ', count($response->map['failed']), ' failed', PHP_EOL;\nforeach ($response->map['failed'] as $failure) {\n    echo $failure['type'], ' ', $failure['id'], ': ', $failure['code'], ' ', $failure['message'], PHP_EOL;\n}"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::bulkRestoreTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'BlogPost', 'id' => 99],\n]]);\n\necho count($response->map['restored']), ' restored, ', count($response->map['failed']), ' failed', PHP_EOL;\nforeach ($response->map['failed'] as $failure) {\n    echo $failure['type'], ' ', $failure['id'], ': ', $failure['code'], ' ', $failure['message'], PHP_EOL;\n}"
     },
     "bulk_delete_trash": {
       "function": "bulkDeleteTrash",
-      "code": "use WebCommander\\Sdk\\Resources\\Trash\\Trash;\n\n$response = Trash::bulkDeleteTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'Category', 'id' => 1229],\n]]);\n\necho count($response->map['deleted']), ' deleted, ', count($response->map['failed']), ' failed', PHP_EOL;\nforeach ($response->map['failed'] as $failure) {\n    echo $failure['type'], ' ', $failure['id'], ': ', $failure['code'], ' ', $failure['message'], PHP_EOL;\n}"
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::bulkDeleteTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'Category', 'id' => 1229],\n]]);\n\necho count($response->map['deleted']), ' deleted, ', count($response->map['failed']), ' failed', PHP_EOL;\nforeach ($response->map['failed'] as $failure) {\n    echo $failure['type'], ' ', $failure['id'], ': ', $failure['code'], ' ', $failure['message'], PHP_EOL;\n}"
     }
   }
 }

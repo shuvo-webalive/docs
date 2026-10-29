@@ -4,27 +4,27 @@
   "endpoints": {
     "get_settings": {
       "function": "getSettings",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().getSettings(Map.of(\"type\", \"customer_registration_field\", \"config_key\", \"abn_placeholder\"));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().getSettings(Map.of(\"type\", \"customer_registration_field\", \"config_key\", \"abn_placeholder\"));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}"
     },
     "head_settings": {
       "function": "headSettings",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().headSettings(Map.of(\"type\", \"general\"));\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().headSettings(Map.of(\"type\", \"general\"));\nSystem.out.println(response.getStatusCode());"
     },
     "update_settings": {
       "function": "updateSettings",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().updateSettings(Map.of(\"settings\", Map.of(\"customer_registration_field\",\n        List.of(Map.of(\"config_key\", \"abn_placeholder\", \"value\", \"Enter your ABN\")))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().updateSettings(Map.of(\"settings\", Map.of(\"customer_registration_field\",\n        List.of(Map.of(\"config_key\", \"abn_placeholder\", \"value\", \"Enter your ABN\")))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}"
     },
     "save_settings": {
       "function": "saveSettings",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().saveSettings(Map.of(\"settings\",\n        Map.of(\"customer_registration_field\", Map.of(\"abn_placeholder\", \"Enter your ABN\"))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().saveSettings(Map.of(\"settings\",\n        Map.of(\"customer_registration_field\", Map.of(\"abn_placeholder\", \"Enter your ABN\"))));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"settings\");\nfor (Object row : (List<?>) settings.get(\"customer_registration_field\")) {\n    Map<?, ?> setting = (Map<?, ?>) row;\n    System.out.println(setting.get(\"config_key\") + \" \" + setting.get(\"value\"));\n}"
     },
     "get_create_customer_fields": {
       "function": "getCreateCustomerFields",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().getCreateCustomerFields();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"fields\"));\nMap<?, ?> configs = (Map<?, ?>) body.get(\"fields_configs\");\nSystem.out.println(configs.get(\"first_name_label\") + \" \" + configs.get(\"first_name_required\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.commonSettings().getCreateCustomerFields();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"fields\"));\nMap<?, ?> configs = (Map<?, ?>) body.get(\"fields_configs\");\nSystem.out.println(configs.get(\"first_name_label\") + \" \" + configs.get(\"first_name_required\"));"
     },
     "head_create_customer_fields": {
       "function": "headCreateCustomerFields",
-      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.commonSettings().headCreateCustomerFields();\nSystem.out.println(response.getStatusCode());"
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.commonSettings().headCreateCustomerFields();\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

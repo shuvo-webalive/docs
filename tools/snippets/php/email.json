@@ -4,7 +4,7 @@
   "endpoints": {
     "send_email": {
       "function": "sendEmail",
-      "code": "use WebCommander\\Sdk\\Resources\\Email\\Email;\n\n$response = Email::sendEmail($client, [\n    'recipients' => ['customer@example.com'], 'cc' => ['orders@example.com'],\n    'subject' => 'Your order has shipped', 'htmlContent' => '<p>Your order is on its way.</p>',\n    'contentType' => 'text/html',\n]);\n\necho $response->map['status'], PHP_EOL;\necho 'accepted: ', implode(', ', $response->map['accepted']), PHP_EOL;\necho 'rejected: ', implode(', ', $response->map['rejected']), PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Email\\Email;\n\n$response = Email::sendEmail($client, [\n    'recipients' => ['customer@example.com'], 'cc' => ['orders@example.com'],\n    'subject' => 'Your order has shipped', 'htmlContent' => '<p>Your order is on its way.</p>',\n    'contentType' => 'text/html',\n]);\n\necho $response->map['status'], PHP_EOL;\necho 'accepted: ', implode(', ', $response->map['accepted']), PHP_EOL;\necho 'rejected: ', implode(', ', $response->map['rejected']), PHP_EOL;"
     }
   }
 }

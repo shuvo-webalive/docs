@@ -10,7 +10,7 @@ GitHub repository.
 | Language | Package | GitHub repository |
 | --- | --- | --- |
 | Python | [`webcommander`](https://pypi.org/project/webcommander/) on PyPI | [WebCommanderCMS/webcommander-sdk-python](https://github.com/WebCommanderCMS/webcommander-sdk-python) |
-| JavaScript | [`webcommander`](https://www.npmjs.com/package/webcommander) on npm | [WebCommanderCMS/webcommander-sdk-js](https://github.com/WebCommanderCMS/webcommander-sdk-js) |
+| JavaScript | [`@webcommander/webcommander`](https://www.npmjs.com/package/@webcommander/webcommander) on npm | [WebCommanderCMS/webcommander-sdk-js](https://github.com/WebCommanderCMS/webcommander-sdk-js) |
 | PHP | [`webcommander/webcommander`](https://packagist.org/packages/webcommander/webcommander) on Packagist | [WebCommanderCMS/webcommander-sdk-php](https://github.com/WebCommanderCMS/webcommander-sdk-php) |
 | Java | [`com.webcommander:webcommander`](https://central.sonatype.com/artifact/com.webcommander/webcommander) on Maven Central | [WebCommanderCMS/webcommander-sdk-java](https://github.com/WebCommanderCMS/webcommander-sdk-java) |
 | .NET | [`WebCommander`](https://www.nuget.org/packages/WebCommander) on NuGet | [WebCommanderCMS/webcommander-sdk-dotnet](https://github.com/WebCommanderCMS/webcommander-sdk-dotnet) |
@@ -41,7 +41,7 @@ GitHub repository.
   </Tab>
   <Tab title="JavaScript">
     ```bash
-    npm install webcommander
+    npm install @webcommander/webcommander
     ```
   </Tab>
   <Tab title="PHP">
@@ -57,7 +57,7 @@ GitHub repository.
     <dependency>
         <groupId>com.webcommander</groupId>
         <artifactId>webcommander</artifactId>
-        <version>VERSION</version>
+        <version>4.0.0</version>
     </dependency>
     ```
 
@@ -105,7 +105,7 @@ GitHub repository.
 
     ```bash
     composer config repositories.webcommander vcs https://github.com/WebCommanderCMS/webcommander-sdk-php
-    composer require webcommander/webcommander:dev-main
+    composer require webcommander/webcommander:^4.0
     ```
   </Tab>
   <Tab title="Java">
@@ -126,7 +126,7 @@ GitHub repository.
         <dependency>
             <groupId>com.webcommander</groupId>
             <artifactId>webcommander</artifactId>
-            <version>VERSION</version>
+            <version>4.0.0</version>
         </dependency>
         ```
       </Step>
@@ -138,7 +138,7 @@ GitHub repository.
         ```bash
         git clone https://github.com/WebCommanderCMS/webcommander-sdk-dotnet.git
         cd webcommander-sdk-dotnet
-        dotnet pack src/WebCommander.Sdk -c Release -o ./artifacts
+        dotnet pack src/WebCommander -c Release -o ./artifacts
         ```
       </Step>
       <Step title="Add it to your project">
@@ -160,10 +160,10 @@ GitHub repository.
   </Tab>
   <Tab title="Go">
     Go always installs from the GitHub repository, so this is the same command as option 1. To use a
-    specific commit or branch, add it after `@`:
+    specific version, commit or branch, add it after `@`:
 
     ```bash
-    go get github.com/WebCommanderCMS/webcommander-sdk-go/v4@main
+    go get github.com/WebCommanderCMS/webcommander-sdk-go/v4@v4.0.0
     ```
   </Tab>
 </Tabs>
@@ -178,22 +178,22 @@ GitHub repository.
   </Tab>
   <Tab title="JavaScript">
     ```js
-    import {WebCommanderClient} from 'webcommander';
+    import {WebCommanderClient} from '@webcommander/webcommander';
     ```
   </Tab>
   <Tab title="PHP">
     ```php
-    use WebCommander\Sdk\Client\WebCommanderClient;
+    use WebCommander\Client\WebCommanderClient;
     ```
   </Tab>
   <Tab title="Java">
     ```java
-    import com.webcommander.sdk.client.WebCommanderClient;
+    import com.webcommander.client.WebCommanderClient;
     ```
   </Tab>
   <Tab title=".NET">
     ```csharp
-    using WebCommander.Sdk.Client;
+    using WebCommander.Client;
     ```
   </Tab>
   <Tab title="Dart">
@@ -213,7 +213,7 @@ GitHub repository.
 | Language | From the package registry | From GitHub |
 | --- | --- | --- |
 | Python | `pip install --upgrade webcommander` | Run the same `pip install git+...` command with `--upgrade` |
-| JavaScript | `npm install webcommander@latest` | Run the same `npm install github:...` command again |
+| JavaScript | `npm install @webcommander/webcommander@latest` | Run the same `npm install github:...` command again |
 | PHP | `composer update webcommander/webcommander` | `composer update webcommander/webcommander` |
 | Java | Change `<version>` in `pom.xml` | `git pull` in the clone, then `mvn install -DskipTests` again |
 | .NET | `dotnet add package WebCommander` | `git pull` in the clone, then `dotnet pack` again |

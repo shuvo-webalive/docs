@@ -4,39 +4,39 @@
   "endpoints": {
     "list_customer_groups": {
       "function": "listCustomerGroups",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::listCustomerGroups($client, ['search_text' => 'wholesale', 'status' => 'active', 'limit' => 50]);\n\nforeach ($response->map['customer_groups'] as $group) {\n    echo $group['id'], ' ', $group['name'], ' ', $group['status'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::listCustomerGroups($client, ['search_text' => 'wholesale', 'status' => 'active', 'limit' => 50]);\n\nforeach ($response->map['customer_groups'] as $group) {\n    echo $group['id'], ' ', $group['name'], ' ', $group['status'], PHP_EOL;\n}\necho $response->map['pagination']['has_next'] ? 'more pages' : 'last page', PHP_EOL;\n"
     },
     "count_customer_groups": {
       "function": "countCustomerGroups",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::countCustomerGroups($client, ['search_text' => 'wholesale', 'status' => 'I']);\n\necho $response->map['total'], PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::countCustomerGroups($client, ['search_text' => 'wholesale', 'status' => 'I']);\n\necho $response->map['total'], PHP_EOL;\n"
     },
     "create_customer_group": {
       "function": "createCustomerGroup",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::createCustomerGroup($client, ['customer_group' => [\n    'name' => 'Wholesale Partners', 'description' => 'Trade accounts', 'status' => 'active',\n    'purchase_preference' => [\n        'minimum_purchase' => ['enabled' => true, 'amount' => 50],\n        'on_account_purchase' => [\n            'enabled' => true, 'max_purchase' => ['enabled' => true, 'amount' => 500],\n            'credit_limit' => ['enabled' => true, 'amount' => 1000], 'payment_terms' => ['enabled' => true, 'terms' => 'NET_30'],\n        ],\n    ],\n    'tax_configuration' => [\n        'override_store_tax' => true, 'tax_exempt' => false, 'tax_message' => 'Prices exclude GST',\n        'show_prices_with_tax_included' => true, 'prices_entered_with_tax_included' => false, 'base_price_rounding' => 'up',\n    ],\n    'product_display' => [\n        'overwrite_default' => true, 'variation_display_type' => 'enable_matrix_view', 'display_parent_image' => true,\n        'activate_colour_variation_image' => false, 'show_selected_variation_value' => true,\n        'strike_through_out_of_stock' => false, 'single_click_variation_loading' => true, 'price_display_method' => 'highest',\n    ],\n]]);\n\n$group = $response->map['customer_group'];\necho $group['id'], ' ', $group['status'], ' ', $group['purchase_preference']['on_account_purchase']['payment_terms']['terms'], PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::createCustomerGroup($client, ['customer_group' => [\n    'name' => 'Wholesale Partners', 'description' => 'Trade accounts', 'status' => 'active',\n    'purchase_preference' => [\n        'minimum_purchase' => ['enabled' => true, 'amount' => 50],\n        'on_account_purchase' => [\n            'enabled' => true, 'max_purchase' => ['enabled' => true, 'amount' => 500],\n            'credit_limit' => ['enabled' => true, 'amount' => 1000], 'payment_terms' => ['enabled' => true, 'terms' => 'NET_30'],\n        ],\n    ],\n    'tax_configuration' => [\n        'override_store_tax' => true, 'tax_exempt' => false, 'tax_message' => 'Prices exclude GST',\n        'show_prices_with_tax_included' => true, 'prices_entered_with_tax_included' => false, 'base_price_rounding' => 'up',\n    ],\n    'product_display' => [\n        'overwrite_default' => true, 'variation_display_type' => 'enable_matrix_view', 'display_parent_image' => true,\n        'activate_colour_variation_image' => false, 'show_selected_variation_value' => true,\n        'strike_through_out_of_stock' => false, 'single_click_variation_loading' => true, 'price_display_method' => 'highest',\n    ],\n]]);\n\n$group = $response->map['customer_group'];\necho $group['id'], ' ', $group['status'], ' ', $group['purchase_preference']['on_account_purchase']['payment_terms']['terms'], PHP_EOL;\n"
     },
     "get_customer_group": {
       "function": "getCustomerGroup",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::getCustomerGroup($client, 1234);\n\n$group = $response->map['customer_group'];\necho $group['name'], ' ', $group['status'], ' ', $group['customer_count'], PHP_EOL;\nforeach ($group['customers'] as $customer) {\n    echo $customer['id'], ' ', $customer['email'], PHP_EOL;\n}\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::getCustomerGroup($client, 1234);\n\n$group = $response->map['customer_group'];\necho $group['name'], ' ', $group['status'], ' ', $group['customer_count'], PHP_EOL;\nforeach ($group['customers'] as $customer) {\n    echo $customer['id'], ' ', $customer['email'], PHP_EOL;\n}\n"
     },
     "patch_customer_group": {
       "function": "patchCustomerGroup",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::patchCustomerGroup($client, 1234, [\n    'customer_group' => [\n        'status' => 'inactive',\n        'purchase_preference' => ['minimum_purchase' => ['amount' => 75]],\n    ],\n]);\n\n$group = $response->map['customer_group'];\necho $group['status'], ' ', $group['purchase_preference']['minimum_purchase']['amount'], PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::patchCustomerGroup($client, 1234, [\n    'customer_group' => [\n        'status' => 'inactive',\n        'purchase_preference' => ['minimum_purchase' => ['amount' => 75]],\n    ],\n]);\n\n$group = $response->map['customer_group'];\necho $group['status'], ' ', $group['purchase_preference']['minimum_purchase']['amount'], PHP_EOL;\n"
     },
     "delete_customer_group": {
       "function": "deleteCustomerGroup",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::deleteCustomerGroup($client, 1234);\n\necho $response->statusCode, PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::deleteCustomerGroup($client, 1234);\n\necho $response->statusCode, PHP_EOL;\n"
     },
     "update_customer_group_customers": {
       "function": "updateCustomerGroupCustomers",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::updateCustomerGroupCustomers($client, 1234, ['customers' => [5678, '5679']]);\n\n$group = $response->map['customer_group'];\necho $group['customer_count'], PHP_EOL;\nforeach ($group['customers'] as $customer) {\n    echo $customer['id'], ' ', $customer['email'], PHP_EOL;\n}\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::updateCustomerGroupCustomers($client, 1234, ['customers' => [5678, '5679']]);\n\n$group = $response->map['customer_group'];\necho $group['customer_count'], PHP_EOL;\nforeach ($group['customers'] as $customer) {\n    echo $customer['id'], ' ', $customer['email'], PHP_EOL;\n}\n"
     },
     "get_customer_group_customer": {
       "function": "getCustomerGroupCustomer",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::getCustomerGroupCustomer($client, 1234, 5678);\n\n$customer = $response->map['customer'];\necho $customer['id'], ' ', $customer['first_name'], ' ', $customer['last_name'], ' ', $customer['email'], PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::getCustomerGroupCustomer($client, 1234, 5678);\n\n$customer = $response->map['customer'];\necho $customer['id'], ' ', $customer['first_name'], ' ', $customer['last_name'], ' ', $customer['email'], PHP_EOL;\n"
     },
     "assign_customer_group": {
       "function": "assignCustomerGroup",
-      "code": "use WebCommander\\Sdk\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::assignCustomerGroup($client, ['customer' => 5678, 'group' => 1234]);\n\necho $response->map['added'] ? 'added' : 'already a member', ' ', $response->map['customer_id'], ' ', $response->map['group']['name'], PHP_EOL;\n"
+      "code": "use WebCommander\\Resources\\CustomerGroups\\CustomerGroups;\n\n$response = CustomerGroups::assignCustomerGroup($client, ['customer' => 5678, 'group' => 1234]);\n\necho $response->map['added'] ? 'added' : 'already a member', ' ', $response->map['customer_id'], ' ', $response->map['group']['name'], PHP_EOL;\n"
     }
   }
 }
