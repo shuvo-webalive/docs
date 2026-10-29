@@ -26,6 +26,10 @@
       "function": "getSearchResultPageProductPromotions",
       "code": "const response = await client.searchResultPage.getSearchResultPageProductPromotions();\nfor (const promotion of response.map.product_promotions) {\n    console.log(promotion.id, promotion.name, promotion.position, promotion.is_active);\n}\n"
     },
+    "head_search_result_page_product_promotions": {
+      "function": "headSearchResultPageProductPromotions",
+      "code": "const response = await client.searchResultPage.headSearchResultPageProductPromotions();\nconsole.log(response.statusCode);\n"
+    },
     "create_search_result_page_product_promotion": {
       "function": "createSearchResultPageProductPromotion",
       "code": "const response = await client.searchResultPage.createSearchResultPageProductPromotion({\n    product_promotion: {name: 'Spring campaign', rule: 'all_search_result', position: 'top'},\n});\nconsole.log(response.map.product_promotion.id);\n"
@@ -33,6 +37,10 @@
     "get_search_result_page_product_promotion": {
       "function": "getSearchResultPageProductPromotion",
       "code": "const response = await client.searchResultPage.getSearchResultPageProductPromotion(4);\nconst promotion = response.map.product_promotion;\nconsole.log(promotion.name, promotion.rule, promotion.position, promotion.is_active);\n"
+    },
+    "head_search_result_page_product_promotion": {
+      "function": "headSearchResultPageProductPromotion",
+      "code": "const response = await client.searchResultPage.headSearchResultPageProductPromotion(4);\nconsole.log(response.statusCode);\n"
     },
     "patch_search_result_page_product_promotion": {
       "function": "patchSearchResultPageProductPromotion",

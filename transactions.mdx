@@ -24,7 +24,7 @@ The Transactions API has six endpoints, and you can call every one from all seve
 | [Check the transactions list](/api-reference/transactions/check-the-transactions-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/transactions` | Checks that the transactions list is reachable. Returns headers only, with no body. |
 | [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/transactions/{transaction_no}` | Returns how many records the number in `transaction_no` is stamped on, for each record type. |
 | [Check a transaction](/api-reference/transactions/check-a-transaction) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/transactions/{transaction_no}` | Checks whether any record is stamped with the number in `transaction_no`. Returns headers only. |
-| [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/transactions/{transaction_no}/items` | Returns the records of one `type` stamped with the number in `transaction_no`, newest first. |
+| [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/transactions/{transaction_no}/items` | Returns the records stamped with the number in `transaction_no`, newest first, of every type or of the `type` you send. |
 | [Check the records of a transaction](/api-reference/transactions/check-the-records-of-a-transaction) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/transactions/{transaction_no}/items` | Checks that one `type` of records under a number is reachable. Returns headers only. |
 
 ## Before you call
@@ -43,7 +43,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **A record in the trash stays counted; a record deleted for good does not.** Deleting a customer,
   a category or a product moves it to the trash. After you delete a category stamped with a number,
   using [Delete a category](/api-reference/categories/delete-a-category), the number's `total_records`, its
-  `category` count and the category's row under `items` do not change, and the number stays in the
+  `category` count and the category's row under `items` do not change, the row's `trashed` is `true`
+  and the `trashed` count of the `category` row rises by one, and the number stays in the
   listing. A record deleted for good leaves its number: after you delete the only custom tax profile
   stamped with a number, [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) returns `404` for that number.
 - **`transaction_no` matches exactly, letter case included.** The number in lower case returns
@@ -53,11 +54,10 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   holds a `limit` above `200` to `200` and shows `200` in `pagination.limit`.
   [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction) rejects it with `400` and the message
   `max cannot exceed 200`. Both default to `20` and accept `max` as another name for `limit`.
-- **`pagination` has ten keys.** `total`, `limit`, `offset`, `count`, `current_page`, `total_pages`,
-  `has_next`, `has_previous`, `previous_page` and `next_page`; the last two are absolute URLs or
-  `null`. Past the last row, both listings return no rows, `has_previous` set to `false` and
-  `current_page` equal to `total_pages`. No response here has an `ETag` header, and every one has
-  `Cache-Control: no-cache, no-store`.
+- **`pagination` has five keys.** `total`, `limit`, `offset`, `has_previous` and `has_next`. It has
+  no page number, page count or next-page link: to read the next page, send the next `offset`. Past
+  the last row, both listings return no rows. No response here has an `ETag` header, and every one
+  has `Cache-Control: no-cache, no-store`.
 - **Errors have one shape.** The body is an `error` object with `code`, `message`, `details` and
   `request_id`. A rejected query parameter adds one `details` entry with its `field`, `code`,
   `message` and the `value` you sent; `message` can be `null`. On

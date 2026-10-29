@@ -1,0 +1,9 @@
+---
+title: "List products"
+description: "Returns the store's products, 20 per call by default and up to 100, each as the full product record, with paging details."
+openapi: "GET /admin/products"
+---
+
+Returns your store's products under `products`, the most recently updated first, with a `pagination` block. Each row is the full record [Retrieve a product](/api-reference/products/retrieve-a-product) returns, and a product in the trash is not listed. `limit` is `1` to `100` and defaults to `20`. Page with `offset`, or with `page` counted from `1`; `offset` wins when you send both. Filter with `search_text`, `name`, `sku`, `ids`, `parent`, `product_type`, `stock`, `is_available`, `is_inventory_enabled`, `created_by`, `price_from`, `price_to`, `created_from`, `created_to`, `updated_from` and `updated_to`. Sort with `sort` and `dir`. `category` is accepted and filters nothing. Any other parameter is rejected with `400` and the reason `unknown_parameter`. `HEAD` on this path returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

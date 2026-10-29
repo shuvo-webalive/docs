@@ -34,6 +34,10 @@
       "function": "get_seo_configuration_document_root",
       "code": "response = client.seo_configuration.get_seo_configuration_document_root({\"limit\": 100})\nfor document_root_file in response.map[\"items\"]:\n    print(document_root_file[\"config_key\"], document_root_file[\"file_name\"], document_root_file[\"file_path\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
     },
+    "head_seo_configuration_document_root": {
+      "function": "head_seo_configuration_document_root",
+      "code": "response = client.seo_configuration.head_seo_configuration_document_root()\nprint(response.status_code)\n"
+    },
     "upload_seo_configuration_document_root": {
       "function": "upload_seo_configuration_document_root",
       "code": "with open(\"verification.txt\", \"rb\") as handle:\n    response = client.seo_configuration.upload_seo_configuration_document_root({\"file\": handle})\ndocument_root_file = response.map[\"document_root_file\"]\nprint(document_root_file[\"config_key\"], document_root_file[\"file_name\"], document_root_file[\"file_path\"])\n"
@@ -46,6 +50,10 @@
       "function": "get_seo_configuration_redirects",
       "code": "response = client.seo_configuration.get_seo_configuration_redirects({\"limit\": 100})\nfor redirect in response.map[\"items\"]:\n    print(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
     },
+    "head_seo_configuration_redirects": {
+      "function": "head_seo_configuration_redirects",
+      "code": "response = client.seo_configuration.head_seo_configuration_redirects()\nprint(response.status_code)\n"
+    },
     "create_seo_configuration_redirect": {
       "function": "create_seo_configuration_redirect",
       "code": "response = client.seo_configuration.create_seo_configuration_redirect({\n    \"source_url\": \"/old-page\",\n    \"destination_url\": \"https://your-store.example.com/new-page\",\n})\nredirect = response.map[\"redirect\"]\nprint(redirect[\"id\"], redirect[\"source_url\"], redirect[\"destination_url\"])\n"
@@ -53,6 +61,10 @@
     "get_seo_configuration_redirect": {
       "function": "get_seo_configuration_redirect",
       "code": "response = client.seo_configuration.get_seo_configuration_redirect(16)\nredirect = response.map[\"redirect\"]\nprint(redirect[\"source_url\"], redirect[\"destination_url\"])\n"
+    },
+    "head_seo_configuration_redirect": {
+      "function": "head_seo_configuration_redirect",
+      "code": "response = client.seo_configuration.head_seo_configuration_redirect(16)\nprint(response.status_code)\n"
     },
     "patch_seo_configuration_redirect": {
       "function": "patch_seo_configuration_redirect",

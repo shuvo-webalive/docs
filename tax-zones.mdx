@@ -43,8 +43,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   record with only a `code`, or an `id` that matches no country or state fails with `500`. The store
   saves a new zone before it checks these records, so after that `500` on a create the zone can still
   be in the listing. The `500` does not include the zone's `id`: look for the zone by `name`.
-- **You send `post_code` as a flat list and get it back nested.** Send `["2000", "3000"]`, and the zone
-  returns `[["2000"], ["3000"]]`. Sending the nested form fails with `500` and the message
+- **`post_code` is a flat list of strings on writes and on reads.** Send `["2000", "3000"]`, and the zone
+  returns `["2000", "3000"]`. Sending a nested list fails with `500` and the message
   `JSONArray cannot be cast to String`.
 - **After a `400` or `404` from a tax endpoint, the next request on the same connection can fail too.**
   Straight after a `404`, the next retrieve returns `404`, even for a zone that exists. A retrieve from

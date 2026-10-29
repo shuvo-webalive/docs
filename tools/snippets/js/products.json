@@ -2,6 +2,10 @@
   "sdk": "js",
   "module": "products",
   "endpoints": {
+    "list_products": {
+      "function": "listProducts",
+      "code": "const response = await client.products.listProducts({limit: 20});\nfor (const product of response.map.products) {\n    console.log(product.id, product.name, product.sku, product.base_price);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
     "create_product": {
       "function": "createProduct",
       "code": "const response = await client.products.createProduct({\n    name: 'Blue Mug',\n    sku: 'MUG-BLUE',\n    base_price: 12.5,\n    transaction_no: 'IMPORT-2026-10-18',\n}, 'IMPORT-2026-10-18');\nconst product = response.map.product;\nconsole.log(product.id, product.sku, product.status, product.transaction_no);\n"
@@ -12,7 +16,7 @@
     },
     "update_product": {
       "function": "updateProduct",
-      "code": "const response = await client.products.updateProduct(101, {\n    invoice_note: 'Ships in 2 business days',\n    advanced: {advance_information: {mpn: 'MPN-0001'}},\n});\nconst product = response.map.product;\nconsole.log(product.invoice_note, product.advanced.advance_information.mpn, product.version);\n"
+      "code": "const response = await client.products.updateProduct(101, {\n    name: 'Cotton T-Shirt',\n    sku: 'TSHIRT-001',\n    base_price: 25.0,\n    product_type: 'physical',\n    available: true,\n    is_on_sale: false,\n    available_on_date_range: false,\n    available_on_weekdays: {enabled: false, weekdays: []},\n    available_for: 'all',\n    selected_customers: {customers: [], groups: []},\n    invoice_note: 'Ships in 2 business days',\n    advanced: {advance_information: {mpn: 'MPN-0001'}},\n});\nconst product = response.map.product;\nconsole.log(product.invoice_note, product.advanced.advance_information.mpn, product.version);\n"
     },
     "patch_product": {
       "function": "patchProduct",

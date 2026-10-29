@@ -61,13 +61,20 @@ ROW_REF = {"$ref": "#/components/schemas/TaxProfile"}
 WRITE_BODY = {"type": "object", "required": ["tax_profile"], "properties": {"tax_profile": {"$ref": "#/components/schemas/TaxProfileInput"}}}
 ROW_RESPONSE = {"type": "object", "properties": {"tax_profile": ROW_REF}}
 
+GST_RULE = {
+    "id": 7, "name": "GST", "code": {"id": 3, "name": "GST", "is_default": True},
+    "description": "Goods and services tax", "default": True, "rounding_type": "nearest", "decimal_point": 2,
+    "zones": [{"id": 1, "name": "Australia", "is_system_generated": True, "is_default": True}],
+    "created_at": "2026-01-15T09:30:00", "updated_at": "2026-01-15T09:30:00",
+}
+
 SAMPLE_ROWS = [
     {"id": 1, "name": "Standard", "description": "Standard rate for retail customers", "default": True,
-     "created_at": "2026-03-02T09:30:00", "updated_at": "2026-03-02T09:30:00"},
+     "tax_rules": [GST_RULE], "created_at": "2026-03-02T09:30:00", "updated_at": "2026-03-02T09:30:00"},
     {"id": 2, "name": "Tax exempt", "description": "Profile for tax-exempt customers", "default": False,
-     "created_at": "2026-03-02T09:32:00", "updated_at": "2026-05-18T14:05:00"},
+     "tax_rules": [], "created_at": "2026-03-02T09:32:00", "updated_at": "2026-05-18T14:05:00"},
     {"id": 3, "name": "Export", "description": "Profile for orders shipped overseas", "default": False,
-     "created_at": "2026-04-11T11:20:00", "updated_at": "2026-04-11T11:20:00"},
+     "tax_rules": [], "created_at": "2026-04-11T11:20:00", "updated_at": "2026-04-11T11:20:00"},
 ]
 
 SAMPLE_PAGINATION = {
@@ -76,7 +83,7 @@ SAMPLE_PAGINATION = {
 }
 
 CREATED_ROW = {"id": 4, "name": "Wholesale", "description": "Profile for wholesale customers", "default": False,
-               "created_at": "2026-09-22T10:15:00", "updated_at": "2026-09-22T10:15:00"}
+               "tax_rules": [], "created_at": "2026-09-22T10:15:00", "updated_at": "2026-09-22T10:15:00"}
 UPDATED_ROW = dict(CREATED_ROW, name="Wholesale AU", updated_at="2026-09-22T10:20:00")
 
 WRAPPER_400 = "The body is not wrapped in `tax_profile` (`tax_profile missing`)."
@@ -89,7 +96,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE,
         "summary": "Returns up to 20 tax profiles per call, and a `pagination` object with the total count.",
-        "description": "Returns the tax profiles under `tax_profiles`, up to 20 per call, and a `pagination` object with the `total` number of profiles. Each profile has the same six fields that [Retrieve a tax profile](" + RETRIEVE_PAGE + ") returns, and at most one has `default` set to `true`. A `limit` above `20` does not return more. To get every profile, step `offset` by the number of profiles each page returned until you reach `pagination.total`.",
+        "description": "Returns the tax profiles under `tax_profiles`, up to 20 per call, and a `pagination` object with the `total` number of profiles. Each profile has the same seven fields that [Retrieve a tax profile](" + RETRIEVE_PAGE + ") returns, and at most one has `default` set to `true`. A `limit` above `20` does not return more. To get every profile, step `offset` by the number of profiles each page returned until you reach `pagination.total`.",
         "parameters": [LIMIT, OFFSET, PAGE, Q, FIELD_METADATA],
         "responses": {
             "200": {
@@ -147,7 +154,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{tax_profile_id}",
         "summary": "Returns the tax profile whose `id` you pass as `tax_profile_id`.",
-        "description": "Returns one tax profile under the `tax_profile` key, with the same six fields a listing row has: `id`, `name`, `description`, `default`, `created_at` and `updated_at`. When no tax profile has that `tax_profile_id`, it returns `404` with `Profile not found`.",
+        "description": "Returns one tax profile under the `tax_profile` key, with the same seven fields a listing row has: `id`, `name`, `description`, `default`, `tax_rules`, `created_at` and `updated_at`. `tax_rules` lists the tax rules the profile uses, each with the fields that [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule) returns; a new profile's list is empty. When no tax profile has that `tax_profile_id`, it returns `404` with `Profile not found`.",
         "parameters": [TAX_PROFILE_ID],
         "responses": {
             "200": {
@@ -219,8 +226,32 @@ SCHEMAS = {
         "name": {"type": "string", "description": "The tax profile's name."},
         "description": {"type": "string", "description": "The tax profile's description."},
         "default": {"type": "boolean", "description": "`true` on at most one profile, the store's default. Updating another profile with `default: true` moves the flag there."},
+        "tax_rules": {"type": "array", "items": {"$ref": "#/components/schemas/TaxProfileRule"}, "description": "The tax rules the profile uses, each with the same ten fields as a tax rule. A new profile's list is empty."},
         "created_at": {"type": "string", "description": "Set by the store when the profile is created. A `created_at` you send is ignored."},
         "updated_at": {"type": "string", "description": "Set by the store."},
+    }},
+    "TaxProfileRule": {"type": "object", "properties": {
+        "id": {"type": "integer", "description": "The tax rule's `id`."},
+        "name": {"type": "string", "description": "The tax rule's name."},
+        "code": {"$ref": "#/components/schemas/TaxProfileRuleCode"},
+        "description": {"type": "string", "description": "The tax rule's description."},
+        "default": {"type": "boolean", "description": "`true` on the default tax rule."},
+        "rounding_type": {"type": "string", "description": "The rule's rounding type, such as `nearest`."},
+        "decimal_point": {"type": "integer", "description": "The rule's decimal places, such as `2`."},
+        "zones": {"type": "array", "items": {"$ref": "#/components/schemas/TaxProfileRuleZone"}, "description": "The tax zones the rule applies to."},
+        "created_at": {"type": "string", "description": "Set by the store."},
+        "updated_at": {"type": "string", "description": "Set by the store."},
+    }},
+    "TaxProfileRuleCode": {"type": "object", "properties": {
+        "id": {"type": "integer", "description": "The tax code's `id`."},
+        "name": {"type": "string", "description": "The tax code's name."},
+        "is_default": {"type": "boolean", "description": "`true` for the default tax code."},
+    }},
+    "TaxProfileRuleZone": {"type": "object", "properties": {
+        "id": {"type": "integer", "description": "The tax zone's `id`."},
+        "name": {"type": "string", "description": "The tax zone's name."},
+        "is_system_generated": {"type": "boolean", "description": "`true` for a zone the store generated."},
+        "is_default": {"type": "boolean", "description": "`true` for the default zone."},
     }},
     "TaxProfileInput": {"type": "object", "properties": {
         "name": {"type": "string", "description": "Required on create. On an update, send it only to rename the profile."},

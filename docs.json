@@ -137,8 +137,10 @@
                   "api-reference/search-result-page/get-a-settings-section",
                   "api-reference/search-result-page/update-a-settings-section",
                   "api-reference/search-result-page/list-product-promotions",
+                  "api-reference/search-result-page/get-product-promotions-headers",
                   "api-reference/search-result-page/create-a-product-promotion",
                   "api-reference/search-result-page/retrieve-a-product-promotion",
+                  "api-reference/search-result-page/get-a-product-promotion-headers",
                   "api-reference/search-result-page/update-a-product-promotion",
                   "api-reference/search-result-page/turn-a-product-promotion-on-or-off",
                   "api-reference/search-result-page/delete-a-product-promotion"
@@ -233,7 +235,8 @@
                   "api-reference/search-settings/get-a-search-settings-section",
                   "api-reference/search-settings/update-a-search-settings-section",
                   "api-reference/search-settings/replace-a-search-settings-section",
-                  "api-reference/search-settings/get-the-reindex-status"
+                  "api-reference/search-settings/get-the-reindex-status",
+                  "api-reference/search-settings/get-the-reindex-status-headers"
                 ]
               },
               {
@@ -249,11 +252,14 @@
                   "api-reference/seo-configuration/update-a-settings-section",
                   "api-reference/seo-configuration/replace-a-settings-section",
                   "api-reference/seo-configuration/list-document-root-files",
+                  "api-reference/seo-configuration/get-document-root-files-headers",
                   "api-reference/seo-configuration/upload-a-document-root-file",
                   "api-reference/seo-configuration/delete-a-document-root-file",
                   "api-reference/seo-configuration/list-redirects",
+                  "api-reference/seo-configuration/get-redirects-headers",
                   "api-reference/seo-configuration/create-a-redirect",
                   "api-reference/seo-configuration/retrieve-a-redirect",
+                  "api-reference/seo-configuration/get-a-redirect-headers",
                   "api-reference/seo-configuration/update-a-redirect",
                   "api-reference/seo-configuration/delete-a-redirect"
                 ]
@@ -480,6 +486,7 @@
                   "api-reference/orders/add-a-comment-to-an-order",
                   "api-reference/orders/retrieve-an-orders-custom-fields",
                   "api-reference/orders/record-a-payment-on-an-order",
+                  "api-reference/orders/list-an-orders-refunds",
                   "api-reference/orders/refund-an-order",
                   "api-reference/orders/refund-a-payment",
                   "api-reference/orders/send-an-orders-invoice",
@@ -607,6 +614,7 @@
                 "expanded": false,
                 "pages": [
                   "products",
+                  "api-reference/products/list-products",
                   "api-reference/products/create-a-product",
                   "api-reference/products/retrieve-a-product",
                   "api-reference/products/update-a-product",

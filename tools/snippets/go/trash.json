@@ -4,7 +4,7 @@
   "endpoints": {
     "list_trash": {
       "function": "ListTrash",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().ListTrash(ctx, map[string]any{\n\t\"type\": \"Category\", \"search\": \"spring\", \"sort\": \"name\", \"order\": \"asc\", \"limit\": 20,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"type\"], item[\"name\"], item[\"updated\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().ListTrash(ctx, map[string]any{\n\t\"type\": \"Category\", \"search\": \"spring\", \"sort\": \"name\", \"order\": \"asc\", \"limit\": 20,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"items\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"id\"], item[\"type\"], item[\"name\"], item[\"removed_at\"])\n}\nfmt.Println(body[\"pagination\"].(map[string]any)[\"total\"])\n"
     },
     "head_trash": {
       "function": "HeadTrash",
@@ -20,7 +20,7 @@
     },
     "restore_trash_item": {
       "function": "RestoreTrashItem",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().RestoreTrashItem(ctx, \"Category\", 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"message\"])\n"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().RestoreTrashItem(ctx, \"Category\", 1234, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nitem := resp.Map().(map[string]any)[\"item\"].(map[string]any)\nfmt.Println(item[\"type\"], item[\"id\"], item[\"name\"])\n"
     },
     "delete_trash_item": {
       "function": "DeleteTrashItem",
@@ -28,11 +28,11 @@
     },
     "bulk_restore_trash": {
       "function": "BulkRestoreTrash",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkRestoreTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"BlogPost\", \"id\": 99},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"restored\"], body[\"failed\"])\nfor _, row := range body[\"errors\"].([]any) {\n\tfailure := row.(map[string]any)\n\tfmt.Println(failure[\"type\"], failure[\"id\"], failure[\"reason\"])\n}\n"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkRestoreTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"BlogPost\", \"id\": 99},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"restored\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"type\"], item[\"id\"], item[\"name\"])\n}\nfor _, row := range body[\"failed\"].([]any) {\n\tfailure := row.(map[string]any)\n\tfmt.Println(failure[\"type\"], failure[\"id\"], failure[\"code\"], failure[\"message\"])\n}\n"
     },
     "bulk_delete_trash": {
       "function": "BulkDeleteTrash",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkDeleteTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1229},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"deleted\"], body[\"failed\"], body[\"errors\"])\n"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkDeleteTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1229},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"deleted\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"type\"], item[\"id\"], item[\"name\"])\n}\nfmt.Println(body[\"failed\"])\n"
     }
   }
 }

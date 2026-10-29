@@ -26,6 +26,10 @@
       "function": "getSearchResultPageProductPromotions",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::getSearchResultPageProductPromotions($client);\n\nforeach ($response->map['product_promotions'] as $promotion) {\n    echo $promotion['id'], ' ', $promotion['name'], ' (', $promotion['position'], ')', $promotion['is_active'] ? '' : ' inactive', PHP_EOL;\n}"
     },
+    "head_search_result_page_product_promotions": {
+      "function": "headSearchResultPageProductPromotions",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::headSearchResultPageProductPromotions($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
     "create_search_result_page_product_promotion": {
       "function": "createSearchResultPageProductPromotion",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::createSearchResultPageProductPromotion($client, [\n    'product_promotion' => ['name' => 'Spring campaign', 'rule' => 'all_search_result', 'position' => 'top'],\n]);\n\necho $response->map['product_promotion']['id'], PHP_EOL;"
@@ -33,6 +37,10 @@
     "get_search_result_page_product_promotion": {
       "function": "getSearchResultPageProductPromotion",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::getSearchResultPageProductPromotion($client, 4);\n\necho $response->map['product_promotion']['name'], PHP_EOL;"
+    },
+    "head_search_result_page_product_promotion": {
+      "function": "headSearchResultPageProductPromotion",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::headSearchResultPageProductPromotion($client, 4);\n\necho $response->statusCode, PHP_EOL;"
     },
     "patch_search_result_page_product_promotion": {
       "function": "patchSearchResultPageProductPromotion",

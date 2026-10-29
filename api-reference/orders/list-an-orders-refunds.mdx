@@ -1,0 +1,9 @@
+---
+title: "List an order's refunds"
+description: "Returns the refunds recorded against an order, newest first, with paging details."
+openapi: "GET /admin/orders/{order_id}/refunds"
+---
+
+Returns the order's refunds under `refunds`, newest first, with `order_id`, `order_no` and a `pagination` block. `order_id` in the response is the order's `internal_id`, and `order_no` is the `order_id` you passed in the path. `limit` takes `1` to `20`: a larger value is capped at `20`, and `0` is rejected with `400`. Page with `offset`, which a negative value makes `400`, or with `page`. Any other query parameter, `sort` and `dir` included, is ignored. [Refund a payment](/api-reference/orders/refund-a-payment) fills `record_only`, `initiated_by`, `cancelled_with_order`, `notify_customer`, `allocation` and `other_amount`, and lists one `lines` entry for each order line it was spread over, with the money as decimal text. [Refund an order](/api-reference/orders/refund-an-order) records the refund on a separate `pis` payment, leaves those fields `null` and `lines` empty, whatever `line_items` you sent. An unknown order returns `404`, and a `HEAD` request returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -34,6 +34,10 @@
       "function": "getSeoConfigurationDocumentRoot",
       "code": "final response = await client.seoConfiguration\n    .getSeoConfigurationDocumentRoot(queryParams: {'limit': 100});\nfinal files = (response.map as Map)['items'] as List;\nfor (final file in files) {\n  print('${(file as Map)['config_key']} ${file['file_name']}');\n}"
     },
+    "head_seo_configuration_document_root": {
+      "function": "headSeoConfigurationDocumentRoot",
+      "code": "final response =\n    await client.seoConfiguration.headSeoConfigurationDocumentRoot();\nprint(response.statusCode);"
+    },
     "upload_seo_configuration_document_root": {
       "function": "uploadSeoConfigurationDocumentRoot",
       "code": "import 'dart:io';\n\nfinal contents = await File('verification.txt').readAsBytes();\nfinal response =\n    await client.seoConfiguration.uploadSeoConfigurationDocumentRoot({\n  'file': ['verification.txt', contents, 'text/plain'],\n});\nfinal documentRootFile = (response.map as Map)['document_root_file'] as Map;\nprint(documentRootFile['config_key']);"
@@ -46,6 +50,10 @@
       "function": "getSeoConfigurationRedirects",
       "code": "final response = await client.seoConfiguration\n    .getSeoConfigurationRedirects(queryParams: {'limit': 100});\nfinal redirects = (response.map as Map)['items'] as List;\nfor (final redirect in redirects) {\n  print('${(redirect as Map)['id']} ${redirect['source_url']}');\n}"
     },
+    "head_seo_configuration_redirects": {
+      "function": "headSeoConfigurationRedirects",
+      "code": "final response =\n    await client.seoConfiguration.headSeoConfigurationRedirects();\nprint(response.statusCode);"
+    },
     "create_seo_configuration_redirect": {
       "function": "createSeoConfigurationRedirect",
       "code": "final response = await client.seoConfiguration.createSeoConfigurationRedirect({\n  'source_url': '/old-page',\n  'destination_url': 'https://your-store.example.com/new-page',\n});\nfinal redirect = (response.map as Map)['redirect'] as Map;\nprint(redirect['id']);"
@@ -53,6 +61,10 @@
     "get_seo_configuration_redirect": {
       "function": "getSeoConfigurationRedirect",
       "code": "final response = await client.seoConfiguration.getSeoConfigurationRedirect(16);\nfinal redirect = (response.map as Map)['redirect'] as Map;\nprint('${redirect['source_url']} ${redirect['destination_url']}');"
+    },
+    "head_seo_configuration_redirect": {
+      "function": "headSeoConfigurationRedirect",
+      "code": "final response =\n    await client.seoConfiguration.headSeoConfigurationRedirect(16);\nprint(response.statusCode);"
     },
     "patch_seo_configuration_redirect": {
       "function": "patchSeoConfigurationRedirect",

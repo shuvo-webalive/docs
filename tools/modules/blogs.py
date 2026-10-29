@@ -84,7 +84,7 @@ IDS = {"name": "ids", "in": "query", "style": "form", "explode": True, "descript
 CATEGORY = {"name": "category", "in": "query", "description": "Keeps only the blog posts filed under the blog category whose `id` you send. A blog category `id` that no post is filed under, or that matches no blog category, returns no posts and no error.", "schema": {"type": "integer", "example": 31}}
 VISIBILITY = {"name": "visibility", "in": "query", "description": "Keeps only the blog posts with this `visibility`: `open`, `hidden` or `restricted`, in any letter case. Any other value returns no posts instead of an error.", "schema": {"type": "string", "enum": VISIBILITY_VALUES, "example": "open"}}
 SEARCH = {"name": "search", "in": "query", "description": "Accepted, but it filters nothing: the listing returns the same posts whatever you send.", "schema": {"type": "string", "example": "spring"}}
-FIELD_METADATA = {"name": "field_metadata", "in": "query", "description": "Send `true` to add a `field_metadata` key that describes each of the seventeen fields of a blog post. Takes `true`, `false`, `1` or `0`; any other value, `True` included, is rejected with `400` and the message `field_metadata must be true/false or 0/1`.", "schema": {"type": "boolean", "example": True}}
+FIELD_METADATA = {"name": "field_metadata", "in": "query", "description": "Send `true` to add a `field_metadata` key that describes each of the eighteen fields of a blog post. Takes `true`, `false`, `1` or `0`; any other value, `True` included, is rejected with `400` and the message `field_metadata must be true/false or 0/1`.", "schema": {"type": "boolean", "example": True}}
 
 COUNT_IDS = dict(IDS, description="Counts only the blog posts whose `id` you list. Repeat the parameter for each post, as in `ids=1201&ids=1202`. A comma list such as `ids=1201,1202` returns `500`. A post in the trash is never counted.")
 COUNT_CATEGORY = dict(CATEGORY, description="Counts only the blog posts filed under the blog category whose `id` you send.")
@@ -143,7 +143,7 @@ def spring_image(stamp):
 
 
 CREATED_ROW = {
-    "id": 1201, "title": "Spring Sale Announcement", "url": "spring-sale-announcement",
+    "id": 1201, "uuid": "9b1e4c7a-2d3f-4a68-8e51-7c0f5a2b6d94", "title": "Spring Sale Announcement", "url": "spring-sale-announcement",
     "content": "<p>Save up to 40% on selected products until the end of the month.</p>",
     "date": "2026-09-28T00:00:00", "is_published": True, "visibility": "open", "visible_to": None,
     "categories": [PROMOTIONS], "created_on": "2026-10-07T09:15:02", "last_updated_on": "2026-10-07T09:15:02",
@@ -152,7 +152,7 @@ CREATED_ROW = {
 }
 
 OLDER_ROW = {
-    "id": 1198, "title": "Caring for Linen Shirts", "url": "caring-for-linen-shirts",
+    "id": 1198, "uuid": "c47a2e90-5b18-4d3c-a6f2-1e8d9b03f7a5", "title": "Caring for Linen Shirts", "url": "caring-for-linen-shirts",
     "content": "<p>Wash cold and dry flat.</p>",
     "date": "2026-09-14T08:30:00", "is_published": True, "visibility": "open", "visible_to": None,
     "categories": [CARE_GUIDES], "created_on": "2026-09-14T08:31:44", "last_updated_on": "2026-09-14T08:31:44",
@@ -327,7 +327,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{blog_id}",
         "summary": "Returns the blog post whose `id` you pass as `blog_id`.",
-        "description": "Returns the blog post under `blog`, with the same seventeen fields as its listing entry, and `group_meta`. Send `field_metadata=true` to add a `field_metadata` key that describes each field; other query parameters are ignored. A post in the trash returns `404`. `HEAD` on this path returns `404` even for a post that exists, so use this call to check that a post exists.",
+        "description": "Returns the blog post under `blog`, with the same eighteen fields as its listing entry, and `group_meta`. Send `field_metadata=true` to add a `field_metadata` key that describes each field; other query parameters are ignored. A post in the trash returns `404`. `HEAD` on this path returns `404` even for a post that exists, so use this call to check that a post exists.",
         "parameters": [BLOG_ID, FIELD_METADATA],
         "responses": {
             "200": {
@@ -542,8 +542,9 @@ ENDPOINTS = [
 ]
 
 SCHEMAS = {
-    "Blog": {"type": "object", "description": "One blog post. A listing entry, a retrieve, and the response to a create, a replace or an update return the same seventeen fields.", "properties": {
+    "Blog": {"type": "object", "description": "One blog post. A listing entry, a retrieve, and the response to a create, a replace or an update return the same eighteen fields.", "properties": {
         "id": {"type": "integer", "description": "The blog post's `id`, assigned by the store. Pass it as `blog_id` in a path."},
+        "uuid": {"type": "string", "description": "A UUID the store assigns to the blog post. It is on every listing entry, retrieve and write response. You cannot set it: a create that names `uuid` is rejected with `400` and the reason `unknown_field`."},
         "title": {"type": "string", "minLength": 2, "maxLength": 255, "description": "The post's title, 2 to 255 characters once trimmed. No two blog posts, live or in the trash, have the same title in any letter case."},
         "url": {"type": "string", "description": "The post's URL slug, such as `spring-sale-announcement`. A create makes it from `title`: lower case, with spaces turned into hyphens and `-1` added when another post already has that slug. A later change of `title` alone does not change it; a replace that sends `url`, or an update that sends `url` beside `title`, sets it."},
         "content": {"type": ["string", "null"], "description": "The post's body, as sent, or `null` when none is set."},
@@ -615,7 +616,7 @@ SCHEMAS = {
         "previous_page": {"type": ["string", "null"], "description": "The full URL of the previous page, with your query, or `null` when `has_previous` is `false`."},
         "next_page": {"type": ["string", "null"], "description": "The full URL of the next page, with your query, or `null` when `has_next` is `false`."},
     }},
-    "BlogFieldMetadata": {"type": "object", "additionalProperties": ref("BlogFieldMetadataEntry"), "description": "One entry for each of the seventeen fields of a blog post, keyed by field name. Returned only when you send `field_metadata=true` to the listing or a retrieve. Some of its notes differ from what the store does: `url` is marked `read_only`, but a replace that sends `url`, or an update that sends it beside `title`, sets it; `title` is described as unique among live posts, but a post in the trash keeps its title taken too; and `visible_to` is described as required when `visibility` is `restricted`, but a create without it is accepted."},
+    "BlogFieldMetadata": {"type": "object", "additionalProperties": ref("BlogFieldMetadataEntry"), "description": "One entry for each of the eighteen fields of a blog post, keyed by field name. Returned only when you send `field_metadata=true` to the listing or a retrieve. Some of its notes differ from what the store does: `url` is marked `read_only`, but a replace that sends `url`, or an update that sends it beside `title`, sets it; `title` is described as unique among live posts, but a post in the trash keeps its title taken too; and `visible_to` is described as required when `visibility` is `restricted`, but a create without it is accepted."},
     "BlogFieldMetadataEntry": {"type": "object", "description": "Describes one field. `type` and `note` are always present; the other keys only where they apply.", "properties": {
         "type": {"type": "string", "description": "The field's value type."},
         "note": {"type": "string", "description": "What the field holds and how a write treats it."},
@@ -628,7 +629,7 @@ SCHEMAS = {
         "values": {"type": "array", "items": {}, "description": "The values the field accepts."},
         "item_type": {"type": "string", "description": "The type of each item, for a list field."},
     }},
-    "BlogInput": {"type": "object", "description": "Send these fields inside `blog`. A create needs `title`; a replace needs `title` and `visibility` and resets most fields it leaves out; an update changes only the fields it sends. Any other field, including `created_on`, `created_by`, `is_disposable` and `is_in_trash`, is rejected with `400`. An `id` field here returns `500` on a create and is ignored on a replace or an update.", "properties": {
+    "BlogInput": {"type": "object", "description": "Send these fields inside `blog`. A create needs `title`; a replace needs `title` and `visibility` and resets most fields it leaves out; an update changes only the fields it sends. Any other field, including `uuid`, `created_on`, `created_by`, `is_disposable` and `is_in_trash`, is rejected with `400`. An `id` field here returns `500` on a create and is ignored on a replace or an update.", "properties": {
         "title": {"type": "string", "minLength": 2, "maxLength": 255, "description": "Required on create and replace. 2 to 255 characters once trimmed. No other blog post, live or in the trash, can have the same title in any letter case."},
         "url": {"type": "string", "description": "Ignored on create, where the store makes `url` from `title`. A replace sets it, and an update sets it only when you send `title` too. The store makes it lower case, turns spaces into hyphens and adds `-1` when another post has it. An empty value is ignored."},
         "content": {"type": ["string", "null"], "description": "Free text, saved as sent. A create or replace that leaves it out sets it to `null`."},

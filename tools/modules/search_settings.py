@@ -317,6 +317,19 @@ ENDPOINTS = [
         },
         "example_call": {"path": {}},
     },
+    {
+        "key": "head_search_settings_reindex_status",
+        "slug": "get-the-reindex-status-headers",
+        "title": "Get the reindex status headers",
+        "method": "HEAD",
+        "path": BASE + "/reindex_status",
+        "summary": "Returns the headers for the reindex status, with no body.",
+        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. Use it to check that the reindex status is reachable without downloading it.",
+        "responses": {
+            "200": {"description": "Headers only. No `ETag` header and no body."},
+        },
+        "example_call": {"path": {}},
+    },
 ]
 
 
@@ -422,7 +435,7 @@ SCHEMAS = {
 }
 
 OVERVIEW_DESCRIPTION = "Read and change the content your store's search covers, the product fields it matches and its synonym groups, and check the reindex status."
-INTRO = "The Search settings API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/search_settings`."
+INTRO = "The Search settings API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/search_settings`."
 WARNING = (
     "**`PUT` replaces, so every field you leave out is reset to its default.** A `PUT`\n"
     "  of `search_fields` that sends only `match_keywords_exactly` returns `match_full_sentences` set to\n"

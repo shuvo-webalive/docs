@@ -1,0 +1,9 @@
+---
+title: "Get document root files headers"
+description: "Returns the headers for the document root files listing, with no body."
+openapi: "HEAD /admin/settings/seo_configuration/document_root"
+---
+
+Returns `200` with headers only and no body. The response has no `ETag` header. Use it to check that the document root files are reachable without downloading them.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

@@ -26,6 +26,10 @@
       "function": "GetSearchResultPageProductPromotions",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageProductPromotions(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"product_promotions\"].([]any) {\n\tpromotion := row.(map[string]any)\n\tfmt.Println(promotion[\"id\"], promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"], promotion[\"is_active\"])\n}"
     },
+    "head_search_result_page_product_promotions": {
+      "function": "HeadSearchResultPageProductPromotions",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().HeadSearchResultPageProductPromotions(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+    },
     "create_search_result_page_product_promotion": {
       "function": "CreateSearchResultPageProductPromotion",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().CreateSearchResultPageProductPromotion(ctx, map[string]any{\n\t\"product_promotion\": map[string]any{\"name\": \"Spring campaign\", \"rule\": \"all_search_result\", \"position\": \"top\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"id\"], promotion[\"name\"], promotion[\"is_active\"])"
@@ -33,6 +37,10 @@
     "get_search_result_page_product_promotion": {
       "function": "GetSearchResultPageProductPromotion",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().GetSearchResultPageProductPromotion(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\npromotion := resp.Map().(map[string]any)[\"product_promotion\"].(map[string]any)\nfmt.Println(promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"], promotion[\"product_ids\"])"
+    },
+    "head_search_result_page_product_promotion": {
+      "function": "HeadSearchResultPageProductPromotion",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().HeadSearchResultPageProductPromotion(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Headers[\"Etag\"])\n"
     },
     "patch_search_result_page_product_promotion": {
       "function": "PatchSearchResultPageProductPromotion",

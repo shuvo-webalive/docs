@@ -34,6 +34,10 @@
       "function": "getSeoConfigurationDocumentRoot",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationDocumentRoot(Map.of(\"limit\", 100));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> file = (Map<?, ?>) row;\n    System.out.println(file.get(\"config_key\") + \" \" + file.get(\"file_name\") + \" \" + file.get(\"file_path\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
+    "head_seo_configuration_document_root": {
+      "function": "headSeoConfigurationDocumentRoot",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.seoConfiguration().headSeoConfigurationDocumentRoot();\nSystem.out.println(response.getStatusCode());"
+    },
     "upload_seo_configuration_document_root": {
       "function": "uploadSeoConfigurationDocumentRoot",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().uploadSeoConfigurationDocumentRoot(\n        Map.of(\"file\", Path.of(\"verification.txt\")));\nMap<?, ?> file = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"document_root_file\");\nSystem.out.println(file.get(\"config_key\") + \" \" + file.get(\"file_name\") + \" \" + file.get(\"file_path\"));"
@@ -46,6 +50,10 @@
       "function": "getSeoConfigurationRedirects",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationRedirects(Map.of(\"limit\", 100));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"items\")) {\n    Map<?, ?> redirect = (Map<?, ?>) row;\n    System.out.println(redirect.get(\"id\") + \" \" + redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
+    "head_seo_configuration_redirects": {
+      "function": "headSeoConfigurationRedirects",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.seoConfiguration().headSeoConfigurationRedirects();\nSystem.out.println(response.getStatusCode());"
+    },
     "create_seo_configuration_redirect": {
       "function": "createSeoConfigurationRedirect",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().createSeoConfigurationRedirect(\n        Map.of(\"source_url\", \"/old-page\", \"destination_url\", \"https://your-store.example.com/new-page\"));\nMap<?, ?> redirect = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"redirect\");\nSystem.out.println(redirect.get(\"id\") + \" \" + redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));"
@@ -53,6 +61,10 @@
     "get_seo_configuration_redirect": {
       "function": "getSeoConfigurationRedirect",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.seoConfiguration().getSeoConfigurationRedirect(16);\nMap<?, ?> redirect = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"redirect\");\nSystem.out.println(redirect.get(\"source_url\") + \" -> \" + redirect.get(\"destination_url\"));"
+    },
+    "head_seo_configuration_redirect": {
+      "function": "headSeoConfigurationRedirect",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.seoConfiguration().headSeoConfigurationRedirect(16);\nSystem.out.println(response.getStatusCode());"
     },
     "patch_seo_configuration_redirect": {
       "function": "patchSeoConfigurationRedirect",

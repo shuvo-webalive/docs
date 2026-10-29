@@ -34,6 +34,10 @@
       "function": "getSeoConfigurationDocumentRoot",
       "code": "const response = await client.seoConfiguration.getSeoConfigurationDocumentRoot({limit: 100});\nfor (const file of response.map.items) {\n    console.log(file.config_key, file.file_name, file.file_path);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
     },
+    "head_seo_configuration_document_root": {
+      "function": "headSeoConfigurationDocumentRoot",
+      "code": "const response = await client.seoConfiguration.headSeoConfigurationDocumentRoot();\nconsole.log(response.statusCode);\n"
+    },
     "upload_seo_configuration_document_root": {
       "function": "uploadSeoConfigurationDocumentRoot",
       "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.seoConfiguration.uploadSeoConfigurationDocumentRoot({\n    file: ['verification.txt', readFileSync('verification.txt'), 'text/plain'],\n});\nconst file = response.map.document_root_file;\nconsole.log(file.config_key, file.file_name, file.file_path);\n"
@@ -46,6 +50,10 @@
       "function": "getSeoConfigurationRedirects",
       "code": "const response = await client.seoConfiguration.getSeoConfigurationRedirects({limit: 100});\nfor (const redirect of response.map.items) {\n    console.log(redirect.id, redirect.source_url, redirect.destination_url);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
     },
+    "head_seo_configuration_redirects": {
+      "function": "headSeoConfigurationRedirects",
+      "code": "const response = await client.seoConfiguration.headSeoConfigurationRedirects();\nconsole.log(response.statusCode);\n"
+    },
     "create_seo_configuration_redirect": {
       "function": "createSeoConfigurationRedirect",
       "code": "const response = await client.seoConfiguration.createSeoConfigurationRedirect({\n    source_url: '/old-page',\n    destination_url: 'https://your-store.example.com/new-page',\n});\nconst redirect = response.map.redirect;\nconsole.log(redirect.id, redirect.source_url, redirect.destination_url);\n"
@@ -53,6 +61,10 @@
     "get_seo_configuration_redirect": {
       "function": "getSeoConfigurationRedirect",
       "code": "const response = await client.seoConfiguration.getSeoConfigurationRedirect(16);\nconst redirect = response.map.redirect;\nconsole.log(redirect.id, redirect.source_url, redirect.destination_url);\n"
+    },
+    "head_seo_configuration_redirect": {
+      "function": "headSeoConfigurationRedirect",
+      "code": "const response = await client.seoConfiguration.headSeoConfigurationRedirect(16);\nconsole.log(response.statusCode);\n"
     },
     "patch_seo_configuration_redirect": {
       "function": "patchSeoConfigurationRedirect",

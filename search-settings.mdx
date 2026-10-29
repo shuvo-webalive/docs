@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Read and change the content your store's search covers, the product fields it matches and its synonym groups, and check the reindex status."
 ---
 
-The Search settings API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/search_settings`.
+The Search settings API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/search_settings`.
 
 <Warning>
   **`PUT` replaces, so every field you leave out is reset to its default.** A `PUT`
@@ -26,6 +26,7 @@ The Search settings API has eight endpoints, and you can call every one from all
 | [Update a search settings section](/api-reference/search-settings/update-a-search-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_settings/{section}` | Changes the fields you send in one section and returns that whole section. |
 | [Replace a search settings section](/api-reference/search-settings/replace-a-search-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/search_settings/{section}` | Replaces one section with the body you send. Fields you leave out are reset. |
 | [Get the reindex status](/api-reference/search-settings/get-the-reindex-status) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/search_settings/reindex_status` | Returns where the search reindex stands: its `state`, start and finish times, and any `error`. |
+| [Get the reindex status headers](/api-reference/search-settings/get-the-reindex-status-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/search_settings/reindex_status` | Returns the headers for the reindex status, with no body. |
 
 ## Before you call
 

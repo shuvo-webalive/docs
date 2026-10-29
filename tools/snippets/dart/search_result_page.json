@@ -26,6 +26,10 @@
       "function": "getSearchResultPageProductPromotions",
       "code": "final response =\n    await client.searchResultPage.getSearchResultPageProductPromotions();\nfinal productPromotions = (response.map as Map)['product_promotions'] as List;\nfor (final productPromotion in productPromotions) {\n  print('${(productPromotion as Map)['id']} ${productPromotion['name']}');\n}"
     },
+    "head_search_result_page_product_promotions": {
+      "function": "headSearchResultPageProductPromotions",
+      "code": "final response =\n    await client.searchResultPage.headSearchResultPageProductPromotions();\nprint(response.statusCode);"
+    },
     "create_search_result_page_product_promotion": {
       "function": "createSearchResultPageProductPromotion",
       "code": "final response =\n    await client.searchResultPage.createSearchResultPageProductPromotion({\n  'product_promotion': {\n    'name': 'Spring campaign',\n    'rule': 'all_search_result',\n    'position': 'top',\n  },\n});\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint(productPromotion['id']);"
@@ -33,6 +37,10 @@
     "get_search_result_page_product_promotion": {
       "function": "getSearchResultPageProductPromotion",
       "code": "final response =\n    await client.searchResultPage.getSearchResultPageProductPromotion(4);\nfinal productPromotion = (response.map as Map)['product_promotion'] as Map;\nprint('${productPromotion['name']} ${productPromotion['position']}');"
+    },
+    "head_search_result_page_product_promotion": {
+      "function": "headSearchResultPageProductPromotion",
+      "code": "final response =\n    await client.searchResultPage.headSearchResultPageProductPromotion(4);\nprint(response.statusCode);"
     },
     "patch_search_result_page_product_promotion": {
       "function": "patchSearchResultPageProductPromotion",

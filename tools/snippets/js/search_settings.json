@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "getSearchSettingsReindexStatus",
       "code": "const response = await client.searchSettings.getSearchSettingsReindexStatus();\nconsole.log(response.map.state, response.map.started_at, response.map.finished_at, response.map.error);\n"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "headSearchSettingsReindexStatus",
+      "code": "const response = await client.searchSettings.headSearchSettingsReindexStatus();\nconsole.log(response.statusCode);\n"
     }
   }
 }

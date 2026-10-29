@@ -25,8 +25,8 @@ NOTES = [
     "  it is rejected with `500`, not `400`.",
     "**`default` is read-only, and more than one tax code can have it.** `default: true` marks a tax\n"
     "  code the store built. A create or an update that sends `default: true` stores `false`.",
-    "**A listing returns at most 20 tax codes per call.** A larger `limit` is capped at `20`, and\n"
-    "  `pagination.limit` shows `20`. To get every tax code, raise `offset` by the number of tax codes\n"
+    "**A listing returns at most 100 tax codes per call.** A larger `limit` is capped at `100`, and\n"
+    "  `pagination.limit` shows `100`. To get every tax code, raise `offset` by the number of tax codes\n"
     "  each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted\n"
     "  and ignored: `q` does not filter the listing, and `field_metadata` returns no field descriptions.",
     "**A rejected request can make the next request on the same connection fail too.** Straight after\n"
@@ -51,7 +51,7 @@ TAX_CODE_ID = {
     "schema": {"type": "integer", "example": 105},
 }
 
-LIMIT = {"name": "limit", "in": "query", "description": "Rows per page. The default and the maximum are `20`: a larger value is capped at `20`, and `pagination.limit` shows `20`. A value below `1`, or one that is not a number, is rejected with `400` `invalid_pagination`.", "schema": {"type": "integer", "minimum": 1, "maximum": 20, "example": 20}}
+LIMIT = {"name": "limit", "in": "query", "description": "Rows per page. The maximum is `100`: a larger value is capped at `100`, and `pagination.limit` shows `100`. A value below `1`, or one that is not a number, is rejected with `400` `invalid_pagination`.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 20}}
 OFFSET = {"name": "offset", "in": "query", "description": "Number of rows to skip. A value that is not a number is rejected with `400` `invalid_pagination`.", "schema": {"type": "integer", "example": 0}}
 PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * limit` against the `limit` you send with it.", "schema": {"type": "integer", "example": 1}}
 QUERY = {"name": "q", "in": "query", "description": "Accepted and ignored: the listing is not filtered.", "schema": {"type": "string"}}
@@ -89,8 +89,8 @@ ENDPOINTS = [
         "title": "List tax codes",
         "method": "GET",
         "path": BASE,
-        "summary": "Returns up to 20 tax codes per call, and how many the store has in `pagination.total`.",
-        "description": "Returns the store's tax codes under `tax_codes`, up to 20 per call, with a `pagination` block. Each tax code has the same eight fields that [Retrieve a tax code](" + RETRIEVE_PAGE + ") returns. A larger `limit` still returns 20, so to get every tax code, raise `offset` by the number of tax codes each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored.",
+        "summary": "Returns up to 100 tax codes per call, and how many the store has in `pagination.total`.",
+        "description": "Returns the store's tax codes under `tax_codes`, up to 100 per call, with a `pagination` block. Each tax code has the same eight fields that [Retrieve a tax code](" + RETRIEVE_PAGE + ") returns. A `limit` above `100` still returns 100, so to get every tax code, raise `offset` by the number of tax codes each page returned until you reach `pagination.total`. `q` and `field_metadata` are accepted and ignored.",
         "parameters": [LIMIT, OFFSET, PAGE, QUERY, FIELD_METADATA],
         "responses": {
             "200": {
@@ -232,7 +232,7 @@ SCHEMAS = {
     }},
     "TaxCodePagination": {"type": "object", "properties": {
         "total": {"type": "integer", "description": "The number of tax codes in the store."},
-        "limit": {"type": "integer", "description": "The page size the store applied. At most `20`."},
+        "limit": {"type": "integer", "description": "The page size the store applied. At most `100`."},
         "offset": {"type": "integer", "description": "The number of tax codes skipped before this page."},
         "count": {"type": "integer", "description": "The number of tax codes on this page."},
         "current_page": {"type": "integer"},

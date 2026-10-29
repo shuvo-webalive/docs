@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "getSearchSettingsReindexStatus",
       "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::getSearchSettingsReindexStatus($client);\n\n$status = $response->map;\necho 'state: ', $status['state'], PHP_EOL;\necho 'finished: ', $status['finished_at'] ?? 'not yet', PHP_EOL;"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "headSearchSettingsReindexStatus",
+      "code": "use WebCommander\\Sdk\\Resources\\Settings\\SearchSettings\\SearchSettings;\n\n$response = SearchSettings::headSearchSettingsReindexStatus($client);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

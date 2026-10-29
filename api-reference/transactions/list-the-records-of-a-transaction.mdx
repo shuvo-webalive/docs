@@ -1,9 +1,9 @@
 ---
 title: "List the records of a transaction"
-description: "Returns the records of one `type` stamped with the number in `transaction_no`, newest first."
+description: "Returns the records stamped with the number in `transaction_no`, newest first, of every type or of the `type` you send."
 openapi: "GET /admin/transactions/{transaction_no}/items"
 ---
 
-Send `type` to choose the kind of record, such as `product` or `category`; the call is rejected with `400` without it. Records come newest first, 20 per call unless you send `limit`, which takes `1` to `200`; `sort` and `order` are ignored. With `detail=slim`, the default, each item has the record's `id` and a few fields that depend on `type`; with `detail=full`, each item is the record as its own retrieve call returns it. A type with no records stamped, or a number no record is stamped with, returns `200` with an empty `items` list and a `total` of `0`, not `404`.
+Returns the records stamped with the number, of every record type. Send `type` to keep only one kind of record, such as `product`, or several, such as `product,category`. Records come newest first, 20 per call unless you send `limit`, which takes `1` to `200`; `sort` and `order` are ignored. Each item has `type`, `stamp` (`created` or `updated`) and `trashed`. With `detail=slim`, the default, an item also has the record's `id` and a few fields that depend on `type`; with `detail=full`, an item is the record as its own retrieve call returns it, with those three fields added. A type with no records stamped, or a number no record is stamped with, returns `200` with an empty `items` list and a `total` of `0`, not `404`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

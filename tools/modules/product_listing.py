@@ -14,6 +14,7 @@ GET_PAGE = "/api-reference/product-listing/get-product-listing-settings"
 UPDATE_PAGE = "/api-reference/product-listing/update-product-listing-settings"
 
 SECTIONS = ["product_information", "load", "sorting", "sortable_items"]
+LISTING_HREF = "/api/v4" + BASE
 LOAD_TYPES = ["pagination", "load_more"]
 POSITIONS = ["top", "bottom", "top_and_bottom"]
 SORT_BY = ["alpha_asc", "alpha_desc", "price_desc", "price_asc", "created_asc", "created_desc"]
@@ -42,12 +43,17 @@ NOTES = [
     "  `load_more`. `load.pagination.position` takes `top`, `bottom`, `top_and_bottom` or `null`.\n"
     "  `sorting.sort_by` takes `alpha_asc`, `alpha_desc`, `price_desc`, `price_asc`, `created_asc`,\n"
     "  `created_desc` or `null`. Any other value is rejected with `400`, and an unknown field is rejected\n"
-    "  with `400` and `not a recognized field`.",
-    "**A write to a dependent field is accepted even when the field it depends on does not switch it on.**\n"
-    "  `load.load_more.per_load` at `0` is accepted while `load.type` is `pagination`, and you can set\n"
-    "  `load.type` while `load.enabled` is `false`. `load.pagination.per_page` is still checked: `0` is\n"
-    "  rejected with `400` and `must be a positive integer for the selected load type`, and `1000000`\n"
-    "  with `400` and `must be between 1 and 999999`.",
+    "  with `400` and `not a recognized field`. The fields are `product_information.show_loyalty_points`,\n"
+    "  `product_information.interaction_buttons.show_view_details`, `product_information.reviews.show_rating`\n"
+    "  and `sortable_items.options.created_date`. The earlier names `show_loyalty_point`, `show_details`,\n"
+    "  `rating_active` and `date` are rejected with `400 unknown_field`.",
+    "**A write that turns on a dependent field while the field it depends on is off is rejected.**\n"
+    "  Turning on `product_information.interaction_buttons.show_view_details` while\n"
+    "  `product_information.interaction_buttons.enabled` is off, or `sortable_items.options.created_date`\n"
+    "  while `sortable_items.enabled` is off, returns `400 constraint_violation`. Turn the field it depends\n"
+    "  on in the same body. `load.pagination.per_page` is also checked: `0` is rejected with `400` and\n"
+    "  `must be a positive integer for the selected load type`, and `1000000` with `400` and\n"
+    "  `must be between 1 and 999999`.",
     "**Add `field_metadata=true` to a read to get a description of every field.** The settings and\n"
     "  `group_meta` are still returned. `field_metadata` is keyed by section, then nested the same way as\n"
     "  that section, with one entry for every field. For `product_information.variation_combination.types`,\n"
@@ -64,14 +70,14 @@ FIELD_METADATA = {
 }
 
 SAMPLE_PRODUCT_INFORMATION = {
-    "interaction_buttons": {"enabled": True, "add_to_cart": True, "show_details": True, "show_on_hover": False},
+    "interaction_buttons": {"enabled": True, "add_to_cart": True, "show_view_details": True, "show_on_hover": False},
     "show_summary": True,
     "show_sale_percentage": True,
     "show_stock_availability": False,
     "show_parent_category": False,
-    "show_loyalty_point": False,
+    "show_loyalty_points": False,
     "price": {"enabled": True, "expect_to_pay": False, "expect_to_pay_with_tax": False},
-    "reviews": {"rating_active": True, "show_review_count": True},
+    "reviews": {"show_rating": True, "show_review_count": True},
     "variation_combination": {"enabled": True, "types": ["Size", "Color"]},
     "show_variations_as_products": False,
 }
@@ -87,10 +93,10 @@ SAMPLE_SORTING = {"enabled": False, "sort_by": None}
 
 SAMPLE_SORTABLE_ITEMS = {
     "enabled": True,
-    "options": {"alphabetic": True, "featured": False, "new": True, "top_selling": False, "price": True, "date": False},
+    "options": {"alphabetic": True, "featured": False, "new": True, "top_selling": False, "price": True, "created_date": False},
 }
 
-SAMPLE_GROUP_META = {section: {"kind": "setting", "writable": True} for section in SECTIONS}
+SAMPLE_GROUP_META = {"product_listing": {"kind": "setting", "writable": True, "href": LISTING_HREF}}
 
 SAMPLE_PRODUCT_LISTING = {
     "product_listing": {
@@ -124,6 +130,7 @@ UPDATE_400 = (
     "The body is not wrapped in `product_listing` (`400 missing_wrapper`: `request body must be wrapped in a 'product_listing' object`), "
     "names something other than the four sections directly inside it (`400 validation_failed`: `<name>: not a recognized section`), "
     "or sends a field or value the section does not accept. The messages for those include `not a recognized field`, "
+    "`unknown_field` for a field name the store has renamed, `constraint_violation` for turning on a field while the field it depends on is off, "
     "`must be a boolean (true/false or 0/1)`, `must be a positive integer for the selected load type`, "
     "`must be between 1 and 999999` and `unknown variation type`. A value outside the allowed list of `load.type`, "
     "`load.pagination.position` or `sorting.sort_by` is rejected with `400` too."
@@ -137,7 +144,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE,
         "summary": "Returns all four product listing sections and a `group_meta` block describing each one.",
-        "description": "Returns every product listing setting under `product_listing`, with all four sections in full: `product_information`, `load`, `sorting` and `sortable_items`. Beside it, `group_meta` gives each section's `kind` and whether it is `writable`; it has no `href`, because no section has a path of its own. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has no `ETag` header.",
+        "description": "Returns every product listing setting under `product_listing`, with all four sections in full: `product_information`, `load`, `sorting` and `sortable_items`. Beside it, `group_meta` holds one `product_listing` entry for the whole area, with its `kind`, whether it is `writable`, and its `href`. No section has a path of its own. Add `field_metadata=true` to also get a description of every field, keyed by section. The response has no `ETag` header.",
         "parameters": [FIELD_METADATA],
         "responses": {
             "200": {
@@ -218,7 +225,7 @@ SCHEMAS = {
         "show_sale_percentage": flag("Show the sale percentage on each tile."),
         "show_stock_availability": flag("Show the stock availability on each tile."),
         "show_parent_category": flag("Show the product's parent category on each tile."),
-        "show_loyalty_point": flag("Show loyalty points on each tile."),
+        "show_loyalty_points": flag("Show loyalty points on each tile."),
         "price": ref("ProductListingPrice"),
         "reviews": ref("ProductListingReviews"),
         "variation_combination": ref("ProductListingVariationCombination"),
@@ -227,7 +234,7 @@ SCHEMAS = {
     "ProductListingInteractionButtons": {"type": "object", "description": "The add to cart and view details buttons on each listing tile.", "properties": {
         "enabled": flag("Show the buttons on each tile."),
         "add_to_cart": flag("Show the add to cart button."),
-        "show_details": flag("Show the view details button."),
+        "show_view_details": flag("Show the view details button. Turning it on while `enabled` is off is rejected with `400 constraint_violation`."),
         "show_on_hover": flag("Show the buttons on hover."),
     }},
     "ProductListingPrice": {"type": "object", "description": "Which prices each listing tile shows.", "properties": {
@@ -236,7 +243,7 @@ SCHEMAS = {
         "expect_to_pay_with_tax": flag("Show the expect to pay price with tax."),
     }},
     "ProductListingReviews": {"type": "object", "description": "The rating stars on each listing tile and the review count beside them.", "properties": {
-        "rating_active": flag("Show the rating stars."),
+        "show_rating": flag("Show the rating stars."),
         "show_review_count": flag("Show the review count beside the stars."),
     }},
     "ProductListingVariationCombination": {"type": "object", "description": "Which variation types each listing tile combines.", "properties": {
@@ -271,20 +278,21 @@ SCHEMAS = {
         "new": flag("Offer sorting by newest."),
         "top_selling": flag("Offer sorting by top selling."),
         "price": flag("Offer sorting by price."),
-        "date": flag("Offer sorting by date."),
+        "created_date": flag("Offer sorting by creation date. Turning it on while `sortable_items.enabled` is off is rejected with `400 constraint_violation`."),
     }},
-    "ProductListingGroupMeta": {"type": "object", "description": "One entry per section. No entry has an `href`, because no section has a path of its own.", "properties": {
-        section: ref("ProductListingSectionMeta") for section in SECTIONS
+    "ProductListingGroupMeta": {"type": "object", "description": "One entry for the whole area, under `product_listing`. It does not repeat per section.", "properties": {
+        "product_listing": ref("ProductListingSectionMeta"),
     }},
     "ProductListingSectionMeta": {"type": "object", "properties": {
-        "kind": {"type": "string", "description": "What the section is. `setting` for all four sections."},
-        "writable": {"type": "boolean", "description": "Whether you can write to the section. `true` for all four sections."},
+        "kind": {"type": "string", "description": "What the area is. `setting`."},
+        "writable": {"type": "boolean", "description": "Whether you can write to the area. `true`."},
+        "href": {"type": "string", "description": "The area's own path, `/api/v4/admin/settings/product_listing`."},
     }},
     "ProductListingFieldMetadata": {"type": "object", "additionalProperties": True, "description": "Keyed by section, then nested the same way as that section's settings, with a `ProductListingFieldMetadataEntry` in place of each field's value. Every field has an entry, and there are no other entries."},
     "ProductListingFieldMetadataEntry": {"type": "object", "properties": {
         "type": {"type": "string", "description": "The kind of value the field takes, such as `enum_list` for `product_information.variation_combination.types`."},
         "allowed_values": {"type": "array", "items": {}, "description": "The values the field accepts. For `product_information.variation_combination.types`, the names of your store's variation types."},
-        "depends_on": {"description": "Present on a field that depends on another field's value, such as `load.load_more.per_load`. A write to the field is still accepted when that other value does not switch it on."},
+        "depends_on": {"description": "Present on a field that depends on another field's value, such as `product_information.interaction_buttons.show_view_details`, which depends on `product_information.interaction_buttons.enabled`. Turning the field on while that other value is off is rejected with `400 constraint_violation`."},
         "nullable": {"description": "Whether the field accepts `null`."},
     }},
     "ProductListingError": {"type": "object", "description": "Describes why the request was rejected. The message gives the reason, such as `request body must be wrapped in a 'product_listing' object`."},

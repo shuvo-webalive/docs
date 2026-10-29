@@ -26,6 +26,10 @@
       "function": "getSearchResultPageProductPromotions",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().getSearchResultPageProductPromotions();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"product_promotions\")) {\n    Map<?, ?> promotion = (Map<?, ?>) row;\n    System.out.println(promotion.get(\"id\") + \" \" + promotion.get(\"name\") + \" \" + promotion.get(\"position\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
     },
+    "head_search_result_page_product_promotions": {
+      "function": "headSearchResultPageProductPromotions",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.searchResultPage().headSearchResultPageProductPromotions();\nSystem.out.println(response.getStatusCode());"
+    },
     "create_search_result_page_product_promotion": {
       "function": "createSearchResultPageProductPromotion",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().createSearchResultPageProductPromotion(Map.of(\n        \"product_promotion\", Map.of(\"name\", \"Spring campaign\", \"rule\", \"all_search_result\", \"position\", \"top\")));\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"id\") + \" \" + promotion.get(\"name\") + \" \" + promotion.get(\"is_active\"));"
@@ -33,6 +37,10 @@
     "get_search_result_page_product_promotion": {
       "function": "getSearchResultPageProductPromotion",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().getSearchResultPageProductPromotion(4);\nMap<?, ?> promotion = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product_promotion\");\nSystem.out.println(promotion.get(\"name\") + \" \" + promotion.get(\"rule\") + \" \" + promotion.get(\"position\"));\nSystem.out.println(promotion.get(\"product_ids\"));"
+    },
+    "head_search_result_page_product_promotion": {
+      "function": "headSearchResultPageProductPromotion",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.searchResultPage().headSearchResultPageProductPromotion(4);\nSystem.out.println(response.getStatusCode());"
     },
     "patch_search_result_page_product_promotion": {
       "function": "patchSearchResultPageProductPromotion",

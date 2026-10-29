@@ -4,6 +4,6 @@ description: "Returns how many records the number in `transaction_no` is stamped
 openapi: "GET /admin/transactions/{transaction_no}"
 ---
 
-Returns the number, its `total_records` and `by_type`, at the top level of the body with no wrapping key. `by_type` always has the same 15 rows in the same order, one per record type, each with `type` and `count`. A row has `items_url` only when `count` is above `0`. To list the records of one type, use [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction).
+Returns the number, its `total_records` and `by_type`, at the top level of the body with no wrapping key. `by_type` always has the same 15 rows in the same order, one per record type, each with `type` and `count`. Each row also splits `count` into `created`, `updated` and `trashed`, and has an `items_url`, also when `count` is `0`. To list the records of one type, use [List the records of a transaction](/api-reference/transactions/list-the-records-of-a-transaction).
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

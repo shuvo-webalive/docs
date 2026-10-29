@@ -26,6 +26,10 @@
       "function": "get_search_result_page_product_promotions",
       "code": "response = client.search_result_page.get_search_result_page_product_promotions()\nfor promotion in response.map[\"product_promotions\"]:\n    print(promotion[\"id\"], promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"])\nprint(response.map[\"pagination\"][\"total\"])\n"
     },
+    "head_search_result_page_product_promotions": {
+      "function": "head_search_result_page_product_promotions",
+      "code": "response = client.search_result_page.head_search_result_page_product_promotions()\nprint(response.status_code)\n"
+    },
     "create_search_result_page_product_promotion": {
       "function": "create_search_result_page_product_promotion",
       "code": "response = client.search_result_page.create_search_result_page_product_promotion({\n    \"product_promotion\": {\n        \"name\": \"Spring campaign\",\n        \"rule\": \"all_search_result\",\n        \"position\": \"top\",\n    },\n})\npromotion = response.map[\"product_promotion\"]\nprint(promotion[\"id\"], promotion[\"is_active\"])\n"
@@ -33,6 +37,10 @@
     "get_search_result_page_product_promotion": {
       "function": "get_search_result_page_product_promotion",
       "code": "response = client.search_result_page.get_search_result_page_product_promotion(4)\npromotion = response.map[\"product_promotion\"]\nprint(promotion[\"name\"], promotion[\"rule\"], promotion[\"position\"])\nprint(promotion[\"product_ids\"])\n"
+    },
+    "head_search_result_page_product_promotion": {
+      "function": "head_search_result_page_product_promotion",
+      "code": "response = client.search_result_page.head_search_result_page_product_promotion(4)\nprint(response.status_code)\n"
     },
     "patch_search_result_page_product_promotion": {
       "function": "patch_search_result_page_product_promotion",

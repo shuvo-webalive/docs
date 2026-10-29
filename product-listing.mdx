@@ -45,12 +45,17 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `load_more`. `load.pagination.position` takes `top`, `bottom`, `top_and_bottom` or `null`.
   `sorting.sort_by` takes `alpha_asc`, `alpha_desc`, `price_desc`, `price_asc`, `created_asc`,
   `created_desc` or `null`. Any other value is rejected with `400`, and an unknown field is rejected
-  with `400` and `not a recognized field`.
-- **A write to a dependent field is accepted even when the field it depends on does not switch it on.**
-  `load.load_more.per_load` at `0` is accepted while `load.type` is `pagination`, and you can set
-  `load.type` while `load.enabled` is `false`. `load.pagination.per_page` is still checked: `0` is
-  rejected with `400` and `must be a positive integer for the selected load type`, and `1000000`
-  with `400` and `must be between 1 and 999999`.
+  with `400` and `not a recognized field`. The fields are `product_information.show_loyalty_points`,
+  `product_information.interaction_buttons.show_view_details`, `product_information.reviews.show_rating`
+  and `sortable_items.options.created_date`. The earlier names `show_loyalty_point`, `show_details`,
+  `rating_active` and `date` are rejected with `400 unknown_field`.
+- **A write that turns on a dependent field while the field it depends on is off is rejected.**
+  Turning on `product_information.interaction_buttons.show_view_details` while
+  `product_information.interaction_buttons.enabled` is off, or `sortable_items.options.created_date`
+  while `sortable_items.enabled` is off, returns `400 constraint_violation`. Turn the field it depends
+  on in the same body. `load.pagination.per_page` is also checked: `0` is rejected with `400` and
+  `must be a positive integer for the selected load type`, and `1000000` with `400` and
+  `must be between 1 and 999999`.
 - **Add `field_metadata=true` to a read to get a description of every field.** The settings and
   `group_meta` are still returned. `field_metadata` is keyed by section, then nested the same way as
   that section, with one entry for every field. For `product_information.variation_combination.types`,

@@ -33,6 +33,10 @@
     "get_search_settings_reindex_status": {
       "function": "getSearchSettingsReindexStatus",
       "code": "import com.webcommander.sdk.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchSettings().getSearchSettingsReindexStatus();\nMap<?, ?> status = (Map<?, ?>) response.getMap();\nSystem.out.println(status.get(\"state\") + \" \" + status.get(\"started_at\") + \" \" + status.get(\"finished_at\"));\nSystem.out.println(status.get(\"error\"));"
+    },
+    "head_search_settings_reindex_status": {
+      "function": "headSearchSettingsReindexStatus",
+      "code": "import com.webcommander.sdk.client.ApiResponse;\n\nApiResponse response = client.searchSettings().headSearchSettingsReindexStatus();\nSystem.out.println(response.getStatusCode());"
     }
   }
 }
