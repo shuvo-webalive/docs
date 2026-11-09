@@ -1,0 +1,35 @@
+---
+title: "Dashboard sections"
+sidebarTitle: "Overview"
+description: "Read what one tab of the admin dashboard's section tabs shows: order updates and best sellers, content to review, bookings, courses or blog activity."
+---
+
+The Dashboard sections API has one endpoint, and you can call it from all seven SDKs. Its path starts with `/api/v4/admin/dashboard/sections`.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get a dashboard section](/api-reference/dashboard-sections/get-a-dashboard-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/sections/{section}` | Returns what one tab of the dashboard's section tabs shows for a period. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Pass the tab's name as `section`.** `section` is one of `ecommerce`, `content`, `bookings`, `courses` or
+  `blog`. Any other value is rejected with `404`, the reason `not_found` and the message
+  `dashboard section not found`, with the detail on the field `key`.
+- **Each tab returns its own fields beside `section` and `period`.** `ecommerce` returns `order_updates` and
+  `best_selling_products`. `content` returns `content_updates` and `top_pages`. `bookings` returns
+  `needs_attention` and `upcoming`. `courses` returns `new_enrolments`, `unpaid_orders` and `popular_courses`.
+  `blog` returns `comments_to_moderate`, `drafts_to_publish` and `most_viewed_posts`. A field of another tab is
+  not in the response.
+- **The period is the one the reports use.** Send `duration`, or `start_date` with `end_date` as `YYYY-MM-DD`.
+  Without either, the period is `last_30_days`. A bad value is rejected with `400`. A query parameter the call does not
+  know is ignored.
+- **Lists can be empty.** A period with no best sellers returns `best_selling_products` as an empty list, and a
+  store without bookings or courses returns empty `upcoming` and `popular_courses` lists.

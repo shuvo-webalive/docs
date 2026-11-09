@@ -1,0 +1,10 @@
+{
+  "sdk": "dart",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "listGiftCards",
+      "code": "final response = await client.giftCards.listGiftCards(\n  queryParams: {'email': 'jane.doe@example.com', 'is_active': 'true'},\n);\nfinal result = response.map as Map;\nfor (final giftCard in result['gift_cards'] as List) {\n  print('${(giftCard as Map)['code']} ${giftCard['balance']} ${giftCard['initial_amount']}');\n}\nfinal pagination = result['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    }
+  }
+}

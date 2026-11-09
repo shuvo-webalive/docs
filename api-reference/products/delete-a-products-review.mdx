@@ -1,0 +1,9 @@
+---
+title: "Delete a product's review"
+description: "Deletes one review of the product permanently."
+openapi: "DELETE /admin/products/{product_id}/reviews/{review_id}"
+---
+
+Deletes the review whose `id` you pass as `review_id` and returns `204` with no body. The review does not go to the trash: [Retrieve a product's review](/api-reference/products/retrieve-a-products-review) then returns `404`, and deleting it again returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

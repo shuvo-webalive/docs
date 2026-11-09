@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "DeleteProductStockLocationAsync",
       "code": "var response = await client.Products.DeleteProductStockLocationAsync(101, 19);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_products": {
+      "function": "CountProductsAsync",
+      "code": "var response = await client.Products.CountProductsAsync(\n    new Dictionary<string, object?> { [\"search_text\"] = \"shirt\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "check_product_sku": {
+      "function": "CheckProductSkuAsync",
+      "code": "var response = await client.Products.CheckProductSkuAsync(\"TSHIRT-001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"available\"]} {body[\"is_exist\"]} {body[\"id\"]}\");"
+    },
+    "list_special_products": {
+      "function": "ListSpecialProductsAsync",
+      "code": "var response = await client.Products.ListSpecialProductsAsync(\n    new Dictionary<string, object?> { [\"type\"] = \"featured\", [\"max\"] = 10 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"total\"]} {body[\"max\"]} {body[\"offset\"]}\");\nforeach (var product in ((IReadOnlyList<object?>)body[\"products\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{product[\"id\"]} {product[\"sku\"]} {product[\"name\"]} {product[\"effective_price\"]}\");"
+    },
+    "bulk_delete_products": {
+      "function": "BulkDeleteProductsAsync",
+      "code": "var response = await client.Products.BulkDeleteProductsAsync(\n    new Dictionary<string, object?> { [\"ids\"] = new[] { 102, 103 } });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"deleted\"]} {body[\"failed\"]}\");"
+    },
+    "list_product_reviews": {
+      "function": "ListProductReviewsAsync",
+      "code": "var response = await client.Products.ListProductReviewsAsync(101,\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var review in ((IReadOnlyList<object?>)body[\"reviews\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{review[\"id\"]} {review[\"status\"]} {review[\"rating\"]} {review[\"comment\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "get_product_review": {
+      "function": "GetProductReviewAsync",
+      "code": "var response = await client.Products.GetProductReviewAsync(101, 31);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar review = (IReadOnlyDictionary<string, object?>)body[\"review\"]!;\nConsole.WriteLine($\"{review[\"id\"]} {review[\"status\"]} {review[\"rating\"]} {review[\"comment\"]}\");"
+    },
+    "patch_product_review": {
+      "function": "PatchProductReviewAsync",
+      "code": "var response = await client.Products.PatchProductReviewAsync(101, 31, new Dictionary<string, object?>\n{\n    [\"status\"] = \"approved\", [\"rating\"] = 2, [\"comment\"] = \"Runs small\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar review = (IReadOnlyDictionary<string, object?>)body[\"review\"]!;\nConsole.WriteLine($\"{review[\"id\"]} {review[\"status\"]} {review[\"rating\"]} {review[\"comment\"]}\");"
+    },
+    "delete_product_review": {
+      "function": "DeleteProductReviewAsync",
+      "code": "var response = await client.Products.DeleteProductReviewAsync(101, 31);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_product_inventory": {
+      "function": "CreateProductInventoryAsync",
+      "code": "var response = await client.Products.CreateProductInventoryAsync(101, new Dictionary<string, object?>\n{\n    [\"product\"] = new Dictionary<string, object?>\n    {\n        [\"product_pricing_and_stock\"] = new Dictionary<string, object?>\n        {\n            [\"track_inventory\"] = true, [\"available_stock\"] = 12, [\"low_level_stock\"] = 3,\n        },\n    },\n}, transactionNo: \"TXN-STOCK-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"status\"]} {body[\"message\"]}\");"
+    },
+    "create_product_image": {
+      "function": "CreateProductImageAsync",
+      "code": "var response = await client.Products.CreateProductImageAsync(101, new Dictionary<string, object?>\n{\n    [\"product\"] = new Dictionary<string, object?>\n    {\n        [\"image_and_video\"] = new Dictionary<string, object?>\n        {\n            [\"images\"] = new[]\n            {\n                new Dictionary<string, object?>\n                {\n                    [\"filename\"] = \"front.png\",\n                    [\"base64\"] = \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\",\n                },\n            },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar product = (IReadOnlyDictionary<string, object?>)body[\"product\"]!;\nforeach (var image in ((IReadOnlyList<object?>)product[\"images\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{image[\"id\"]} {image[\"filename\"]} {image[\"link\"]}\");"
+    },
+    "create_product_media": {
+      "function": "CreateProductMediaAsync",
+      "code": "var response = await client.Products.CreateProductMediaAsync(101, new Dictionary<string, object?>\n{\n    [\"type\"] = \"images\", [\"filename\"] = \"side.png\",\n    [\"content\"] = \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"id\"]} {body[\"filename\"]} {body[\"position\"]} {body[\"primary\"]} {body[\"url\"]}\");"
+    },
+    "delete_product_media_image": {
+      "function": "DeleteProductMediaImageAsync",
+      "code": "var response = await client.Products.DeleteProductMediaImageAsync(101, 1876);\nConsole.WriteLine(response.StatusCode);"
     }
   }
 }

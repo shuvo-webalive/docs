@@ -1,0 +1,26 @@
+{
+  "sdk": "dart",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "listDashboards",
+      "code": "final response = await client.dashboards.listDashboards();\nfor (final dashboard in (response.map as Map)['dashboards'] as List) {\n  print('${(dashboard as Map)['id']} ${dashboard['name']} ${dashboard['default']}');\n}"
+    },
+    "create_dashboard": {
+      "function": "createDashboard",
+      "code": "final response = await client.dashboards.createDashboard({\n  'name': 'Weekly',\n  'kpis': ['total_sales', 'total_orders', 'aov'],\n});\nfinal dashboard = response.map as Map;\nprint('${dashboard['id']} ${dashboard['name']} ${dashboard['default']}');"
+    },
+    "get_dashboard": {
+      "function": "getDashboard",
+      "code": "final response = await client.dashboards\n    .getDashboard('3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01');\nfinal dashboard = response.map as Map;\nprint(dashboard['name']);\nfor (final section in dashboard['standard_sections'] as List) {\n  print('${(section as Map)['key']} ${section['visible']}');\n}"
+    },
+    "patch_dashboard": {
+      "function": "patchDashboard",
+      "code": "final response = await client.dashboards.patchDashboard(\n  '3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01',\n  {\n    'standard_sections': [\n      {'key': 'announcement', 'visible': false},\n    ],\n  },\n);\nfor (final section in (response.map as Map)['standard_sections'] as List) {\n  print('${(section as Map)['key']} ${section['visible']}');\n}"
+    },
+    "delete_dashboard": {
+      "function": "deleteDashboard",
+      "code": "final response = await client.dashboards\n    .deleteDashboard('3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01');\nprint(response.statusCode);"
+    }
+  }
+}

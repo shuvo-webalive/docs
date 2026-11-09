@@ -1,0 +1,26 @@
+{
+  "sdk": "php",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "listDashboards",
+      "code": "use WebCommander\\Resources\\Dashboards\\Dashboards;\n\n$response = Dashboards::listDashboards($client);\n\nforeach ($response->map['dashboards'] as $dashboard) {\n    echo $dashboard['id'], ' ', $dashboard['name'], $dashboard['default'] ? ' (default)' : '', PHP_EOL;\n}"
+    },
+    "create_dashboard": {
+      "function": "createDashboard",
+      "code": "use WebCommander\\Resources\\Dashboards\\Dashboards;\n\n$response = Dashboards::createDashboard($client, [\n    'name' => 'Weekly',\n    'kpis' => ['total_sales', 'total_orders', 'aov'],\n]);\n\necho $response->map['id'], ' ', $response->map['name'], PHP_EOL;"
+    },
+    "get_dashboard": {
+      "function": "getDashboard",
+      "code": "use WebCommander\\Resources\\Dashboards\\Dashboards;\n\n$response = Dashboards::getDashboard($client, '3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01');\n\nforeach ($response->map['standard_sections'] as $section) {\n    echo $section['key'], $section['visible'] ? ' visible' : ' hidden', PHP_EOL;\n}"
+    },
+    "patch_dashboard": {
+      "function": "patchDashboard",
+      "code": "use WebCommander\\Resources\\Dashboards\\Dashboards;\n\n$response = Dashboards::patchDashboard($client, '3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01', [\n    'standard_sections' => [['key' => 'announcement', 'visible' => false]],\n]);\n\necho $response->map['standard_sections'][0]['visible'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "delete_dashboard": {
+      "function": "deleteDashboard",
+      "code": "use WebCommander\\Resources\\Dashboards\\Dashboards;\n\n$response = Dashboards::deleteDashboard($client, '3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01');\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

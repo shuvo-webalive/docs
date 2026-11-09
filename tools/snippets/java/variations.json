@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.variations().updateProductVariations(4321, Map.of(\n        \"variation_ids\", List.of(91), \"available\", true, \"available_stock\", 12,\n        \"min_order_quantity\", 1, \"max_order_quantity\", 5));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"message\"));\nfor (Object row : (List<?>) body.get(\"updated\")) {\n    Map<?, ?> variant = (Map<?, ?>) row;\n    System.out.println(variant.get(\"id\") + \" \" + variant.get(\"name\"));\n}"
+    },
+    "get_product_variation": {
+      "function": "getProductVariation",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.variations().getProductVariation(4321, 91);\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nSystem.out.println(variation.get(\"variation_id\") + \" \" + variation.get(\"sku\") + \" \" + variation.get(\"active\"));\nSystem.out.println(variation.get(\"options\") + \" \" + variation.get(\"pricing\") + \" \" + variation.get(\"inventory\"));"
+    },
+    "delete_product_variation": {
+      "function": "deleteProductVariation",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.variations().deleteProductVariation(4321, 91);\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

@@ -1,0 +1,9 @@
+---
+title: "Delete several products"
+description: "Moves the products whose `id` values you send to the trash and counts the ones that could not be moved."
+openapi: "POST /admin/products/bulk-delete"
+---
+
+Send `ids`, the `id` of each product to move to the trash, at the top level of the body with no wrapper. Each product moves to the trash the way [Delete a product](/api-reference/products/delete-a-product) moves it: it still reads back with `status` set to `trashed`, and nothing is deleted permanently. The call returns `200` even when some `id` values fail, so read `failed` and `errors` instead of the status code.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

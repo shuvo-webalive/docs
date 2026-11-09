@@ -1,0 +1,46 @@
+{
+  "sdk": "go",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "ListShippingRates",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().ListShippingRates(ctx, map[string]any{\n\t\"method\":        \"flat_rate\",\n\t\"handling_cost\": \"with_handling\",\n\t\"sort\":          \"name\",\n\t\"order\":         \"asc\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"shipping_rates\"].([]any) {\n\trate := row.(map[string]any)\n\tfmt.Println(rate[\"id\"], rate[\"name\"], rate[\"method\"], rate[\"shipping_cost\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "head_shipping_rates": {
+      "function": "HeadShippingRates",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().HeadShippingRates(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "count_shipping_rates": {
+      "function": "CountShippingRates",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().CountShippingRates(ctx, map[string]any{\"method\": \"flat_rate\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"total\"])"
+    },
+    "head_shipping_rates_count": {
+      "function": "HeadShippingRatesCount",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().HeadShippingRatesCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_shipping_rate": {
+      "function": "CreateShippingRate",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().CreateShippingRate(ctx, map[string]any{\n\t\"shipping_rate\": map[string]any{\n\t\t\"name\":          \"Flat 10\",\n\t\t\"method\":        \"flat_rate\",\n\t\t\"shipping_cost\": map[string]any{\"amount\": 10, \"type\": \"fixed\"},\n\t\t\"handling_cost\": map[string]any{\"amount\": 5, \"type\": \"percent\"},\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrate := resp.Map().(map[string]any)[\"shipping_rate\"].(map[string]any)\nfmt.Println(rate[\"id\"], rate[\"name\"], rate[\"method\"])"
+    },
+    "get_shipping_rate": {
+      "function": "GetShippingRate",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().GetShippingRate(ctx, 21, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrate := resp.Map().(map[string]any)[\"shipping_rate\"].(map[string]any)\nfmt.Println(rate[\"id\"], rate[\"name\"], rate[\"method\"], rate[\"weight_unit\"], rate[\"conditions\"])"
+    },
+    "head_shipping_rate": {
+      "function": "HeadShippingRate",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().HeadShippingRate(ctx, 21, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_shipping_rate": {
+      "function": "UpdateShippingRate",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().UpdateShippingRate(ctx, 21, map[string]any{\n\t\"shipping_rate\": map[string]any{\n\t\t\"name\":                       \"Flat 12\",\n\t\t\"method\":                     \"flat_rate\",\n\t\t\"calculate_for_entire_order\": false,\n\t\t\"price_entered_with_tax\":     false,\n\t\t\"shipping_cost\":              map[string]any{\"amount\": 12, \"type\": \"fixed\"},\n\t\t\"handling_cost\":              map[string]any{\"amount\": 5, \"type\": \"percent\"},\n\t\t\"additional_rule\":            map[string]any{\"enabled\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrate := resp.Map().(map[string]any)[\"shipping_rate\"].(map[string]any)\nfmt.Println(rate[\"id\"], rate[\"name\"], rate[\"method\"])"
+    },
+    "patch_shipping_rate": {
+      "function": "PatchShippingRate",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().PatchShippingRate(ctx, 21, map[string]any{\n\t\"shipping_rate\": map[string]any{\n\t\t\"shipping_cost\": map[string]any{\"amount\": 12, \"type\": \"fixed\"},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrate := resp.Map().(map[string]any)[\"shipping_rate\"].(map[string]any)\nfmt.Println(rate[\"id\"], rate[\"name\"], rate[\"method\"])"
+    },
+    "delete_shipping_rate": {
+      "function": "DeleteShippingRate",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRates().DeleteShippingRate(ctx, 21, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "UpdateProductVariationsAsync",
       "code": "var response = await client.Variations.UpdateProductVariationsAsync(4321, new Dictionary<string, object?>\n{\n    [\"variation_ids\"] = new object[] { 91 }, [\"available\"] = true, [\"available_stock\"] = 12,\n    [\"min_order_quantity\"] = 1, [\"max_order_quantity\"] = 5,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"message\"]);\nforeach (var variant in ((IReadOnlyList<object?>)body[\"updated\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{variant[\"id\"]} {variant[\"name\"]}\");"
+    },
+    "get_product_variation": {
+      "function": "GetProductVariationAsync",
+      "code": "var response = await client.Variations.GetProductVariationAsync(4321, 91);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nvar pricing = (IReadOnlyDictionary<string, object?>)variation[\"pricing\"]!;\nvar inventory = (IReadOnlyDictionary<string, object?>)variation[\"inventory\"]!;\nConsole.WriteLine($\"{variation[\"variation_id\"]} {variation[\"sku\"]} {pricing[\"base_price\"]} {inventory[\"quantity\"]}\");"
+    },
+    "delete_product_variation": {
+      "function": "DeleteProductVariationAsync",
+      "code": "var response = await client.Variations.DeleteProductVariationAsync(4321, 91);\nConsole.WriteLine(response.StatusCode);"
     }
   }
 }

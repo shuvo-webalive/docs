@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "final response = await client.variations.updateProductVariations(4321, {\n  'variation_ids': [91],\n  'available': true,\n  'available_stock': 12,\n  'min_order_quantity': 1,\n  'max_order_quantity': 5,\n});\nfinal body = response.map as Map;\nprint(body['message']);\nfor (final variant in body['updated'] as List) {\n  print('${(variant as Map)['id']} ${variant['name']}');\n}"
+    },
+    "get_product_variation": {
+      "function": "getProductVariation",
+      "code": "final response = await client.variations.getProductVariation(4321, 91);\nfinal variation = (response.map as Map)['variation'] as Map;\nprint('${variation['variation_id']} ${variation['sku']} ${variation['active']}');\nprint((variation['pricing'] as Map)['base_price']);"
+    },
+    "delete_product_variation": {
+      "function": "deleteProductVariation",
+      "code": "final response = await client.variations.deleteProductVariation(4321, 91);\nprint(response.statusCode);"
     }
   }
 }

@@ -5,8 +5,8 @@ SLUG = "variations"
 BASE = "/admin/variations"
 ICON = "swatchbook"
 
-OVERVIEW_DESCRIPTION = "List, create, replace, update and delete variation types and their options, and list, import and update the variants of a product."
-INTRO = "The Variations API has twelve endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`."
+OVERVIEW_DESCRIPTION = "List, create, replace, update and delete variation types and their options, and list, import, retrieve, update and delete the variants of a product."
+INTRO = "The Variations API has fourteen endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`."
 
 PRODUCT_BASE = "/admin/products/{product_id}/variations"
 
@@ -19,6 +19,8 @@ DELETE_OPTION_PAGE = "/api-reference/variations/delete-a-variation-option"
 PRODUCT_VARIANTS_PAGE = "/api-reference/variations/list-a-products-variants"
 BULK_PAGE = "/api-reference/variations/update-a-products-variants"
 IMPORT_PAGE = "/api-reference/variations/import-a-products-variants"
+RETRIEVE_VARIANT_PAGE = "/api-reference/variations/retrieve-a-products-variant"
+DELETE_VARIANT_PAGE = "/api-reference/variations/delete-a-products-variant"
 CREATE_PRODUCT_PAGE = "/api-reference/products/create-a-product"
 
 WARNING = (
@@ -54,6 +56,10 @@ NOTES = [
     "  `sale_price` divided by the tax rate and rounded to the cent: a stored `90.99` reads `82.72`.\n"
     "  [Update a product's variants](" + BULK_PAGE + ") stores the price you send as it is. A price you read\n"
     "  and write back is therefore not the price that was stored: send the price including tax.",
+    "**A variant's `variation_id` is not its own product `id`.** [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ") and [Delete a product's variant](" + DELETE_VARIANT_PAGE + ") take the variant's `variation_id`,\n"
+    "  the value [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns as `variation_id` and `id`. Every variant is also a product row with a third number, its own product `id`, which\n"
+    "  [Check a product SKU](/api-reference/products/check-a-product-sku) reports for the variant's SKU. Retrieving a variant through another product's `product_id` returns `400`. [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ")\n"
+    "  names the availability `active` where the list names it `available`. Deleting a variant is permanent: it returns `204`, and deleting it again returns `404`.",
     "**The listing returns 20 types per call unless you send `limit`.** `limit` takes `1` to `100`. To get\n"
     "  more, send a higher `offset`, or the next `page`, while `pagination.has_next` is `true`. The listing\n"
     "  accepts only `search`, `standard`, `limit`, `offset`, `page` and `field_metadata`: any other query\n"
@@ -84,6 +90,14 @@ PRODUCT_ID = {
     "schema": {"type": "integer", "example": 4321},
 }
 
+PRODUCT_VARIANT_ID = {
+    "name": "variation_id",
+    "in": "path",
+    "required": True,
+    "description": "The variant's `variation_id`. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns it as `variation_id` and `id`. It is not a variation type's `id`, and it is not the variant's own product `id`. The variant must belong to the product you pass as `product_id`.",
+    "schema": {"type": "integer", "example": 91},
+}
+
 SEARCH = {"name": "search", "in": "query", "description": "Keeps only types whose `name` contains this text, in any letter case. It does not search option labels.", "schema": {"type": "string", "example": "size"}}
 STANDARD = {"name": "standard", "in": "query", "description": "Keeps only types of this kind: `text`, `color` or `image`, in any letter case. Any other value is rejected with `400` and the reason `invalid_enum`.", "schema": {"type": "string", "enum": ["text", "color", "image"], "example": "text"}}
 LIMIT = {"name": "limit", "in": "query", "description": "The number of types per page, from `1` to `100`. Defaults to `20`. `pagination.limit` shows the value applied. `0`, values above `100` and text such as `abc` are rejected with `400` and the message `must be a whole number from 1 to 100`. The reason is `out_of_range` for `0` and values above `100`, and `invalid_integer` for text.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 20}}
@@ -91,7 +105,7 @@ OFFSET = {"name": "offset", "in": "query", "description": "Number of types to sk
 PAGE = {"name": "page", "in": "query", "description": "1-based page number, read as `offset = (page - 1) * limit`. Sending both `page` and `offset` is rejected with `400` and the reason `conflicting_params`.", "schema": {"type": "integer", "example": 2}}
 FIELD_METADATA = {"name": "field_metadata", "in": "query", "description": "Send `true` to also get `field_metadata`, which describes each field of a variation type and of an option: its type, its limits, and whether it is read-only. Accepts `true`, `false`, `1` and `0`; any other value is rejected with `400` and the reason `invalid_boolean`.", "schema": {"type": "boolean", "example": True}}
 CASCADE = {"name": "cascade", "in": "query", "description": "Send `true` or `1` to delete the type's options with it. Without it, or with `false` or `0`, a type that has options is rejected with `409`. Any other value is rejected with `400` and the reason `invalid_boolean`.", "schema": {"type": "boolean", "example": True}}
-TRANSACTION_NO = {"name": "X-Transaction-No", "in": "header", "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") does not show it. `GET /api/v4/admin/products/{product_id}/variations/{variation_id}` returns it as the variant's `transaction_no`, and [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) counts the variant under `product_variation`.", "schema": {"type": "string", "example": "IMPORT-2026-10-18"}}
+TRANSACTION_NO = {"name": "X-Transaction-No", "in": "header", "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") does not show it. [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ") returns it as the variant's `transaction_no`, and [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) counts the variant under `product_variation`.", "schema": {"type": "string", "example": "IMPORT-2026-10-18"}}
 RESPONSE_MODE = {"name": "response", "in": "query", "description": "`slim` (the default) returns each updated variant's `id` and `name`. `full` returns fourteen fields for each one. Any other value is rejected with `400`, the reason `invalid_enum` and the message `must be one of slim, full`.", "schema": {"type": "string", "enum": ["slim", "full"], "example": "full"}}
 
 ERROR_REF = {"$ref": "#/components/schemas/VariationError"}
@@ -148,6 +162,23 @@ PATCHED_ROW = {"id": 15, "name": "Shirt Size", "standard": "text", "disposable":
     {"id": 203, "label": "Large", "value": "L", "order": 3, "default": False, "image": None},
     {"id": 204, "label": "Extra Large", "value": "XL", "order": 4, "default": False, "image": None},
 ]}
+
+VARIANT_ROW = {
+    "variation_id": 91,
+    "name": "Cotton T-Shirt",
+    "sku": "TSHIRT-001-S",
+    "custom_sku": None,
+    "barcode": None,
+    "country_of_origin": None,
+    "hs_code": None,
+    "active": True,
+    "options": [{"id": 101, "type": "Size", "label": "Small"}, {"id": 73, "type": "Colour", "label": "Red"}],
+    "pricing": {"base_price": 25.0, "cost_price": 10.0, "sale_price": 0.0, "compare_at_price": None, "is_on_sale": False},
+    "inventory": {"is_enabled": False, "quantity": 12, "low_stock_threshold": 5},
+    "ordering": {"min_quantity": 1, "max_quantity": 10},
+    "transaction_no": None,
+    "url": "/api/v4/admin/products/4321/variations/91",
+}
 
 BULK_BODY = {"variation_ids": [91], "available": True, "available_stock": 12, "min_order_quantity": 1, "max_order_quantity": 5}
 BULK_SLIM_RESULT = {"status": "success", "message": "1 variations updated", "updated": [{"id": 91, "name": "Cotton T-Shirt"}], "failed": []}
@@ -350,7 +381,7 @@ ENDPOINTS = [
         "parameters": [PRODUCT_ID],
         "responses": {
             "200": {
-                "description": "The product's variant groups in `variations`. Each variant has nineteen fields, including its `variation_id`, which [Update a product's variants](" + BULK_PAGE + ") takes in `variation_ids`. Prices arrive as whole numbers or decimals, such as `0` and `10.0`. On a product whose prices include tax, `base_price` and `sale_price` are net of tax. The response has no `ETag` header.",
+                "description": "The product's variant groups in `variations`. Each variant has twenty fields, including its `variation_id` (`id` repeats it), which [Update a product's variants](" + BULK_PAGE + ") takes in `variation_ids`. Prices arrive as whole numbers or decimals, such as `0` and `10.0`. On a product whose prices include tax, `base_price` and `sale_price` are net of tax. The response has no `ETag` header.",
                 "schema": {"$ref": "#/components/schemas/VariationProductVariants"},
             },
             "404": {"description": "No product has that `product_id`. The message is `Product not found`.", "schema": ERROR_REF},
@@ -369,7 +400,7 @@ ENDPOINTS = [
         "body": {"schema": {"$ref": "#/components/schemas/VariationImportInput"}, "example": IMPORT_BODY},
         "responses": {
             "201": {
-                "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](" + PRODUCT_VARIANTS_PAGE + "). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. The listing does not show the transaction number; `GET /api/v4/admin/products/{product_id}/variations/{variation_id}` returns it as the variant's `transaction_no`.",
+                "description": "`status` is `success`, `message` counts the variants, such as `2 of 2 variants imported successfully`, and `total_variants` is the number imported. The response returns no variant: read them with [List a product's variants](" + PRODUCT_VARIANTS_PAGE + "). There, the `dimensions.weight` you import can read back as text, such as `\"4\"`, so read it as a number or as text. The listing does not show the transaction number; [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ") returns it as the variant's `transaction_no`.",
                 "schema": {"$ref": "#/components/schemas/VariationImportResult"},
                 "example": IMPORT_RESULT,
             },
@@ -396,7 +427,7 @@ ENDPOINTS = [
         "body": {"schema": {"$ref": "#/components/schemas/VariationBulkInput"}, "example": BULK_BODY},
         "responses": {
             "200": {
-                "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. A `GET` on the `url` in a `full` entry returns that one variant, and the entry's `sale_price` and `is_on_sale` can differ from what [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns for a product on sale: read the variant back there to check its values.",
+                "description": "`status` is `success`, `message` gives the number of variants updated, `updated` lists each variant written, and `failed` is empty. With `response=full`, each `updated` entry has fourteen fields. [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ") returns the variant the `url` in a `full` entry names, and the entry's `sale_price` and `is_on_sale` can differ from what [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns for a product on sale: read the variant back there to check its values.",
                 "schema": {"$ref": "#/components/schemas/VariationBulkResult"},
                 "example": BULK_SLIM_RESULT,
             },
@@ -406,6 +437,41 @@ ENDPOINTS = [
             },
         },
         "example_call": {"path": {"product_id": 4321}},
+    },
+    {
+        "key": "get_product_variation",
+        "slug": "retrieve-a-products-variant",
+        "title": "Retrieve a product's variant",
+        "method": "GET",
+        "path": PRODUCT_BASE + "/{variation_id}",
+        "summary": "Returns one variant of the product, with its options, pricing, stock and order quantities.",
+        "description": "Returns the variant whose `variation_id` you pass, under the `variation` key: its `name` and SKUs, whether it is `active`, its `options` (one for each variation type, with the type's name in `type`), `pricing`, `inventory`, `ordering`, its `transaction_no` and its own `url`. Do not rely on the order of `options`. The variant must belong to the product you pass as `product_id`.",
+        "parameters": [PRODUCT_ID, PRODUCT_VARIANT_ID],
+        "responses": {
+            "200": {
+                "description": "The variant. `active` is the value [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns as `available`. `transaction_no` is `null` when no transaction number was stored.",
+                "schema": {"type": "object", "properties": {"variation": {"$ref": "#/components/schemas/VariationProductVariantDetail"}}},
+                "example": {"variation": VARIANT_ROW},
+            },
+            "400": {"description": "The variant belongs to another product. The message is `Variation does not belong to this product`.", "schema": ERROR_REF},
+            "404": {"description": "No variant has that `variation_id`. The message is `Variation not found`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 4321, "variation_id": 91}},
+    },
+    {
+        "key": "delete_product_variation",
+        "slug": "delete-a-products-variant",
+        "title": "Delete a product's variant",
+        "method": "DELETE",
+        "path": PRODUCT_BASE + "/{variation_id}",
+        "summary": "Deletes one variant of the product permanently.",
+        "description": "Deletes the variant whose `variation_id` you pass and returns `204` with no body. Retrieving or deleting it again returns `404`.",
+        "parameters": [PRODUCT_ID, PRODUCT_VARIANT_ID],
+        "responses": {
+            "204": {"description": "The variant is deleted. No body."},
+            "404": {"description": "No variant has that `variation_id`, for example because you already deleted it.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 4321, "variation_id": 91}},
     },
 ]
 
@@ -462,7 +528,8 @@ SCHEMAS = {
         "variants": {"type": "array", "items": {"$ref": "#/components/schemas/VariationProductVariant"}},
     }},
     "VariationProductVariant": {"type": "object", "properties": {
-        "variation_id": {"type": "integer", "description": "Identifies the variant. It is not a variation type's `id`. Send it in `variation_ids` to update the variant."},
+        "id": {"type": "integer", "description": "The same number as `variation_id`."},
+        "variation_id": {"type": "integer", "description": "Identifies the variant. It is not a variation type's `id`. Send it in `variation_ids` to update the variant, and pass it as `variation_id` to retrieve or delete the variant."},
         "available": {"type": "boolean", "description": "Whether the variant is available."},
         "is_base": {"type": "boolean"},
         "key": {"type": "string", "description": "The variant's option labels joined with `/`, such as `Small/Red`."},
@@ -481,6 +548,43 @@ SCHEMAS = {
         "dimensions": {"$ref": "#/components/schemas/VariationProductVariantDimensions"},
         "badges": {"$ref": "#/components/schemas/VariationProductVariantBadges"},
         "images": {"type": "array", "items": {"$ref": "#/components/schemas/VariationProductVariantImage"}, "description": "The variant's images."},
+    }},
+    "VariationProductVariantDetail": {"type": "object", "description": "One variant, as [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ") returns it.", "properties": {
+        "variation_id": {"type": "integer", "description": "The variant's `variation_id`. It is not a variation type's `id`."},
+        "name": {"type": "string", "description": "The variant's name."},
+        "sku": {"type": "string", "description": "The variant's SKU."},
+        "custom_sku": {"type": ["string", "null"]},
+        "barcode": {"type": ["string", "null"]},
+        "country_of_origin": {"type": ["string", "null"]},
+        "hs_code": {"type": ["string", "null"]},
+        "active": {"type": "boolean", "description": "Whether the variant is available. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") returns it as `available`."},
+        "options": {"type": "array", "items": {"$ref": "#/components/schemas/VariationProductVariantOption"}, "description": "One option for each variation type of the variant. Do not rely on their order."},
+        "pricing": {"$ref": "#/components/schemas/VariationProductVariantDetailPricing"},
+        "inventory": {"$ref": "#/components/schemas/VariationProductVariantDetailInventory"},
+        "ordering": {"$ref": "#/components/schemas/VariationProductVariantDetailOrdering"},
+        "transaction_no": {"type": ["string", "null"], "description": "The variant's transaction number, or `null`."},
+        "url": {"type": "string", "description": "The path of this variant, such as `/api/v4/admin/products/4321/variations/91`."},
+    }},
+    "VariationProductVariantOption": {"type": "object", "properties": {
+        "id": {"type": "integer", "description": "The variation option's `id`."},
+        "type": {"type": "string", "description": "The name of the variation type the option belongs to, such as `Size`."},
+        "label": {"type": "string", "description": "The option's label."},
+    }},
+    "VariationProductVariantDetailPricing": {"type": "object", "properties": {
+        "base_price": {"type": "number"},
+        "cost_price": {"type": "number"},
+        "sale_price": {"type": "number"},
+        "compare_at_price": {"type": ["number", "null"], "description": "The variant's compare-at price, or `null`."},
+        "is_on_sale": {"type": "boolean"},
+    }},
+    "VariationProductVariantDetailInventory": {"type": "object", "properties": {
+        "is_enabled": {"type": "boolean", "description": "Whether inventory tracking is on for the variant."},
+        "quantity": {"type": "integer", "description": "The variant's stock."},
+        "low_stock_threshold": {"type": "integer"},
+    }},
+    "VariationProductVariantDetailOrdering": {"type": "object", "properties": {
+        "min_quantity": {"type": "integer", "description": "The smallest quantity a customer can order."},
+        "max_quantity": {"type": "integer", "description": "The largest quantity a customer can order. `0` means no maximum."},
     }},
     "VariationProductVariantPricing": {"type": "object", "description": "On a product whose prices include tax, `base_price` and `sale_price` are the stored prices divided by the tax rate and rounded to the cent.", "properties": {
         "base_price": {"type": "number", "description": "The variant's base price."},
@@ -554,7 +658,7 @@ SCHEMAS = {
         "inventory": {"$ref": "#/components/schemas/VariationBulkInventory"},
         "ordering": {"$ref": "#/components/schemas/VariationBulkOrdering"},
         "transaction_no": {"type": "string"},
-        "url": {"type": "string", "description": "A path such as `/api/v4/admin/products/4321/variations/91`. A `GET` on it returns that one variant, with its `transaction_no`."},
+        "url": {"type": "string", "description": "A path such as `/api/v4/admin/products/4321/variations/91`. [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + ") reads that variant, with its `transaction_no`."},
     }},
     "VariationBulkOption": {"type": "object", "properties": {
         "id": {"type": "integer", "description": "The variation option's `id`."},

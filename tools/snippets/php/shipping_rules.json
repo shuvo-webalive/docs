@@ -1,0 +1,46 @@
+{
+  "sdk": "php",
+  "module": "shipping_rules",
+  "endpoints": {
+    "list_shipping_rules": {
+      "function": "listShippingRules",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::listShippingRules($client, ['zone_id' => 5, 'method' => 'flat_rate', 'handling_cost' => 'without_handling', 'sort' => 'name', 'order' => 'asc']);\n\nforeach ($response->map['shipping_rules'] as $rule) {\n    echo $rule['id'], ' ', $rule['name'], PHP_EOL;\n}"
+    },
+    "head_shipping_rules": {
+      "function": "headShippingRules",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::headShippingRules($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_shipping_rules": {
+      "function": "countShippingRules",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::countShippingRules($client, ['zone_id' => 5]);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "head_shipping_rules_count": {
+      "function": "headShippingRulesCount",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::headShippingRulesCount($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_shipping_rule": {
+      "function": "createShippingRule",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::createShippingRule($client, [\n    'shipping_rule' => [\n        'name' => 'Metro',\n        'description' => 'Metro deliveries',\n        'shipping_class' => 2,\n        'shipping_rate' => 21,\n        'zones' => [5],\n        'profile_id' => 12,\n    ],\n], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['shipping_rule']['id'], PHP_EOL;"
+    },
+    "get_shipping_rule": {
+      "function": "getShippingRule",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::getShippingRule($client, 31);\n\n$rule = $response->map['shipping_rule'];\necho $rule['name'], ': ', count($rule['zones']), ' zone(s)', PHP_EOL;"
+    },
+    "head_shipping_rule": {
+      "function": "headShippingRule",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::headShippingRule($client, 31);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_shipping_rule": {
+      "function": "updateShippingRule",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::updateShippingRule($client, 31, [\n    'shipping_rule' => [\n        'name' => 'Metro',\n        'description' => 'Metro and inner west deliveries',\n        'shipping_class' => 2,\n        'shipping_rate' => 21,\n        'zones' => [5, 6],\n    ],\n]);\n\necho $response->map['shipping_rule']['description'], PHP_EOL;"
+    },
+    "patch_shipping_rule": {
+      "function": "patchShippingRule",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::patchShippingRule($client, 31, ['shipping_rule' => ['zones' => [5, 6]]]);\n\necho count($response->map['shipping_rule']['zones']), ' zone(s)', PHP_EOL;"
+    },
+    "delete_shipping_rule": {
+      "function": "deleteShippingRule",
+      "code": "use WebCommander\\Resources\\ShippingRules\\ShippingRules;\n\n$response = ShippingRules::deleteShippingRule($client, 31);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

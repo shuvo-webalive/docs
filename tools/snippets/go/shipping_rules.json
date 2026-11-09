@@ -1,0 +1,46 @@
+{
+  "sdk": "go",
+  "module": "shipping_rules",
+  "endpoints": {
+    "list_shipping_rules": {
+      "function": "ListShippingRules",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().ListShippingRules(ctx, map[string]any{\n\t\"zone_id\":       5,\n\t\"method\":        \"flat_rate\",\n\t\"handling_cost\": \"without_handling\",\n\t\"sort\":          \"name\",\n\t\"order\":         \"asc\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"shipping_rules\"].([]any) {\n\trule := row.(map[string]any)\n\tfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"shipping_class\"], rule[\"shipping_rate\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "head_shipping_rules": {
+      "function": "HeadShippingRules",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().HeadShippingRules(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "count_shipping_rules": {
+      "function": "CountShippingRules",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().CountShippingRules(ctx, map[string]any{\"zone_id\": 5}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"total\"])"
+    },
+    "head_shipping_rules_count": {
+      "function": "HeadShippingRulesCount",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().HeadShippingRulesCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_shipping_rule": {
+      "function": "CreateShippingRule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().CreateShippingRule(ctx, map[string]any{\n\t\"shipping_rule\": map[string]any{\n\t\t\"name\":           \"Metro\",\n\t\t\"description\":    \"Metro deliveries\",\n\t\t\"shipping_class\": 2,\n\t\t\"shipping_rate\":  21,\n\t\t\"zones\":          []any{5},\n\t\t\"profile_id\":     12,\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"shipping_rule\"].(map[string]any)\nfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"shipping_class\"])"
+    },
+    "get_shipping_rule": {
+      "function": "GetShippingRule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().GetShippingRule(ctx, 31, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"shipping_rule\"].(map[string]any)\nfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"shipping_class\"], rule[\"shipping_rate\"], rule[\"zones\"])"
+    },
+    "head_shipping_rule": {
+      "function": "HeadShippingRule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().HeadShippingRule(ctx, 31, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_shipping_rule": {
+      "function": "UpdateShippingRule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().UpdateShippingRule(ctx, 31, map[string]any{\n\t\"shipping_rule\": map[string]any{\n\t\t\"name\":           \"Metro\",\n\t\t\"description\":    \"Metro and inner west deliveries\",\n\t\t\"shipping_class\": 2,\n\t\t\"shipping_rate\":  21,\n\t\t\"zones\":          []any{5, 6},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"shipping_rule\"].(map[string]any)\nfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"shipping_class\"])"
+    },
+    "patch_shipping_rule": {
+      "function": "PatchShippingRule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().PatchShippingRule(ctx, 31, map[string]any{\n\t\"shipping_rule\": map[string]any{\n\t\t\"zones\": []any{5, 6},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"shipping_rule\"].(map[string]any)\nfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"shipping_class\"])"
+    },
+    "delete_shipping_rule": {
+      "function": "DeleteShippingRule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingRules().DeleteShippingRule(ctx, 31, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

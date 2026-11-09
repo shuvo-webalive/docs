@@ -1,0 +1,34 @@
+{
+  "sdk": "go",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "CreateOrderPreview",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().CreateOrderPreview(ctx, map[string]any{\n\t\"customer_id\":   512,\n\t\"delivery_type\": \"shipping\",\n\t\"products\": []any{\n\t\tmap[string]any{\"product_id\": 101, \"quantity\": 2},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nsession := order[\"session\"].(map[string]any)\ntotals := order[\"totals\"].(map[string]any)\nfmt.Println(session[\"session_id\"], session[\"status\"], session[\"expires_at\"])\nfmt.Println(totals[\"sub_total\"], totals[\"shipping_cost\"], totals[\"grand_total\"], totals[\"due\"])"
+    },
+    "get_order_preview": {
+      "function": "GetOrderPreview",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().GetOrderPreview(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nsession := order[\"session\"].(map[string]any)\ntotals := order[\"totals\"].(map[string]any)\nfmt.Println(session[\"session_id\"], session[\"status\"], session[\"expires_at\"])\nfmt.Println(totals[\"sub_total\"], totals[\"shipping_cost\"], totals[\"grand_total\"], totals[\"due\"])"
+    },
+    "confirm_order_preview": {
+      "function": "ConfirmOrderPreview",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().ConfirmOrderPreview(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\n\t\"send_email\":     false,\n\t\"transaction_no\": \"TXN-ORDER-0001\",\n\t\"payment\": map[string]any{\n\t\t\"amount\":                10.0,\n\t\t\"payment_status\":        \"success\",\n\t\t\"payment_method\":        \"manual\",\n\t\t\"transaction_reference\": \"REF-0001\",\n\t\t\"transaction_date\":      \"2026-11-05T06:12:00Z\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"order_status\"], order[\"payment_status\"], order[\"grand_total\"], order[\"paid\"], order[\"due\"])"
+    },
+    "apply_order_preview_coupon": {
+      "function": "ApplyOrderPreviewCoupon",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().ApplyOrderPreviewCoupon(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"code\": \"SAVE10\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\ntotals := order[\"totals\"].(map[string]any)\nfmt.Println(order[\"discounts\"], totals[\"total_discount\"], totals[\"grand_total\"], totals[\"due\"])"
+    },
+    "remove_order_preview_coupon": {
+      "function": "RemoveOrderPreviewCoupon",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().RemoveOrderPreviewCoupon(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "ApplyOrderPreviewGiftCard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().ApplyOrderPreviewGiftCard(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"code\": \"GIFT-0001\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\ntotals := order[\"totals\"].(map[string]any)\nfmt.Println(order[\"discounts\"], totals[\"total_discount\"], totals[\"grand_total\"], totals[\"due\"])"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "RemoveOrderPreviewGiftCard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.OrderPreviews().RemoveOrderPreviewGiftCard(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

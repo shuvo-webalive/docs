@@ -39,7 +39,10 @@
       "icon": "truck",
       "modules": [
         "shipping_methods",
-        "shipping_classes"
+        "shipping_classes",
+        "shipping_profiles",
+        "shipping_rates",
+        "shipping_rules"
       ]
     },
     {
@@ -72,10 +75,35 @@
       ]
     },
     {
+      "name": "Order previews",
+      "icon": "clipboard-check",
+      "modules": [
+        "order_previews"
+      ]
+    },
+    {
+      "name": "Gift cards",
+      "icon": "gift",
+      "modules": [
+        "gift_cards"
+      ]
+    },
+    {
       "name": "Carts",
       "icon": "cart-shopping",
       "modules": [
         "carts"
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "icon": "gauge",
+      "modules": [
+        "dashboards",
+        "dashboard_banners",
+        "dashboard_kpis",
+        "dashboard_reports",
+        "dashboard_sections"
       ]
     },
     {

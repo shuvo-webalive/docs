@@ -1,0 +1,9 @@
+---
+title: "Retrieve an order preview"
+description: "Returns the preview whose `session_id` you pass, with its current totals."
+openapi: "GET /admin/orders/preview/{preview_session_id}"
+---
+
+Returns the preview in the same shape as [Start an order preview](/api-reference/order-previews/start-an-order-preview), with any coupon or gift card you applied. Reading a preview does not move `session.expires_at`. A preview that was confirmed returns `410`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

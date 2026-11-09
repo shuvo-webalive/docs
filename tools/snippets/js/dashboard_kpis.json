@@ -1,0 +1,18 @@
+{
+  "sdk": "js",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "getDashboardKpiOptions",
+      "code": "const response = await client.dashboardKpis.getDashboardKpiOptions();\nconsole.log(response.map.min, response.map.max, response.map.selected);\nfor (const group of response.map.groups) {\n    for (const metric of group.metrics) {\n        console.log(group.key, metric.key, metric.label, metric.in_use);\n    }\n}\n"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "getDashboardKpiSelection",
+      "code": "const response = await client.dashboardKpis.getDashboardKpiSelection({duration: 'last_7_days'});\nfor (const kpi of response.map.selected) {\n    console.log(kpi.position, kpi.key, kpi.value, kpi.previous_value, kpi.change_percent);\n}\n"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "updateDashboardKpiSelection",
+      "code": "const response = await client.dashboardKpis.updateDashboardKpiSelection(\n    {metrics: ['total_sales', 'total_orders', 'aov']},\n    {duration: 'last_7_days'},\n);\nfor (const kpi of response.map.selected) {\n    console.log(kpi.position, kpi.key, kpi.value);\n}\n"
+    }
+  }
+}

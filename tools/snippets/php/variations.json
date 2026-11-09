@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::updateProductVariations($client, 4321, [\n    'variation_ids' => [91], 'available' => true, 'available_stock' => 12,\n    'min_order_quantity' => 1, 'max_order_quantity' => 5,\n]);\n\necho $response->map['message'], PHP_EOL;\nforeach ($response->map['updated'] as $variant) {\n    echo $variant['id'], ' ', $variant['name'], PHP_EOL;\n}\n"
+    },
+    "get_product_variation": {
+      "function": "getProductVariation",
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::getProductVariation($client, 4321, 91);\n\n$variation = $response->map['variation'];\necho $variation['sku'], ' ', $variation['pricing']['base_price'], PHP_EOL;"
+    },
+    "delete_product_variation": {
+      "function": "deleteProductVariation",
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteProductVariation($client, 4321, 91);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

@@ -1,0 +1,9 @@
+---
+title: "Place the order from a preview"
+description: "Places a real order from the preview and closes the preview."
+openapi: "POST /admin/orders/preview/{preview_session_id}/confirm"
+---
+
+This creates an order. It matches the last preview: the same `grand_total` and `total_discount`, with `order_status` `in_progress`. The body is optional; with no body, or with `{}`, the order has `payment_status` `unpaid`, `paid` `0` and `due` equal to `grand_total`. To record a payment, send `payment`, whose `payment_method` is required; `payment_status` `success` records it, `failed` is kept in `payments` but leaves the order unpaid, and `pending` leaves it unpaid. An `amount` below the grand total sets `payment_status` to `partial`, and an `amount` equal to it sets `paid`. After the call the preview is closed. To file the order under a transaction number, send `transaction_no` in the body.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

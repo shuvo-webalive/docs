@@ -1,0 +1,46 @@
+{
+  "sdk": "java",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "listShippingRates",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingRates().listShippingRates(Map.of(\"method\", \"flat_rate\", \"handling_cost\", \"with_handling\", \"sort\", \"name\", \"order\", \"asc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_rates\")) {\n    Map<?, ?> rate = (Map<?, ?>) row;\n    System.out.println(rate.get(\"id\") + \" \" + rate.get(\"name\") + \" \" + rate.get(\"method\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "head_shipping_rates": {
+      "function": "headShippingRates",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingRates().headShippingRates();\nSystem.out.println(response.getStatusCode());"
+    },
+    "count_shipping_rates": {
+      "function": "countShippingRates",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingRates().countShippingRates(Map.of(\"method\", \"flat_rate\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total\"));"
+    },
+    "head_shipping_rates_count": {
+      "function": "headShippingRatesCount",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingRates().headShippingRatesCount();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_shipping_rate": {
+      "function": "createShippingRate",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingRates().createShippingRate(Map.of(\"shipping_rate\", Map.of(\n        \"name\", \"Flat 10\", \"method\", \"flat_rate\",\n        \"shipping_cost\", Map.of(\"amount\", 10, \"type\", \"fixed\"),\n        \"handling_cost\", Map.of(\"amount\", 5, \"type\", \"percent\"))));\nMap<?, ?> shippingRate = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_rate\");\nSystem.out.println(shippingRate.get(\"id\") + \" \" + shippingRate.get(\"name\") + \" \" + shippingRate.get(\"method\"));\nSystem.out.println(shippingRate.get(\"shipping_cost\") + \" \" + shippingRate.get(\"handling_cost\"));"
+    },
+    "get_shipping_rate": {
+      "function": "getShippingRate",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingRates().getShippingRate(21);\nMap<?, ?> shippingRate = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_rate\");\nSystem.out.println(shippingRate.get(\"id\") + \" \" + shippingRate.get(\"name\") + \" \" + shippingRate.get(\"method\"));\nSystem.out.println(shippingRate.get(\"shipping_cost\") + \" \" + shippingRate.get(\"handling_cost\"));"
+    },
+    "head_shipping_rate": {
+      "function": "headShippingRate",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingRates().headShippingRate(21);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_shipping_rate": {
+      "function": "updateShippingRate",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingRates().updateShippingRate(21, Map.of(\"shipping_rate\", Map.of(\n        \"name\", \"Flat 12\", \"method\", \"flat_rate\",\n        \"calculate_for_entire_order\", false, \"price_entered_with_tax\", false,\n        \"shipping_cost\", Map.of(\"amount\", 12, \"type\", \"fixed\"),\n        \"handling_cost\", Map.of(\"amount\", 5, \"type\", \"percent\"),\n        \"additional_rule\", Map.of(\"enabled\", false))));\nMap<?, ?> shippingRate = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_rate\");\nSystem.out.println(shippingRate.get(\"id\") + \" \" + shippingRate.get(\"name\") + \" \" + shippingRate.get(\"method\"));\nSystem.out.println(shippingRate.get(\"shipping_cost\") + \" \" + shippingRate.get(\"handling_cost\"));"
+    },
+    "patch_shipping_rate": {
+      "function": "patchShippingRate",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingRates().patchShippingRate(21, Map.of(\"shipping_rate\", Map.of(\n        \"shipping_cost\", Map.of(\"amount\", 12, \"type\", \"fixed\"))));\nMap<?, ?> shippingRate = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_rate\");\nSystem.out.println(shippingRate.get(\"id\") + \" \" + shippingRate.get(\"name\") + \" \" + shippingRate.get(\"method\"));\nSystem.out.println(shippingRate.get(\"shipping_cost\") + \" \" + shippingRate.get(\"handling_cost\"));"
+    },
+    "delete_shipping_rate": {
+      "function": "deleteShippingRate",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingRates().deleteShippingRate(21);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

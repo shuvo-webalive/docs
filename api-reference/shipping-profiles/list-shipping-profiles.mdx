@@ -1,0 +1,9 @@
+---
+title: "List shipping profiles"
+description: "Returns up to 20 shipping profiles per call, newest first, with paging details."
+openapi: "GET /admin/shipping_profiles"
+---
+
+Returns the shipping profiles in `shipping_profiles`, 20 per call unless you send `limit`, and a `pagination` block. The newest profile comes first unless you send `sort` and `order`. Filter with `search` and `default`. A query parameter the listing does not know is ignored. When several parameters are invalid, the `400` response lists each one in `details`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

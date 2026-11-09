@@ -1,0 +1,10 @@
+{
+  "sdk": "python",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "list_gift_cards",
+      "code": "response = client.gift_cards.list_gift_cards({\"email\": \"jane.doe@example.com\", \"is_active\": \"true\"})\nfor gift_card in response.map[\"gift_cards\"]:\n    print(gift_card[\"id\"], gift_card[\"code\"], gift_card[\"balance\"], gift_card[\"is_active\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+---
+title: "Dashboard reports"
+sidebarTitle: "Overview"
+description: "Read the store's quick report, sales report and summary for a period, or check that each one can be read without fetching the body."
+---
+
+The Dashboard reports API has six endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/dashboard/reports`.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Get the quick report](/api-reference/dashboard-reports/get-the-quick-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/quick` | Returns the dashboard's KPI figures, order and sales totals, and most viewed items for a period. |
+| [Check the quick report](/api-reference/dashboard-reports/check-the-quick-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/reports/quick` | Returns `200` and the headers of the quick report, with no body. |
+| [Get the sales report](/api-reference/dashboard-reports/get-the-sales-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/sales` | Returns sales by day or month for a period, with totals. |
+| [Check the sales report](/api-reference/dashboard-reports/check-the-sales-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/reports/sales` | Returns `200` and the headers of the sales report, with no body. |
+| [Get the summary report](/api-reference/dashboard-reports/get-the-summary-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/reports/summary` | Returns the quick report's totals, orders by month, sales rows, top products and order updates in one call. |
+| [Check the summary report](/api-reference/dashboard-reports/check-the-summary-report) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/reports/summary` | Returns `200` and the headers of the summary report, with no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every report takes the same period.** Send `duration`, or `start_date` with `end_date` as `YYYY-MM-DD`.
+  Without either, the period is `last_30_days`. `duration` is one of `today`, `yesterday`, `last_24_hours`, `last_7_days`, `last_30_days`, `this_month`, `last_month`, `last_3_months`, `last_6_months`, `last_12_months`, `last_24_months`, `last_36_months`, `last_48_months`, `last_60_months`, or `custom`, which the response uses when you send dates. `period` in every response shows the days covered, the
+  days before them that `previous_value` covers, the `time_zone` and the `currency`.
+- **A bad value is rejected with `400`, and one response lists every field that failed.** A `duration` outside the
+  list, a `duration` sent twice, and a `start_date` without an `end_date` (or the reverse) are rejected with the reason
+  `invalid_request`. A query parameter a report does not know is ignored.
+- **The reports are read-only, and each has a `HEAD` form.** The `HEAD` call returns `200` with no body and checks
+  the same query as the `GET`, so a bad value is rejected with `400`. Use it to check that a report can be read.
+- **A period with no sales has no rows.** [Get the sales report](/api-reference/dashboard-reports/get-the-sales-report) returns `rows` as an empty
+  list and still returns `totals`. Lists such as `view_report.items` can be empty too.
+- **Do not expect two reports to give the same total.** In the same call, `orders.count` and the `total_orders` tile
+  can differ, and the sales report covers only paid orders.

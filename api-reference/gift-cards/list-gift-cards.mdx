@@ -1,0 +1,9 @@
+---
+title: "List gift cards"
+description: "Returns up to 20 gift cards per call, newest first, with paging details."
+openapi: "GET /admin/gift_cards"
+---
+
+Returns the gift cards in `gift_cards`, newest first, up to 20 per call, with a `pagination` block. Filter with `code`, `email` and `is_active`; `code` and `email` match the whole value in any letter case. Any query parameter not listed here is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

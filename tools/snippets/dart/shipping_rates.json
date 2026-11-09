@@ -1,0 +1,46 @@
+{
+  "sdk": "dart",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "listShippingRates",
+      "code": "final response = await client.shippingRates.listShippingRates(\n  queryParams: {\n    'method': 'flat_rate',\n    'handling_cost': 'with_handling',\n    'sort': 'name',\n    'order': 'asc',\n  },\n);\nfinal result = response.map as Map;\nfor (final shippingRate in result['shipping_rates'] as List) {\n  print('${(shippingRate as Map)['id']} ${shippingRate['name']} ${shippingRate['method']}');\n}\nfinal pagination = result['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
+    "head_shipping_rates": {
+      "function": "headShippingRates",
+      "code": "final response = await client.shippingRates.headShippingRates();\nprint(response.statusCode);"
+    },
+    "count_shipping_rates": {
+      "function": "countShippingRates",
+      "code": "final response = await client.shippingRates\n    .countShippingRates(queryParams: {'method': 'flat_rate'});\nprint((response.map as Map)['total']);"
+    },
+    "head_shipping_rates_count": {
+      "function": "headShippingRatesCount",
+      "code": "final response = await client.shippingRates.headShippingRatesCount();\nprint(response.statusCode);"
+    },
+    "create_shipping_rate": {
+      "function": "createShippingRate",
+      "code": "final response = await client.shippingRates.createShippingRate(\n  {\n    'shipping_rate': {\n      'name': 'Flat 10',\n      'method': 'flat_rate',\n      'shipping_cost': {'amount': 10, 'type': 'fixed'},\n      'handling_cost': {'amount': 5, 'type': 'percent'},\n    },\n  },\n  transactionNo: 'TXN-IMPORT-0001',\n);\nfinal shippingRate = (response.map as Map)['shipping_rate'] as Map;\nprint('${shippingRate['id']} ${shippingRate['transaction_no']}');"
+    },
+    "get_shipping_rate": {
+      "function": "getShippingRate",
+      "code": "final response = await client.shippingRates.getShippingRate(21);\nfinal shippingRate = (response.map as Map)['shipping_rate'] as Map;\nprint('${shippingRate['name']} ${shippingRate['method']}');\nprint((shippingRate['shipping_cost'] as Map)['amount']);"
+    },
+    "head_shipping_rate": {
+      "function": "headShippingRate",
+      "code": "final response = await client.shippingRates.headShippingRate(21);\nprint(response.statusCode);"
+    },
+    "update_shipping_rate": {
+      "function": "updateShippingRate",
+      "code": "final response = await client.shippingRates.updateShippingRate(21, {\n  'shipping_rate': {\n    'name': 'Flat 12',\n    'method': 'flat_rate',\n    'calculate_for_entire_order': false,\n    'price_entered_with_tax': false,\n    'shipping_cost': {'amount': 12, 'type': 'fixed'},\n    'handling_cost': {'amount': 5, 'type': 'percent'},\n    'additional_rule': {'enabled': false},\n  },\n});\nfinal shippingRate = (response.map as Map)['shipping_rate'] as Map;\nprint('${shippingRate['name']} ${(shippingRate['shipping_cost'] as Map)['amount']}');"
+    },
+    "patch_shipping_rate": {
+      "function": "patchShippingRate",
+      "code": "final response = await client.shippingRates.patchShippingRate(21, {\n  'shipping_rate': {\n    'shipping_cost': {'amount': 12, 'type': 'fixed'},\n  },\n});\nfinal shippingRate = (response.map as Map)['shipping_rate'] as Map;\nprint('${shippingRate['name']} ${(shippingRate['shipping_cost'] as Map)['amount']}');"
+    },
+    "delete_shipping_rate": {
+      "function": "deleteShippingRate",
+      "code": "final response = await client.shippingRates.deleteShippingRate(21);\nprint(response.statusCode);"
+    }
+  }
+}

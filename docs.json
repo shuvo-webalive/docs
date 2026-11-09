@@ -324,6 +324,58 @@
                   "api-reference/shipping-classes/delete-a-shipping-class",
                   "api-reference/shipping-classes/set-the-default-shipping-class"
                 ]
+              },
+              {
+                "group": "Shipping profiles",
+                "expanded": false,
+                "pages": [
+                  "shipping-profiles",
+                  "api-reference/shipping-profiles/list-shipping-profiles",
+                  "api-reference/shipping-profiles/check-the-shipping-profiles-list",
+                  "api-reference/shipping-profiles/count-shipping-profiles",
+                  "api-reference/shipping-profiles/check-the-shipping-profile-count",
+                  "api-reference/shipping-profiles/create-a-shipping-profile",
+                  "api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard",
+                  "api-reference/shipping-profiles/retrieve-a-shipping-profile",
+                  "api-reference/shipping-profiles/check-a-shipping-profile",
+                  "api-reference/shipping-profiles/replace-a-shipping-profile",
+                  "api-reference/shipping-profiles/update-a-shipping-profile",
+                  "api-reference/shipping-profiles/delete-a-shipping-profile"
+                ]
+              },
+              {
+                "group": "Shipping rates",
+                "expanded": false,
+                "pages": [
+                  "shipping-rates",
+                  "api-reference/shipping-rates/list-shipping-rates",
+                  "api-reference/shipping-rates/check-the-shipping-rates-list",
+                  "api-reference/shipping-rates/count-shipping-rates",
+                  "api-reference/shipping-rates/check-the-shipping-rate-count",
+                  "api-reference/shipping-rates/create-a-shipping-rate",
+                  "api-reference/shipping-rates/retrieve-a-shipping-rate",
+                  "api-reference/shipping-rates/check-a-shipping-rate",
+                  "api-reference/shipping-rates/replace-a-shipping-rate",
+                  "api-reference/shipping-rates/update-a-shipping-rate",
+                  "api-reference/shipping-rates/delete-a-shipping-rate"
+                ]
+              },
+              {
+                "group": "Shipping rules",
+                "expanded": false,
+                "pages": [
+                  "shipping-rules",
+                  "api-reference/shipping-rules/list-shipping-rules",
+                  "api-reference/shipping-rules/check-the-shipping-rules-list",
+                  "api-reference/shipping-rules/count-shipping-rules",
+                  "api-reference/shipping-rules/check-the-shipping-rule-count",
+                  "api-reference/shipping-rules/create-a-shipping-rule",
+                  "api-reference/shipping-rules/retrieve-a-shipping-rule",
+                  "api-reference/shipping-rules/check-a-shipping-rule",
+                  "api-reference/shipping-rules/replace-a-shipping-rule",
+                  "api-reference/shipping-rules/update-a-shipping-rule",
+                  "api-reference/shipping-rules/delete-a-shipping-rule"
+                ]
               }
             ]
           },
@@ -513,6 +565,30 @@
             ]
           },
           {
+            "group": "Order previews",
+            "icon": "clipboard-check",
+            "expanded": false,
+            "pages": [
+              "order-previews",
+              "api-reference/order-previews/start-an-order-preview",
+              "api-reference/order-previews/retrieve-an-order-preview",
+              "api-reference/order-previews/place-the-order-from-a-preview",
+              "api-reference/order-previews/apply-a-coupon-to-a-preview",
+              "api-reference/order-previews/remove-the-coupon-from-a-preview",
+              "api-reference/order-previews/apply-a-gift-card-to-a-preview",
+              "api-reference/order-previews/remove-the-gift-card-from-a-preview"
+            ]
+          },
+          {
+            "group": "Gift cards",
+            "icon": "gift",
+            "expanded": false,
+            "pages": [
+              "gift-cards",
+              "api-reference/gift-cards/list-gift-cards"
+            ]
+          },
+          {
             "group": "Carts",
             "icon": "cart-shopping",
             "expanded": false,
@@ -525,6 +601,69 @@
               "api-reference/carts/empty-a-cart",
               "api-reference/carts/remove-an-item-from-a-cart",
               "api-reference/carts/create-an-order-from-a-cart"
+            ]
+          },
+          {
+            "group": "Dashboard",
+            "icon": "gauge",
+            "expanded": false,
+            "pages": [
+              {
+                "group": "Dashboards",
+                "expanded": false,
+                "pages": [
+                  "dashboards",
+                  "api-reference/dashboards/list-dashboard-layouts",
+                  "api-reference/dashboards/create-a-dashboard-layout",
+                  "api-reference/dashboards/retrieve-a-dashboard-layout",
+                  "api-reference/dashboards/update-a-dashboard-layout",
+                  "api-reference/dashboards/delete-a-dashboard-layout"
+                ]
+              },
+              {
+                "group": "Dashboard banners",
+                "expanded": false,
+                "pages": [
+                  "dashboard-banners",
+                  "api-reference/dashboard-banners/list-dashboard-banners",
+                  "api-reference/dashboard-banners/create-a-dashboard-banner",
+                  "api-reference/dashboard-banners/retrieve-a-dashboard-banner",
+                  "api-reference/dashboard-banners/update-a-dashboard-banner",
+                  "api-reference/dashboard-banners/delete-a-dashboard-banner",
+                  "api-reference/dashboard-banners/get-the-dashboard-feed"
+                ]
+              },
+              {
+                "group": "Dashboard KPIs",
+                "expanded": false,
+                "pages": [
+                  "dashboard-kpis",
+                  "api-reference/dashboard-kpis/list-kpi-options",
+                  "api-reference/dashboard-kpis/get-the-kpi-selection",
+                  "api-reference/dashboard-kpis/update-the-kpi-selection"
+                ]
+              },
+              {
+                "group": "Dashboard reports",
+                "expanded": false,
+                "pages": [
+                  "dashboard-reports",
+                  "api-reference/dashboard-reports/get-the-quick-report",
+                  "api-reference/dashboard-reports/check-the-quick-report",
+                  "api-reference/dashboard-reports/get-the-sales-report",
+                  "api-reference/dashboard-reports/check-the-sales-report",
+                  "api-reference/dashboard-reports/get-the-summary-report",
+                  "api-reference/dashboard-reports/check-the-summary-report"
+                ]
+              },
+              {
+                "group": "Dashboard sections",
+                "expanded": false,
+                "pages": [
+                  "dashboard-sections",
+                  "api-reference/dashboard-sections/get-a-dashboard-section"
+                ]
+              }
             ]
           },
           {
@@ -623,7 +762,19 @@
                   "api-reference/products/import-a-products-reviews",
                   "api-reference/products/retrieve-a-products-stock",
                   "api-reference/products/set-a-products-stock",
-                  "api-reference/products/unassign-an-inventory-location-from-a-product"
+                  "api-reference/products/unassign-an-inventory-location-from-a-product",
+                  "api-reference/products/count-products",
+                  "api-reference/products/check-a-product-sku",
+                  "api-reference/products/list-special-products",
+                  "api-reference/products/delete-several-products",
+                  "api-reference/products/list-a-products-reviews",
+                  "api-reference/products/retrieve-a-products-review",
+                  "api-reference/products/patch-a-products-review",
+                  "api-reference/products/delete-a-products-review",
+                  "api-reference/products/update-a-products-inventory",
+                  "api-reference/products/upload-images-to-a-product",
+                  "api-reference/products/add-an-image-to-a-products-media",
+                  "api-reference/products/delete-a-products-image"
                 ]
               },
               {
@@ -642,7 +793,9 @@
                   "api-reference/variations/delete-a-variation-option",
                   "api-reference/variations/list-a-products-variants",
                   "api-reference/variations/import-a-products-variants",
-                  "api-reference/variations/update-a-products-variants"
+                  "api-reference/variations/update-a-products-variants",
+                  "api-reference/variations/retrieve-a-products-variant",
+                  "api-reference/variations/delete-a-products-variant"
                 ]
               }
             ]

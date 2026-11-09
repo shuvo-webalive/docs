@@ -1,0 +1,34 @@
+{
+  "sdk": "js",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "createOrderPreview",
+      "code": "const response = await client.orderPreviews.createOrderPreview({\n    customer_id: 512,\n    delivery_type: 'shipping',\n    products: [{product_id: 101, quantity: 2}],\n});\nconst preview = response.map.order;\nconsole.log(preview.session.session_id, preview.session.expires_at);\nconsole.log(preview.totals.sub_total, preview.totals.shipping_cost, preview.totals.grand_total);\n"
+    },
+    "get_order_preview": {
+      "function": "getOrderPreview",
+      "code": "const response = await client.orderPreviews.getOrderPreview('PRV-3f2a9c41b7d80e65');\nconst preview = response.map.order;\nconsole.log(preview.session.status, preview.items.length, preview.totals.grand_total);\n"
+    },
+    "confirm_order_preview": {
+      "function": "confirmOrderPreview",
+      "code": "const response = await client.orderPreviews.confirmOrderPreview('PRV-3f2a9c41b7d80e65', {\n    send_email: false,\n    transaction_no: 'TXN-ORDER-0001',\n    payment: {\n        amount: 10.0,\n        payment_status: 'success',\n        payment_method: 'manual',\n        transaction_reference: 'REF-0001',\n        transaction_date: '2026-11-05T06:12:00Z',\n    },\n});\nconst order = response.map.order;\nconsole.log(order.order_id, order.order_no, order.order_status, order.payment_status);\n"
+    },
+    "apply_order_preview_coupon": {
+      "function": "applyOrderPreviewCoupon",
+      "code": "const response = await client.orderPreviews.applyOrderPreviewCoupon('PRV-3f2a9c41b7d80e65', {code: 'SAVE10'});\nconst preview = response.map.order;\nconsole.log(preview.discounts.coupon.code, preview.discounts.coupon.amount, preview.totals.grand_total);\n"
+    },
+    "remove_order_preview_coupon": {
+      "function": "removeOrderPreviewCoupon",
+      "code": "const response = await client.orderPreviews.removeOrderPreviewCoupon('PRV-3f2a9c41b7d80e65');\nconsole.log(response.statusCode);\n"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "applyOrderPreviewGiftCard",
+      "code": "const response = await client.orderPreviews.applyOrderPreviewGiftCard('PRV-3f2a9c41b7d80e65', {code: 'GIFT-0001'});\nconst giftCard = response.map.order.discounts.gift_card;\nconsole.log(giftCard.code, giftCard.applied_amount, giftCard.remaining_balance);\nconsole.log(response.map.order.totals.due);\n"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "removeOrderPreviewGiftCard",
+      "code": "const response = await client.orderPreviews.removeOrderPreviewGiftCard('PRV-3f2a9c41b7d80e65');\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

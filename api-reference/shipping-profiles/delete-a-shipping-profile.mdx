@@ -1,0 +1,9 @@
+---
+title: "Delete a shipping profile"
+description: "Deletes a shipping profile permanently. You cannot delete the default profile."
+openapi: "DELETE /admin/shipping_profiles/{shipping_profile_id}"
+---
+
+Deletes the shipping profile whose `shipping_profile_id` you pass, permanently, and returns `204` with no body. The profile's rules and zones stay in the store. You cannot delete the default profile: make another profile the default first, or the call is rejected with `409`. A second delete of the same profile returns `404`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

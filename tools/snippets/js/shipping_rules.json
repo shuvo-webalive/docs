@@ -1,0 +1,46 @@
+{
+  "sdk": "js",
+  "module": "shipping_rules",
+  "endpoints": {
+    "list_shipping_rules": {
+      "function": "listShippingRules",
+      "code": "const response = await client.shippingRules.listShippingRules({zone_id: 5, method: 'flat_rate', handling_cost: 'without_handling', sort: 'name', order: 'asc'});\nfor (const rule of response.map.shipping_rules) {\n    console.log(rule.id, rule.name, rule.shipping_rate.name);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_shipping_rules": {
+      "function": "headShippingRules",
+      "code": "const response = await client.shippingRules.headShippingRules();\nconsole.log(response.statusCode);\n"
+    },
+    "count_shipping_rules": {
+      "function": "countShippingRules",
+      "code": "const response = await client.shippingRules.countShippingRules({zone_id: 5});\nconsole.log(response.map.total);\n"
+    },
+    "head_shipping_rules_count": {
+      "function": "headShippingRulesCount",
+      "code": "const response = await client.shippingRules.headShippingRulesCount();\nconsole.log(response.statusCode);\n"
+    },
+    "create_shipping_rule": {
+      "function": "createShippingRule",
+      "code": "const response = await client.shippingRules.createShippingRule({\n    shipping_rule: {\n        name: 'Metro',\n        description: 'Metro deliveries',\n        shipping_class: 2,\n        shipping_rate: 21,\n        zones: [5],\n        profile_id: 12,\n    },\n}, 'IMPORT-2026-11-05');\nconst rule = response.map.shipping_rule;\nconsole.log(rule.id, rule.name, rule.shipping_rate.name, rule.transaction_no);\n"
+    },
+    "get_shipping_rule": {
+      "function": "getShippingRule",
+      "code": "const response = await client.shippingRules.getShippingRule(31);\nconst rule = response.map.shipping_rule;\nconsole.log(rule.name, rule.shipping_class.name, rule.shipping_rate.name);\nfor (const zone of rule.zones) {\n    console.log(zone.id, zone.name);\n}\n"
+    },
+    "head_shipping_rule": {
+      "function": "headShippingRule",
+      "code": "const response = await client.shippingRules.headShippingRule(31);\nconsole.log(response.statusCode);\n"
+    },
+    "update_shipping_rule": {
+      "function": "updateShippingRule",
+      "code": "const response = await client.shippingRules.updateShippingRule(31, {\n    shipping_rule: {\n        name: 'Metro',\n        description: 'Metro and inner west deliveries',\n        shipping_class: 2,\n        shipping_rate: 21,\n        zones: [5, 6],\n    },\n});\nconst rule = response.map.shipping_rule;\nconsole.log(rule.name, rule.description, rule.zones.length);\n"
+    },
+    "patch_shipping_rule": {
+      "function": "patchShippingRule",
+      "code": "const response = await client.shippingRules.patchShippingRule(31, {shipping_rule: {zones: [5, 6]}});\nconsole.log(response.map.shipping_rule.name, response.map.shipping_rule.zones.length);\n"
+    },
+    "delete_shipping_rule": {
+      "function": "deleteShippingRule",
+      "code": "const response = await client.shippingRules.deleteShippingRule(31);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

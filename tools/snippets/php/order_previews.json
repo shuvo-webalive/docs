@@ -1,0 +1,34 @@
+{
+  "sdk": "php",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "createOrderPreview",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::createOrderPreview($client, [\n    'customer_id' => 512,\n    'delivery_type' => 'shipping',\n    'products' => [['product_id' => 101, 'quantity' => 2]],\n]);\n\n$session = $response->map['order']['session'];\necho $session['session_id'], ' expires ', $session['expires_at'], PHP_EOL;"
+    },
+    "get_order_preview": {
+      "function": "getOrderPreview",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::getOrderPreview($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->map['order']['session']['status'], PHP_EOL;"
+    },
+    "confirm_order_preview": {
+      "function": "confirmOrderPreview",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::confirmOrderPreview($client, 'PRV-3f2a9c41b7d80e65', [\n    'send_email' => false,\n    'transaction_no' => 'TXN-ORDER-0001',\n    'payment' => [\n        'amount' => 10.0,\n        'payment_status' => 'success',\n        'payment_method' => 'manual',\n        'transaction_reference' => 'REF-0001',\n        'transaction_date' => '2026-11-05T06:12:00Z',\n    ],\n]);\n\n$order = $response->map['order'];\necho $order['order_id'], ' ', $order['order_status'], ' ', $order['payment_status'], PHP_EOL;"
+    },
+    "apply_order_preview_coupon": {
+      "function": "applyOrderPreviewCoupon",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::applyOrderPreviewCoupon($client, 'PRV-3f2a9c41b7d80e65', ['code' => 'SAVE10']);\n\necho $response->map['order']['discounts']['coupon']['status'], PHP_EOL;"
+    },
+    "remove_order_preview_coupon": {
+      "function": "removeOrderPreviewCoupon",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::removeOrderPreviewCoupon($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "applyOrderPreviewGiftCard",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::applyOrderPreviewGiftCard($client, 'PRV-3f2a9c41b7d80e65', ['code' => 'GIFT-0001']);\n\necho $response->map['order']['discounts']['gift_card']['applied_amount'], PHP_EOL;"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "removeOrderPreviewGiftCard",
+      "code": "use WebCommander\\Resources\\OrderPreviews\\OrderPreviews;\n\n$response = OrderPreviews::removeOrderPreviewGiftCard($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

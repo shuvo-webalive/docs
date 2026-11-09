@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "delete_product_stock_location",
       "code": "response = client.products.delete_product_stock_location(101, 19)\nprint(response.status_code)\n"
+    },
+    "count_products": {
+      "function": "count_products",
+      "code": "response = client.products.count_products({\"search_text\": \"shirt\"})\nprint(response.map[\"total\"])\n"
+    },
+    "check_product_sku": {
+      "function": "check_product_sku",
+      "code": "response = client.products.check_product_sku(\"TSHIRT-001\")\nprint(response.map[\"available\"], response.map[\"is_exist\"])\n"
+    },
+    "list_special_products": {
+      "function": "list_special_products",
+      "code": "response = client.products.list_special_products({\"type\": \"featured\", \"max\": 10})\nfor product in response.map[\"products\"]:\n    print(product[\"id\"], product[\"sku\"], product[\"name\"], product[\"effective_price\"])\nprint(response.map[\"total\"])\n"
+    },
+    "bulk_delete_products": {
+      "function": "bulk_delete_products",
+      "code": "response = client.products.bulk_delete_products({\"ids\": [102, 103]})\nprint(response.map[\"deleted\"], response.map[\"failed\"])\n"
+    },
+    "list_product_reviews": {
+      "function": "list_product_reviews",
+      "code": "response = client.products.list_product_reviews(101, {\"limit\": 20})\nfor review in response.map[\"reviews\"]:\n    print(review[\"id\"], review[\"rating\"], review[\"status\"], review[\"comment\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "get_product_review": {
+      "function": "get_product_review",
+      "code": "response = client.products.get_product_review(101, 31)\nreview = response.map[\"review\"]\nprint(review[\"id\"], review[\"rating\"], review[\"status\"], review[\"comment\"])\n"
+    },
+    "patch_product_review": {
+      "function": "patch_product_review",
+      "code": "response = client.products.patch_product_review(101, 31, {\"status\": \"approved\", \"rating\": 2, \"comment\": \"Runs small\"})\nreview = response.map[\"review\"]\nprint(review[\"status\"], review[\"rating\"], review[\"comment\"])\n"
+    },
+    "delete_product_review": {
+      "function": "delete_product_review",
+      "code": "response = client.products.delete_product_review(101, 31)\nprint(response.status_code)\n"
+    },
+    "create_product_inventory": {
+      "function": "create_product_inventory",
+      "code": "response = client.products.create_product_inventory(101, {\n    \"product\": {\n        \"product_pricing_and_stock\": {\n            \"track_inventory\": True,\n            \"available_stock\": 12,\n            \"low_level_stock\": 3,\n        },\n    },\n}, transaction_no=\"TXN-IMPORT-0001\")\nprint(response.map[\"status\"], response.map[\"message\"])\n"
+    },
+    "create_product_image": {
+      "function": "create_product_image",
+      "code": "response = client.products.create_product_image(101, {\n    \"product\": {\n        \"image_and_video\": {\n            \"images\": [\n                {\n                    \"filename\": \"front.png\",\n                    \"base64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\",\n                },\n            ],\n        },\n    },\n})\nfor image in response.map[\"product\"][\"images\"]:\n    print(image[\"id\"], image[\"filename\"], image[\"link\"])\n"
+    },
+    "create_product_media": {
+      "function": "create_product_media",
+      "code": "response = client.products.create_product_media(101, {\n    \"type\": \"images\",\n    \"filename\": \"side.png\",\n    \"content\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\",\n})\nprint(response.map[\"id\"], response.map[\"filename\"], response.map[\"position\"], response.map[\"url\"])\n"
+    },
+    "delete_product_media_image": {
+      "function": "delete_product_media_image",
+      "code": "response = client.products.delete_product_media_image(101, 1876)\nprint(response.status_code)\n"
     }
   }
 }

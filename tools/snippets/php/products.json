@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "deleteProductStockLocation",
       "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::deleteProductStockLocation($client, 101, 19);\n\necho $response->statusCode, PHP_EOL;\n"
+    },
+    "count_products": {
+      "function": "countProducts",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::countProducts($client, ['search_text' => 'shirt']);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "check_product_sku": {
+      "function": "checkProductSku",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::checkProductSku($client, 'TSHIRT-001');\n\necho $response->map['available'] ? 'SKU is free' : 'SKU is used by product ' . $response->map['product']['id'], PHP_EOL;"
+    },
+    "list_special_products": {
+      "function": "listSpecialProducts",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::listSpecialProducts($client, ['type' => 'featured', 'max' => 10]);\n\nforeach ($response->map['products'] as $product) {\n    echo $product['id'], ' ', $product['sku'], ' ', $product['name'], ' ', $product['effective_price'], PHP_EOL;\n}"
+    },
+    "bulk_delete_products": {
+      "function": "bulkDeleteProducts",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::bulkDeleteProducts($client, ['ids' => [102, 103]]);\n\necho $response->map['deleted'], ' deleted, ', $response->map['failed'], ' failed', PHP_EOL;"
+    },
+    "list_product_reviews": {
+      "function": "listProductReviews",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::listProductReviews($client, 101, ['limit' => 20]);\n\nforeach ($response->map['reviews'] as $review) {\n    echo $review['id'], ' ', $review['reviewer']['name'], ' ', $review['rating'], ' ', $review['status'], PHP_EOL;\n}"
+    },
+    "get_product_review": {
+      "function": "getProductReview",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::getProductReview($client, 101, 31);\n\n$review = $response->map['review'];\necho $review['reviewer']['name'], ' ', $review['rating'], ': ', $review['comment'], PHP_EOL;"
+    },
+    "patch_product_review": {
+      "function": "patchProductReview",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::patchProductReview($client, 101, 31, ['status' => 'approved', 'rating' => 2, 'comment' => 'Runs small']);\n\necho $response->map['review']['comment'], PHP_EOL;"
+    },
+    "delete_product_review": {
+      "function": "deleteProductReview",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::deleteProductReview($client, 101, 31);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_product_inventory": {
+      "function": "createProductInventory",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::createProductInventory($client, 101, [\n    'product' => ['product_pricing_and_stock' => ['track_inventory' => true, 'available_stock' => 12, 'low_level_stock' => 3]],\n], transactionNo: 'TXN-STOCK-0001');\n\necho $response->map['status'], ': ', $response->map['message'], PHP_EOL;"
+    },
+    "create_product_image": {
+      "function": "createProductImage",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::createProductImage($client, 101, [\n    'product' => ['image_and_video' => ['images' => [[\n        'filename' => 'front.png',\n        'base64' => 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=',\n    ]]]],\n]);\n\nforeach ($response->map['product']['images'] as $image) {\n    echo $image['id'], ' ', $image['filename'], PHP_EOL;\n}"
+    },
+    "create_product_media": {
+      "function": "createProductMedia",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::createProductMedia($client, 101, [\n    'type' => 'images',\n    'filename' => 'side.png',\n    'content' => 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=',\n]);\n\necho $response->map['id'], ' ', $response->map['filename'], ' at position ', $response->map['position'], PHP_EOL;"
+    },
+    "delete_product_media_image": {
+      "function": "deleteProductMediaImage",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::deleteProductMediaImage($client, 101, 1876);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

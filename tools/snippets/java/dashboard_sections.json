@@ -1,0 +1,10 @@
+{
+  "sdk": "java",
+  "module": "dashboard_sections",
+  "endpoints": {
+    "get_dashboard_section": {
+      "function": "getDashboardSection",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardSections().getDashboardSection(\"blog\", Map.of(\"duration\", \"last_7_days\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"section\") + \" \" + body.get(\"comments_to_moderate\"));\nSystem.out.println(((Map<?, ?>) body.get(\"drafts_to_publish\")).get(\"count\"));\nfor (Object row : (List<?>) body.get(\"most_viewed_posts\")) {\n    Map<?, ?> entry = (Map<?, ?>) row;\n    System.out.println(((Map<?, ?>) entry.get(\"post\")).get(\"name\") + \" \" + entry.get(\"views\"));\n}"
+    }
+  }
+}

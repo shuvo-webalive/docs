@@ -1,0 +1,50 @@
+{
+  "sdk": "dotnet",
+  "module": "shipping_profiles",
+  "endpoints": {
+    "list_shipping_profiles": {
+      "function": "ListShippingProfilesAsync",
+      "code": "var response = await client.ShippingProfiles.ListShippingProfilesAsync(\n    new Dictionary<string, object?> { [\"search\"] = \"metro\", [\"sort\"] = \"name\", [\"order\"] = \"asc\", [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var profile in ((IReadOnlyList<object?>)body[\"shipping_profiles\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{profile[\"id\"]} {profile[\"name\"]} {profile[\"rule_preference\"]} {profile[\"default\"]} {profile[\"rules_count\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_shipping_profiles": {
+      "function": "HeadShippingProfilesAsync",
+      "code": "var response = await client.ShippingProfiles.HeadShippingProfilesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_shipping_profiles": {
+      "function": "CountShippingProfilesAsync",
+      "code": "var response = await client.ShippingProfiles.CountShippingProfilesAsync(\n    new Dictionary<string, object?> { [\"default\"] = \"true\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "head_shipping_profiles_count": {
+      "function": "HeadShippingProfilesCountAsync",
+      "code": "var response = await client.ShippingProfiles.HeadShippingProfilesCountAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_shipping_profile": {
+      "function": "CreateShippingProfileAsync",
+      "code": "var response = await client.ShippingProfiles.CreateShippingProfileAsync(new Dictionary<string, object?>\n{\n    [\"shipping_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Metro profile\", [\"description\"] = \"Metro deliveries\",\n        [\"rule_preference\"] = \"product_assigned_rule\", [\"shipping_rules\"] = new[] { 31 },\n    },\n}, transactionNo: \"TXN-SHIPPING-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar profile = (IReadOnlyDictionary<string, object?>)body[\"shipping_profile\"]!;\nConsole.WriteLine($\"{profile[\"id\"]} {profile[\"name\"]} {profile[\"rule_preference\"]} {profile[\"default\"]} {profile[\"rules_count\"]}\");"
+    },
+    "create_shipping_profile_wizard": {
+      "function": "CreateShippingProfileWizardAsync",
+      "code": "var response = await client.ShippingProfiles.CreateShippingProfileWizardAsync(new Dictionary<string, object?>\n{\n    [\"shipping_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Wizard profile\", [\"description\"] = \"Built in one call\",\n        [\"rule_preference\"] = \"product_assigned_rule\",\n        [\"shipping_rules\"] = new[]\n        {\n            new Dictionary<string, object?>\n            {\n                [\"name\"] = \"Metro delivery\", [\"description\"] = \"Metro deliveries\", [\"shipping_class\"] = 2,\n                [\"zones\"] = new[]\n                {\n                    new Dictionary<string, object?> { [\"id\"] = 5 },\n                    new Dictionary<string, object?> { [\"name\"] = \"Inner West\" },\n                },\n                [\"shipping_rate\"] = new Dictionary<string, object?>\n                {\n                    [\"name\"] = \"Metro flat rate\", [\"method\"] = \"flat_rate\",\n                    [\"shipping_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 10, [\"type\"] = \"fixed\" },\n                    [\"handling_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 5, [\"type\"] = \"percent\" },\n                },\n            },\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar profile = (IReadOnlyDictionary<string, object?>)body[\"shipping_profile\"]!;\nConsole.WriteLine($\"{profile[\"id\"]} {profile[\"name\"]} {profile[\"rule_preference\"]} {profile[\"default\"]} {profile[\"rules_count\"]}\");"
+    },
+    "get_shipping_profile": {
+      "function": "GetShippingProfileAsync",
+      "code": "var response = await client.ShippingProfiles.GetShippingProfileAsync(12);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar profile = (IReadOnlyDictionary<string, object?>)body[\"shipping_profile\"]!;\nConsole.WriteLine($\"{profile[\"id\"]} {profile[\"name\"]} {profile[\"rule_preference\"]} {profile[\"default\"]} {profile[\"rules_count\"]}\");"
+    },
+    "head_shipping_profile": {
+      "function": "HeadShippingProfileAsync",
+      "code": "var response = await client.ShippingProfiles.HeadShippingProfileAsync(12);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_shipping_profile": {
+      "function": "UpdateShippingProfileAsync",
+      "code": "var response = await client.ShippingProfiles.UpdateShippingProfileAsync(12, new Dictionary<string, object?>\n{\n    [\"shipping_profile\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Metro profile\", [\"description\"] = \"Metro and inner west deliveries\",\n        [\"rule_preference\"] = \"lowest_shipping_cost_rule\", [\"shipping_rules\"] = new[] { 31 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar profile = (IReadOnlyDictionary<string, object?>)body[\"shipping_profile\"]!;\nConsole.WriteLine($\"{profile[\"id\"]} {profile[\"name\"]} {profile[\"rule_preference\"]} {profile[\"default\"]} {profile[\"rules_count\"]}\");"
+    },
+    "patch_shipping_profile": {
+      "function": "PatchShippingProfileAsync",
+      "code": "var response = await client.ShippingProfiles.PatchShippingProfileAsync(12, new Dictionary<string, object?>\n{\n    [\"shipping_profile\"] = new Dictionary<string, object?> { [\"default\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar profile = (IReadOnlyDictionary<string, object?>)body[\"shipping_profile\"]!;\nConsole.WriteLine($\"{profile[\"id\"]} {profile[\"name\"]} {profile[\"rule_preference\"]} {profile[\"default\"]} {profile[\"rules_count\"]}\");"
+    },
+    "delete_shipping_profile": {
+      "function": "DeleteShippingProfileAsync",
+      "code": "var response = await client.ShippingProfiles.DeleteShippingProfileAsync(12);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

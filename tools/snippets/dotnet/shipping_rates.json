@@ -1,0 +1,46 @@
+{
+  "sdk": "dotnet",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "ListShippingRatesAsync",
+      "code": "var response = await client.ShippingRates.ListShippingRatesAsync(\n    new Dictionary<string, object?> { [\"method\"] = \"flat_rate\", [\"handling_cost\"] = \"with_handling\", [\"sort\"] = \"name\", [\"order\"] = \"asc\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var rate in ((IReadOnlyList<object?>)body[\"shipping_rates\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{rate[\"id\"]} {rate[\"name\"]} {rate[\"method\"]} {rate[\"calculate_for_entire_order\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_shipping_rates": {
+      "function": "HeadShippingRatesAsync",
+      "code": "var response = await client.ShippingRates.HeadShippingRatesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_shipping_rates": {
+      "function": "CountShippingRatesAsync",
+      "code": "var response = await client.ShippingRates.CountShippingRatesAsync(\n    new Dictionary<string, object?> { [\"method\"] = \"flat_rate\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "head_shipping_rates_count": {
+      "function": "HeadShippingRatesCountAsync",
+      "code": "var response = await client.ShippingRates.HeadShippingRatesCountAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_shipping_rate": {
+      "function": "CreateShippingRateAsync",
+      "code": "var response = await client.ShippingRates.CreateShippingRateAsync(new Dictionary<string, object?>\n{\n    [\"shipping_rate\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Flat 10\", [\"method\"] = \"flat_rate\",\n        [\"shipping_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 10, [\"type\"] = \"fixed\" },\n        [\"handling_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 5, [\"type\"] = \"percent\" },\n    },\n}, transactionNo: \"TXN-SHIPPING-0002\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rate = (IReadOnlyDictionary<string, object?>)body[\"shipping_rate\"]!;\nConsole.WriteLine($\"{rate[\"id\"]} {rate[\"name\"]} {rate[\"method\"]} {rate[\"calculate_for_entire_order\"]}\");"
+    },
+    "get_shipping_rate": {
+      "function": "GetShippingRateAsync",
+      "code": "var response = await client.ShippingRates.GetShippingRateAsync(21);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rate = (IReadOnlyDictionary<string, object?>)body[\"shipping_rate\"]!;\nConsole.WriteLine($\"{rate[\"id\"]} {rate[\"name\"]} {rate[\"method\"]} {rate[\"calculate_for_entire_order\"]}\");"
+    },
+    "head_shipping_rate": {
+      "function": "HeadShippingRateAsync",
+      "code": "var response = await client.ShippingRates.HeadShippingRateAsync(21);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_shipping_rate": {
+      "function": "UpdateShippingRateAsync",
+      "code": "var response = await client.ShippingRates.UpdateShippingRateAsync(21, new Dictionary<string, object?>\n{\n    [\"shipping_rate\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Flat 12\", [\"method\"] = \"flat_rate\",\n        [\"calculate_for_entire_order\"] = false, [\"price_entered_with_tax\"] = false,\n        [\"shipping_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 12, [\"type\"] = \"fixed\" },\n        [\"handling_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 5, [\"type\"] = \"percent\" },\n        [\"additional_rule\"] = new Dictionary<string, object?> { [\"enabled\"] = false },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rate = (IReadOnlyDictionary<string, object?>)body[\"shipping_rate\"]!;\nConsole.WriteLine($\"{rate[\"id\"]} {rate[\"name\"]} {rate[\"method\"]} {rate[\"calculate_for_entire_order\"]}\");"
+    },
+    "patch_shipping_rate": {
+      "function": "PatchShippingRateAsync",
+      "code": "var response = await client.ShippingRates.PatchShippingRateAsync(21, new Dictionary<string, object?>\n{\n    [\"shipping_rate\"] = new Dictionary<string, object?> { [\"shipping_cost\"] = new Dictionary<string, object?> { [\"amount\"] = 12, [\"type\"] = \"fixed\" } },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rate = (IReadOnlyDictionary<string, object?>)body[\"shipping_rate\"]!;\nConsole.WriteLine($\"{rate[\"id\"]} {rate[\"name\"]} {rate[\"method\"]} {rate[\"calculate_for_entire_order\"]}\");"
+    },
+    "delete_shipping_rate": {
+      "function": "DeleteShippingRateAsync",
+      "code": "var response = await client.ShippingRates.DeleteShippingRateAsync(21);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

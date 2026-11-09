@@ -1,0 +1,30 @@
+{
+  "sdk": "php",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "getDashboardReportQuick",
+      "code": "use WebCommander\\Resources\\DashboardReports\\DashboardReports;\n\n$response = DashboardReports::getDashboardReportQuick($client, ['duration' => 'last_12_months', 'kpis' => 'total_sales,aov', 'entity_name' => 'product']);\n\nforeach ($response->map['kpis'] as $kpi) {\n    echo $kpi['label'], ' ', $kpi['value'], ' (', $kpi['change_percent'], '% vs previous period)', PHP_EOL;\n}"
+    },
+    "head_dashboard_report_quick": {
+      "function": "headDashboardReportQuick",
+      "code": "use WebCommander\\Resources\\DashboardReports\\DashboardReports;\n\n$response = DashboardReports::headDashboardReportQuick($client, ['duration' => 'last_12_months']);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_dashboard_report_sales": {
+      "function": "getDashboardReportSales",
+      "code": "use WebCommander\\Resources\\DashboardReports\\DashboardReports;\n\n$response = DashboardReports::getDashboardReportSales($client, ['duration' => 'last_12_months', 'breakdown' => 'true', 'sort' => 'sales', 'order' => 'desc']);\n\nforeach ($response->map['rows'] as $row) {\n    echo $row['label'], ' ', $row['sales'], PHP_EOL;\n}"
+    },
+    "head_dashboard_report_sales": {
+      "function": "headDashboardReportSales",
+      "code": "use WebCommander\\Resources\\DashboardReports\\DashboardReports;\n\n$response = DashboardReports::headDashboardReportSales($client, ['duration' => 'last_12_months']);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_dashboard_report_summary": {
+      "function": "getDashboardReportSummary",
+      "code": "use WebCommander\\Resources\\DashboardReports\\DashboardReports;\n\n$response = DashboardReports::getDashboardReportSummary($client, ['duration' => 'last_12_months']);\n\n$sales = $response->map['quick_report']['sales'];\necho $sales['total'], ' from ', $sales['items_sold'], ' items sold', PHP_EOL;"
+    },
+    "head_dashboard_report_summary": {
+      "function": "headDashboardReportSummary",
+      "code": "use WebCommander\\Resources\\DashboardReports\\DashboardReports;\n\n$response = DashboardReports::headDashboardReportSummary($client, ['duration' => 'last_12_months']);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+---
+title: "Retrieve a shipping profile"
+description: "Returns the shipping profile whose `id` you pass as `shipping_profile_id`."
+openapi: "GET /admin/shipping_profiles/{shipping_profile_id}"
+---
+
+Returns one shipping profile under the `shipping_profile` key, with the same ten fields a listing row has. `shipping_rules` lists the rules on the profile, each with its `id`, its `name` and its shipping rate, or `null` when the rule has none. Query parameters you add are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

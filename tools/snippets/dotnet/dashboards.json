@@ -1,0 +1,26 @@
+{
+  "sdk": "dotnet",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "ListDashboardsAsync",
+      "code": "var response = await client.Dashboards.ListDashboardsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var dashboard in ((IReadOnlyList<object?>)body[\"dashboards\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{dashboard[\"id\"]} {dashboard[\"name\"]} {dashboard[\"default\"]}\");"
+    },
+    "create_dashboard": {
+      "function": "CreateDashboardAsync",
+      "code": "var response = await client.Dashboards.CreateDashboardAsync(new Dictionary<string, object?>\n{\n    [\"name\"] = \"Weekly\", [\"kpis\"] = new[] { \"total_sales\", \"total_orders\", \"aov\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"id\"]} {body[\"name\"]} {body[\"default\"]}\");\nforeach (var kpi in ((IReadOnlyList<object?>)body[\"kpis\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{kpi[\"position\"]} {kpi[\"key\"]} {kpi[\"label\"]}\");"
+    },
+    "get_dashboard": {
+      "function": "GetDashboardAsync",
+      "code": "var response = await client.Dashboards.GetDashboardAsync(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"id\"]} {body[\"name\"]} {body[\"default\"]}\");\nforeach (var section in ((IReadOnlyList<object?>)body[\"standard_sections\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{section[\"key\"]} {section[\"visible\"]}\");\nforeach (var kpi in ((IReadOnlyList<object?>)body[\"kpis\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{kpi[\"position\"]} {kpi[\"key\"]} {kpi[\"label\"]}\");"
+    },
+    "patch_dashboard": {
+      "function": "PatchDashboardAsync",
+      "code": "var response = await client.Dashboards.PatchDashboardAsync(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\", new Dictionary<string, object?>\n{\n    [\"standard_sections\"] = new[] { new Dictionary<string, object?> { [\"key\"] = \"announcement\", [\"visible\"] = false } },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"id\"]} {body[\"name\"]} {body[\"default\"]}\");\nforeach (var section in ((IReadOnlyList<object?>)body[\"standard_sections\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{section[\"key\"]} {section[\"visible\"]}\");"
+    },
+    "delete_dashboard": {
+      "function": "DeleteDashboardAsync",
+      "code": "var response = await client.Dashboards.DeleteDashboardAsync(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\");\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

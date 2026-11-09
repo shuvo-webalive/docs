@@ -1,0 +1,32 @@
+---
+title: "Gift cards"
+sidebarTitle: "Overview"
+description: "List your store's gift cards, newest first, and filter them by code, email address or active state."
+---
+
+The Gift cards API has one endpoint, and you can call it from all seven SDKs. Its path is `/api/v4/admin/gift_cards`.
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List gift cards](/api-reference/gift-cards/list-gift-cards) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/gift_cards` | Returns up to 20 gift cards per call, newest first, with paging details. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **A listing returns at most 20 gift cards per call, newest first.** A larger `limit` is capped at `20`, and
+  `pagination.limit` shows `20`. To get more, send `page` or `offset` while `pagination.has_next` is `true`.
+  `limit=0` is rejected with `400` and the reason `invalid_pagination`.
+- **`code` and `email` match the whole value.** Both ignore letter case, and a part of a code or of an address
+  matches nothing. Pass the whole address to find a customer's cards, then use the card's `code` in
+  [Apply a gift card to a preview](/api-reference/order-previews/apply-a-gift-card-to-a-preview).
+- **The listing accepts only six parameters.** `limit`, `offset`, `page`, `code`, `email` and `is_active` are the
+  ones on this page; any other name, such as `is_paid`, `balance`, `customer_id` or `sort`, is rejected with `400` and
+  the reason `unknown_parameter`.
+- **This API only lists gift cards.** There is no endpoint to create or change one.

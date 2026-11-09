@@ -1,0 +1,30 @@
+{
+  "sdk": "java",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "listDashboardBanners",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardBanners().listDashboardBanners();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"banners\")) {\n    Map<?, ?> banner = (Map<?, ?>) row;\n    System.out.println(banner.get(\"key\") + \" \" + banner.get(\"title\") + \" \" + banner.get(\"active\") + \" \" + banner.get(\"position\"));\n}"
+    },
+    "create_dashboard_banner": {
+      "function": "createDashboardBanner",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardBanners().createDashboardBanner(Map.of(\n        \"key\", \"spring_sale\", \"title\", \"Spring sale\", \"description\", \"Ends Friday.\",\n        \"tags\", List.of(\"Sales\"), \"icon\", \"tag\",\n        \"learn_more\", Map.of(\"action\", \"open_link\", \"label\", \"Learn more\", \"url\", \"https://example.com/spring-sale\")));\nMap<?, ?> banner = (Map<?, ?>) response.getMap();\nSystem.out.println(banner.get(\"key\") + \" \" + banner.get(\"title\") + \" \" + banner.get(\"active\") + \" \" + banner.get(\"position\"));"
+    },
+    "get_dashboard_banner": {
+      "function": "getDashboardBanner",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboardBanners().getDashboardBanner(\"spring_sale\");\nMap<?, ?> banner = (Map<?, ?>) response.getMap();\nSystem.out.println(banner.get(\"key\") + \" \" + banner.get(\"title\") + \" \" + banner.get(\"active\") + \" \" + banner.get(\"position\"));"
+    },
+    "patch_dashboard_banner": {
+      "function": "patchDashboardBanner",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboardBanners().patchDashboardBanner(\"spring_sale\",\n        Map.of(\"title\", \"Spring sale ends today\", \"active\", false));\nMap<?, ?> banner = (Map<?, ?>) response.getMap();\nSystem.out.println(banner.get(\"key\") + \" \" + banner.get(\"title\") + \" \" + banner.get(\"active\") + \" \" + banner.get(\"position\"));"
+    },
+    "delete_dashboard_banner": {
+      "function": "deleteDashboardBanner",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.dashboardBanners().deleteDashboardBanner(\"spring_sale\");\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_dashboard_content_info": {
+      "function": "getDashboardContentInfo",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardBanners().getDashboardContentInfo();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"banners\")) {\n    Map<?, ?> banner = (Map<?, ?>) row;\n    System.out.println(banner.get(\"key\") + \" \" + banner.get(\"title\") + \" \" + banner.get(\"active\") + \" \" + banner.get(\"position\"));\n}"
+    }
+  }
+}

@@ -1,10 +1,10 @@
 ---
 title: "Products"
 sidebarTitle: "Overview"
-description: "List products, create, read, update and delete a product, import its reviews, read and set its stock at each inventory location, and unassign a location from it."
+description: "List, count, create, read, update and delete products, check a SKU, list special products, delete several products at once, import, list, read, change and delete a product's reviews, upload and delete its images, set its inventory, read and set its stock at each inventory location, and unassign a location from it."
 ---
 
-The Products API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`.
+The Products API has twenty-two endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`.
 
 <Warning>
   **Setting a product's stock unassigns every location you leave out, even one that still holds stock.**
@@ -19,7 +19,7 @@ The Products API has ten endpoints, and you can call every one from all seven SD
 | --- | --- | --- | --- |
 | [List products](/api-reference/products/list-products) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products` | Returns the store's products, 20 per call by default and up to 100, each as the full product record, with paging details. |
 | [Create a product](/api-reference/products/create-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products` | Creates a product and returns it with its `id`, which the other calls take as `product_id`. |
-| [Retrieve a product](/api-reference/products/retrieve-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}` | Returns the product whose `id` you pass as `product_id`, with all 87 of its fields. |
+| [Retrieve a product](/api-reference/products/retrieve-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}` | Returns the product whose `id` you pass as `product_id`, with all 46 of its fields. |
 | [Update a product](/api-reference/products/update-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/products/{product_id}` | Changes the product fields you send, keeps every other field, and returns the product. The body must include ten required fields. |
 | [Patch a product](/api-reference/products/patch-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/products/{product_id}` | Changes the product fields you send, keeps every other field, and returns the product, the same way `PUT` does. |
 | [Delete a product](/api-reference/products/delete-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/products/{product_id}` | Moves the product to the trash. The product still reads back, with `status` set to `trashed`. |
@@ -27,6 +27,18 @@ The Products API has ten endpoints, and you can call every one from all seven SD
 | [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}/stock` | Returns the product's stock at each inventory location it is assigned to, and the total. |
 | [Set a product's stock](/api-reference/products/set-a-products-stock) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/products/{product_id}/stock` | Sets the product's stock at each location you send and unassigns every location you leave out. |
 | [Unassign an inventory location from a product](/api-reference/products/unassign-an-inventory-location-from-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/products/{product_id}/stock/locations/{inventory_location_id}` | Unassigns an inventory location that holds `0` units of the product and is not its default. |
+| [Count products](/api-reference/products/count-products) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/count` | Returns how many products match the filters you send, without the products themselves. |
+| [Check a product SKU](/api-reference/products/check-a-product-sku) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/check-sku` | Tells you whether a SKU is free and, when it is not, which product holds it. |
+| [List special products](/api-reference/products/list-special-products) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/special` | Returns one selection of products: on sale, featured, new, top selling, or a customer's last bought or last viewed. |
+| [Delete several products](/api-reference/products/delete-several-products) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products/bulk-delete` | Moves the products whose `id` values you send to the trash and counts the ones that could not be moved. |
+| [List a product's reviews](/api-reference/products/list-a-products-reviews) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}/reviews` | Returns the product's reviews, 20 per call by default, with paging details. |
+| [Retrieve a product's review](/api-reference/products/retrieve-a-products-review) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}/reviews/{review_id}` | Returns one review of the product, under `review`. |
+| [Patch a product's review](/api-reference/products/patch-a-products-review) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/products/{product_id}/reviews/{review_id}` | Changes the `status`, `rating` or `comment` of one review and returns the review. |
+| [Delete a product's review](/api-reference/products/delete-a-products-review) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/products/{product_id}/reviews/{review_id}` | Deletes one review of the product permanently. |
+| [Update a product's inventory](/api-reference/products/update-a-products-inventory) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products/{product_id}/inventories` | Sets whether the product tracks stock, its available stock and its low stock level. |
+| [Upload images to a product](/api-reference/products/upload-images-to-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products/{product_id}/image` | Stores one or more base64-encoded images on the product and returns the images it stored. |
+| [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products/{product_id}/media` | Stores one base64-encoded image on the product and returns the stored image as one row. |
+| [Delete a product's image](/api-reference/products/delete-a-products-image) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/products/{product_id}/media/images/{image_id}` | Deletes one image from the product. |
 
 ## Before you call
 
@@ -55,7 +67,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `transaction_no` in the body instead. When you send both with different values, the header's value is
   stored and the body's is lost, with no error. On `PUT` and `PATCH` the header is ignored, and a body
   `transaction_no` is stored only on a product that has none: a product that has one keeps it.
-- **Some fields you read cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,
+- **Some fields cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,
   `sold_out`, `sold_out_label`, `length`, `width`, `height`, `weight`, `featured`, `new`, `model`, `is_draft`,
   `has_variations`, `urls` or `created_by` is rejected with `400` and the reason `read_only_field`; the value
   you read is accepted. `status` and `reviews` are rejected with the reason `unknown_field`, so remove them
@@ -64,7 +76,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   at the top level, but they are rejected there.
 - **Setting stock changes the product too.** `available_stock` is the sum of the rows' `stock`, and
   `product_pricing_and_stock.low_level_stock` takes the `low_stock_level` of the product's default
-  location. The product's `version`, `updated_at` and `last_updated_by` change when the stock changes.
+  location. The product's `version`, `updated_at` and `updated_by` change when the stock changes.
   `product_pricing_and_stock.locations` on [Retrieve a product](/api-reference/products/retrieve-a-product) holds the same rows as
   [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock).
 - **The first location you assign to a product is missing from the response.** On a product with no
@@ -79,11 +91,11 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`,
   `available_for` or `selected_customers` with `400` and the reason `required`. Every other field you leave out
   keeps its value. [Patch a product](/api-reference/products/patch-a-product) has no required fields.
-- **A product's fields also come in blocks.** Alongside the flat fields, a product returns `pricing`, `inventory`,
-  `ordering`, `restrictions`, `tax`, `shipping`, `available_for_purchase`, `media`, `categories`,
-  `up_sell_products`, `summary`, `description`, `virtual`, `product_url`, `updated_by` and `links`, and
-  `advanced` also holds `product_flags`, `product_dimension`, `product_identifiers` and `webtool`. A block holds
-  the same values as the flat fields, and a write to either one changes both, on a create, a `PUT` and a `PATCH`.
+- **A product returns its prices, flags and availability inside blocks, not as flat fields.** A product returns 46 fields, among them `pricing`, `inventory`, `ordering`,
+  `restrictions`, `tax`, `shipping`, `available_for_purchase`, `media`, `categories`, `up_sell_products`, `summary`, `description`, `virtual`, `product_url`, `updated_by` and `links`,
+  and `advanced` holds `product_flags`, `product_dimension`, `product_identifiers` and `webtool`. Read the base price from `pricing.base_price` and the featured flag from
+  `advanced.product_flags.featured.enabled`: the flat fields `base_price`, `is_featured` and the others that moved into blocks are not returned. A create and a `PATCH` still accept the flat
+  names, so `{"base_price": 3.5}` changes `pricing.base_price`.
   These block fields are read-only: `product_url`, `links`, `restrictions.enabled`, `restrictions.display_only`,
   `restrictions.price.enabled`, `restrictions.purchase.enabled`, `shipping.enabled`, the two units in
   `advanced.product_dimension`, `advanced.product_flags.sold_out` and `advanced.webtool`. A value you send in
@@ -98,3 +110,29 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `{"customers": [], "groups": []}` when nobody is named. To write `selected_customers`, send the customer ids in
   `customers` and the customer group ids in `groups`; a group sent as `{"id": ...}` is rejected with `400`.
   `restrict_for_selected_customers` is read-only.
+- **Upload images as JSON with the file base64-encoded.** [Upload images to a product](/api-reference/products/upload-images-to-a-product) and [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) reject a multipart body
+  with `415`, the message `Content-Type must be application/json` and `details[0].field` set to `Content-Type`. Send the file's bytes as base64 text. Only images are accepted: a `type` of `videos` or
+  `specification_file` on [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) is rejected with `400` and the reason `not_supported`. The store keeps the file under your `filename` with a UUID and `_`
+  in front, such as `<uuid>_front.png`, so compare the end of the name.
+- **The two upload calls take different bodies and return different shapes.** [Upload images to a product](/api-reference/products/upload-images-to-a-product) takes `{"product": {"image_and_video": {"images": [{"filename": ..., "base64": ...}]}}}`,
+  stores one or more files, and returns `201` with only the files it just stored in `product.images`, and no `Location` header. [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) takes one file as
+  `{"type": "images", "filename": ..., "content": ...}` at the top level, where `content` is base64 text or a `data:image/png;base64,...` address, and returns `201` with a `Location` header and the stored image
+  as one flat row: `id`, `filename`, `position`, `primary`, `alt_text`, `url` and `thumbnail_url`. `position` is optional. A field named `base64` on that call is rejected with `400` and the reason `unknown_field`.
+  Pass the image's `id` as `image_id` to [Delete a product's image](/api-reference/products/delete-a-products-image). Deleting it again returns `404`.
+- **Delete several products moves them to the trash and returns `200` even when some fail.** Send `{"ids": [...]}` to [Delete several products](/api-reference/products/delete-several-products); `product_ids` is rejected with `400` and the reason `required`,
+  and so is an empty list. `deleted` counts the products moved to the trash, `failed` counts the others, and `errors` lists each failure with its `id` and a `reason` such as `not_found`. A product in the trash
+  still holds its SKU, which [Check a product SKU](/api-reference/products/check-a-product-sku) reports with `status` set to `trashed`, and neither [Count products](/api-reference/products/count-products) nor [List products](/api-reference/products/list-products) includes it.
+- **Count products takes the list's filters, but not its paging or sorting.** [Count products](/api-reference/products/count-products) returns `total` and `count`, which hold the same number, for the same filters as [List products](/api-reference/products/list-products),
+  so the count equals `pagination.total` of the list with the same filters. `limit`, `offset` and `sortBy` are rejected with `400` and the reason `unknown_parameter`. `status` takes `active`, `inactive` or `draft`,
+  and `product_type` takes `physical`, `downloadable`, `gift_card` or `bundle`; any other value is rejected with `400` and the reason `invalid_enum`. `category` is accepted and filters nothing. A list or a count without `status` includes draft products.
+- **List special products needs `type`, and two types need a customer.** Send `type` set to `onSale`, `featured`, `new`, `topSelling`, `lastBought` or `lastViewed`, in that letter case, to [List special products](/api-reference/products/list-special-products).
+  `max` is `1` to `100` and defaults to `10`, and `offset` is `0` or more. `lastBought` and `lastViewed` are per customer: send `customerId` (the customer's `customer_id` or `internal_id`) or `customer_email`.
+  `customer_id` is not read, and a `customerId` no customer has is rejected with `400` and the reason `unknown_reference`. A per-customer list with no products also returns `"status": "success"`.
+- **Check a product SKU also sees trashed products and variants.** [Check a product SKU](/api-reference/products/check-a-product-sku) ignores letter case. A SKU held by a variant is reported under the variant's own product `id`, not the `id` of the parent
+  product, and a SKU held by a product in the trash is reported with `status` set to `trashed`. Send `exclude_product_id` with the `id` of the product you are editing to treat its own SKU as free.
+- **A review's `status` is `pending` or `approved`, and the review list pages.** [Patch a product's review](/api-reference/products/patch-a-products-review) takes `status`, `rating` and `comment`, and a `status` of `rejected` is rejected with `400` and the reason `invalid_enum`.
+  [List a product's reviews](/api-reference/products/list-a-products-reviews) takes `limit` (`1` to `100`, default `20`) and `offset` and returns a `pagination` block. It ignores `status` and `page`: a list sent with `status=pending` still returns approved reviews.
+  [Retrieve a product's review](/api-reference/products/retrieve-a-products-review) returns `404` with the message `Review not found` when no review has that `review_id`, and `400` when the review belongs to another product.
+- **Updating a product's inventory sets the stock figure, and a variant keeps its own.** [Update a product's inventory](/api-reference/products/update-a-products-inventory) takes `track_inventory`, `available_stock` and `low_level_stock` inside
+  `product.product_pricing_and_stock` and returns `201`. Read the new stock with [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock). The stock of a product's variants does not change. The call takes the optional `X-Transaction-No` header:
+  the number is stored when the product has none, but the response to that first write shows the earlier value, `null`.

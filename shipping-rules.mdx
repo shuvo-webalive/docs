@@ -1,0 +1,62 @@
+---
+title: "Shipping rules"
+sidebarTitle: "Overview"
+description: "List, count, create, replace, update and delete shipping rules: a shipping class, a shipping rate and the zones they apply to, under one name."
+---
+
+The Shipping rules API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_rules`.
+
+<Warning>
+  **A shipping rule is deleted permanently, and a rule that is on a shipping profile cannot be deleted.**
+  [Delete a shipping rule](/api-reference/shipping-rules/delete-a-shipping-rule) on a rule that a profile uses is rejected with `409`, and the
+  response names the profile. The rule's `profiles` list shows which profiles use it. Take the rule off those
+  profiles first. Deleting a rule keeps its shipping rate and its zones.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping rules](/api-reference/shipping-rules/list-shipping-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rules` | Returns up to 20 shipping rules per call, newest first, with paging details. |
+| [Check the shipping rules list](/api-reference/shipping-rules/check-the-shipping-rules-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_rules` | Returns `200` and the headers of the shipping rules listing, with no body. |
+| [Count shipping rules](/api-reference/shipping-rules/count-shipping-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rules/count` | Returns the number of shipping rules that match the listing's filters, as `total`. |
+| [Check the shipping rule count](/api-reference/shipping-rules/check-the-shipping-rule-count) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_rules/count` | Returns `200` and the headers of the shipping rule count, with no body. |
+| [Create a shipping rule](/api-reference/shipping-rules/create-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_rules` | Creates a shipping rule and returns it with its `id`, which other calls take as `shipping_rule_id`. |
+| [Retrieve a shipping rule](/api-reference/shipping-rules/retrieve-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rules/{shipping_rule_id}` | Returns the shipping rule whose `id` you pass as `shipping_rule_id`. |
+| [Check a shipping rule](/api-reference/shipping-rules/check-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_rules/{shipping_rule_id}` | Returns `200` and headers only when the shipping rule exists, and `404` when it does not. |
+| [Replace a shipping rule](/api-reference/shipping-rules/replace-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_rules/{shipping_rule_id}` | Replaces a shipping rule with the fields you send in `shipping_rule`, and returns it. |
+| [Update a shipping rule](/api-reference/shipping-rules/update-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shipping_rules/{shipping_rule_id}` | Changes only the fields you send inside `shipping_rule` and returns the rule. |
+| [Delete a shipping rule](/api-reference/shipping-rules/delete-a-shipping-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_rules/{shipping_rule_id}` | Deletes a shipping rule permanently. You cannot delete a rule that is on a shipping profile. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create, replace and update wrap the rule in `shipping_rule`.** Send `{"shipping_rule": {...}}`. A body
+  without the wrapper is rejected with `400`. A field the rule does not have is rejected with `400` and the
+  reason `unknown_field`, and an `id` in the body with `400` and the reason `not_allowed`. Responses return
+  the rule inside `shipping_rule`.
+- **A rule has a shipping class, a shipping rate and zones, and you send each one by its `id`.**
+  `shipping_class` and `shipping_rate` take an `id`, either bare as `2` or as `{"id": 2}`, or `null`.
+  `zones` takes the whole list of tax zone `id` values, bare or as `{"id": ...}`, each zone once. An
+  unknown `id`, `0`, a decimal such as `1.5`, text, or a repeated zone is rejected with `400`. A class,
+  rate or zone you leave out reads `null`, `null` and `[]`.
+- **`PUT` replaces a rule, and `PATCH` changes only the fields you send.**
+  [Replace a shipping rule](/api-reference/shipping-rules/replace-a-shipping-rule) needs `name`, `description`, `shipping_class`,
+  `shipping_rate` and `zones`, and names each missing field in the `400` response with the reason
+  `required`. The first three take `null`, and `zones` takes `[]`. [Update a shipping rule](/api-reference/shipping-rules/update-a-shipping-rule)
+  changes only what you send: `zones` is the full new list, and a `shipping_rate` or `shipping_class` of
+  `null` takes it off the rule. The rate and the zones themselves stay in the store.
+- **Send `profile_id` on a create to put the new rule on a shipping profile.** The profile then lists the
+  rule in `shipping_rules`. A `profile_id` that no profile has is rejected with `400`.
+- **Filters on a listing take `id` values, and each rule is listed once.** `shipping_class_id` and
+  `zone_id` keep the rules that have that class or zone. A class or zone `id` that no record has is
+  rejected with `400` and the reason `invalid_reference`. `method` and `handling_cost` match the
+  rule's shipping rate.
+- **A listing returns 20 rules per call unless you send `limit`, and the newest rule comes first.** `limit`
+  takes `1` to `100`, and `offset` skips rules. To get more, send a higher `offset` while
+  `pagination.has_next` is `true`. A query parameter the listing does not know is ignored.

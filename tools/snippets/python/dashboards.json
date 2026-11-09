@@ -1,0 +1,26 @@
+{
+  "sdk": "python",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "list_dashboards",
+      "code": "response = client.dashboards.list_dashboards()\nfor dashboard in response.map[\"dashboards\"]:\n    print(dashboard[\"id\"], dashboard[\"name\"], dashboard[\"default\"])\n"
+    },
+    "create_dashboard": {
+      "function": "create_dashboard",
+      "code": "response = client.dashboards.create_dashboard({\"name\": \"Weekly\", \"kpis\": [\"total_sales\", \"total_orders\", \"aov\"]})\nprint(response.map[\"id\"], response.map[\"name\"])\n"
+    },
+    "get_dashboard": {
+      "function": "get_dashboard",
+      "code": "response = client.dashboards.get_dashboard(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\")\nprint(response.map[\"name\"], response.map[\"default\"])\nfor section in response.map[\"standard_sections\"]:\n    print(section[\"key\"], section[\"visible\"])\n"
+    },
+    "patch_dashboard": {
+      "function": "patch_dashboard",
+      "code": "response = client.dashboards.patch_dashboard(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\", {\"standard_sections\": [{\"key\": \"announcement\", \"visible\": False}]})\nfor section in response.map[\"standard_sections\"]:\n    print(section[\"key\"], section[\"visible\"])\n"
+    },
+    "delete_dashboard": {
+      "function": "delete_dashboard",
+      "code": "response = client.dashboards.delete_dashboard(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\")\nprint(response.status_code)\n"
+    }
+  }
+}

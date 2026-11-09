@@ -1,0 +1,9 @@
+---
+title: "Get the sales report"
+description: "Returns sales by day or month for a period, with totals."
+openapi: "GET /admin/dashboard/reports/sales"
+---
+
+Returns `rows`, one for each day or month in the period that has sales, and `totals`. `group_by` in the response is `day` for a period of about a month or less and `month` for a longer one. Add `breakdown=true` to get orders, shipping, tax, discounts, refunds and the top product on each row and in the totals. Sort with `sort` and `order`. A period with no sales returns `rows` as an empty list.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

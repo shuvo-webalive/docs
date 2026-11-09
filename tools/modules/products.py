@@ -22,9 +22,21 @@ LOCATIONS_PAGE = "/api-reference/inventory-locations/list-inventory-locations"
 LOCATION_STOCK_PAGE = "/api-reference/inventory-locations/list-stock-at-an-inventory-location"
 DELETE_LOCATION_PAGE = "/api-reference/inventory-locations/delete-an-inventory-location"
 CATEGORIES_PAGE = "/api-reference/categories/list-categories"
+COUNT_PAGE = "/api-reference/products/count-products"
+CHECK_SKU_PAGE = "/api-reference/products/check-a-product-sku"
+SPECIAL_PAGE = "/api-reference/products/list-special-products"
+BULK_DELETE_PAGE = "/api-reference/products/delete-several-products"
+LIST_REVIEWS_PAGE = "/api-reference/products/list-a-products-reviews"
+RETRIEVE_REVIEW_PAGE = "/api-reference/products/retrieve-a-products-review"
+PATCH_REVIEW_PAGE = "/api-reference/products/patch-a-products-review"
+DELETE_REVIEW_PAGE = "/api-reference/products/delete-a-products-review"
+INVENTORY_PAGE = "/api-reference/products/update-a-products-inventory"
+UPLOAD_IMAGES_PAGE = "/api-reference/products/upload-images-to-a-product"
+ADD_MEDIA_PAGE = "/api-reference/products/add-an-image-to-a-products-media"
+DELETE_IMAGE_PAGE = "/api-reference/products/delete-a-products-image"
 
-OVERVIEW_DESCRIPTION = "List products, create, read, update and delete a product, import its reviews, read and set its stock at each inventory location, and unassign a location from it."
-INTRO = "The Products API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
+OVERVIEW_DESCRIPTION = "List, count, create, read, update and delete products, check a SKU, list special products, delete several products at once, import, list, read, change and delete a product's reviews, upload and delete its images, set its inventory, read and set its stock at each inventory location, and unassign a location from it."
+INTRO = "The Products API has twenty-two endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
 
 WARNING = (
     "**Setting a product's stock unassigns every location you leave out, even one that still holds stock.**\n"
@@ -53,7 +65,7 @@ NOTES = [
     "  `transaction_no` in the body instead. When you send both with different values, the header's value is\n"
     "  stored and the body's is lost, with no error. On `PUT` and `PATCH` the header is ignored, and a body\n"
     "  `transaction_no` is stored only on a product that has none: a product that has one keeps it.",
-    "**Some fields you read cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,\n"
+    "**Some fields cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,\n"
     "  `sold_out`, `sold_out_label`, `length`, `width`, `height`, `weight`, `featured`, `new`, `model`, `is_draft`,\n"
     "  `has_variations`, `urls` or `created_by` is rejected with `400` and the reason `read_only_field`; the value\n"
     "  you read is accepted. `status` and `reviews` are rejected with the reason `unknown_field`, so remove them\n"
@@ -62,7 +74,7 @@ NOTES = [
     "  at the top level, but they are rejected there.",
     "**Setting stock changes the product too.** `available_stock` is the sum of the rows' `stock`, and\n"
     "  `product_pricing_and_stock.low_level_stock` takes the `low_stock_level` of the product's default\n"
-    "  location. The product's `version`, `updated_at` and `last_updated_by` change when the stock changes.\n"
+    "  location. The product's `version`, `updated_at` and `updated_by` change when the stock changes.\n"
     "  `product_pricing_and_stock.locations` on [Retrieve a product](" + RETRIEVE_PAGE + ") holds the same rows as\n"
     "  [Retrieve a product's stock](" + STOCK_PAGE + ").",
     "**The first location you assign to a product is missing from the response.** On a product with no\n"
@@ -77,11 +89,11 @@ NOTES = [
     "  `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`,\n"
     "  `available_for` or `selected_customers` with `400` and the reason `required`. Every other field you leave out\n"
     "  keeps its value. [Patch a product](" + PATCH_PAGE + ") has no required fields.",
-    "**A product's fields also come in blocks.** Alongside the flat fields, a product returns `pricing`, `inventory`,\n"
-    "  `ordering`, `restrictions`, `tax`, `shipping`, `available_for_purchase`, `media`, `categories`,\n"
-    "  `up_sell_products`, `summary`, `description`, `virtual`, `product_url`, `updated_by` and `links`, and\n"
-    "  `advanced` also holds `product_flags`, `product_dimension`, `product_identifiers` and `webtool`. A block holds\n"
-    "  the same values as the flat fields, and a write to either one changes both, on a create, a `PUT` and a `PATCH`.\n"
+    "**A product returns its prices, flags and availability inside blocks, not as flat fields.** A product returns 46 fields, among them `pricing`, `inventory`, `ordering`,\n"
+    "  `restrictions`, `tax`, `shipping`, `available_for_purchase`, `media`, `categories`, `up_sell_products`, `summary`, `description`, `virtual`, `product_url`, `updated_by` and `links`,\n"
+    "  and `advanced` holds `product_flags`, `product_dimension`, `product_identifiers` and `webtool`. Read the base price from `pricing.base_price` and the featured flag from\n"
+    "  `advanced.product_flags.featured.enabled`: the flat fields `base_price`, `is_featured` and the others that moved into blocks are not returned. A create and a `PATCH` still accept the flat\n"
+    "  names, so `{\"base_price\": 3.5}` changes `pricing.base_price`.\n"
     "  These block fields are read-only: `product_url`, `links`, `restrictions.enabled`, `restrictions.display_only`,\n"
     "  `restrictions.price.enabled`, `restrictions.purchase.enabled`, `shipping.enabled`, the two units in\n"
     "  `advanced.product_dimension`, `advanced.product_flags.sold_out` and `advanced.webtool`. A value you send in\n"
@@ -96,6 +108,32 @@ NOTES = [
     "  `{\"customers\": [], \"groups\": []}` when nobody is named. To write `selected_customers`, send the customer ids in\n"
     "  `customers` and the customer group ids in `groups`; a group sent as `{\"id\": ...}` is rejected with `400`.\n"
     "  `restrict_for_selected_customers` is read-only.",
+    "**Upload images as JSON with the file base64-encoded.** [Upload images to a product](" + UPLOAD_IMAGES_PAGE + ") and [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") reject a multipart body\n"
+    "  with `415`, the message `Content-Type must be application/json` and `details[0].field` set to `Content-Type`. Send the file's bytes as base64 text. Only images are accepted: a `type` of `videos` or\n"
+    "  `specification_file` on [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") is rejected with `400` and the reason `not_supported`. The store keeps the file under your `filename` with a UUID and `_`\n"
+    "  in front, such as `<uuid>_front.png`, so compare the end of the name.",
+    "**The two upload calls take different bodies and return different shapes.** [Upload images to a product](" + UPLOAD_IMAGES_PAGE + ") takes `{\"product\": {\"image_and_video\": {\"images\": [{\"filename\": ..., \"base64\": ...}]}}}`,\n"
+    "  stores one or more files, and returns `201` with only the files it just stored in `product.images`, and no `Location` header. [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") takes one file as\n"
+    "  `{\"type\": \"images\", \"filename\": ..., \"content\": ...}` at the top level, where `content` is base64 text or a `data:image/png;base64,...` address, and returns `201` with a `Location` header and the stored image\n"
+    "  as one flat row: `id`, `filename`, `position`, `primary`, `alt_text`, `url` and `thumbnail_url`. `position` is optional. A field named `base64` on that call is rejected with `400` and the reason `unknown_field`.\n"
+    "  Pass the image's `id` as `image_id` to [Delete a product's image](" + DELETE_IMAGE_PAGE + "). Deleting it again returns `404`.",
+    "**Delete several products moves them to the trash and returns `200` even when some fail.** Send `{\"ids\": [...]}` to [Delete several products](" + BULK_DELETE_PAGE + "); `product_ids` is rejected with `400` and the reason `required`,\n"
+    "  and so is an empty list. `deleted` counts the products moved to the trash, `failed` counts the others, and `errors` lists each failure with its `id` and a `reason` such as `not_found`. A product in the trash\n"
+    "  still holds its SKU, which [Check a product SKU](" + CHECK_SKU_PAGE + ") reports with `status` set to `trashed`, and neither [Count products](" + COUNT_PAGE + ") nor [List products](" + LIST_PAGE + ") includes it.",
+    "**Count products takes the list's filters, but not its paging or sorting.** [Count products](" + COUNT_PAGE + ") returns `total` and `count`, which hold the same number, for the same filters as [List products](" + LIST_PAGE + "),\n"
+    "  so the count equals `pagination.total` of the list with the same filters. `limit`, `offset` and `sortBy` are rejected with `400` and the reason `unknown_parameter`. `status` takes `active`, `inactive` or `draft`,\n"
+    "  and `product_type` takes `physical`, `downloadable`, `gift_card` or `bundle`; any other value is rejected with `400` and the reason `invalid_enum`. `category` is accepted and filters nothing. A list or a count without `status` includes draft products.",
+    "**List special products needs `type`, and two types need a customer.** Send `type` set to `onSale`, `featured`, `new`, `topSelling`, `lastBought` or `lastViewed`, in that letter case, to [List special products](" + SPECIAL_PAGE + ").\n"
+    "  `max` is `1` to `100` and defaults to `10`, and `offset` is `0` or more. `lastBought` and `lastViewed` are per customer: send `customerId` (the customer's `customer_id` or `internal_id`) or `customer_email`.\n"
+    "  `customer_id` is not read, and a `customerId` no customer has is rejected with `400` and the reason `unknown_reference`. A per-customer list with no products also returns `\"status\": \"success\"`.",
+    "**Check a product SKU also sees trashed products and variants.** [Check a product SKU](" + CHECK_SKU_PAGE + ") ignores letter case. A SKU held by a variant is reported under the variant's own product `id`, not the `id` of the parent\n"
+    "  product, and a SKU held by a product in the trash is reported with `status` set to `trashed`. Send `exclude_product_id` with the `id` of the product you are editing to treat its own SKU as free.",
+    "**A review's `status` is `pending` or `approved`, and the review list pages.** [Patch a product's review](" + PATCH_REVIEW_PAGE + ") takes `status`, `rating` and `comment`, and a `status` of `rejected` is rejected with `400` and the reason `invalid_enum`.\n"
+    "  [List a product's reviews](" + LIST_REVIEWS_PAGE + ") takes `limit` (`1` to `100`, default `20`) and `offset` and returns a `pagination` block. It ignores `status` and `page`: a list sent with `status=pending` still returns approved reviews.\n"
+    "  [Retrieve a product's review](" + RETRIEVE_REVIEW_PAGE + ") returns `404` with the message `Review not found` when no review has that `review_id`, and `400` when the review belongs to another product.",
+    "**Updating a product's inventory sets the stock figure, and a variant keeps its own.** [Update a product's inventory](" + INVENTORY_PAGE + ") takes `track_inventory`, `available_stock` and `low_level_stock` inside\n"
+    "  `product.product_pricing_and_stock` and returns `201`. Read the new stock with [Retrieve a product's stock](" + STOCK_PAGE + "). The stock of a product's variants does not change. The call takes the optional `X-Transaction-No` header:\n"
+    "  the number is stored when the product has none, but the response to that first write shows the earlier value, `null`.",
 ]
 
 
@@ -179,13 +217,10 @@ SAMPLE_PRODUCT = {
     "sku": "TSHIRT-001",
     "heading": "Cotton T-Shirt",
     "invoice_note": "",
-    "available": True,
     "password_protected": False,
     "password": "",
-    "base_price": 25.0,
-    "cost_price": 12.0,
-    "is_on_sale": False,
-    "sale_price": 0.0,
+    "pricing": {"base_price": 25.0, "cost_price": 12.0, "rrp_price": None, "on_sale": {"enabled": False, "discounted_price": None, "amount_type": "flat"}},
+    "available_for_purchase": {"enabled": True, "active": True, "who_can_view": "all"},
     "version": 7,
     "product_pricing_and_stock": {
         "track_inventory": True,
@@ -195,7 +230,7 @@ SAMPLE_PRODUCT = {
         "is_multi_location_enabled": True,
         "locations": LOCATION_ROWS,
     },
-    "advanced": {"advance_information": {"mpn": "", "barcode": "", "hs_code": ""}},
+    "advanced": {"advance_information": {"mpn": "", "barcode": "", "hs_code": ""}, "product_flags": {"featured": {"enabled": False, "label": None}, "new_product": False}},
     "product_variation": {},
     "has_variations": False,
 }
@@ -247,11 +282,11 @@ CREATED_PRODUCT = {
     "status": "active",
     "transaction_no": "IMPORT-2026-10-18",
     "product_type": "physical",
-    "base_price": 12.5,
+    "pricing": {"base_price": 12.5, "cost_price": 0.0},
 }
 
 PATCHED_PRODUCT = copy.deepcopy(SAMPLE_PRODUCT)
-PATCHED_PRODUCT["base_price"] = 27.5
+PATCHED_PRODUCT["pricing"] = dict(PATCHED_PRODUCT["pricing"], base_price=27.5)
 PATCHED_PRODUCT["version"] = 8
 
 REVIEWS_BODY = {"product": {"reviews": [{"name": "Sam Lee", "email": "sam@example.com", "rating": 5, "review": "Great shirt", "status": "approved"}]}}
@@ -269,7 +304,8 @@ LIST_PARAMETERS = [
     {"name": "sku", "in": "query", "description": "Filters by product `sku`.", "schema": {"type": "string"}},
     {"name": "ids", "in": "query", "description": "Returns the products with these `id` values. Repeat the name for several products, such as `ids=101&ids=102`. A comma-separated list is rejected with `500`.", "schema": {"type": "integer", "example": 101}},
     {"name": "parent", "in": "query", "description": "A category's `id`. [List categories](" + CATEGORIES_PAGE + ") returns it. Returns the products filed under that category.", "schema": {"type": "integer"}},
-    {"name": "product_type", "in": "query", "description": "Returns one type of product: `physical`, `downloadable` or `gift_card`.", "schema": {"type": "string", "enum": ["physical", "downloadable", "gift_card"]}},
+    {"name": "product_type", "in": "query", "description": "Returns one type of product: `physical`, `downloadable`, `gift_card` or `bundle`. `productType` works too.", "schema": {"type": "string", "enum": ["physical", "downloadable", "gift_card", "bundle"]}},
+    {"name": "status", "in": "query", "description": "Returns the products with this status: `active`, `inactive` or `draft`. Any other value is rejected with `400` and the reason `invalid_enum`. Without it, the list includes draft products.", "schema": {"type": "string", "enum": ["active", "inactive", "draft"]}},
     {"name": "stock", "in": "query", "description": "Filters by stock level: `in`, `out` or `low`.", "schema": {"type": "string", "enum": ["in", "out", "low"]}},
     {"name": "is_available", "in": "query", "description": "Filters by whether the product is available.", "schema": {"type": "boolean"}},
     {"name": "is_inventory_enabled", "in": "query", "description": "Filters by whether the product tracks inventory.", "schema": {"type": "boolean"}},
@@ -286,6 +322,105 @@ LIST_PARAMETERS = [
     {"name": "field_metadata", "in": "query", "description": "Send `true` to add `field_metadata` beside `products`, a schema of the product fields.", "schema": {"type": "boolean", "example": True}},
 ]
 
+COUNT_EXCLUDED = ("limit", "offset", "page", "sort", "dir", "field_metadata")
+
+
+def count_parameter(parameter):
+    description = parameter["description"]
+    if parameter["name"] == "status":
+        description = "Counts the products with this status: `active`, `inactive` or `draft`. Any other value is rejected with `400` and the reason `invalid_enum`. Without it, the count includes draft products."
+    else:
+        description = description.replace("Returns the products", "Counts the products").replace("Returns products", "Counts the products").replace("Returns one type of product", "Counts one type of product")
+    return dict(parameter, description=description)
+
+
+COUNT_PARAMETERS = [count_parameter(p) for p in LIST_PARAMETERS if p["name"] not in COUNT_EXCLUDED]
+
+SKU_PARAMETERS = [
+    {"name": "sku", "in": "query", "required": True, "description": "The SKU to look up. The match ignores letter case. `SKU` in capital letters is rejected with `400` and the reason `unknown_parameter`.", "schema": {"type": "string", "example": "TSHIRT-001"}},
+    {"name": "exclude_product_id", "in": "query", "description": "A product's `id`. When that product holds the SKU, the SKU counts as free, so you can check a SKU while you edit the product that has it. Another product's `id` changes nothing.", "schema": {"type": "integer", "example": 101}},
+]
+
+SPECIAL_PARAMETERS = [
+    {"name": "type", "in": "query", "required": True, "description": "Which selection to return: `onSale`, `featured`, `new`, `topSelling`, `lastBought` or `lastViewed`, in this letter case. A missing `type` is rejected with `400` and the reason `required`, and another value with the reason `invalid_enum`.", "schema": {"type": "string", "enum": ["onSale", "featured", "new", "topSelling", "lastBought", "lastViewed"], "example": "featured"}},
+    {"name": "max", "in": "query", "description": "The number of products to return, from `1` to `100`. The default is `10`. `0` or a negative number is rejected with `400` and the reason `out_of_range`, and so is a number above `100`.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 10}},
+    {"name": "offset", "in": "query", "description": "The number of products to skip, `0` or more. A negative number is rejected with `400` and the reason `out_of_range`. `page` is ignored.", "schema": {"type": "integer", "minimum": 0, "example": 0}},
+    {"name": "customerId", "in": "query", "description": "A customer's `customer_id` or `internal_id`. `lastBought` and `lastViewed` need it or `customer_email`. A `customerId` that no customer has is rejected with `400` and the reason `unknown_reference`. `customer_id` is not read.", "schema": {"type": "integer", "example": 74479}},
+    {"name": "customer_email", "in": "query", "description": "A customer's email address. `lastBought` and `lastViewed` need it or `customerId`.", "schema": {"type": "string", "example": "alex@example.com"}},
+]
+
+REVIEW_ID = {
+    "name": "review_id",
+    "in": "path",
+    "required": True,
+    "description": "The review's `id`. [List a product's reviews](" + LIST_REVIEWS_PAGE + ") returns it as `reviews[].id`, and [Import a product's reviews](" + REVIEWS_PAGE + ") as `product.reviews[].id`. The review must belong to the product you pass as `product_id`.",
+    "schema": {"type": "integer", "example": 31},
+}
+
+IMAGE_ID = {
+    "name": "image_id",
+    "in": "path",
+    "required": True,
+    "description": "The image's `id`. [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") returns it as `id`, [Upload images to a product](" + UPLOAD_IMAGES_PAGE + ") as `product.images[].id`, and [Retrieve a product](" + RETRIEVE_PAGE + ") as `media.images[].id`.",
+    "schema": {"type": "integer", "example": 1876},
+}
+
+REVIEW_LIMIT = {"name": "limit", "in": "query", "description": "The number of reviews per page, from `1` to `100`. The default is `20`. `0`, a number above `100` and text such as `abc` are rejected with `400`, the message `limit: must be a whole number from 1 to 100` and the reason `out_of_range`.", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "example": 20}}
+REVIEW_OFFSET = {"name": "offset", "in": "query", "description": "The number of reviews to skip, `0` or more. A negative number is rejected with `400` and the reason `out_of_range`. `page` and `status` are ignored.", "schema": {"type": "integer", "minimum": 0, "example": 0}}
+
+INVENTORY_TRANSACTION_NO = dict(TRANSACTION_NO, description="Optional. A transaction number, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. The store stores it as the product's `transaction_no` when the product has none. The response to that first write shows `null`, the value from before the write.")
+
+PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII="
+IMAGE_UUID = "6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
+
+COUNT_RESULT = {"total": 117, "count": 117}
+SKU_FREE = {"available": True, "is_exist": False, "product": None}
+SKU_HELD = {"available": False, "is_exist": True, "product": {"id": 101, "name": "Cotton T-Shirt", "status": "active"}, "id": 101}
+
+SPECIAL_ROW = {
+    "id": 101,
+    "sku": "TSHIRT-001",
+    "name": "Cotton T-Shirt",
+    "image": "https://your-store.example.com/resources/product/101/150-tshirt.png",
+    "base_price": 27.5,
+    "is_on_sale": False,
+    "on_sale_amount_type": "flat",
+    "effective_price": 25.0,
+    "actual_base_price": 25.0,
+    "on_sale_amount": 0.0,
+    "expect_to_pay_price": 0.0,
+    "expect_to_pay_price_with_tax": 27.5,
+    "tax_exclusive_base_price": 25.0,
+    "tax_exclusive_sale_price": 0.0,
+    "tax": 2.5,
+    "previous_price_to_display": None,
+    "actual_price_to_display": 27.5,
+    "sale_price": 0.0,
+    "updated": "2026-10-10T10:42:00",
+    "url": "https://your-store.example.com/product/cotton-t-shirt",
+    "summary": "<p>Everyday cotton t-shirt.</p>",
+    "description": "<p>Soft cotton.</p>",
+}
+SPECIAL_RESULT = {"total": 1, "max": 10, "offset": 0, "products": [SPECIAL_ROW], "pagination": {"total": 1, "limit": 10, "offset": 0, "has_previous": False, "has_next": False}}
+
+BULK_DELETE_BODY = {"ids": [102, 103]}
+BULK_DELETE_RESULT = {"deleted": 2, "failed": 0, "errors": []}
+
+REVIEW_ROW = {"id": 31, "productId": 101, "name": "Alex Kim", "email": "alex@example.com", "review": "Great shirt", "rating": 4.0, "date": "2026-10-18T09:30:00", "status": "approved", "files": [], "product_id": 101, "reviewer": {"name": "Alex Kim", "email": "alex@example.com"}, "comment": "Great shirt", "created_at": "2026-10-18T09:30:00Z"}
+REVIEW_LIST = {"reviews": [REVIEW_ROW], "pagination": {"total": 1, "limit": 20, "offset": 0, "has_previous": False, "has_next": False}}
+REVIEW_PATCH_BODY = {"status": "approved", "rating": 2, "comment": "Runs small"}
+REVIEW_PATCHED = {"review": dict(REVIEW_ROW, rating=2.0, review="Runs small", comment="Runs small")}
+
+INVENTORY_BODY = {"product": {"product_pricing_and_stock": {"track_inventory": True, "available_stock": 12, "low_level_stock": 3}}}
+INVENTORY_RESULT = {"status": "success", "message": "Inventory has been updated successfully", "transaction_no": None}
+
+IMAGE_BODY = {"product": {"image_and_video": {"images": [{"filename": "front.png", "base64": PNG_BASE64}]}}}
+IMAGE_RESULT = {"product": {"images": [{"id": 1876, "filename": IMAGE_UUID + "_front.png", "alt_text": "", "thumbnail": "https://your-store.example.com/resources/product/101/150-" + IMAGE_UUID + "_front.png", "link": "https://your-store.example.com/resources/product/101/" + IMAGE_UUID + "_front.png"}], "videos": [], "specs": []}, "transaction_no": None}
+
+MEDIA_BODY = {"type": "images", "filename": "side.png", "content": PNG_BASE64}
+MEDIA_RESULT = {"id": 1877, "filename": IMAGE_UUID + "_side.png", "position": 2, "primary": False, "alt_text": "", "url": "https://your-store.example.com/resources/product/101/" + IMAGE_UUID + "_side.png", "thumbnail_url": "https://your-store.example.com/resources/product/101/150-" + IMAGE_UUID + "_side.png"}
+
+
 LIST_PAGINATION = {"total": 2, "limit": 20, "offset": 0, "has_previous": False, "has_next": False}
 
 ENDPOINTS = [
@@ -296,11 +431,11 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE,
         "summary": "Returns the store's products, 20 per call by default and up to 100, each as the full product record, with paging details.",
-        "description": "Returns your store's products under `products`, the most recently updated first, with a `pagination` block. Each row is the full record [Retrieve a product](" + RETRIEVE_PAGE + ") returns, and a product in the trash is not listed. `limit` is `1` to `100` and defaults to `20`. Page with `offset`, or with `page` counted from `1`; `offset` wins when you send both. Filter with `search_text`, `name`, `sku`, `ids`, `parent`, `product_type`, `stock`, `is_available`, `is_inventory_enabled`, `created_by`, `price_from`, `price_to`, `created_from`, `created_to`, `updated_from` and `updated_to`. Sort with `sort` and `dir`. `category` is accepted and filters nothing. Any other parameter is rejected with `400` and the reason `unknown_parameter`. `HEAD` on this path returns `404`.",
+        "description": "Returns your store's products under `products`, the most recently updated first, with a `pagination` block. Each row is the full record [Retrieve a product](" + RETRIEVE_PAGE + ") returns, and a product in the trash is not listed. [Count products](" + COUNT_PAGE + ") counts the same products. `limit` is `1` to `100` and defaults to `20`. Page with `offset`, or with `page` counted from `1`; `offset` wins when you send both. Filter with `search_text`, `name`, `sku`, `ids`, `parent`, `product_type`, `status`, `stock`, `is_available`, `is_inventory_enabled`, `created_by`, `price_from`, `price_to`, `created_from`, `created_to`, `updated_from` and `updated_to`. Sort with `sort` and `dir`. `category` is accepted and filters nothing. Any other parameter is rejected with `400` and the reason `unknown_parameter`. `HEAD` on this path returns `404`.",
         "parameters": LIST_PARAMETERS,
         "responses": {
             "200": {
-                "description": "`products` holds the products on this page, each with all 87 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `pagination` has five keys: `total`, `limit`, `offset`, `has_previous` and `has_next`. With `field_metadata=true`, a `field_metadata` key is added beside `products`. The example shows a selection of the fields.",
+                "description": "`products` holds the products on this page, each with all 46 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `pagination` has five keys: `total`, `limit`, `offset`, `has_previous` and `has_next`. With `field_metadata=true`, a `field_metadata` key is added beside `products`. The example shows a selection of the fields.",
                 "schema": ref("ProductPage"),
                 "example": {"products": [SAMPLE_PRODUCT, CREATED_PRODUCT], "pagination": LIST_PAGINATION},
             },
@@ -325,7 +460,7 @@ ENDPOINTS = [
         "body": {"schema": ref("ProductCreateInput"), "example": CREATE_BODY},
         "responses": {
             "201": {
-                "description": "The new product, with all 87 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `status` is `active`, and `id` is the value the other calls take as `product_id`. `transaction_no` holds the number you sent, or `null` when you sent none. The example shows a selection of the fields.",
+                "description": "The new product, with all 46 fields that [Retrieve a product](" + RETRIEVE_PAGE + ") returns. `status` is `active`, and `id` is the value the other calls take as `product_id`. `transaction_no` holds the number you sent, or `null` when you sent none. The example shows a selection of the fields.",
                 "schema": PRODUCT_RESPONSE,
                 "example": {"product": CREATED_PRODUCT},
             },
@@ -343,8 +478,8 @@ ENDPOINTS = [
         "title": "Retrieve a product",
         "method": "GET",
         "path": BASE + "/{product_id}",
-        "summary": "Returns the product whose `id` you pass as `product_id`, with all 87 of its fields.",
-        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none. A product you deleted is still returned, with `status` set to `trashed`.",
+        "summary": "Returns the product whose `id` you pass as `product_id`, with all 46 of its fields.",
+        "description": "Returns one product under the `product` key, with its prices, availability, stock, media, tags, reviews and variations. Prices are in `pricing` and the flags in `advanced.product_flags`: flat fields such as `base_price` and `is_featured` are not returned. Send `field_metadata=true` to also get a description of each field. `field_metadata` is the only query parameter accepted: any other, such as `limit` or `fields`, is rejected with `400`. `password` reads `***` when the product has a password and `\"\"` when it has none. A product you deleted is still returned, with `status` set to `trashed`.",
         "parameters": [PRODUCT_ID, FIELD_METADATA],
         "responses": {
             "200": {
@@ -373,7 +508,7 @@ ENDPOINTS = [
         "body": {"schema": ref("ProductInput"), "example": UPDATE_BODY},
         "responses": {
             "200": {
-                "description": "The product after the update, with an `ETag` header. When something changed, `version`, `updated_at`, `last_updated_on` and `last_updated_by` change too. The example shows a selection of the fields.",
+                "description": "The product after the update, with an `ETag` header. When something changed, `version`, `updated_at` and `updated_by` change too. The example shows a selection of the fields.",
                 "schema": PRODUCT_RESPONSE,
                 "example": {"product": UPDATED_PRODUCT},
             },
@@ -392,12 +527,12 @@ ENDPOINTS = [
         "method": "PATCH",
         "path": BASE + "/{product_id}",
         "summary": "Changes the product fields you send, keeps every other field, and returns the product, the same way `PUT` does.",
-        "description": "Send the fields to change at the top level of the body, not inside `product`. This call takes the same body as [Update a product](" + UPDATE_PAGE + ") and merges it the same way: a field you leave out keeps its value, inside nested blocks too. A body that changes nothing, `{}` included, returns `200` with the product unchanged. A product in the trash is rejected with `409`.",
+        "description": "Send the fields to change at the top level of the body, not inside `product`. This call takes the same body as [Update a product](" + UPDATE_PAGE + ") and merges it the same way: a field you leave out keeps its value, inside nested blocks too. A body that changes nothing, `{}` included, returns `200` with the product unchanged. The flat names such as `base_price` and `is_featured` are still accepted; the response shows the changed values in `pricing.base_price` and `advanced.product_flags.featured.enabled`. A product in the trash is rejected with `409`.",
         "parameters": [PRODUCT_ID],
         "body": {"schema": ref("ProductInput"), "example": {"base_price": 27.5}},
         "responses": {
             "200": {
-                "description": "The product after the change. When something changed, `version`, `updated_at`, `last_updated_on` and `last_updated_by` change too. The example shows a selection of the fields.",
+                "description": "The product after the change. When something changed, `version`, `updated_at` and `updated_by` change too. The example shows a selection of the fields.",
                 "schema": PRODUCT_RESPONSE,
                 "example": {"product": PATCHED_PRODUCT},
             },
@@ -510,6 +645,249 @@ ENDPOINTS = [
         },
         "example_call": {"path": {"product_id": 101, "inventory_location_id": 19}},
     },
+    {
+        "key": "count_products",
+        "slug": "count-products",
+        "title": "Count products",
+        "method": "GET",
+        "path": BASE + "/count",
+        "summary": "Returns how many products match the filters you send, without the products themselves.",
+        "description": "Returns `total` and `count`, which hold the same number: the products that match the filters. Draft products are counted and products in the trash are not, so with no filter the count equals `pagination.total` of [List products](" + LIST_PAGE + "). Send the list's filters: `search_text`, `name`, `sku`, `ids`, `parent`, `product_type`, `status`, `stock`, `is_available`, `is_inventory_enabled`, `created_by`, `price_from`, `price_to`, `created_from`, `created_to`, `updated_from` and `updated_to`. `productType` and `priceFrom` work as well as `product_type` and `price_from`, and the error messages name the camelCase form. Paging and sorting parameters, such as `limit`, `offset` and `sortBy`, are rejected with `400` and the reason `unknown_parameter`. `HEAD` on this path returns `404`.",
+        "parameters": COUNT_PARAMETERS,
+        "responses": {
+            "200": {
+                "description": "`total` is the number of products that match, and `count` repeats it.",
+                "schema": ref("ProductCount"),
+                "example": COUNT_RESULT,
+            },
+            "400": {
+                "description": "You sent `limit`, `offset`, `sortBy` or another parameter the count does not accept (reason `unknown_parameter`), a `status` other than `active`, `inactive` or `draft` (reason `invalid_enum`), a `product_type` other than `physical`, `downloadable`, `gift_card` or `bundle` (reason `invalid_enum`), or a `price_from` that is not a number (reason `invalid_number`).",
+                "schema": ERROR_REF,
+                "example": UNKNOWN_PARAMETER,
+            },
+        },
+        "example_call": {"query": {"search_text": "shirt"}},
+    },
+    {
+        "key": "check_product_sku",
+        "slug": "check-a-product-sku",
+        "title": "Check a product SKU",
+        "method": "GET",
+        "path": BASE + "/check-sku",
+        "summary": "Tells you whether a SKU is free and, when it is not, which product holds it.",
+        "description": "Send `sku` to learn whether a product already holds it. The match ignores letter case and also finds a SKU held by a product in the trash and by a variant. A variant's SKU is reported under the variant's own product `id`, not the `id` of the product it belongs to. Send `exclude_product_id` with the `id` of the product you are editing to treat that product's own SKU as free. [Create a product](" + CREATE_PAGE + ") rejects a SKU another product holds with `409`.",
+        "parameters": SKU_PARAMETERS,
+        "responses": {
+            "200": {
+                "description": "`available` is `true` and `is_exist` is `false` when the SKU is free; `product` is then `null` and the response has no `id`. When a product holds the SKU, `available` is `false`, `is_exist` is `true`, `product` gives the holder's `id`, `name` and `status` (`active` or `trashed`), and `id` repeats the holder's `id`.",
+                "schema": ref("ProductSkuCheck"),
+                "example": SKU_HELD,
+            },
+            "400": {
+                "description": "`sku` is missing or empty (message `sku is required`), or you sent a parameter other than `sku` and `exclude_product_id`, `SKU` in capital letters included (reason `unknown_parameter`).",
+                "schema": ERROR_REF,
+            },
+        },
+        "example_call": {"query": {"sku": "TSHIRT-001"}},
+    },
+    {
+        "key": "list_special_products",
+        "slug": "list-special-products",
+        "title": "List special products",
+        "method": "GET",
+        "path": BASE + "/special",
+        "summary": "Returns one selection of products: on sale, featured, new, top selling, or a customer's last bought or last viewed.",
+        "description": "Send `type` to choose the selection: `onSale`, `featured`, `new`, `topSelling`, `lastBought` or `lastViewed`. Each row has the product's name, SKU, image, URL and its price fields, such as `base_price`, `sale_price` and `tax`. Page with `max` (`1` to `100`, default `10`) and `offset`; `pagination.limit` repeats `max`. `lastBought` and `lastViewed` are per customer, so also send `customerId` or `customer_email`. Parameters the endpoint does not know, `page` included, are ignored.",
+        "parameters": SPECIAL_PARAMETERS,
+        "responses": {
+            "200": {
+                "description": "`products` holds the selection's rows, `total` is the number of products in the selection, and `pagination` has `total`, `limit`, `offset`, `has_previous` and `has_next`. A per-customer selection that has no products also returns `status` set to `success`; a selection with products does not.",
+                "schema": ref("ProductSpecialPage"),
+                "example": SPECIAL_RESULT,
+            },
+            "400": {
+                "description": "`type` is missing (reason `required`) or is not one of the six values (reason `invalid_enum`); `max` or `offset` is out of range (reason `out_of_range`); `lastBought` or `lastViewed` has neither `customerId` nor `customer_email` (reason `customer_required`); or `customerId` names no customer (reason `unknown_reference`).",
+                "schema": ERROR_REF,
+            },
+        },
+        "example_call": {"query": {"type": "featured", "max": 10}},
+    },
+    {
+        "key": "bulk_delete_products",
+        "slug": "delete-several-products",
+        "title": "Delete several products",
+        "method": "POST",
+        "path": BASE + "/bulk-delete",
+        "summary": "Moves the products whose `id` values you send to the trash and counts the ones that could not be moved.",
+        "description": "Send `ids`, the `id` of each product to move to the trash, at the top level of the body with no wrapper. Each product moves to the trash the way [Delete a product](" + DELETE_PAGE + ") moves it: it still reads back with `status` set to `trashed`, and nothing is deleted permanently. The call returns `200` even when some `id` values fail, so read `failed` and `errors` instead of the status code.",
+        "body": {"schema": ref("ProductsBulkDeleteInput"), "example": BULK_DELETE_BODY},
+        "responses": {
+            "200": {
+                "description": "`deleted` counts the products moved to the trash and `failed` counts the others. `errors` lists each failure with its `id` and a `reason`, such as `not_found`.",
+                "schema": ref("ProductsBulkDeleteResult"),
+                "example": BULK_DELETE_RESULT,
+            },
+            "400": {
+                "description": "`ids` is missing or an empty list (reason `required`, message `ids: must be a non-empty list of product ids`). A body that sends `product_ids` instead of `ids` is rejected the same way.",
+                "schema": ERROR_REF,
+            },
+        },
+        "example_call": {},
+    },
+    {
+        "key": "list_product_reviews",
+        "slug": "list-a-products-reviews",
+        "title": "List a product's reviews",
+        "method": "GET",
+        "path": BASE + "/{product_id}/reviews",
+        "summary": "Returns the product's reviews, 20 per call by default, with paging details.",
+        "description": "Returns the reviews of the product whose `id` you pass as `product_id`, under `reviews`, with a `pagination` block. Page with `limit` (`1` to `100`, default `20`) and `offset`. `status` and `page` are ignored: a request sent with `status=pending` still returns approved reviews. Each review is the same record [Import a product's reviews](" + REVIEWS_PAGE + ") returns. `HEAD` on this path returns `404`.",
+        "parameters": [PRODUCT_ID, REVIEW_LIMIT, REVIEW_OFFSET],
+        "responses": {
+            "200": {
+                "description": "`reviews` holds the reviews on this page, and `pagination` has `total`, `limit`, `offset`, `has_previous` and `has_next`. A product with no reviews returns `reviews: []`.",
+                "schema": ref("ProductReviewList"),
+                "example": REVIEW_LIST,
+            },
+            "400": {"description": "`limit` or `offset` is out of range (reason `out_of_range`).", "schema": ERROR_REF},
+            "404": {"description": "No product has that `product_id`. The message is `Product not found`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}, "query": {"limit": 20}},
+    },
+    {
+        "key": "get_product_review",
+        "slug": "retrieve-a-products-review",
+        "title": "Retrieve a product's review",
+        "method": "GET",
+        "path": BASE + "/{product_id}/reviews/{review_id}",
+        "summary": "Returns one review of the product, under `review`.",
+        "description": "Returns the review whose `id` you pass as `review_id`, under the `review` key. The review must belong to the product you pass as `product_id`.",
+        "parameters": [PRODUCT_ID, REVIEW_ID],
+        "responses": {
+            "200": {
+                "description": "The review, with the same fields as an entry of [List a product's reviews](" + LIST_REVIEWS_PAGE + ").",
+                "schema": {"type": "object", "properties": {"review": ref("ProductReview")}},
+                "example": {"review": REVIEW_ROW},
+            },
+            "400": {"description": "The review belongs to another product. The message is `Review does not belong to this product`.", "schema": ERROR_REF},
+            "404": {"description": "No review has that `review_id`, for example because you deleted it. The message is `Review not found`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101, "review_id": 31}},
+    },
+    {
+        "key": "patch_product_review",
+        "slug": "patch-a-products-review",
+        "title": "Patch a product's review",
+        "method": "PATCH",
+        "path": BASE + "/{product_id}/reviews/{review_id}",
+        "summary": "Changes the `status`, `rating` or `comment` of one review and returns the review.",
+        "description": "Send `status`, `rating` and `comment` at the top level of the body, with no wrapper. `status` is `pending` or `approved`. Only the fields you send change. A new `comment` changes the review's `review` text too, because the two hold the same text.",
+        "parameters": [PRODUCT_ID, REVIEW_ID],
+        "body": {"schema": ref("ProductReviewPatchInput"), "example": REVIEW_PATCH_BODY},
+        "responses": {
+            "200": {
+                "description": "The review after the change, under `review`.",
+                "schema": {"type": "object", "properties": {"review": ref("ProductReview")}},
+                "example": REVIEW_PATCHED,
+            },
+            "400": {"description": "`status` is not `pending` or `approved`, `rejected` included. The reason is `invalid_enum` and the message is `status must be one of pending, approved`.", "schema": ERROR_REF},
+            "404": {"description": "No review has that `review_id`. The message is `Review not found`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101, "review_id": 31}},
+    },
+    {
+        "key": "delete_product_review",
+        "slug": "delete-a-products-review",
+        "title": "Delete a product's review",
+        "method": "DELETE",
+        "path": BASE + "/{product_id}/reviews/{review_id}",
+        "summary": "Deletes one review of the product permanently.",
+        "description": "Deletes the review whose `id` you pass as `review_id` and returns `204` with no body. The review does not go to the trash: [Retrieve a product's review](" + RETRIEVE_REVIEW_PAGE + ") then returns `404`, and deleting it again returns `404`.",
+        "parameters": [PRODUCT_ID, REVIEW_ID],
+        "responses": {
+            "204": {"description": "The review is deleted. No body."},
+            "404": {"description": "No review has that `review_id`, for example because you already deleted it.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101, "review_id": 31}},
+    },
+    {
+        "key": "create_product_inventory",
+        "slug": "update-a-products-inventory",
+        "title": "Update a product's inventory",
+        "method": "POST",
+        "path": BASE + "/{product_id}/inventories",
+        "summary": "Sets whether the product tracks stock, its available stock and its low stock level.",
+        "description": "Wrap the settings in `product.product_pricing_and_stock` and send `track_inventory`, `available_stock` and optionally `low_level_stock`. The call returns `201`. Read the new stock with [Retrieve a product's stock](" + STOCK_PAGE + "): on a store with one inventory location, `locations` is empty. The stock of the product's variants does not change, because each variant keeps its own. To store a transaction number, pass `transaction_no` in the SDKs, which sends the `X-Transaction-No` header.",
+        "parameters": [PRODUCT_ID, INVENTORY_TRANSACTION_NO],
+        "body": {"schema": ref("ProductInventoryInput"), "example": INVENTORY_BODY},
+        "responses": {
+            "201": {
+                "description": "`status` is `success` and `message` is `Inventory has been updated successfully`. `transaction_no` shows the product's number from before this write, so it is `null` when this write is the first to store one. The response has an `ETag` header.",
+                "schema": ref("ProductInventoryResult"),
+                "example": INVENTORY_RESULT,
+            },
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "create_product_image",
+        "slug": "upload-images-to-a-product",
+        "title": "Upload images to a product",
+        "method": "POST",
+        "path": BASE + "/{product_id}/image",
+        "summary": "Stores one or more base64-encoded images on the product and returns the images it stored.",
+        "description": "Send JSON: wrap the files in `product.image_and_video.images`, each with a `filename` and the file's bytes as base64 text in `base64`. You can send several files in one call. A multipart body is rejected with `415`. The store keeps each file under your `filename` with a UUID and `_` in front. To add one image at a chosen `position`, use [Add an image to a product's media](" + ADD_MEDIA_PAGE + ").",
+        "parameters": [PRODUCT_ID],
+        "body": {"schema": ref("ProductImageUploadInput"), "example": IMAGE_BODY},
+        "responses": {
+            "201": {
+                "description": "`product.images` holds only the files this call stored, each with `id`, `filename`, `alt_text`, `thumbnail` and `link`; `videos` and `specs` are empty. `transaction_no` is the product's number, or `null`. The response has no `Location` header.",
+                "schema": ref("ProductMediaUploaded"),
+                "example": IMAGE_RESULT,
+            },
+            "415": {"description": "The body is not JSON. The message is `Content-Type must be application/json` and `details[0].field` is `Content-Type`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "create_product_media",
+        "slug": "add-an-image-to-a-products-media",
+        "title": "Add an image to a product's media",
+        "method": "POST",
+        "path": BASE + "/{product_id}/media",
+        "summary": "Stores one base64-encoded image on the product and returns the stored image as one row.",
+        "description": "Send JSON at the top level of the body, with no wrapper: `type` set to `images`, a `filename`, and `content`, which is the file's bytes as base64 text or a `data:image/png;base64,...` address. `position` is optional. Only images are accepted. A multipart body is rejected with `415`. The store keeps the file under your `filename` with a UUID and `_` in front. To store several files in one call, use [Upload images to a product](" + UPLOAD_IMAGES_PAGE + ").",
+        "parameters": [PRODUCT_ID],
+        "body": {"schema": ref("ProductMediaUploadInput"), "example": MEDIA_BODY},
+        "responses": {
+            "201": {
+                "description": "The stored image as one row, not wrapped in `product`: `id`, `filename`, `position`, `primary`, `alt_text`, `url` and `thumbnail_url`. The first image of a product has `position` `1` and `primary` `true`. The `Location` header is the path of the image, `/api/v4/admin/products/{product_id}/media/images/{image_id}`.",
+                "schema": ref("ProductMediaImage"),
+                "example": MEDIA_RESULT,
+            },
+            "400": {
+                "description": "`type` is `videos` or `specification_file` (reason `not_supported`, message `videos cannot be uploaded through the API yet - images only`); `filename` or `content` is missing (reason `required`); or you sent a field the call does not accept, such as `base64` in place of `content` (reason `unknown_field`).",
+                "schema": ERROR_REF,
+            },
+            "415": {"description": "The body is not JSON. The message is `Content-Type must be application/json`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "delete_product_media_image",
+        "slug": "delete-a-products-image",
+        "title": "Delete a product's image",
+        "method": "DELETE",
+        "path": BASE + "/{product_id}/media/images/{image_id}",
+        "summary": "Deletes one image from the product.",
+        "description": "Deletes the image whose `id` you pass as `image_id` and returns `204` with no body. Deleting it again returns `404`.",
+        "parameters": [PRODUCT_ID, IMAGE_ID],
+        "responses": {
+            "204": {"description": "The image is deleted. No body."},
+            "404": {"description": "The product has no image with that `image_id`, for example because you already deleted it. The message is `Image id: <image_id> not found`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101, "image_id": 1876}},
+    },
 ]
 
 READ_ONLY = "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
@@ -518,94 +896,53 @@ STAMP = "Changes when the product changes. A value you send is ignored."
 ADVANCED_CODE = "Write it here: at the top level of the product it is rejected with `400` and the reason `unknown_field`."
 
 SCHEMAS = {
-    "Product": {"type": "object", "description": "One product: 87 fields, the same set on every product.", "properties": {
+    "Product": {"type": "object", "description": "One product: 46 fields, the same set on every product. Prices, flags, dimensions, availability and stock settings are inside blocks such as `pricing`, `advanced` and `available_for_purchase`; flat fields such as `base_price` and `is_featured` are not returned.", "properties": {
         "id": typed("integer", "The product's `id`. Pass it as `product_id` in a path. " + READ_ONLY),
         "name": typed("string"),
         "sku": typed("string"),
         "status": typed("string", "`active` on a new product and `trashed` on a product you deleted. Read-only: sending it is rejected with `400` and the reason `unknown_field`."),
         "urls": dict(ref("ProductUrls"), description=READ_ONLY),
         "heading": typed("string"),
-        "parents": array_of("ProductParent", "The categories the product is filed under. In a write, send the `id` of each category."),
         "created_by": dict(ref("ProductNamedReference"), description="Who created the product. " + READ_ONLY),
         "created_at": typed("string", READ_ONLY),
         "updated_at": typed("string", STAMP),
         "transaction_no": nullable("string", "The product's transaction number, or `null` when it has none."),
         "product_type": typed("string"),
         "custom_type": typed("string"),
-        "is_virtual": typed("boolean"),
         "invoice_note": typed("string"),
-        "available": typed("boolean"),
         "product_page": dict(ref("ProductNamedReference"), description="The product's page as `id` and `name`. Some products return `{}` instead."),
         "product_layout": {"description": "`{}` on every product read."},
         "custom_class": typed("string", READ_ONLY),
-        "available_on_date_range": typed("boolean"),
-        "available_from_date": typed("string"),
-        "available_to_date": typed("string"),
-        "available_for": typed("string", "Who can buy the product. `selected` limits it to the customers and groups in `selected_customers`."),
-        "selected_customers": dict(ref("ProductSelectedCustomers"), description="The customers and customer groups the product is available to, as an object with `customers` and `groups`. Both lists are empty when the product names nobody. In a write, send ids: see `ProductSelectedCustomersInput`."),
-        "restrict_for_selected_customers": dict(ref("ProductSelectedCustomers"), description="The customers and groups a restriction names, as an object with `customers` and `groups`. Both lists are empty when nobody is named. Read-only."),
         "password_protected": typed("boolean"),
         "password": typed("string", "`***` when the product has a password, `\"\"` when it has none. Sending back `***` keeps the stored password."),
-        "available_on_weekdays": ref("ProductAvailableOnWeekdays"),
-        "base_price": typed("number"),
-        "cost_price": typed("number"),
-        "compare_at_price": nullable("number"),
-        "is_on_sale": typed("boolean"),
-        "sale_price": typed("number"),
-        "sold_out": typed("boolean", READ_ONLY),
-        "length": typed("number", DIMENSION),
-        "width": typed("number", DIMENSION),
-        "height": typed("number", DIMENSION),
-        "weight": typed("number", DIMENSION),
-        "sold_out_label": typed("string", READ_ONLY),
-        "is_featured": typed("boolean"),
-        "featured_label": typed("string"),
-        "is_new": typed("boolean"),
-        "featured": typed("boolean", READ_ONLY),
-        "new": typed("boolean", READ_ONLY),
-        "model": typed("string", READ_ONLY),
-        "product_properties": ref("ProductProperties"),
         "version": typed("integer", "Changes when the product changes, including when its stock changes. A write that changes nothing keeps it. A value you send is ignored."),
-        "created_on": typed("string", READ_ONLY),
-        "last_updated_on": typed("string", STAMP),
-        "last_updated_by": {"anyOf": [ref("ProductNamedReference"), {"type": "null"}], "description": "Who last changed the product, or `null`. " + STAMP},
-        "schedule_type": typed("string"),
-        "custom_schedule_option": typed("string"),
-        "tax_settings": ref("ProductTaxSettings"),
         "variation_price_display": ref("ProductVariationPriceDisplay"),
-        "administrative_status": typed("boolean"),
-        "is_draft": typed("boolean", READ_ONLY),
-        "product_summary": typed("string"),
-        "product_description": typed("string"),
         "product_pricing_and_stock": ref("ProductPricingAndStock"),
-        "image_and_video": ref("ProductImageAndVideo"),
         "advanced": ref("ProductAdvanced"),
         "related_products": array_of("ProductLink"),
-        "similar_products": array_of("ProductLink"),
         "bundle": {"oneOf": [ref("ProductBundle"), {"type": "null"}], "description": "The product's bundle settings, or `null` when the product is not a bundle."},
         "seo_configs": array_of("ProductSeoConfig"),
         "tags": array_of("ProductTag"),
         "custom_properties": array_of("ProductCustomProperty"),
         "reviews": array_of("ProductReview", "Read-only: sending it is rejected with `400` and the reason `unknown_field`."),
         "product_variation": dict(ref("ProductVariation"), description="The product's variation types and variants, or `{}` on a product with no variations."),
-        "preorder_enabled": typed("boolean"),
         "has_variations": typed("boolean", READ_ONLY),
-        "available_for_purchase": dict(ref("ProductAvailableForPurchase"), description="Availability in one block: `enabled` is `available`, `active` is `administrative_status` and `who_can_view` is `available_for`."),
-        "categories": array_of("ProductCategory", "The categories the product is filed under, the same ones as `parents`."),
-        "description": typed("string", "The same text as `product_description`."),
-        "inventory": dict(ref("ProductInventory"), description="Stock settings in one block, with the same values as `product_pricing_and_stock` and `preorder_enabled`."),
+        "available_for_purchase": dict(ref("ProductAvailableForPurchase"), description="Availability in one block: `enabled` is whether the product is available, `active` is whether it is active in the administration and `who_can_view` is who can buy it."),
+        "categories": array_of("ProductCategory", "The categories the product is filed under. In a write, send the `id` of each category in `parents`."),
+        "description": typed("string", "The product's description."),
+        "inventory": dict(ref("ProductInventory"), description="Stock settings in one block: stock tracking, the combined stock limit and pre-order."),
         "links": dict(ref("ProductLinks"), description="The API paths of the product and its sub-paths. Read-only."),
-        "media": dict(ref("ProductMedia"), description="The product's images and videos, the same files as `image_and_video`."),
+        "media": dict(ref("ProductMedia"), description="The product's images and videos."),
         "ordering": dict(ref("ProductOrdering"), description="The smallest and largest quantity a customer can order."),
-        "pricing": dict(ref("ProductPricing"), description="Prices in one block, with the same values as `base_price`, `cost_price`, `compare_at_price` and the sale and advanced pricing settings."),
+        "pricing": dict(ref("ProductPricing"), description="Prices in one block: the base price, the cost price, the recommended retail price and the sale and advanced pricing settings. Read the product's price from `pricing.base_price`."),
         "product_url": typed("string", "The product's full storefront address. Read-only."),
         "restrictions": dict(ref("ProductRestrictions"), description="Who can see the price and who can buy, in one block."),
         "shipping": dict(ref("ProductShipping"), description="The product's shipping profile."),
-        "summary": typed("string", "The same text as `product_summary`."),
-        "tax": dict(ref("ProductTax"), description="The same settings as `tax_settings`, in one block."),
+        "summary": typed("string", "The product's summary."),
+        "tax": dict(ref("ProductTax"), description="The product's tax settings in one block."),
         "up_sell_products": array_of("ProductLink", "The products offered as an up-sell. In a write, send `{\"id\": ...}` records."),
         "updated_by": dict(ref("ProductNamedReference"), description="Who last changed the product. A value you send returns `200` and is not kept."),
-        "virtual": typed("boolean", "The same value as `is_virtual`."),
+        "virtual": typed("boolean", "`true` when the product is virtual."),
     }},
     "ProductUrls": {"type": "object", "properties": {
         "url": typed("string", "The product's URL slug."),
@@ -614,13 +951,6 @@ SCHEMAS = {
     "ProductNamedReference": {"type": "object", "description": "A record the product refers to: an author, a page, a customer or a customer group.", "properties": {
         "id": typed("integer", "The `id` of the named person, page, customer or customer group."),
         "name": typed("string"),
-    }},
-    "ProductParent": {"type": "object", "description": "One category the product is filed under. [List categories](" + CATEGORIES_PAGE + ") returns the store's categories.", "properties": {
-        "id": typed("integer", "The category's id."),
-        "name": typed("string"),
-        "is_in_trash": typed("boolean"),
-        "is_parent_in_trash": typed("boolean"),
-        "is_disposable": typed("boolean"),
     }},
     "ProductSelectedCustomer": {"type": "object", "description": "One customer an audience names.", "properties": {
         "id": typed("integer", "The customer's `customer_id`."),
@@ -749,12 +1079,12 @@ SCHEMAS = {
         "label": typed("string"),
     }},
     "ProductFlags": {"type": "object", "description": "The product's flags in one block.", "properties": {
-        "featured": dict(ref("ProductFlag"), description="The same values as `is_featured` and `featured_label`."),
-        "new_product": typed("boolean", "The same value as `is_new`."),
-        "sold_out": dict(ref("ProductFlag"), description="The same values as `sold_out` and `sold_out_label`. Read-only."),
-        "model_number": typed("string", "The same value as `model`."),
+        "featured": dict(ref("ProductFlag"), description="Whether the product is flagged as featured, and its label."),
+        "new_product": typed("boolean", "Whether the product is flagged as new."),
+        "sold_out": dict(ref("ProductFlag"), description="Whether the product is sold out, and its label. Read-only."),
+        "model_number": typed("string", "The product's model number."),
     }},
-    "ProductDimension": {"type": "object", "description": "The same values as `product_properties`. The two units are read-only here.", "properties": {
+    "ProductDimension": {"type": "object", "description": "The product's dimensions and their units. The two units are read-only here. Write the dimensions in `product_properties`.", "properties": {
         "length_unit": typed("string", "Read-only here."),
         "weight_unit": typed("string", "Read-only here."),
         "width": typed("number"),
@@ -960,7 +1290,7 @@ SCHEMAS = {
         "parent_in_trash": typed("boolean"),
         "disposable": typed("boolean"),
     }},
-    "ProductMediaImage": {"type": "object", "properties": {
+    "ProductMediaImage": {"type": "object", "description": "One image of the product. [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") returns it as the whole response.", "properties": {
         "id": typed("integer", "The image's id."),
         "filename": typed("string"),
         "position": typed("integer"),
@@ -998,10 +1328,10 @@ SCHEMAS = {
     }},
     "ProductSchedule": {"type": "object", "description": "When the product is available.", "properties": {
         "enabled": typed("boolean"),
-        "type": typed("string", "The same value as `schedule_type`: `date_range` or `custom_schedule`."),
+        "type": typed("string", "`date_range` or `custom_schedule`."),
         "start_date": typed("string"),
         "end_date": typed("string"),
-        "preset": typed("string", "The same value as `custom_schedule_option`: `all_days`, `weekdays`, `business_hour`, `weekends` or `custom`."),
+        "preset": typed("string", "`all_days`, `weekdays`, `business_hour`, `weekends` or `custom`."),
         "weekdays": ref("ProductScheduleWeekdays"),
     }},
     "ProductPasswordProtection": {"type": "object", "description": "The same values as `password_protected` and `password`. A password that is set reads `***`.", "properties": {
@@ -1009,9 +1339,9 @@ SCHEMAS = {
         "password": typed("string"),
     }},
     "ProductAvailableForPurchase": {"type": "object", "description": "Availability in one block.", "properties": {
-        "enabled": typed("boolean", "The same value as `available`."),
-        "active": typed("boolean", "The same value as `administrative_status`."),
-        "who_can_view": typed("string", "The same value as `available_for`."),
+        "enabled": typed("boolean", "Whether the product is available."),
+        "active": typed("boolean", "Whether the product is active in the administration."),
+        "who_can_view": typed("string", "Who can buy the product. `selected` limits it to the customers and groups in `selected_customers`."),
         "selected_customers": ref("ProductSelectedCustomers"),
         "restrict_for_selected_customers": dict(ref("ProductSelectedCustomers"), description="Read-only."),
         "schedule": ref("ProductSchedule"),
@@ -1047,7 +1377,7 @@ SCHEMAS = {
     "ProductPricing": {"type": "object", "description": "Prices in one block. On a create, `base_price` here is accepted in place of the top-level `base_price`.", "properties": {
         "base_price": typed("number"),
         "cost_price": typed("number"),
-        "rrp_price": typed("number", "The same value as `compare_at_price`."),
+        "rrp_price": typed("number", "The recommended retail price."),
         "on_sale": ref("ProductOnSale"),
         "advanced_pricing": ref("ProductAdvancedPricing"),
     }},
@@ -1064,7 +1394,7 @@ SCHEMAS = {
     "ProductInventory": {"type": "object", "description": "Stock settings in one block.", "properties": {
         "tracking": ref("ProductInventoryTracking"),
         "combined_stock_limit": ref("ProductCombinedStockLimit"),
-        "preorder": typed("boolean", "The same value as `preorder_enabled`."),
+        "preorder": typed("boolean", "Whether the product can be pre-ordered."),
     }},
     "ProductOrdering": {"type": "object", "description": "The order quantity limits.", "properties": {
         "min_quantity": typed("integer"),
@@ -1085,8 +1415,8 @@ SCHEMAS = {
         "enabled": typed("boolean"),
         "base_price_rounding": typed("string"),
     }},
-    "ProductTax": {"type": "object", "description": "The same settings as `tax_settings`, in one block.", "properties": {
-        "enabled": typed("boolean", "The same value as `overwrite_default_config`."),
+    "ProductTax": {"type": "object", "description": "The product's tax settings in one block.", "properties": {
+        "enabled": typed("boolean", "`true` when the product overrides the store's default tax settings."),
         "exempt": typed("boolean"),
         "custom_tax_profile": dict(ref("ProductNamedReference"), description="The custom tax profile. In a write, send its id or `{\"id\": ...}`."),
         "message": typed("string"),
@@ -1244,4 +1574,133 @@ SCHEMAS["ProductValidationError"] = {"type": "object", "description": "The rejec
         "field": typed("string", "The field that was rejected."),
         "code": typed("string", "Why it was rejected, such as `unknown_field`."),
     }}},
+}}
+
+SCHEMAS["ProductCount"] = {"type": "object", "properties": {
+    "total": typed("integer", "The number of products that match the filters."),
+    "count": typed("integer", "The same number as `total`."),
+}}
+
+SCHEMAS["ProductSkuHolder"] = {"type": "object", "description": "The product that holds the SKU.", "properties": {
+    "id": typed("integer", "The holder's `id`. A variant's SKU names the variant's own product, not the product it belongs to."),
+    "name": typed("string"),
+    "status": typed("string", "`active` or `trashed`."),
+}}
+
+SCHEMAS["ProductSkuCheck"] = {"type": "object", "properties": {
+    "available": typed("boolean", "`true` when no product holds the SKU."),
+    "is_exist": typed("boolean", "`true` when a product holds the SKU."),
+    "product": {"oneOf": [ref("ProductSkuHolder"), {"type": "null"}], "description": "The product that holds the SKU, or `null` when the SKU is free."},
+    "id": typed("integer", "The holder's `id`. Left out when the SKU is free."),
+}}
+
+SCHEMAS["ProductSpecial"] = {"type": "object", "description": "One product of the selection.", "properties": {
+    "id": typed("integer", "The product's `id`. Pass it as `product_id` in a path."),
+    "sku": typed("string"),
+    "name": typed("string"),
+    "image": typed("string", "The address of the product's image."),
+    "base_price": typed("number"),
+    "is_on_sale": typed("boolean"),
+    "on_sale_amount_type": typed("string"),
+    "effective_price": typed("number"),
+    "actual_base_price": typed("number"),
+    "on_sale_amount": typed("number"),
+    "expect_to_pay_price": typed("number"),
+    "expect_to_pay_price_with_tax": typed("number"),
+    "tax_exclusive_base_price": typed("number"),
+    "tax_exclusive_sale_price": typed("number"),
+    "tax": typed("number"),
+    "previous_price_to_display": nullable("number", "`null` when the product has no previous price."),
+    "actual_price_to_display": typed("number"),
+    "sale_price": typed("number"),
+    "updated": typed("string", "When the product last changed, as `yyyy-MM-ddTHH:mm:ss`."),
+    "url": typed("string", "The address of the product's page."),
+    "summary": typed("string"),
+    "description": typed("string"),
+}}
+
+SCHEMAS["ProductSpecialPage"] = {"type": "object", "properties": {
+    "status": typed("string", "`success`. Only a per-customer selection with no products returns it."),
+    "total": typed("integer", "The number of products in the selection."),
+    "max": typed("integer", "The page size applied: the `max` you sent, or `10`."),
+    "offset": typed("integer", "The number of products skipped before this page."),
+    "products": array_of("ProductSpecial", "The products on this page."),
+    "pagination": ref("ProductPagination"),
+}}
+
+SCHEMAS["ProductsBulkDeleteInput"] = {"type": "object", "required": ["ids"], "description": "Send `ids` at the top level of the body, with no wrapper. `product_ids` is rejected.", "properties": {
+    "ids": {"type": "array", "minItems": 1, "items": {"type": "integer"}, "description": "Required and not empty. The `id` of each product to move to the trash."},
+}}
+
+SCHEMAS["ProductBulkDeleteError"] = {"type": "object", "properties": {
+    "id": typed("integer", "The `id` that could not be moved to the trash."),
+    "reason": typed("string", "Why, such as `not_found`."),
+}}
+
+SCHEMAS["ProductsBulkDeleteResult"] = {"type": "object", "properties": {
+    "deleted": typed("integer", "The number of products moved to the trash."),
+    "failed": typed("integer", "The number of `id` values that could not be moved."),
+    "errors": array_of("ProductBulkDeleteError", "One entry per failure, or `[]`."),
+}}
+
+SCHEMAS["ProductReviewList"] = {"type": "object", "properties": {
+    "reviews": array_of("ProductReview", "The reviews on this page, or `[]`."),
+    "pagination": ref("ProductReviewPagination"),
+}}
+
+SCHEMAS["ProductReviewPagination"] = {"type": "object", "properties": {
+    "total": typed("integer", "The number of reviews the product has."),
+    "limit": typed("integer", "The page size applied: the `limit` you sent, or `20`."),
+    "offset": typed("integer", "The number of reviews skipped before this page."),
+    "has_previous": typed("boolean", "`true` when reviews come before this page."),
+    "has_next": typed("boolean", "`true` when more reviews follow this page."),
+}}
+
+SCHEMAS["ProductReviewPatchInput"] = {"type": "object", "description": "Send these fields at the top level of the body, with no wrapper. Only the fields you send change.", "properties": {
+    "status": {"type": "string", "enum": ["pending", "approved"], "description": "`pending` or `approved`. `rejected` is rejected with `400` and the reason `invalid_enum`."},
+    "rating": {"type": "number", "minimum": 1, "maximum": 5, "description": "The rating, `1` to `5`."},
+    "comment": typed("string", "The review's text. It changes `review` too."),
+}}
+
+SCHEMAS["ProductInventoryStockInput"] = {"type": "object", "properties": {
+    "track_inventory": typed("boolean", "Whether the product tracks stock."),
+    "available_stock": typed("integer", "The units available."),
+    "low_level_stock": typed("integer", "The low stock level."),
+}}
+
+SCHEMAS["ProductInventoryInput"] = {"type": "object", "required": ["product"], "description": "Wrap the settings in `product.product_pricing_and_stock`.", "properties": {
+    "product": {"type": "object", "required": ["product_pricing_and_stock"], "properties": {
+        "product_pricing_and_stock": ref("ProductInventoryStockInput"),
+    }},
+}}
+
+SCHEMAS["ProductInventoryResult"] = {"type": "object", "properties": {
+    "status": typed("string", "`success`."),
+    "message": typed("string", "`Inventory has been updated successfully`."),
+    "transaction_no": nullable("string", "The product's transaction number from before this write, or `null`."),
+}}
+
+SCHEMAS["ProductImageFileInput"] = {"type": "object", "required": ["filename", "base64"], "properties": {
+    "filename": typed("string", "The file name, such as `front.png`."),
+    "base64": typed("string", "The file's bytes as base64 text."),
+}}
+
+SCHEMAS["ProductImageUploadInput"] = {"type": "object", "required": ["product"], "description": "Wrap the files in `product.image_and_video.images`. Send JSON: a multipart body is rejected with `415`.", "properties": {
+    "product": {"type": "object", "required": ["image_and_video"], "properties": {
+        "image_and_video": {"type": "object", "required": ["images"], "properties": {
+            "images": {"type": "array", "minItems": 1, "items": ref("ProductImageFileInput"), "description": "The images to store. Send several to store them in one call."},
+        }},
+    }},
+}}
+
+SCHEMAS["ProductMediaUploaded"] = {"type": "object", "properties": {
+    "product": ref("ProductImageAndVideo"),
+    "transaction_no": nullable("string", "The product's transaction number, or `null`."),
+}}
+
+SCHEMAS["ProductMediaUploadInput"] = {"type": "object", "required": ["type", "filename", "content"], "description": "Send these fields at the top level of the body, with no wrapper.", "properties": {
+    "type": {"type": "string", "enum": ["images"], "description": "`images`. `videos` and `specification_file` are rejected with `400` and the reason `not_supported`."},
+    "filename": typed("string", "The file name, such as `side.png`."),
+    "content": typed("string", "The file's bytes as base64 text, or a `data:image/png;base64,...` address."),
+    "position": typed("integer", "Optional. The image's place among the product's images, counted from `1`."),
 }}

@@ -1,0 +1,18 @@
+{
+  "sdk": "go",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "GetDashboardKPIOptions",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardKPIs().GetDashboardKPIOptions(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"min\"], body[\"max\"], body[\"selected\"])\nfor _, row := range body[\"groups\"].([]any) {\n\tgroup := row.(map[string]any)\n\tfmt.Println(group[\"key\"], group[\"label\"])\n}"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "GetDashboardKPISelection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardKPIs().GetDashboardKPISelection(ctx, map[string]any{\"duration\": \"last_7_days\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"selected\"].([]any) {\n\tkpi := row.(map[string]any)\n\tfmt.Println(kpi[\"position\"], kpi[\"label\"], kpi[\"value\"], kpi[\"change_percent\"], kpi[\"direction\"])\n}"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "UpdateDashboardKPISelection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardKPIs().UpdateDashboardKPISelection(ctx, map[string]any{\n\t\"metrics\": []any{\"total_sales\", \"total_orders\", \"aov\"},\n}, map[string]any{\"duration\": \"last_7_days\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"selected\"].([]any) {\n\tkpi := row.(map[string]any)\n\tfmt.Println(kpi[\"position\"], kpi[\"label\"], kpi[\"value\"], kpi[\"change_percent\"], kpi[\"direction\"])\n}"
+    }
+  }
+}

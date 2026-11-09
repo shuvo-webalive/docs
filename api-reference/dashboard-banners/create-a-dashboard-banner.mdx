@@ -1,0 +1,9 @@
+---
+title: "Create a dashboard banner"
+description: "Creates a banner that shows on every admin's dashboard and returns it."
+openapi: "POST /admin/dashboard/banners"
+---
+
+Send `key`, `title`, `description` and `learn_more`, which are required. The banner is `active` unless you send `active` `false`, `tags` is empty unless you send tags, and `position` is last unless you send one. The banner shows on the dashboard of every admin at once. The response is the banner, with no `Location` header. A `key` that another banner already has is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

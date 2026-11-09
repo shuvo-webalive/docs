@@ -1,0 +1,30 @@
+{
+  "sdk": "go",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "GetDashboardReportQuick",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardReports().GetDashboardReportQuick(ctx, map[string]any{\"duration\": \"last_12_months\", \"kpis\": \"total_sales,aov\", \"entity_name\": \"product\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nsales := body[\"sales\"].(map[string]any)\nfmt.Println(sales[\"total\"], sales[\"items_sold\"], sales[\"average_order_value\"])\nfor _, row := range body[\"kpis\"].([]any) {\n\tkpi := row.(map[string]any)\n\tfmt.Println(kpi[\"label\"], kpi[\"value\"], kpi[\"change_percent\"])\n}"
+    },
+    "head_dashboard_report_quick": {
+      "function": "HeadDashboardReportQuick",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardReports().HeadDashboardReportQuick(ctx, map[string]any{\"duration\": \"last_12_months\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_dashboard_report_sales": {
+      "function": "GetDashboardReportSales",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardReports().GetDashboardReportSales(ctx, map[string]any{\n\t\"duration\":  \"last_12_months\",\n\t\"breakdown\": true,\n\t\"sort\":      \"sales\",\n\t\"order\":     \"desc\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"rows\"].([]any) {\n\tline := row.(map[string]any)\n\tfmt.Println(line[\"label\"], line[\"sales\"])\n}\nfmt.Println(body[\"totals\"])"
+    },
+    "head_dashboard_report_sales": {
+      "function": "HeadDashboardReportSales",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardReports().HeadDashboardReportSales(ctx, map[string]any{\"duration\": \"last_12_months\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_dashboard_report_summary": {
+      "function": "GetDashboardReportSummary",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardReports().GetDashboardReportSummary(ctx, map[string]any{\"duration\": \"last_12_months\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nquick := body[\"quick_report\"].(map[string]any)\nfmt.Println(quick[\"orders\"], quick[\"sales\"])\nfor _, row := range body[\"order_by_month\"].([]any) {\n\tmonth := row.(map[string]any)\n\tfmt.Println(month[\"date\"], month[\"count\"])\n}"
+    },
+    "head_dashboard_report_summary": {
+      "function": "HeadDashboardReportSummary",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardReports().HeadDashboardReportSummary(ctx, map[string]any{\"duration\": \"last_12_months\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

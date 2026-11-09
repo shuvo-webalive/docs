@@ -1,0 +1,18 @@
+{
+  "sdk": "php",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "getDashboardKpiOptions",
+      "code": "use WebCommander\\Resources\\DashboardKpis\\DashboardKpis;\n\n$response = DashboardKpis::getDashboardKpiOptions($client);\n\necho 'Choose ', $response->map['min'], ' to ', $response->map['max'], ' of:', PHP_EOL;\nforeach ($response->map['groups'] as $group) {\n    foreach ($group['metrics'] as $metric) {\n        echo $group['label'], ' ', $metric['key'], ' ', $metric['label'], PHP_EOL;\n    }\n}"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "getDashboardKpiSelection",
+      "code": "use WebCommander\\Resources\\DashboardKpis\\DashboardKpis;\n\n$response = DashboardKpis::getDashboardKpiSelection($client, ['duration' => 'last_7_days']);\n\nforeach ($response->map['selected'] as $kpi) {\n    echo $kpi['position'], ' ', $kpi['key'], ' ', $kpi['label'], PHP_EOL;\n}"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "updateDashboardKpiSelection",
+      "code": "use WebCommander\\Resources\\DashboardKpis\\DashboardKpis;\n\n$response = DashboardKpis::updateDashboardKpiSelection($client, ['metrics' => ['total_sales', 'total_orders', 'aov']], ['duration' => 'last_7_days']);\n\nforeach ($response->map['selected'] as $kpi) {\n    echo $kpi['position'], ' ', $kpi['key'], PHP_EOL;\n}"
+    }
+  }
+}

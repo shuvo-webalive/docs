@@ -1,0 +1,10 @@
+{
+  "sdk": "java",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "listGiftCards",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.giftCards().listGiftCards(Map.of(\"email\", \"jane.doe@example.com\", \"is_active\", \"true\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"gift_cards\")) {\n    Map<?, ?> giftCard = (Map<?, ?>) row;\n    System.out.println(giftCard.get(\"id\") + \" \" + giftCard.get(\"code\") + \" \" + giftCard.get(\"balance\") + \" \" + giftCard.get(\"is_active\"));\n}"
+    }
+  }
+}

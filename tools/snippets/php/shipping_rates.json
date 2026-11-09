@@ -1,0 +1,46 @@
+{
+  "sdk": "php",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "listShippingRates",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::listShippingRates($client, ['method' => 'flat_rate', 'handling_cost' => 'with_handling', 'sort' => 'name', 'order' => 'asc']);\n\nforeach ($response->map['shipping_rates'] as $rate) {\n    echo $rate['id'], ' ', $rate['name'], ' ', $rate['method'], PHP_EOL;\n}"
+    },
+    "head_shipping_rates": {
+      "function": "headShippingRates",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::headShippingRates($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_shipping_rates": {
+      "function": "countShippingRates",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::countShippingRates($client, ['method' => 'flat_rate']);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "head_shipping_rates_count": {
+      "function": "headShippingRatesCount",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::headShippingRatesCount($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_shipping_rate": {
+      "function": "createShippingRate",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::createShippingRate($client, [\n    'shipping_rate' => [\n        'name' => 'Flat 10',\n        'method' => 'flat_rate',\n        'shipping_cost' => ['amount' => 10, 'type' => 'fixed'],\n        'handling_cost' => ['amount' => 5, 'type' => 'percent'],\n    ],\n], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['shipping_rate']['id'], PHP_EOL;"
+    },
+    "get_shipping_rate": {
+      "function": "getShippingRate",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::getShippingRate($client, 21);\n\n$rate = $response->map['shipping_rate'];\necho $rate['name'], ' ', $rate['method'], PHP_EOL;"
+    },
+    "head_shipping_rate": {
+      "function": "headShippingRate",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::headShippingRate($client, 21);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_shipping_rate": {
+      "function": "updateShippingRate",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::updateShippingRate($client, 21, [\n    'shipping_rate' => [\n        'name' => 'Flat 12',\n        'method' => 'flat_rate',\n        'calculate_for_entire_order' => false,\n        'price_entered_with_tax' => false,\n        'shipping_cost' => ['amount' => 12, 'type' => 'fixed'],\n        'handling_cost' => ['amount' => 5, 'type' => 'percent'],\n        'additional_rule' => ['enabled' => false],\n    ],\n]);\n\necho $response->map['shipping_rate']['name'], PHP_EOL;"
+    },
+    "patch_shipping_rate": {
+      "function": "patchShippingRate",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::patchShippingRate($client, 21, [\n    'shipping_rate' => ['shipping_cost' => ['amount' => 12, 'type' => 'fixed']],\n]);\n\necho $response->map['shipping_rate']['shipping_cost']['amount'], PHP_EOL;"
+    },
+    "delete_shipping_rate": {
+      "function": "deleteShippingRate",
+      "code": "use WebCommander\\Resources\\ShippingRates\\ShippingRates;\n\n$response = ShippingRates::deleteShippingRate($client, 21);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

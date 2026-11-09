@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "deleteProductStockLocation",
       "code": "final response = await client.products.deleteProductStockLocation(101, 19);\nprint(response.statusCode);"
+    },
+    "count_products": {
+      "function": "countProducts",
+      "code": "final response =\n    await client.products.countProducts(queryParams: {'search_text': 'shirt'});\nfinal result = response.map as Map;\nprint('${result['total']} ${result['count']}');"
+    },
+    "check_product_sku": {
+      "function": "checkProductSku",
+      "code": "final response = await client.products\n    .checkProductSku('TSHIRT-001', excludeProductId: 101);\nfinal result = response.map as Map;\nprint('${result['available']} ${result['is_exist']}');"
+    },
+    "list_special_products": {
+      "function": "listSpecialProducts",
+      "code": "final response = await client.products\n    .listSpecialProducts({'type': 'featured', 'max': 10});\nfinal result = response.map as Map;\nfor (final product in result['products'] as List) {\n  print('${(product as Map)['id']} ${product['name']} ${product['effective_price']}');\n}\nprint(result['total']);"
+    },
+    "bulk_delete_products": {
+      "function": "bulkDeleteProducts",
+      "code": "final response = await client.products.bulkDeleteProducts({\n  'ids': [102, 103],\n});\nfinal result = response.map as Map;\nprint('${result['deleted']} ${result['failed']}');"
+    },
+    "list_product_reviews": {
+      "function": "listProductReviews",
+      "code": "final response =\n    await client.products.listProductReviews(101, queryParams: {'limit': 20});\nfinal result = response.map as Map;\nfor (final review in result['reviews'] as List) {\n  print('${(review as Map)['id']} ${review['rating']} ${review['status']}');\n}\nfinal pagination = result['pagination'] as Map;\nprint('${pagination['total']} ${pagination['has_next']}');"
+    },
+    "get_product_review": {
+      "function": "getProductReview",
+      "code": "final response = await client.products.getProductReview(101, 31);\nfinal review = (response.map as Map)['review'] as Map;\nprint('${review['name']} ${review['rating']} ${review['comment']}');"
+    },
+    "patch_product_review": {
+      "function": "patchProductReview",
+      "code": "final response = await client.products.patchProductReview(101, 31, {\n  'status': 'approved',\n  'rating': 2,\n  'comment': 'Runs small',\n});\nfinal review = (response.map as Map)['review'] as Map;\nprint('${review['status']} ${review['rating']} ${review['comment']}');"
+    },
+    "delete_product_review": {
+      "function": "deleteProductReview",
+      "code": "final response = await client.products.deleteProductReview(101, 31);\nprint(response.statusCode);"
+    },
+    "create_product_inventory": {
+      "function": "createProductInventory",
+      "code": "final response = await client.products.createProductInventory(\n  101,\n  {\n    'product': {\n      'product_pricing_and_stock': {\n        'track_inventory': true,\n        'available_stock': 12,\n        'low_level_stock': 3,\n      },\n    },\n  },\n  transactionNo: 'IMPORT-2026-10-18',\n);\nfinal result = response.map as Map;\nprint('${result['status']} ${result['message']}');"
+    },
+    "create_product_image": {
+      "function": "createProductImage",
+      "code": "final response = await client.products.createProductImage(101, {\n  'product': {\n    'image_and_video': {\n      'images': [\n        {\n          'filename': 'front.png',\n          'base64':\n              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=',\n        },\n      ],\n    },\n  },\n});\nfinal product = (response.map as Map)['product'] as Map;\nfor (final image in product['images'] as List) {\n  print('${(image as Map)['id']} ${image['link']}');\n}"
+    },
+    "create_product_media": {
+      "function": "createProductMedia",
+      "code": "final response = await client.products.createProductMedia(101, {\n  'type': 'images',\n  'filename': 'side.png',\n  'content':\n      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=',\n});\nfinal image = response.map as Map;\nprint('${image['id']} ${image['position']} ${image['url']}');"
+    },
+    "delete_product_media_image": {
+      "function": "deleteProductMediaImage",
+      "code": "final response = await client.products.deleteProductMediaImage(101, 1876);\nprint(response.statusCode);"
     }
   }
 }

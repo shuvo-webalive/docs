@@ -1,0 +1,10 @@
+{
+  "sdk": "dotnet",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "ListGiftCardsAsync",
+      "code": "var response = await client.GiftCards.ListGiftCardsAsync(\n    new Dictionary<string, object?> { [\"email\"] = \"jane.doe@example.com\", [\"is_active\"] = \"true\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var giftCard in ((IReadOnlyList<object?>)body[\"gift_cards\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{giftCard[\"id\"]} {giftCard[\"code\"]} {giftCard[\"balance\"]} {giftCard[\"initial_amount\"]} {giftCard[\"is_active\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    }
+  }
+}

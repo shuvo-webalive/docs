@@ -1,0 +1,30 @@
+{
+  "sdk": "python",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "get_dashboard_report_quick",
+      "code": "response = client.dashboard_reports.get_dashboard_report_quick({\n    \"duration\": \"last_12_months\",\n    \"kpis\": \"total_sales,aov\",\n    \"entity_name\": \"product\",\n})\nfor kpi in response.map[\"kpis\"]:\n    print(kpi[\"key\"], kpi[\"value\"], kpi[\"change_percent\"], kpi[\"direction\"])\n"
+    },
+    "head_dashboard_report_quick": {
+      "function": "head_dashboard_report_quick",
+      "code": "response = client.dashboard_reports.head_dashboard_report_quick({\"duration\": \"last_12_months\"})\nprint(response.status_code)\n"
+    },
+    "get_dashboard_report_sales": {
+      "function": "get_dashboard_report_sales",
+      "code": "response = client.dashboard_reports.get_dashboard_report_sales({\n    \"duration\": \"last_12_months\",\n    \"breakdown\": \"true\",\n    \"sort\": \"sales\",\n    \"order\": \"desc\",\n})\nfor row in response.map[\"rows\"]:\n    print(row[\"label\"], row[\"sales\"])\nprint(response.map[\"totals\"][\"sales\"])\n"
+    },
+    "head_dashboard_report_sales": {
+      "function": "head_dashboard_report_sales",
+      "code": "response = client.dashboard_reports.head_dashboard_report_sales({\"duration\": \"last_12_months\"})\nprint(response.status_code)\n"
+    },
+    "get_dashboard_report_summary": {
+      "function": "get_dashboard_report_summary",
+      "code": "response = client.dashboard_reports.get_dashboard_report_summary({\"duration\": \"last_12_months\"})\nquick_report = response.map[\"quick_report\"]\nprint(quick_report[\"orders\"][\"count\"], quick_report[\"sales\"][\"total\"], quick_report[\"customers\"][\"new\"])\n"
+    },
+    "head_dashboard_report_summary": {
+      "function": "head_dashboard_report_summary",
+      "code": "response = client.dashboard_reports.head_dashboard_report_summary({\"duration\": \"last_12_months\"})\nprint(response.status_code)\n"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+---
+title: "Dashboards"
+sidebarTitle: "Overview"
+description: "List, create, retrieve, update and delete the dashboard layouts that choose which sections the store's admin dashboard shows, in what order, and which KPI tiles it starts with."
+---
+
+The Dashboards API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/dashboards`.
+
+<Warning>
+  **Creating a layout changes the store, and making a layout the default changes the dashboard for every admin.**
+  A layout you create is saved to the store and stays there until you delete it with
+  [Delete a dashboard layout](/api-reference/dashboards/delete-a-dashboard-layout). Sending `"default": true` moves the store's default
+  layout to the layout you name, and every admin then sees that layout. Before you do, note which row of
+  [List dashboard layouts](/api-reference/dashboards/list-dashboard-layouts) has `default` `true`, so you can set it back.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List dashboard layouts](/api-reference/dashboards/list-dashboard-layouts) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/dashboards` | Returns every dashboard layout with its `id`, `name` and whether it is the default. |
+| [Create a dashboard layout](/api-reference/dashboards/create-a-dashboard-layout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/dashboards` | Creates a layout as a copy of the default layout and returns it with its `id`. |
+| [Retrieve a dashboard layout](/api-reference/dashboards/retrieve-a-dashboard-layout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/dashboards/{dashboard_id}` | Returns the layout whose `id` you pass as `dashboard_id`, with its sections and KPI tiles. |
+| [Update a dashboard layout](/api-reference/dashboards/update-a-dashboard-layout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/dashboards/{dashboard_id}` | Changes only the fields you send and returns the whole layout. |
+| [Delete a dashboard layout](/api-reference/dashboards/delete-a-dashboard-layout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/dashboards/{dashboard_id}` | Deletes the layout whose `id` you pass as `dashboard_id` and returns no body. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send the fields of every write as they are, with no wrapper.** Create and update take the layout's fields at
+  the top level of the body, such as `{"name": "Weekly"}`. Responses return the layout the same way, with no
+  wrapper. A body with no fields is rejected with `400`, and a field the layout does not have is ignored.
+- **Pass the layout's `id` as `dashboard_id`.** The `id` is a UUID, and you read it from
+  [List dashboard layouts](/api-reference/dashboards/list-dashboard-layouts) or from the response to creating the layout. An `id` that
+  matches no layout is rejected with `404`, the reason `not_found`, and the detail on the field `dashboard_id`.
+- **A new layout is a copy of the default layout.** [Create a dashboard layout](/api-reference/dashboards/create-a-dashboard-layout) copies the
+  default layout's sections and its KPI tiles, or the layout whose `id` you send as `copy_from`. The
+  `customisable_sections` and `kpis` you send are then applied on top of the copy. A new layout is never the
+  default unless you send `default` `true`.
+- **An update changes only what you send, and sections are matched by `key`.** Send `standard_sections`,
+  `customisable_sections` or `kpis` with just the entries to change. A section you leave out keeps its
+  `visible` value and its `position`. The four standard sections (`announcement`, `performance`, `activity`
+  and `contact`) take only `visible`, and `contact` cannot be hidden. The customisable sections
+  (`setup_guide`, `section_tabs` and `seo`) also take a `position`. Send the tabs of `section_tabs` as `tabs`
+  and the parts of `seo` as `parts`, each with its `key`.
+- **`kpis` is the full list of the layout's KPI tiles, as 2 to 5 distinct keys in tile order.** The keys are
+  the metric keys that the KPI options list, such as `total_sales` or `aov`. Sending `kpis` replaces the
+  tiles the layout has, and `position` in the response counts from `1`.
+- **A layout name is unique and at most 60 characters.** A `name` that another layout already has is rejected
+  with `409`, the reason `conflict` and the detail code `name_taken`. A blank `name` or one longer than 60
+  characters is rejected with `400`.

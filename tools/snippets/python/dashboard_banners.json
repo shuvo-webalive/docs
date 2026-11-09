@@ -1,0 +1,30 @@
+{
+  "sdk": "python",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "list_dashboard_banners",
+      "code": "response = client.dashboard_banners.list_dashboard_banners()\nfor banner in response.map[\"banners\"]:\n    print(banner[\"key\"], banner[\"position\"], banner[\"active\"], banner[\"title\"])\n"
+    },
+    "create_dashboard_banner": {
+      "function": "create_dashboard_banner",
+      "code": "response = client.dashboard_banners.create_dashboard_banner({\n    \"key\": \"spring_sale\",\n    \"title\": \"Spring sale\",\n    \"description\": \"Ends Friday.\",\n    \"tags\": [\"Sales\"],\n    \"icon\": \"tag\",\n    \"learn_more\": {\"action\": \"open_link\", \"label\": \"Learn more\", \"url\": \"https://example.com/spring-sale\"},\n})\nprint(response.map[\"key\"], response.map[\"position\"], response.map[\"active\"])\n"
+    },
+    "get_dashboard_banner": {
+      "function": "get_dashboard_banner",
+      "code": "response = client.dashboard_banners.get_dashboard_banner(\"spring_sale\")\nprint(response.map[\"title\"], response.map[\"description\"], response.map[\"active\"])\n"
+    },
+    "patch_dashboard_banner": {
+      "function": "patch_dashboard_banner",
+      "code": "response = client.dashboard_banners.patch_dashboard_banner(\"spring_sale\", {\"title\": \"Spring sale ends today\", \"active\": False})\nprint(response.map[\"title\"], response.map[\"active\"])\n"
+    },
+    "delete_dashboard_banner": {
+      "function": "delete_dashboard_banner",
+      "code": "response = client.dashboard_banners.delete_dashboard_banner(\"spring_sale\")\nprint(response.status_code)\n"
+    },
+    "get_dashboard_content_info": {
+      "function": "get_dashboard_content_info",
+      "code": "response = client.dashboard_banners.get_dashboard_content_info()\nprint(len(response.map[\"banners\"]), response.map[\"online_store\"], response.map[\"contact\"][\"email\"])\n"
+    }
+  }
+}
