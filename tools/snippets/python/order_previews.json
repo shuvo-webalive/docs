@@ -1,0 +1,34 @@
+{
+  "sdk": "python",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "create_order_preview",
+      "code": "response = client.order_previews.create_order_preview({\n    \"customer_id\": 512,\n    \"delivery_type\": \"shipping\",\n    \"products\": [{\"product_id\": 101, \"quantity\": 2}],\n})\norder = response.map[\"order\"]\nprint(order[\"session\"][\"session_id\"], order[\"session\"][\"expires_at\"])\nprint(order[\"totals\"][\"grand_total\"], order[\"totals\"][\"due\"])\n"
+    },
+    "get_order_preview": {
+      "function": "get_order_preview",
+      "code": "response = client.order_previews.get_order_preview(\"PRV-3f2a9c41b7d80e65\")\norder = response.map[\"order\"]\nprint(order[\"session\"][\"status\"], order[\"totals\"][\"grand_total\"])\nfor item in order[\"items\"]:\n    print(item[\"sku\"], item[\"quantity\"], item[\"total_amount\"])\n"
+    },
+    "confirm_order_preview": {
+      "function": "confirm_order_preview",
+      "code": "response = client.order_previews.confirm_order_preview(\"PRV-3f2a9c41b7d80e65\", {\n    \"send_email\": False,\n    \"transaction_no\": \"TXN-ORDER-0001\",\n    \"payment\": {\n        \"amount\": 10.0,\n        \"payment_status\": \"success\",\n        \"payment_method\": \"manual\",\n        \"transaction_reference\": \"REF-0001\",\n        \"transaction_date\": \"2026-11-05T06:12:00Z\",\n    },\n})\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"payment_status\"], order[\"grand_total\"], order[\"due\"])\n"
+    },
+    "apply_order_preview_coupon": {
+      "function": "apply_order_preview_coupon",
+      "code": "response = client.order_previews.apply_order_preview_coupon(\"PRV-3f2a9c41b7d80e65\", {\"code\": \"SAVE10\"})\norder = response.map[\"order\"]\nprint(order[\"discounts\"][\"coupon\"][\"status\"], order[\"totals\"][\"total_discount\"])\n"
+    },
+    "remove_order_preview_coupon": {
+      "function": "remove_order_preview_coupon",
+      "code": "response = client.order_previews.remove_order_preview_coupon(\"PRV-3f2a9c41b7d80e65\")\nprint(response.status_code)\n"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "apply_order_preview_gift_card",
+      "code": "response = client.order_previews.apply_order_preview_gift_card(\"PRV-3f2a9c41b7d80e65\", {\"code\": \"GIFT-0001\"})\norder = response.map[\"order\"]\nprint(order[\"discounts\"][\"gift_card\"][\"applied_amount\"], order[\"totals\"][\"due\"])\n"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "remove_order_preview_gift_card",
+      "code": "response = client.order_previews.remove_order_preview_gift_card(\"PRV-3f2a9c41b7d80e65\")\nprint(response.status_code)\n"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "sdk": "go",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "ListDashboards",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Dashboards().ListDashboards(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"dashboards\"].([]any) {\n\tdashboard := row.(map[string]any)\n\tfmt.Println(dashboard[\"id\"], dashboard[\"name\"], dashboard[\"default\"])\n}"
+    },
+    "create_dashboard": {
+      "function": "CreateDashboard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Dashboards().CreateDashboard(ctx, map[string]any{\n\t\"name\": \"Weekly\",\n\t\"kpis\": []any{\"total_sales\", \"total_orders\", \"aov\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"id\"], body[\"name\"], body[\"default\"])"
+    },
+    "get_dashboard": {
+      "function": "GetDashboard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Dashboards().GetDashboard(ctx, \"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"id\"], body[\"name\"], body[\"standard_sections\"], body[\"customisable_sections\"])"
+    },
+    "patch_dashboard": {
+      "function": "PatchDashboard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Dashboards().PatchDashboard(ctx, \"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\", map[string]any{\n\t\"standard_sections\": []any{\n\t\tmap[string]any{\"key\": \"announcement\", \"visible\": false},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"standard_sections\"].([]any) {\n\tsection := row.(map[string]any)\n\tfmt.Println(section[\"key\"], section[\"visible\"])\n}"
+    },
+    "delete_dashboard": {
+      "function": "DeleteDashboard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Dashboards().DeleteDashboard(ctx, \"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "sdk": "php",
+  "module": "shipping_profiles",
+  "endpoints": {
+    "list_shipping_profiles": {
+      "function": "listShippingProfiles",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::listShippingProfiles($client, ['search' => 'metro', 'sort' => 'name', 'order' => 'asc', 'limit' => 20]);\n\nforeach ($response->map['shipping_profiles'] as $profile) {\n    echo $profile['id'], ' ', $profile['name'], ' ', $profile['rule_preference'], $profile['default'] ? ' (default)' : '', PHP_EOL;\n}"
+    },
+    "head_shipping_profiles": {
+      "function": "headShippingProfiles",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::headShippingProfiles($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "count_shipping_profiles": {
+      "function": "countShippingProfiles",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::countShippingProfiles($client, ['default' => 'true']);\n\necho $response->map['total'], PHP_EOL;"
+    },
+    "head_shipping_profiles_count": {
+      "function": "headShippingProfilesCount",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::headShippingProfilesCount($client);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "create_shipping_profile": {
+      "function": "createShippingProfile",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::createShippingProfile($client, [\n    'shipping_profile' => [\n        'name' => 'Metro profile',\n        'description' => 'Metro deliveries',\n        'rule_preference' => 'product_assigned_rule',\n        'shipping_rules' => [31],\n    ],\n], transactionNo: 'TXN-IMPORT-0001');\n\necho $response->map['shipping_profile']['id'], PHP_EOL;"
+    },
+    "create_shipping_profile_wizard": {
+      "function": "createShippingProfileWizard",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::createShippingProfileWizard($client, [\n    'shipping_profile' => [\n        'name' => 'Wizard profile',\n        'description' => 'Built in one call',\n        'rule_preference' => 'product_assigned_rule',\n        'shipping_rules' => [[\n            'name' => 'Metro delivery',\n            'description' => 'Metro deliveries',\n            'shipping_class' => 2,\n            'zones' => [['id' => 5], ['name' => 'Inner West']],\n            'shipping_rate' => [\n                'name' => 'Metro flat rate',\n                'method' => 'flat_rate',\n                'shipping_cost' => ['amount' => 10, 'type' => 'fixed'],\n                'handling_cost' => ['amount' => 5, 'type' => 'percent'],\n            ],\n        ]],\n    ],\n]);\n\n$profile = $response->map['shipping_profile'];\necho $profile['id'], ' ', $profile['name'], ' with ', $profile['rules_count'], ' rule(s)', PHP_EOL;"
+    },
+    "get_shipping_profile": {
+      "function": "getShippingProfile",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::getShippingProfile($client, 12);\n\n$profile = $response->map['shipping_profile'];\necho $profile['name'], ' ', $profile['rule_preference'], $profile['default'] ? ' (default)' : '', PHP_EOL;"
+    },
+    "head_shipping_profile": {
+      "function": "headShippingProfile",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::headShippingProfile($client, 12);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_shipping_profile": {
+      "function": "updateShippingProfile",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::updateShippingProfile($client, 12, [\n    'shipping_profile' => [\n        'name' => 'Metro profile',\n        'description' => 'Metro and inner west deliveries',\n        'rule_preference' => 'lowest_shipping_cost_rule',\n        'shipping_rules' => [31],\n    ],\n]);\n\necho $response->map['shipping_profile']['rule_preference'], PHP_EOL;"
+    },
+    "patch_shipping_profile": {
+      "function": "patchShippingProfile",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::patchShippingProfile($client, 12, ['shipping_profile' => ['default' => true]]);\n\necho $response->map['shipping_profile']['default'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "delete_shipping_profile": {
+      "function": "deleteShippingProfile",
+      "code": "use WebCommander\\Resources\\ShippingProfiles\\ShippingProfiles;\n\n$response = ShippingProfiles::deleteShippingProfile($client, 12);\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

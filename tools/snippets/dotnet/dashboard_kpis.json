@@ -1,0 +1,18 @@
+{
+  "sdk": "dotnet",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "GetDashboardKpiOptionsAsync",
+      "code": "var response = await client.DashboardKpis.GetDashboardKpiOptionsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"min\"]} {body[\"max\"]} {string.Join(\", \", (IReadOnlyList<object?>)body[\"selected\"]!)}\");\nforeach (var group in ((IReadOnlyList<object?>)body[\"groups\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{group[\"key\"]} {group[\"label\"]}\");"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "GetDashboardKpiSelectionAsync",
+      "code": "var response = await client.DashboardKpis.GetDashboardKpiSelectionAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_7_days\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar period = (IReadOnlyDictionary<string, object?>)body[\"period\"]!;\nConsole.WriteLine($\"{period[\"start_date\"]} {period[\"end_date\"]}\");\nforeach (var kpi in ((IReadOnlyList<object?>)body[\"selected\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{kpi[\"position\"]} {kpi[\"key\"]} {kpi[\"value\"]} {kpi[\"previous_value\"]}\");"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "UpdateDashboardKpiSelectionAsync",
+      "code": "var response = await client.DashboardKpis.UpdateDashboardKpiSelectionAsync(\n    new Dictionary<string, object?> { [\"metrics\"] = new[] { \"total_sales\", \"total_orders\", \"aov\" } },\n    new Dictionary<string, object?> { [\"duration\"] = \"last_7_days\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var kpi in ((IReadOnlyList<object?>)body[\"selected\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{kpi[\"position\"]} {kpi[\"key\"]} {kpi[\"value\"]} {kpi[\"previous_value\"]}\");"
+    }
+  }
+}

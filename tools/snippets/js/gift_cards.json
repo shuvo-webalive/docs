@@ -1,0 +1,10 @@
+{
+  "sdk": "js",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "listGiftCards",
+      "code": "const response = await client.giftCards.listGiftCards({email: 'jane.doe@example.com', is_active: 'true'});\nfor (const giftCard of response.map.gift_cards) {\n    console.log(giftCard.id, giftCard.code, giftCard.balance, giftCard.is_active);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    }
+  }
+}

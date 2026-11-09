@@ -1,0 +1,46 @@
+{
+  "sdk": "python",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "list_shipping_rates",
+      "code": "response = client.shipping_rates.list_shipping_rates({\"method\": \"flat_rate\", \"handling_cost\": \"with_handling\", \"sort\": \"name\", \"order\": \"asc\"})\nfor rate in response.map[\"shipping_rates\"]:\n    print(rate[\"id\"], rate[\"name\"], rate[\"method\"], rate[\"shipping_cost\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+    },
+    "head_shipping_rates": {
+      "function": "head_shipping_rates",
+      "code": "response = client.shipping_rates.head_shipping_rates()\nprint(response.status_code)\n"
+    },
+    "count_shipping_rates": {
+      "function": "count_shipping_rates",
+      "code": "response = client.shipping_rates.count_shipping_rates({\"method\": \"flat_rate\"})\nprint(response.map[\"total\"])\n"
+    },
+    "head_shipping_rates_count": {
+      "function": "head_shipping_rates_count",
+      "code": "response = client.shipping_rates.head_shipping_rates_count()\nprint(response.status_code)\n"
+    },
+    "create_shipping_rate": {
+      "function": "create_shipping_rate",
+      "code": "response = client.shipping_rates.create_shipping_rate({\n    \"shipping_rate\": {\n        \"name\": \"Flat 10\",\n        \"method\": \"flat_rate\",\n        \"shipping_cost\": {\"amount\": 10, \"type\": \"fixed\"},\n        \"handling_cost\": {\"amount\": 5, \"type\": \"percent\"},\n    },\n}, transaction_no=\"TXN-IMPORT-0001\")\nrate = response.map[\"shipping_rate\"]\nprint(rate[\"id\"], rate[\"name\"], rate[\"method\"])\n"
+    },
+    "get_shipping_rate": {
+      "function": "get_shipping_rate",
+      "code": "response = client.shipping_rates.get_shipping_rate(21)\nrate = response.map[\"shipping_rate\"]\nprint(rate[\"name\"], rate[\"method\"], rate[\"shipping_cost\"], rate[\"handling_cost\"])\n"
+    },
+    "head_shipping_rate": {
+      "function": "head_shipping_rate",
+      "code": "response = client.shipping_rates.head_shipping_rate(21)\nprint(response.status_code)\n"
+    },
+    "update_shipping_rate": {
+      "function": "update_shipping_rate",
+      "code": "response = client.shipping_rates.update_shipping_rate(21, {\n    \"shipping_rate\": {\n        \"name\": \"Flat 12\",\n        \"method\": \"flat_rate\",\n        \"calculate_for_entire_order\": False,\n        \"price_entered_with_tax\": False,\n        \"shipping_cost\": {\"amount\": 12, \"type\": \"fixed\"},\n        \"handling_cost\": {\"amount\": 5, \"type\": \"percent\"},\n        \"additional_rule\": {\"enabled\": False},\n    },\n})\nrate = response.map[\"shipping_rate\"]\nprint(rate[\"name\"], rate[\"shipping_cost\"])\n"
+    },
+    "patch_shipping_rate": {
+      "function": "patch_shipping_rate",
+      "code": "response = client.shipping_rates.patch_shipping_rate(21, {\"shipping_rate\": {\"shipping_cost\": {\"amount\": 12, \"type\": \"fixed\"}}})\nrate = response.map[\"shipping_rate\"]\nprint(rate[\"name\"], rate[\"shipping_cost\"])\n"
+    },
+    "delete_shipping_rate": {
+      "function": "delete_shipping_rate",
+      "code": "response = client.shipping_rates.delete_shipping_rate(21)\nprint(response.status_code)\n"
+    }
+  }
+}

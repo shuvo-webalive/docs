@@ -1,0 +1,26 @@
+{
+  "sdk": "java",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "listDashboards",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboards().listDashboards();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"dashboards\")) {\n    Map<?, ?> dashboard = (Map<?, ?>) row;\n    System.out.println(dashboard.get(\"id\") + \" \" + dashboard.get(\"name\") + \" \" + dashboard.get(\"default\"));\n}"
+    },
+    "create_dashboard": {
+      "function": "createDashboard",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboards().createDashboard(Map.of(\n        \"name\", \"Weekly\", \"kpis\", List.of(\"total_sales\", \"total_orders\", \"aov\")));\nMap<?, ?> dashboard = (Map<?, ?>) response.getMap();\nSystem.out.println(dashboard.get(\"id\") + \" \" + dashboard.get(\"name\") + \" \" + dashboard.get(\"default\"));\nSystem.out.println(dashboard.get(\"standard_sections\"));"
+    },
+    "get_dashboard": {
+      "function": "getDashboard",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboards().getDashboard(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\");\nMap<?, ?> dashboard = (Map<?, ?>) response.getMap();\nSystem.out.println(dashboard.get(\"id\") + \" \" + dashboard.get(\"name\") + \" \" + dashboard.get(\"default\"));\nSystem.out.println(dashboard.get(\"standard_sections\"));"
+    },
+    "patch_dashboard": {
+      "function": "patchDashboard",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboards().patchDashboard(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\", Map.of(\n        \"standard_sections\", List.of(Map.of(\"key\", \"announcement\", \"visible\", false))));\nMap<?, ?> dashboard = (Map<?, ?>) response.getMap();\nSystem.out.println(dashboard.get(\"id\") + \" \" + dashboard.get(\"name\") + \" \" + dashboard.get(\"default\"));\nSystem.out.println(dashboard.get(\"standard_sections\"));"
+    },
+    "delete_dashboard": {
+      "function": "deleteDashboard",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.dashboards().deleteDashboard(\"3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01\");\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

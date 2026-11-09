@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "update_product_variations",
       "code": "response = client.variations.update_product_variations(4321, {\n    \"variation_ids\": [91],\n    \"available\": True,\n    \"available_stock\": 12,\n    \"min_order_quantity\": 1,\n    \"max_order_quantity\": 5,\n})\nprint(response.map[\"message\"])\nfor variant in response.map[\"updated\"]:\n    print(variant[\"id\"], variant[\"name\"])\n"
+    },
+    "get_product_variation": {
+      "function": "get_product_variation",
+      "code": "response = client.variations.get_product_variation(4321, 91)\nvariation = response.map[\"variation\"]\nprint(variation[\"variation_id\"], variation[\"sku\"], variation[\"active\"])\nfor option in variation[\"options\"]:\n    print(option[\"type\"], option[\"label\"])\nprint(variation[\"pricing\"][\"base_price\"])\n"
+    },
+    "delete_product_variation": {
+      "function": "delete_product_variation",
+      "code": "response = client.variations.delete_product_variation(4321, 91)\nprint(response.status_code)\n"
     }
   }
 }

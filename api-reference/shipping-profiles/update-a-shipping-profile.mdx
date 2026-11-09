@@ -1,0 +1,9 @@
+---
+title: "Update a shipping profile"
+description: "Changes only the fields you send inside `shipping_profile` and returns the profile."
+openapi: "PATCH /admin/shipping_profiles/{shipping_profile_id}"
+---
+
+Send only the fields to change, inside `shipping_profile`; every field you leave out keeps its value. `shipping_rules` is the full new list of rule `id` values, and `[]` takes every rule off the profile. `default` set to `true` makes this profile the store default and sets `default` to `false` on the old one. `default` set to `false` on the default profile is rejected with `409`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

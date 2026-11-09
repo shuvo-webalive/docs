@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "deleteProductStockLocation",
       "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.products().deleteProductStockLocation(101, 19);\nSystem.out.println(response.getStatusCode());"
+    },
+    "count_products": {
+      "function": "countProducts",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().countProducts(Map.of(\"search_text\", \"shirt\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total\"));"
+    },
+    "check_product_sku": {
+      "function": "checkProductSku",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().checkProductSku(\"TSHIRT-001\");\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"available\") + \" \" + body.get(\"is_exist\") + \" \" + body.get(\"product\"));"
+    },
+    "list_special_products": {
+      "function": "listSpecialProducts",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().listSpecialProducts(Map.of(\"type\", \"featured\", \"max\", 10));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"products\")) {\n    Map<?, ?> product = (Map<?, ?>) row;\n    System.out.println(product.get(\"id\") + \" \" + product.get(\"name\") + \" \" + product.get(\"effective_price\"));\n}\nSystem.out.println(body.get(\"total\"));"
+    },
+    "bulk_delete_products": {
+      "function": "bulkDeleteProducts",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().bulkDeleteProducts(Map.of(\"ids\", List.of(102, 103)));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"deleted\") + \" \" + body.get(\"failed\") + \" \" + body.get(\"errors\"));"
+    },
+    "list_product_reviews": {
+      "function": "listProductReviews",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().listProductReviews(101, Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"reviews\")) {\n    Map<?, ?> review = (Map<?, ?>) row;\n    System.out.println(review.get(\"id\") + \" \" + review.get(\"reviewer\") + \" \" + review.get(\"rating\") + \" \" + review.get(\"status\") + \" \" + review.get(\"comment\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "get_product_review": {
+      "function": "getProductReview",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().getProductReview(101, 31);\nMap<?, ?> review = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"review\");\nSystem.out.println(review.get(\"id\") + \" \" + review.get(\"rating\") + \" \" + review.get(\"status\") + \" \" + review.get(\"comment\"));"
+    },
+    "patch_product_review": {
+      "function": "patchProductReview",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().patchProductReview(101, 31,\n        Map.of(\"status\", \"approved\", \"rating\", 2, \"comment\", \"Runs small\"));\nMap<?, ?> review = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"review\");\nSystem.out.println(review.get(\"id\") + \" \" + review.get(\"rating\") + \" \" + review.get(\"status\") + \" \" + review.get(\"comment\"));"
+    },
+    "delete_product_review": {
+      "function": "deleteProductReview",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.products().deleteProductReview(101, 31);\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_product_inventory": {
+      "function": "createProductInventory",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().createProductInventory(101, Map.of(\n        \"product\", Map.of(\"product_pricing_and_stock\", Map.of(\n                \"track_inventory\", true, \"available_stock\", 12, \"low_level_stock\", 3))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"status\") + \" \" + body.get(\"message\"));"
+    },
+    "create_product_image": {
+      "function": "createProductImage",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().createProductImage(101, Map.of(\n        \"product\", Map.of(\"image_and_video\", Map.of(\"images\", List.of(Map.of(\n                \"filename\", \"front.png\", \"base64\", \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\"))))));\nMap<?, ?> product = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"product\");\nfor (Object row : (List<?>) product.get(\"images\")) {\n    Map<?, ?> image = (Map<?, ?>) row;\n    System.out.println(image.get(\"id\") + \" \" + image.get(\"filename\") + \" \" + image.get(\"link\"));\n}"
+    },
+    "create_product_media": {
+      "function": "createProductMedia",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().createProductMedia(101, Map.of(\n        \"type\", \"images\", \"filename\", \"side.png\", \"content\", \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\"));\nMap<?, ?> media = (Map<?, ?>) response.getMap();\nSystem.out.println(media.get(\"id\") + \" \" + media.get(\"filename\") + \" \" + media.get(\"position\") + \" \" + media.get(\"primary\"));"
+    },
+    "delete_product_media_image": {
+      "function": "deleteProductMediaImage",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.products().deleteProductMediaImage(101, 1876);\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "UpdateProductVariations",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().UpdateProductVariations(ctx, 4321, map[string]any{\n\t\"variation_ids\":      []any{91},\n\t\"available\":          true,\n\t\"available_stock\":    12,\n\t\"min_order_quantity\": 1,\n\t\"max_order_quantity\": 5,\n}, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"message\"], body[\"updated\"])"
+    },
+    "get_product_variation": {
+      "function": "GetProductVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().GetProductVariation(ctx, 4321, 91, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\npricing := variation[\"pricing\"].(map[string]any)\nfmt.Println(variation[\"variation_id\"], variation[\"sku\"], variation[\"active\"], pricing[\"base_price\"])\nfor _, row := range variation[\"options\"].([]any) {\n\toption := row.(map[string]any)\n\tfmt.Println(option[\"type\"], option[\"label\"])\n}"
+    },
+    "delete_product_variation": {
+      "function": "DeleteProductVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().DeleteProductVariation(ctx, 4321, 91, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     }
   }
 }

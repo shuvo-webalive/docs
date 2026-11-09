@@ -1,0 +1,10 @@
+{
+  "sdk": "go",
+  "module": "dashboard_sections",
+  "endpoints": {
+    "get_dashboard_section": {
+      "function": "GetDashboardSection",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardSections().GetDashboardSection(ctx, \"blog\", map[string]any{\"duration\": \"last_7_days\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"section\"], body[\"comments_to_moderate\"], body[\"drafts_to_publish\"], body[\"most_viewed_posts\"])"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+---
+title: "Dashboard KPIs"
+sidebarTitle: "Overview"
+description: "List the metrics the dashboard's KPI tiles can show, read the tiles in use with their figures for a period, and choose which 2 to 5 tiles the dashboard shows."
+---
+
+The Dashboard KPIs API has three endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/dashboard`.
+
+<Warning>
+  **[Update the KPI selection](/api-reference/dashboard-kpis/update-the-kpi-selection) changes the tiles on the dashboard of every admin.**
+  It writes the KPI tiles of the store's default dashboard layout, so the change shows at once for everyone,
+  and the layout's `updated_at` moves. Before you call it, read the keys in `selected` from
+  [List KPI options](/api-reference/dashboard-kpis/list-kpi-options), so you can send them back to restore the tiles.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List KPI options](/api-reference/dashboard-kpis/list-kpi-options) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/dashboard/kpi_options` | Returns every metric a KPI tile can show, by group, and the keys now selected. |
+| [Get the KPI selection](/api-reference/dashboard-kpis/get-the-kpi-selection) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/dashboard/kpi_selection` | Returns the KPI tiles the dashboard shows, with their figures for a period. |
+| [Update the KPI selection](/api-reference/dashboard-kpis/update-the-kpi-selection) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/dashboard/kpi_selection` | Sets the 2 to 5 KPI tiles the dashboard shows, for every admin, and returns them. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Select metrics by `key`, not by `code`.** Each metric has a `key` and a `code`. For most metrics they are
+  the same. For some they differ, such as `key` `aov` with `code` `average_order_value`. [Update the KPI
+  selection](/api-reference/dashboard-kpis/update-the-kpi-selection) takes the `key`.
+- **The dashboard shows 2 to 5 tiles.** `min` and `max` in [List KPI options](/api-reference/dashboard-kpis/list-kpi-options) give the
+  limits. The store has 27 metrics in five groups: `ecommerce`, `content`, `blog`, `bookings` and `courses`.
+- **The figures follow the period you send.** [Get the KPI selection](/api-reference/dashboard-kpis/get-the-kpi-selection) and the update
+  take `duration` (the default is `last_30_days`) or `start_date` with `end_date` as `YYYY-MM-DD`. Each tile
+  has `value` and `previous_value`, the figure for the period before it, and `change_percent`, which is `null`
+  when `previous_value` is `0`. A bad value, or one date without the other, is rejected with `400`.
+- **The update sends the full list, and the tiles follow your order.** The response has the same fields as
+  [Get the KPI selection](/api-reference/dashboard-kpis/get-the-kpi-selection), with the tiles in the order you sent and `position` from `1`.
+  A body with a field other than `metrics` is not an error: the other fields are ignored.

@@ -1,0 +1,30 @@
+{
+  "sdk": "php",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "listDashboardBanners",
+      "code": "use WebCommander\\Resources\\DashboardBanners\\DashboardBanners;\n\n$response = DashboardBanners::listDashboardBanners($client);\n\nforeach ($response->map['banners'] as $banner) {\n    echo $banner['position'], ' ', $banner['key'], ' ', $banner['title'], $banner['active'] ? '' : ' (inactive)', PHP_EOL;\n}"
+    },
+    "create_dashboard_banner": {
+      "function": "createDashboardBanner",
+      "code": "use WebCommander\\Resources\\DashboardBanners\\DashboardBanners;\n\n$response = DashboardBanners::createDashboardBanner($client, [\n    'key' => 'spring_sale',\n    'title' => 'Spring sale',\n    'description' => 'Ends Friday.',\n    'tags' => ['Sales'],\n    'icon' => 'tag',\n    'learn_more' => ['action' => 'open_link', 'label' => 'Learn more', 'url' => 'https://example.com/spring-sale'],\n]);\n\necho $response->map['key'], ' at position ', $response->map['position'], PHP_EOL;"
+    },
+    "get_dashboard_banner": {
+      "function": "getDashboardBanner",
+      "code": "use WebCommander\\Resources\\DashboardBanners\\DashboardBanners;\n\n$response = DashboardBanners::getDashboardBanner($client, 'spring_sale');\n\necho $response->map['title'], ': ', $response->map['description'], PHP_EOL;"
+    },
+    "patch_dashboard_banner": {
+      "function": "patchDashboardBanner",
+      "code": "use WebCommander\\Resources\\DashboardBanners\\DashboardBanners;\n\n$response = DashboardBanners::patchDashboardBanner($client, 'spring_sale', ['title' => 'Spring sale ends today', 'active' => false]);\n\necho $response->map['title'], $response->map['active'] ? '' : ' (inactive)', PHP_EOL;"
+    },
+    "delete_dashboard_banner": {
+      "function": "deleteDashboardBanner",
+      "code": "use WebCommander\\Resources\\DashboardBanners\\DashboardBanners;\n\n$response = DashboardBanners::deleteDashboardBanner($client, 'spring_sale');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_dashboard_content_info": {
+      "function": "getDashboardContentInfo",
+      "code": "use WebCommander\\Resources\\DashboardBanners\\DashboardBanners;\n\n$response = DashboardBanners::getDashboardContentInfo($client);\n\nforeach ($response->map['banners'] as $banner) {\n    echo $banner['key'], ' ', $banner['title'], PHP_EOL;\n}"
+    }
+  }
+}

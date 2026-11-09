@@ -1,0 +1,46 @@
+{
+  "sdk": "js",
+  "module": "shipping_rates",
+  "endpoints": {
+    "list_shipping_rates": {
+      "function": "listShippingRates",
+      "code": "const response = await client.shippingRates.listShippingRates({method: 'flat_rate', handling_cost: 'with_handling', sort: 'name', order: 'asc'});\nfor (const rate of response.map.shipping_rates) {\n    console.log(rate.id, rate.name, rate.method, rate.shipping_cost);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_shipping_rates": {
+      "function": "headShippingRates",
+      "code": "const response = await client.shippingRates.headShippingRates();\nconsole.log(response.statusCode);\n"
+    },
+    "count_shipping_rates": {
+      "function": "countShippingRates",
+      "code": "const response = await client.shippingRates.countShippingRates({method: 'flat_rate'});\nconsole.log(response.map.total);\n"
+    },
+    "head_shipping_rates_count": {
+      "function": "headShippingRatesCount",
+      "code": "const response = await client.shippingRates.headShippingRatesCount();\nconsole.log(response.statusCode);\n"
+    },
+    "create_shipping_rate": {
+      "function": "createShippingRate",
+      "code": "const response = await client.shippingRates.createShippingRate({\n    shipping_rate: {\n        name: 'Flat 10',\n        method: 'flat_rate',\n        shipping_cost: {amount: 10, type: 'fixed'},\n        handling_cost: {amount: 5, type: 'percent'},\n    },\n}, 'IMPORT-2026-11-05');\nconst rate = response.map.shipping_rate;\nconsole.log(rate.id, rate.name, rate.shipping_cost.amount, rate.transaction_no);\n"
+    },
+    "get_shipping_rate": {
+      "function": "getShippingRate",
+      "code": "const response = await client.shippingRates.getShippingRate(21);\nconst rate = response.map.shipping_rate;\nconsole.log(rate.name, rate.method, rate.shipping_cost, rate.handling_cost);\nconsole.log(rate.additional_rule.enabled, rate.conditions.length);\n"
+    },
+    "head_shipping_rate": {
+      "function": "headShippingRate",
+      "code": "const response = await client.shippingRates.headShippingRate(21);\nconsole.log(response.statusCode);\n"
+    },
+    "update_shipping_rate": {
+      "function": "updateShippingRate",
+      "code": "const response = await client.shippingRates.updateShippingRate(21, {\n    shipping_rate: {\n        name: 'Flat 12',\n        method: 'flat_rate',\n        calculate_for_entire_order: false,\n        price_entered_with_tax: false,\n        shipping_cost: {amount: 12, type: 'fixed'},\n        handling_cost: {amount: 5, type: 'percent'},\n        additional_rule: {enabled: false},\n    },\n});\nconst rate = response.map.shipping_rate;\nconsole.log(rate.name, rate.shipping_cost.amount);\n"
+    },
+    "patch_shipping_rate": {
+      "function": "patchShippingRate",
+      "code": "const response = await client.shippingRates.patchShippingRate(21, {\n    shipping_rate: {shipping_cost: {amount: 12, type: 'fixed'}},\n});\nconsole.log(response.map.shipping_rate.name, response.map.shipping_rate.shipping_cost.amount);\n"
+    },
+    "delete_shipping_rate": {
+      "function": "deleteShippingRate",
+      "code": "const response = await client.shippingRates.deleteShippingRate(21);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

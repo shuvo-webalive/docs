@@ -1,0 +1,30 @@
+{
+  "sdk": "go",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "ListDashboardBanners",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardBanners().ListDashboardBanners(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"banners\"].([]any) {\n\tbanner := row.(map[string]any)\n\tfmt.Println(banner[\"key\"], banner[\"position\"], banner[\"active\"], banner[\"title\"])\n}"
+    },
+    "create_dashboard_banner": {
+      "function": "CreateDashboardBanner",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardBanners().CreateDashboardBanner(ctx, map[string]any{\n\t\"key\":         \"spring_sale\",\n\t\"title\":       \"Spring sale\",\n\t\"description\": \"Ends Friday.\",\n\t\"tags\":        []any{\"Sales\"},\n\t\"icon\":        \"tag\",\n\t\"learn_more\":  map[string]any{\"action\": \"open_link\", \"label\": \"Learn more\", \"url\": \"https://example.com/spring-sale\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"key\"], body[\"position\"], body[\"active\"], body[\"title\"])"
+    },
+    "get_dashboard_banner": {
+      "function": "GetDashboardBanner",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardBanners().GetDashboardBanner(ctx, \"spring_sale\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"key\"], body[\"position\"], body[\"active\"], body[\"title\"])"
+    },
+    "patch_dashboard_banner": {
+      "function": "PatchDashboardBanner",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardBanners().PatchDashboardBanner(ctx, \"spring_sale\", map[string]any{\"title\": \"Spring sale ends today\", \"active\": false}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"key\"], body[\"position\"], body[\"active\"], body[\"title\"])"
+    },
+    "delete_dashboard_banner": {
+      "function": "DeleteDashboardBanner",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardBanners().DeleteDashboardBanner(ctx, \"spring_sale\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_dashboard_content_info": {
+      "function": "GetDashboardContentInfo",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.DashboardBanners().GetDashboardContentInfo(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"banners\"].([]any) {\n\tbanner := row.(map[string]any)\n\tfmt.Println(banner[\"key\"], banner[\"position\"], banner[\"active\"], banner[\"title\"])\n}"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "sdk": "dart",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "getDashboardReportQuick",
+      "code": "final response = await client.dashboardReports.getDashboardReportQuick(\n  queryParams: {\n    'duration': 'last_12_months',\n    'kpis': 'total_sales,aov',\n    'entity_name': 'product',\n  },\n);\nfinal report = response.map as Map;\nprint((report['orders'] as Map)['count']);\nfor (final kpi in report['kpis'] as List) {\n  print('${(kpi as Map)['key']} ${kpi['value']} ${kpi['direction']}');\n}"
+    },
+    "head_dashboard_report_quick": {
+      "function": "headDashboardReportQuick",
+      "code": "final response = await client.dashboardReports\n    .headDashboardReportQuick(queryParams: {'duration': 'last_12_months'});\nprint(response.statusCode);"
+    },
+    "get_dashboard_report_sales": {
+      "function": "getDashboardReportSales",
+      "code": "final response = await client.dashboardReports.getDashboardReportSales(\n  queryParams: {\n    'duration': 'last_12_months',\n    'breakdown': 'true',\n    'sort': 'sales',\n    'order': 'desc',\n  },\n);\nfinal report = response.map as Map;\nfor (final row in report['rows'] as List) {\n  print('${(row as Map)['label']} ${row['sales']}');\n}\nprint((report['totals'] as Map)['sales']);"
+    },
+    "head_dashboard_report_sales": {
+      "function": "headDashboardReportSales",
+      "code": "final response = await client.dashboardReports\n    .headDashboardReportSales(queryParams: {'duration': 'last_12_months'});\nprint(response.statusCode);"
+    },
+    "get_dashboard_report_summary": {
+      "function": "getDashboardReportSummary",
+      "code": "final response = await client.dashboardReports\n    .getDashboardReportSummary(queryParams: {'duration': 'last_12_months'});\nfinal report = response.map as Map;\nfinal quickReport = report['quick_report'] as Map;\nprint((quickReport['orders'] as Map)['count']);\nprint((quickReport['sales'] as Map)['total']);"
+    },
+    "head_dashboard_report_summary": {
+      "function": "headDashboardReportSummary",
+      "code": "final response = await client.dashboardReports\n    .headDashboardReportSummary(queryParams: {'duration': 'last_12_months'});\nprint(response.statusCode);"
+    }
+  }
+}

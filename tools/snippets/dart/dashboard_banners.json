@@ -1,0 +1,30 @@
+{
+  "sdk": "dart",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "listDashboardBanners",
+      "code": "final response = await client.dashboardBanners.listDashboardBanners();\nfor (final banner in (response.map as Map)['banners'] as List) {\n  print('${(banner as Map)['key']} ${banner['title']} ${banner['active']}');\n}"
+    },
+    "create_dashboard_banner": {
+      "function": "createDashboardBanner",
+      "code": "final response = await client.dashboardBanners.createDashboardBanner({\n  'key': 'spring_sale',\n  'title': 'Spring sale',\n  'description': 'Ends Friday.',\n  'tags': ['Sales'],\n  'icon': 'tag',\n  'learn_more': {\n    'action': 'open_link',\n    'label': 'Learn more',\n    'url': 'https://example.com/spring-sale',\n  },\n});\nfinal banner = response.map as Map;\nprint('${banner['key']} ${banner['position']}');"
+    },
+    "get_dashboard_banner": {
+      "function": "getDashboardBanner",
+      "code": "final response =\n    await client.dashboardBanners.getDashboardBanner('spring_sale');\nfinal banner = response.map as Map;\nprint('${banner['title']} ${banner['active']}');"
+    },
+    "patch_dashboard_banner": {
+      "function": "patchDashboardBanner",
+      "code": "final response = await client.dashboardBanners.patchDashboardBanner(\n  'spring_sale',\n  {'title': 'Spring sale ends today', 'active': false},\n);\nfinal banner = response.map as Map;\nprint('${banner['title']} ${banner['active']}');"
+    },
+    "delete_dashboard_banner": {
+      "function": "deleteDashboardBanner",
+      "code": "final response =\n    await client.dashboardBanners.deleteDashboardBanner('spring_sale');\nprint(response.statusCode);"
+    },
+    "get_dashboard_content_info": {
+      "function": "getDashboardContentInfo",
+      "code": "final response = await client.dashboardBanners.getDashboardContentInfo();\nfinal contentInfo = response.map as Map;\nfor (final banner in contentInfo['banners'] as List) {\n  print('${(banner as Map)['key']} ${banner['title']}');\n}"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "sdk": "dotnet",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "GetDashboardReportQuickAsync",
+      "code": "var response = await client.DashboardReports.GetDashboardReportQuickAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_12_months\", [\"kpis\"] = \"total_sales,aov\", [\"entity_name\"] = \"product\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar period = (IReadOnlyDictionary<string, object?>)body[\"period\"]!;\nConsole.WriteLine($\"{period[\"start_date\"]} {period[\"end_date\"]} {period[\"currency\"]}\");\nforeach (var kpi in ((IReadOnlyList<object?>)body[\"kpis\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{kpi[\"key\"]} {kpi[\"value\"]} {kpi[\"change_percent\"]} {kpi[\"direction\"]}\");\nvar orders = (IReadOnlyDictionary<string, object?>)body[\"orders\"]!;\nConsole.WriteLine($\"{orders[\"count\"]} {orders[\"pending\"]} {orders[\"cancelled\"]}\");"
+    },
+    "head_dashboard_report_quick": {
+      "function": "HeadDashboardReportQuickAsync",
+      "code": "var response = await client.DashboardReports.HeadDashboardReportQuickAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_12_months\" });\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_dashboard_report_sales": {
+      "function": "GetDashboardReportSalesAsync",
+      "code": "var response = await client.DashboardReports.GetDashboardReportSalesAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_12_months\", [\"breakdown\"] = \"true\", [\"sort\"] = \"sales\", [\"order\"] = \"desc\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar period = (IReadOnlyDictionary<string, object?>)body[\"period\"]!;\nConsole.WriteLine($\"{period[\"start_date\"]} {period[\"end_date\"]} {period[\"currency\"]}\");\nforeach (var row in ((IReadOnlyList<object?>)body[\"rows\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{row[\"label\"]} {row[\"sales\"]}\");\nvar totals = (IReadOnlyDictionary<string, object?>)body[\"totals\"]!;\nConsole.WriteLine(totals[\"sales\"]);"
+    },
+    "head_dashboard_report_sales": {
+      "function": "HeadDashboardReportSalesAsync",
+      "code": "var response = await client.DashboardReports.HeadDashboardReportSalesAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_12_months\" });\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_dashboard_report_summary": {
+      "function": "GetDashboardReportSummaryAsync",
+      "code": "var response = await client.DashboardReports.GetDashboardReportSummaryAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_12_months\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar period = (IReadOnlyDictionary<string, object?>)body[\"period\"]!;\nConsole.WriteLine($\"{period[\"start_date\"]} {period[\"end_date\"]} {period[\"currency\"]}\");\nvar quickReport = (IReadOnlyDictionary<string, object?>)body[\"quick_report\"]!;\nvar sales = (IReadOnlyDictionary<string, object?>)quickReport[\"sales\"]!;\nConsole.WriteLine($\"{sales[\"total\"]} {sales[\"items_sold\"]} {sales[\"average_order_value\"]}\");"
+    },
+    "head_dashboard_report_summary": {
+      "function": "HeadDashboardReportSummaryAsync",
+      "code": "var response = await client.DashboardReports.HeadDashboardReportSummaryAsync(\n    new Dictionary<string, object?> { [\"duration\"] = \"last_12_months\" });\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

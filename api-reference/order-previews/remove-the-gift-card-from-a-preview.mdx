@@ -1,0 +1,9 @@
+---
+title: "Remove the gift card from a preview"
+description: "Removes the applied gift card, so `due` returns to the grand total."
+openapi: "DELETE /admin/orders/preview/{preview_session_id}/gift-card"
+---
+
+Removes the gift card and returns `204` with no body. This call moves `session.expires_at` to 30 minutes after the call.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

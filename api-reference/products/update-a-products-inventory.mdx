@@ -1,0 +1,9 @@
+---
+title: "Update a product's inventory"
+description: "Sets whether the product tracks stock, its available stock and its low stock level."
+openapi: "POST /admin/products/{product_id}/inventories"
+---
+
+Wrap the settings in `product.product_pricing_and_stock` and send `track_inventory`, `available_stock` and optionally `low_level_stock`. The call returns `201`. Read the new stock with [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock): on a store with one inventory location, `locations` is empty. The stock of the product's variants does not change, because each variant keeps its own. To store a transaction number, pass `transaction_no` in the SDKs, which sends the `X-Transaction-No` header.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

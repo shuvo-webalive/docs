@@ -1,0 +1,34 @@
+{
+  "sdk": "java",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "createOrderPreview",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.orderPreviews().createOrderPreview(Map.of(\n        \"customer_id\", 512, \"delivery_type\", \"shipping\",\n        \"products\", List.of(Map.of(\"product_id\", 101, \"quantity\", 2))));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nMap<?, ?> session = (Map<?, ?>) order.get(\"session\");\nSystem.out.println(session.get(\"session_id\") + \" \" + session.get(\"status\") + \" \" + session.get(\"expires_at\"));\nMap<?, ?> totals = (Map<?, ?>) order.get(\"totals\");\nSystem.out.println(totals.get(\"sub_total\") + \" \" + totals.get(\"total_discount\") + \" \" + totals.get(\"grand_total\") + \" \" + totals.get(\"due\"));"
+    },
+    "get_order_preview": {
+      "function": "getOrderPreview",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderPreviews().getOrderPreview(\"PRV-3f2a9c41b7d80e65\");\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nMap<?, ?> session = (Map<?, ?>) order.get(\"session\");\nSystem.out.println(session.get(\"session_id\") + \" \" + session.get(\"status\") + \" \" + session.get(\"expires_at\"));\nMap<?, ?> totals = (Map<?, ?>) order.get(\"totals\");\nSystem.out.println(totals.get(\"sub_total\") + \" \" + totals.get(\"total_discount\") + \" \" + totals.get(\"grand_total\") + \" \" + totals.get(\"due\"));"
+    },
+    "confirm_order_preview": {
+      "function": "confirmOrderPreview",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderPreviews().confirmOrderPreview(\"PRV-3f2a9c41b7d80e65\", Map.of(\n        \"send_email\", false, \"transaction_no\", \"TXN-ORDER-0001\",\n        \"payment\", Map.of(\"amount\", 10.0, \"payment_status\", \"success\", \"payment_method\", \"manual\",\n                \"transaction_reference\", \"REF-0001\", \"transaction_date\", \"2026-11-05T06:12:00Z\")));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nSystem.out.println(order.get(\"order_id\") + \" \" + order.get(\"order_status\") + \" \" + order.get(\"payment_status\"));\nSystem.out.println(order.get(\"grand_total\") + \" \" + order.get(\"paid\") + \" \" + order.get(\"due\"));"
+    },
+    "apply_order_preview_coupon": {
+      "function": "applyOrderPreviewCoupon",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderPreviews().applyOrderPreviewCoupon(\"PRV-3f2a9c41b7d80e65\", Map.of(\"code\", \"SAVE10\"));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nMap<?, ?> coupon = (Map<?, ?>) ((Map<?, ?>) order.get(\"discounts\")).get(\"coupon\");\nSystem.out.println(coupon.get(\"code\") + \" \" + coupon.get(\"status\") + \" \" + coupon.get(\"amount\"));\nMap<?, ?> totals = (Map<?, ?>) order.get(\"totals\");\nSystem.out.println(totals.get(\"sub_total\") + \" \" + totals.get(\"total_discount\") + \" \" + totals.get(\"grand_total\") + \" \" + totals.get(\"due\"));"
+    },
+    "remove_order_preview_coupon": {
+      "function": "removeOrderPreviewCoupon",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.orderPreviews().removeOrderPreviewCoupon(\"PRV-3f2a9c41b7d80e65\");\nSystem.out.println(response.getStatusCode());"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "applyOrderPreviewGiftCard",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.orderPreviews().applyOrderPreviewGiftCard(\"PRV-3f2a9c41b7d80e65\", Map.of(\"code\", \"GIFT-0001\"));\nMap<?, ?> order = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"order\");\nMap<?, ?> giftCard = (Map<?, ?>) ((Map<?, ?>) order.get(\"discounts\")).get(\"gift_card\");\nSystem.out.println(giftCard.get(\"code\") + \" \" + giftCard.get(\"status\") + \" \" + giftCard.get(\"applied_amount\"));\nMap<?, ?> totals = (Map<?, ?>) order.get(\"totals\");\nSystem.out.println(totals.get(\"sub_total\") + \" \" + totals.get(\"total_discount\") + \" \" + totals.get(\"grand_total\") + \" \" + totals.get(\"due\"));"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "removeOrderPreviewGiftCard",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.orderPreviews().removeOrderPreviewGiftCard(\"PRV-3f2a9c41b7d80e65\");\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

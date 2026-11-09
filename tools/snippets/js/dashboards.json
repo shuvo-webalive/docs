@@ -1,0 +1,26 @@
+{
+  "sdk": "js",
+  "module": "dashboards",
+  "endpoints": {
+    "list_dashboards": {
+      "function": "listDashboards",
+      "code": "const response = await client.dashboards.listDashboards();\nfor (const dashboard of response.map.dashboards) {\n    console.log(dashboard.id, dashboard.name, dashboard.default);\n}\n"
+    },
+    "create_dashboard": {
+      "function": "createDashboard",
+      "code": "const response = await client.dashboards.createDashboard({\n    name: 'Weekly',\n    kpis: ['total_sales', 'total_orders', 'aov'],\n});\nconsole.log(response.map.id, response.map.name, response.map.kpis.length);\n"
+    },
+    "get_dashboard": {
+      "function": "getDashboard",
+      "code": "const response = await client.dashboards.getDashboard('3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01');\nconsole.log(response.map.name, response.map.default);\nfor (const section of response.map.standard_sections) {\n    console.log(section.key, section.visible);\n}\n"
+    },
+    "patch_dashboard": {
+      "function": "patchDashboard",
+      "code": "const response = await client.dashboards.patchDashboard('3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01', {\n    standard_sections: [{key: 'announcement', visible: false}],\n});\nfor (const section of response.map.standard_sections) {\n    console.log(section.key, section.visible);\n}\n"
+    },
+    "delete_dashboard": {
+      "function": "deleteDashboard",
+      "code": "const response = await client.dashboards.deleteDashboard('3f2b8c1e-7a4d-4e29-9b1a-5c6d7e8f9a01');\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

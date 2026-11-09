@@ -1,0 +1,34 @@
+{
+  "sdk": "dotnet",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "CreateOrderPreviewAsync",
+      "code": "var response = await client.OrderPreviews.CreateOrderPreviewAsync(new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512, [\"delivery_type\"] = \"shipping\",\n    [\"products\"] = new[] { new Dictionary<string, object?> { [\"product_id\"] = 101, [\"quantity\"] = 2 } },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nvar session = (IReadOnlyDictionary<string, object?>)order[\"session\"]!;\nvar totals = (IReadOnlyDictionary<string, object?>)order[\"totals\"]!;\nConsole.WriteLine($\"{session[\"session_id\"]} {session[\"expires_at\"]} {totals[\"grand_total\"]} {totals[\"due\"]}\");"
+    },
+    "get_order_preview": {
+      "function": "GetOrderPreviewAsync",
+      "code": "var response = await client.OrderPreviews.GetOrderPreviewAsync(\"PRV-3f2a9c41b7d80e65\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nvar session = (IReadOnlyDictionary<string, object?>)order[\"session\"]!;\nvar totals = (IReadOnlyDictionary<string, object?>)order[\"totals\"]!;\nConsole.WriteLine($\"{session[\"session_id\"]} {session[\"status\"]} {totals[\"grand_total\"]} {totals[\"due\"]}\");"
+    },
+    "confirm_order_preview": {
+      "function": "ConfirmOrderPreviewAsync",
+      "code": "var response = await client.OrderPreviews.ConfirmOrderPreviewAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?>\n{\n    [\"send_email\"] = false, [\"transaction_no\"] = \"TXN-ORDER-0001\",\n    [\"payment\"] = new Dictionary<string, object?>\n    {\n        [\"amount\"] = 10.0, [\"payment_status\"] = \"success\", [\"payment_method\"] = \"manual\",\n        [\"transaction_reference\"] = \"REF-0001\", [\"transaction_date\"] = \"2026-11-05T06:12:00Z\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"order_status\"]} {order[\"payment_status\"]} {order[\"grand_total\"]} {order[\"due\"]}\");"
+    },
+    "apply_order_preview_coupon": {
+      "function": "ApplyOrderPreviewCouponAsync",
+      "code": "var response = await client.OrderPreviews.ApplyOrderPreviewCouponAsync(\"PRV-3f2a9c41b7d80e65\",\n    new Dictionary<string, object?> { [\"code\"] = \"SAVE10\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nvar discounts = (IReadOnlyDictionary<string, object?>)order[\"discounts\"]!;\nvar coupon = (IReadOnlyDictionary<string, object?>)discounts[\"coupon\"]!;\nvar totals = (IReadOnlyDictionary<string, object?>)order[\"totals\"]!;\nConsole.WriteLine($\"{coupon[\"code\"]} {coupon[\"status\"]} {coupon[\"amount\"]} {totals[\"grand_total\"]}\");"
+    },
+    "remove_order_preview_coupon": {
+      "function": "RemoveOrderPreviewCouponAsync",
+      "code": "var response = await client.OrderPreviews.RemoveOrderPreviewCouponAsync(\"PRV-3f2a9c41b7d80e65\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "ApplyOrderPreviewGiftCardAsync",
+      "code": "var response = await client.OrderPreviews.ApplyOrderPreviewGiftCardAsync(\"PRV-3f2a9c41b7d80e65\",\n    new Dictionary<string, object?> { [\"code\"] = \"GIFT-0001\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nvar discounts = (IReadOnlyDictionary<string, object?>)order[\"discounts\"]!;\nvar giftCard = (IReadOnlyDictionary<string, object?>)discounts[\"gift_card\"]!;\nvar totals = (IReadOnlyDictionary<string, object?>)order[\"totals\"]!;\nConsole.WriteLine($\"{giftCard[\"code\"]} {giftCard[\"applied_amount\"]} {totals[\"gift_card_applied\"]} {totals[\"due\"]}\");"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "RemoveOrderPreviewGiftCardAsync",
+      "code": "var response = await client.OrderPreviews.RemoveOrderPreviewGiftCardAsync(\"PRV-3f2a9c41b7d80e65\");\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "sdk": "dotnet",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "ListDashboardBannersAsync",
+      "code": "var response = await client.DashboardBanners.ListDashboardBannersAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var banner in ((IReadOnlyList<object?>)body[\"banners\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{banner[\"key\"]} {banner[\"position\"]} {banner[\"active\"]} {banner[\"title\"]}\");"
+    },
+    "create_dashboard_banner": {
+      "function": "CreateDashboardBannerAsync",
+      "code": "var response = await client.DashboardBanners.CreateDashboardBannerAsync(new Dictionary<string, object?>\n{\n    [\"key\"] = \"spring_sale\", [\"title\"] = \"Spring sale\", [\"description\"] = \"Ends Friday.\",\n    [\"tags\"] = new[] { \"Sales\" }, [\"icon\"] = \"tag\",\n    [\"learn_more\"] = new Dictionary<string, object?>\n    {\n        [\"action\"] = \"open_link\", [\"label\"] = \"Learn more\", [\"url\"] = \"https://example.com/spring-sale\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"key\"]} {body[\"position\"]} {body[\"active\"]} {body[\"title\"]}\");"
+    },
+    "get_dashboard_banner": {
+      "function": "GetDashboardBannerAsync",
+      "code": "var response = await client.DashboardBanners.GetDashboardBannerAsync(\"spring_sale\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"key\"]} {body[\"position\"]} {body[\"active\"]} {body[\"title\"]}\");"
+    },
+    "patch_dashboard_banner": {
+      "function": "PatchDashboardBannerAsync",
+      "code": "var response = await client.DashboardBanners.PatchDashboardBannerAsync(\"spring_sale\", new Dictionary<string, object?>\n{\n    [\"title\"] = \"Spring sale ends today\", [\"active\"] = false,\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"key\"]} {body[\"position\"]} {body[\"active\"]} {body[\"title\"]}\");"
+    },
+    "delete_dashboard_banner": {
+      "function": "DeleteDashboardBannerAsync",
+      "code": "var response = await client.DashboardBanners.DeleteDashboardBannerAsync(\"spring_sale\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_dashboard_content_info": {
+      "function": "GetDashboardContentInfoAsync",
+      "code": "var response = await client.DashboardBanners.GetDashboardContentInfoAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var banner in ((IReadOnlyList<object?>)body[\"banners\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{banner[\"key\"]} {banner[\"position\"]} {banner[\"active\"]} {banner[\"title\"]}\");\nConsole.WriteLine(string.Join(\", \", body.Keys));"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "sdk": "python",
+  "module": "dashboard_sections",
+  "endpoints": {
+    "get_dashboard_section": {
+      "function": "get_dashboard_section",
+      "code": "response = client.dashboard_sections.get_dashboard_section(\"blog\", {\"duration\": \"last_7_days\"})\nprint(response.map[\"section\"], response.map[\"comments_to_moderate\"])\nprint(response.map[\"drafts_to_publish\"][\"count\"])\n"
+    }
+  }
+}

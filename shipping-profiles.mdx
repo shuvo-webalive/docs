@@ -1,0 +1,65 @@
+---
+title: "Shipping profiles"
+sidebarTitle: "Overview"
+description: "List, count, create, replace, update and delete shipping profiles, choose the default profile, and build a profile with its rules and rates in one call."
+---
+
+The Shipping profiles API has eleven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_profiles`.
+
+<Warning>
+  **Sending `default` as `true` changes the default shipping profile for the whole store.**
+  [Create a shipping profile](/api-reference/shipping-profiles/create-a-shipping-profile) or
+  [Update a shipping profile](/api-reference/shipping-profiles/update-a-shipping-profile) with `default` set to `true` makes that profile the
+  default and sets `default` to `false` on the profile that was the default. Before you call either, find
+  the current default, the profile in [List shipping profiles](/api-reference/shipping-profiles/list-shipping-profiles) with `default=true`, so
+  you can set it back. You cannot set `default` to `false` on the default profile, and you cannot delete
+  it: both are rejected with `409`. Make another profile the default first.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping profiles](/api-reference/shipping-profiles/list-shipping-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_profiles` | Returns up to 20 shipping profiles per call, newest first, with paging details. |
+| [Check the shipping profiles list](/api-reference/shipping-profiles/check-the-shipping-profiles-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_profiles` | Returns `200` and the headers of the shipping profiles listing, with no body. |
+| [Count shipping profiles](/api-reference/shipping-profiles/count-shipping-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_profiles/count` | Returns the number of shipping profiles that match the listing's filters, as `total`. |
+| [Check the shipping profile count](/api-reference/shipping-profiles/check-the-shipping-profile-count) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_profiles/count` | Returns `200` and the headers of the shipping profile count, with no body. |
+| [Create a shipping profile](/api-reference/shipping-profiles/create-a-shipping-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_profiles` | Creates a shipping profile and returns it with its `id`, which other calls take as `shipping_profile_id`. |
+| [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_profiles/wizard` | Creates a shipping profile with its rules, rates and zones in one call. |
+| [Retrieve a shipping profile](/api-reference/shipping-profiles/retrieve-a-shipping-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_profiles/{shipping_profile_id}` | Returns the shipping profile whose `id` you pass as `shipping_profile_id`. |
+| [Check a shipping profile](/api-reference/shipping-profiles/check-a-shipping-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_profiles/{shipping_profile_id}` | Returns `200` and headers only when the shipping profile exists, and `404` when it does not. |
+| [Replace a shipping profile](/api-reference/shipping-profiles/replace-a-shipping-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_profiles/{shipping_profile_id}` | Replaces a shipping profile with the fields you send in `shipping_profile`, and returns it. |
+| [Update a shipping profile](/api-reference/shipping-profiles/update-a-shipping-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shipping_profiles/{shipping_profile_id}` | Changes only the fields you send inside `shipping_profile` and returns the profile. |
+| [Delete a shipping profile](/api-reference/shipping-profiles/delete-a-shipping-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_profiles/{shipping_profile_id}` | Deletes a shipping profile permanently. You cannot delete the default profile. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create, replace, update and the wizard wrap the profile in `shipping_profile`.** Send
+  `{"shipping_profile": {...}}`. A body without the wrapper is rejected with `400`. A field the profile
+  does not have is rejected with `400`, and so is an `id` in the body. Responses return the profile inside
+  `shipping_profile`.
+- **`rule_preference` decides which rule applies when several match.** It is `product_assigned_rule`, the
+  default, `lowest_shipping_cost_rule` or `highest_shipping_cost_rule`. The short codes `hp`, `lsc` and
+  `hsc` are accepted on a write, and the profile returns the long names. Any other value is rejected
+  with `400`.
+- **`shipping_rules` is the whole list of rule `id` values, and each rule appears once.** Send the `id` of
+  each shipping rule. An unknown `id` or a repeated one is rejected with `400`. An update with
+  `"shipping_rules": []` takes every rule off the profile, and the rules stay in the store. A profile
+  returns each rule with its `id`, its `name` and its shipping rate, or `null` when the rule has none.
+- **`PUT` replaces a profile, and `PATCH` changes only the fields you send.**
+  [Replace a shipping profile](/api-reference/shipping-profiles/replace-a-shipping-profile) needs `name`, `description`, `rule_preference` and
+  `shipping_rules`, and names each missing field in the `400` response with the reason `required`.
+  `description` takes `null`. To change one field, use [Update a shipping profile](/api-reference/shipping-profiles/update-a-shipping-profile).
+- **The wizard creates a profile, its rules and their rates in one call.** [Create a shipping profile with the
+  wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard) returns `201` for a new profile `name`. When a profile already has that
+  `name`, it adds the new rules to that profile and returns `200`. Any bad value saves nothing. Only a
+  `POST` works on the wizard path: a `GET` or `HEAD` is rejected with `405`.
+- **A listing returns 20 profiles per call unless you send `limit`, and the newest profile comes first.**
+  `limit` takes `1` to `100`, and `offset` skips profiles. To get more, send a higher `offset` while
+  `pagination.has_next` is `true`. A query parameter the listing does not know is ignored.

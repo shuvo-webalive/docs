@@ -1,0 +1,30 @@
+{
+  "sdk": "js",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "getDashboardReportQuick",
+      "code": "const response = await client.dashboardReports.getDashboardReportQuick({duration: 'last_12_months', kpis: 'total_sales,aov', entity_name: 'product'});\nconsole.log(response.map.orders.count, response.map.sales.total, response.map.sales.average_order_value);\nfor (const kpi of response.map.kpis) {\n    console.log(kpi.key, kpi.value, kpi.change_percent);\n}\n"
+    },
+    "head_dashboard_report_quick": {
+      "function": "headDashboardReportQuick",
+      "code": "const response = await client.dashboardReports.headDashboardReportQuick({duration: 'last_12_months'});\nconsole.log(response.statusCode);\n"
+    },
+    "get_dashboard_report_sales": {
+      "function": "getDashboardReportSales",
+      "code": "const response = await client.dashboardReports.getDashboardReportSales({duration: 'last_12_months', breakdown: 'true', sort: 'sales', order: 'desc'});\nfor (const row of response.map.rows) {\n    console.log(row.date, row.label, row.sales);\n}\nconsole.log(response.map.totals.sales);\n"
+    },
+    "head_dashboard_report_sales": {
+      "function": "headDashboardReportSales",
+      "code": "const response = await client.dashboardReports.headDashboardReportSales({duration: 'last_12_months'});\nconsole.log(response.statusCode);\n"
+    },
+    "get_dashboard_report_summary": {
+      "function": "getDashboardReportSummary",
+      "code": "const response = await client.dashboardReports.getDashboardReportSummary({duration: 'last_12_months'});\nconsole.log(response.map.quick_report.orders.count, response.map.quick_report.sales.total);\nfor (const item of response.map.best_selling_products) {\n    console.log(item.product.id, item.product.name, item.units_sold);\n}\nconsole.log(response.map.order_updates.low_stock_items, response.map.order_updates.pending_fulfillment);\n"
+    },
+    "head_dashboard_report_summary": {
+      "function": "headDashboardReportSummary",
+      "code": "const response = await client.dashboardReports.headDashboardReportSummary({duration: 'last_12_months'});\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

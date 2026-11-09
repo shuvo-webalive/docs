@@ -1,0 +1,30 @@
+{
+  "sdk": "js",
+  "module": "dashboard_banners",
+  "endpoints": {
+    "list_dashboard_banners": {
+      "function": "listDashboardBanners",
+      "code": "const response = await client.dashboardBanners.listDashboardBanners();\nfor (const banner of response.map.banners) {\n    console.log(banner.key, banner.title, banner.active, banner.position);\n}\n"
+    },
+    "create_dashboard_banner": {
+      "function": "createDashboardBanner",
+      "code": "const response = await client.dashboardBanners.createDashboardBanner({\n    key: 'spring_sale',\n    title: 'Spring sale',\n    description: 'Ends Friday.',\n    tags: ['Sales'],\n    icon: 'tag',\n    learn_more: {action: 'open_link', label: 'Learn more', url: 'https://example.com/spring-sale'},\n});\nconsole.log(response.map.key, response.map.title, response.map.position);\n"
+    },
+    "get_dashboard_banner": {
+      "function": "getDashboardBanner",
+      "code": "const response = await client.dashboardBanners.getDashboardBanner('spring_sale');\nconsole.log(response.map.key, response.map.title, response.map.description, response.map.active);\n"
+    },
+    "patch_dashboard_banner": {
+      "function": "patchDashboardBanner",
+      "code": "const response = await client.dashboardBanners.patchDashboardBanner('spring_sale', {\n    title: 'Spring sale ends today',\n    active: false,\n});\nconsole.log(response.map.title, response.map.active);\n"
+    },
+    "delete_dashboard_banner": {
+      "function": "deleteDashboardBanner",
+      "code": "const response = await client.dashboardBanners.deleteDashboardBanner('spring_sale');\nconsole.log(response.statusCode);\n"
+    },
+    "get_dashboard_content_info": {
+      "function": "getDashboardContentInfo",
+      "code": "const response = await client.dashboardBanners.getDashboardContentInfo();\nconsole.log(response.map.banners.length, response.map.contact.email, response.map.contact.help_center_url);\n"
+    }
+  }
+}

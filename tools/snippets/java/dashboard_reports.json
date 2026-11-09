@@ -1,0 +1,30 @@
+{
+  "sdk": "java",
+  "module": "dashboard_reports",
+  "endpoints": {
+    "get_dashboard_report_quick": {
+      "function": "getDashboardReportQuick",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardReports().getDashboardReportQuick(Map.of(\n        \"duration\", \"last_12_months\", \"kpis\", \"total_sales,aov\", \"entity_name\", \"product\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> sales = (Map<?, ?>) body.get(\"sales\");\nSystem.out.println(sales.get(\"total\") + \" \" + sales.get(\"items_sold\") + \" \" + sales.get(\"average_order_value\"));\nfor (Object row : (List<?>) body.get(\"kpis\")) {\n    Map<?, ?> kpi = (Map<?, ?>) row;\n    System.out.println(kpi.get(\"key\") + \" \" + kpi.get(\"value\") + \" \" + kpi.get(\"change_percent\"));\n}"
+    },
+    "head_dashboard_report_quick": {
+      "function": "headDashboardReportQuick",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboardReports().headDashboardReportQuick(Map.of(\"duration\", \"last_12_months\"));\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_dashboard_report_sales": {
+      "function": "getDashboardReportSales",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardReports().getDashboardReportSales(Map.of(\n        \"duration\", \"last_12_months\", \"breakdown\", \"true\", \"sort\", \"sales\", \"order\", \"desc\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"group_by\") + \" \" + body.get(\"totals\"));\nfor (Object row : (List<?>) body.get(\"rows\")) {\n    Map<?, ?> month = (Map<?, ?>) row;\n    System.out.println(month.get(\"label\") + \" \" + month.get(\"sales\"));\n}"
+    },
+    "head_dashboard_report_sales": {
+      "function": "headDashboardReportSales",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboardReports().headDashboardReportSales(Map.of(\"duration\", \"last_12_months\"));\nSystem.out.println(response.getStatusCode());"
+    },
+    "get_dashboard_report_summary": {
+      "function": "getDashboardReportSummary",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboardReports().getDashboardReportSummary(Map.of(\"duration\", \"last_12_months\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> quickReport = (Map<?, ?>) body.get(\"quick_report\");\nSystem.out.println(quickReport.get(\"orders\") + \" \" + quickReport.get(\"sales\"));\nSystem.out.println(body.get(\"sales_report\"));"
+    },
+    "head_dashboard_report_summary": {
+      "function": "headDashboardReportSummary",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.dashboardReports().headDashboardReportSummary(Map.of(\"duration\", \"last_12_months\"));\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

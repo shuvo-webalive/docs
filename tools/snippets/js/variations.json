@@ -49,6 +49,14 @@
     "update_product_variations": {
       "function": "updateProductVariations",
       "code": "const response = await client.variations.updateProductVariations(4321, {\n    variation_ids: [91],\n    available: true,\n    available_stock: 12,\n    min_order_quantity: 1,\n    max_order_quantity: 5,\n});\nconsole.log(response.map.message);\nfor (const variant of response.map.updated) {\n    console.log(variant.id, variant.name);\n}\n"
+    },
+    "get_product_variation": {
+      "function": "getProductVariation",
+      "code": "const response = await client.variations.getProductVariation(4321, 91);\nconst variation = response.map.variation;\nconsole.log(variation.variation_id, variation.name, variation.sku, variation.active);\nconsole.log(variation.pricing.base_price, variation.inventory.quantity);\n"
+    },
+    "delete_product_variation": {
+      "function": "deleteProductVariation",
+      "code": "const response = await client.variations.deleteProductVariation(4321, 91);\nconsole.log(response.statusCode);\n"
     }
   }
 }

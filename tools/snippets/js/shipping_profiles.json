@@ -1,0 +1,50 @@
+{
+  "sdk": "js",
+  "module": "shipping_profiles",
+  "endpoints": {
+    "list_shipping_profiles": {
+      "function": "listShippingProfiles",
+      "code": "const response = await client.shippingProfiles.listShippingProfiles({search: 'metro', sort: 'name', order: 'asc', limit: 20});\nfor (const profile of response.map.shipping_profiles) {\n    console.log(profile.id, profile.name, profile.rule_preference, profile.rules_count);\n}\nconsole.log(response.map.pagination.total, response.map.pagination.has_next);\n"
+    },
+    "head_shipping_profiles": {
+      "function": "headShippingProfiles",
+      "code": "const response = await client.shippingProfiles.headShippingProfiles();\nconsole.log(response.statusCode);\n"
+    },
+    "count_shipping_profiles": {
+      "function": "countShippingProfiles",
+      "code": "const response = await client.shippingProfiles.countShippingProfiles({default: 'true'});\nconsole.log(response.map.total);\n"
+    },
+    "head_shipping_profiles_count": {
+      "function": "headShippingProfilesCount",
+      "code": "const response = await client.shippingProfiles.headShippingProfilesCount();\nconsole.log(response.statusCode);\n"
+    },
+    "create_shipping_profile": {
+      "function": "createShippingProfile",
+      "code": "const response = await client.shippingProfiles.createShippingProfile({\n    shipping_profile: {\n        name: 'Metro profile',\n        description: 'Metro deliveries',\n        rule_preference: 'product_assigned_rule',\n        shipping_rules: [31],\n    },\n}, 'IMPORT-2026-11-05');\nconst profile = response.map.shipping_profile;\nconsole.log(profile.id, profile.name, profile.transaction_no);\n"
+    },
+    "create_shipping_profile_wizard": {
+      "function": "createShippingProfileWizard",
+      "code": "const response = await client.shippingProfiles.createShippingProfileWizard({\n    shipping_profile: {\n        name: 'Wizard profile',\n        description: 'Built in one call',\n        rule_preference: 'product_assigned_rule',\n        shipping_rules: [\n            {\n                name: 'Metro delivery',\n                description: 'Metro deliveries',\n                shipping_class: 2,\n                zones: [{id: 5}, {name: 'Inner West'}],\n                shipping_rate: {\n                    name: 'Metro flat rate',\n                    method: 'flat_rate',\n                    shipping_cost: {amount: 10, type: 'fixed'},\n                    handling_cost: {amount: 5, type: 'percent'},\n                },\n            },\n        ],\n    },\n});\nconst profile = response.map.shipping_profile;\nconsole.log(response.statusCode, profile.id, profile.name, profile.rules_count);\n"
+    },
+    "get_shipping_profile": {
+      "function": "getShippingProfile",
+      "code": "const response = await client.shippingProfiles.getShippingProfile(12);\nconst profile = response.map.shipping_profile;\nconsole.log(profile.name, profile.rule_preference, profile.default);\nfor (const rule of profile.shipping_rules) {\n    console.log(rule.id, rule.name);\n}\n"
+    },
+    "head_shipping_profile": {
+      "function": "headShippingProfile",
+      "code": "const response = await client.shippingProfiles.headShippingProfile(12);\nconsole.log(response.statusCode);\n"
+    },
+    "update_shipping_profile": {
+      "function": "updateShippingProfile",
+      "code": "const response = await client.shippingProfiles.updateShippingProfile(12, {\n    shipping_profile: {\n        name: 'Metro profile',\n        description: 'Metro and inner west deliveries',\n        rule_preference: 'lowest_shipping_cost_rule',\n        shipping_rules: [31],\n    },\n});\nconst profile = response.map.shipping_profile;\nconsole.log(profile.name, profile.description, profile.rule_preference);\n"
+    },
+    "patch_shipping_profile": {
+      "function": "patchShippingProfile",
+      "code": "const response = await client.shippingProfiles.patchShippingProfile(12, {shipping_profile: {default: true}});\nconsole.log(response.map.shipping_profile.name, response.map.shipping_profile.default);\n"
+    },
+    "delete_shipping_profile": {
+      "function": "deleteShippingProfile",
+      "code": "const response = await client.shippingProfiles.deleteShippingProfile(12);\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

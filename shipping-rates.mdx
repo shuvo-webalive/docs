@@ -1,0 +1,68 @@
+---
+title: "Shipping rates"
+sidebarTitle: "Overview"
+description: "List, count, create, replace, update and delete shipping rates: the prices a shipping rule applies, as flat, free, per-price, per-quantity, per-weight or per-variation shipping."
+---
+
+The Shipping rates API has ten endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_rates`.
+
+<Warning>
+  **A shipping rate is deleted permanently, and a rate that a shipping rule uses cannot be deleted.**
+  [Delete a shipping rate](/api-reference/shipping-rates/delete-a-shipping-rate) on a rate that a rule uses is rejected with `409`, and the
+  response names the rule. The rate's `shipping_rules` list shows which rules use it. Delete those rules,
+  or take the rate off them, first.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List shipping rates](/api-reference/shipping-rates/list-shipping-rates) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rates` | Returns up to 20 shipping rates per call, newest first, with paging details. |
+| [Check the shipping rates list](/api-reference/shipping-rates/check-the-shipping-rates-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_rates` | Returns `200` and the headers of the shipping rates listing, with no body. |
+| [Count shipping rates](/api-reference/shipping-rates/count-shipping-rates) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rates/count` | Returns the number of shipping rates that match the listing's filters, as `total`. |
+| [Check the shipping rate count](/api-reference/shipping-rates/check-the-shipping-rate-count) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_rates/count` | Returns `200` and the headers of the shipping rate count, with no body. |
+| [Create a shipping rate](/api-reference/shipping-rates/create-a-shipping-rate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/shipping_rates` | Creates a shipping rate and returns it with its `id`, which other calls take as `shipping_rate_id`. |
+| [Retrieve a shipping rate](/api-reference/shipping-rates/retrieve-a-shipping-rate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/shipping_rates/{shipping_rate_id}` | Returns the shipping rate whose `id` you pass as `shipping_rate_id`. |
+| [Check a shipping rate](/api-reference/shipping-rates/check-a-shipping-rate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/shipping_rates/{shipping_rate_id}` | Returns `200` and headers only when the shipping rate exists, and `404` when it does not. |
+| [Replace a shipping rate](/api-reference/shipping-rates/replace-a-shipping-rate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/shipping_rates/{shipping_rate_id}` | Replaces a shipping rate with the fields you send in `shipping_rate`, and returns it. |
+| [Update a shipping rate](/api-reference/shipping-rates/update-a-shipping-rate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/shipping_rates/{shipping_rate_id}` | Changes only the fields you send inside `shipping_rate` and returns the rate. |
+| [Delete a shipping rate](/api-reference/shipping-rates/delete-a-shipping-rate) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/shipping_rates/{shipping_rate_id}` | Deletes a shipping rate permanently. You cannot delete a rate that a shipping rule uses. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Create, replace and update wrap the rate in `shipping_rate`.** Send `{"shipping_rate": {...}}`. A body
+  without the wrapper is rejected with `400`, the reason `required` and the message
+  `shipping_rate: must be an object`. A field the rate does not have is rejected with `400` and the reason
+  `unknown_field`, and an `id` in the body with `400` and the reason `not_allowed`. Responses return the
+  rate inside `shipping_rate`.
+- **`method` decides which fields a rate takes.** `method` is `flat_rate`, `free_shipping`, `ship_by_price`,
+  `ship_by_quantity`, `ship_by_weight`, `ship_by_variation` or `shipping_variant`, and it is required. A
+  `flat_rate` needs `shipping_cost`, and takes `handling_cost` and `additional_rule`. The four `ship_by_...`
+  methods take their costs per row in `conditions`, and a `shipping_cost` at the top level of the rate is
+  rejected with `400` and the reason `not_allowed`. `free_shipping` and `shipping_variant` need no cost.
+  A cost is `{"amount": 10, "type": "fixed"}`, and `type` is `fixed` or `percent`.
+- **A `conditions` row depends on the method.** A `ship_by_price` or `ship_by_quantity` row has `from`, `to`,
+  `shipping_cost` and `handling_cost`. A `ship_by_weight` row also has `packet_weight`. A
+  `ship_by_variation` row has `variation_combination`, a list of `{"id": ...}` with a variation's `id`,
+  instead of `from` and `to`. Rows whose `from` and `to` overlap are rejected with `400` and the reason
+  `overlapping_range`.
+- **`free_shipping` always saves `calculate_for_entire_order` as `false`.** The store ignores a `true` you
+  send. `price_entered_with_tax` keeps the value you send, and the rate's `shipping_cost` and
+  `additional_rule` read `null`.
+- **`PUT` replaces a rate, and `PATCH` changes only the fields you send.**
+  [Replace a shipping rate](/api-reference/shipping-rates/replace-a-shipping-rate) needs `name`, `method`, `calculate_for_entire_order` and
+  `price_entered_with_tax`, the costs the method uses, `handling_cost` and `additional_rule`, and names each
+  missing field in the `400` response with the reason `required`. `handling_cost` and `additional_rule`
+  take `null`. To change one field, use [Update a shipping rate](/api-reference/shipping-rates/update-a-shipping-rate).
+- **A listing returns 20 rates per call unless you send `limit`, and the newest rate comes first.** `limit`
+  takes `1` to `100`, and `offset` skips rates. To get more, send a higher `offset` while
+  `pagination.has_next` is `true`. A query parameter the listing does not know is ignored.
+- **A rate created a long time ago can return a `method` other than the seven names.** For example
+  `FLAT_RATE` or `[sbq, sbq]`, with `shipping_cost` `null` and no rows in `conditions`. Treat any other
+  value as unknown, and send only the seven names on a write.

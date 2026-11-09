@@ -1,0 +1,46 @@
+{
+  "sdk": "dotnet",
+  "module": "shipping_rules",
+  "endpoints": {
+    "list_shipping_rules": {
+      "function": "ListShippingRulesAsync",
+      "code": "var response = await client.ShippingRules.ListShippingRulesAsync(\n    new Dictionary<string, object?> { [\"zone_id\"] = 5, [\"method\"] = \"flat_rate\", [\"handling_cost\"] = \"without_handling\", [\"sort\"] = \"name\", [\"order\"] = \"asc\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var rule in ((IReadOnlyList<object?>)body[\"shipping_rules\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{rule[\"id\"]} {rule[\"name\"]} {rule[\"description\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine($\"{pagination[\"total\"]} {pagination[\"has_next\"]}\");"
+    },
+    "head_shipping_rules": {
+      "function": "HeadShippingRulesAsync",
+      "code": "var response = await client.ShippingRules.HeadShippingRulesAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "count_shipping_rules": {
+      "function": "CountShippingRulesAsync",
+      "code": "var response = await client.ShippingRules.CountShippingRulesAsync(\n    new Dictionary<string, object?> { [\"zone_id\"] = 5 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine(body[\"total\"]);"
+    },
+    "head_shipping_rules_count": {
+      "function": "HeadShippingRulesCountAsync",
+      "code": "var response = await client.ShippingRules.HeadShippingRulesCountAsync();\nConsole.WriteLine(response.StatusCode);"
+    },
+    "create_shipping_rule": {
+      "function": "CreateShippingRuleAsync",
+      "code": "var response = await client.ShippingRules.CreateShippingRuleAsync(new Dictionary<string, object?>\n{\n    [\"shipping_rule\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Metro\", [\"description\"] = \"Metro deliveries\",\n        [\"shipping_class\"] = 2, [\"shipping_rate\"] = 21, [\"zones\"] = new[] { 5 }, [\"profile_id\"] = 12,\n    },\n}, transactionNo: \"TXN-SHIPPING-0003\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rule = (IReadOnlyDictionary<string, object?>)body[\"shipping_rule\"]!;\nConsole.WriteLine($\"{rule[\"id\"]} {rule[\"name\"]} {rule[\"description\"]}\");"
+    },
+    "get_shipping_rule": {
+      "function": "GetShippingRuleAsync",
+      "code": "var response = await client.ShippingRules.GetShippingRuleAsync(31);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rule = (IReadOnlyDictionary<string, object?>)body[\"shipping_rule\"]!;\nConsole.WriteLine($\"{rule[\"id\"]} {rule[\"name\"]} {rule[\"description\"]}\");"
+    },
+    "head_shipping_rule": {
+      "function": "HeadShippingRuleAsync",
+      "code": "var response = await client.ShippingRules.HeadShippingRuleAsync(31);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_shipping_rule": {
+      "function": "UpdateShippingRuleAsync",
+      "code": "var response = await client.ShippingRules.UpdateShippingRuleAsync(31, new Dictionary<string, object?>\n{\n    [\"shipping_rule\"] = new Dictionary<string, object?>\n    {\n        [\"name\"] = \"Metro\", [\"description\"] = \"Metro and inner west deliveries\",\n        [\"shipping_class\"] = 2, [\"shipping_rate\"] = 21, [\"zones\"] = new[] { 5, 6 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rule = (IReadOnlyDictionary<string, object?>)body[\"shipping_rule\"]!;\nConsole.WriteLine($\"{rule[\"id\"]} {rule[\"name\"]} {rule[\"description\"]}\");"
+    },
+    "patch_shipping_rule": {
+      "function": "PatchShippingRuleAsync",
+      "code": "var response = await client.ShippingRules.PatchShippingRuleAsync(31, new Dictionary<string, object?>\n{\n    [\"shipping_rule\"] = new Dictionary<string, object?> { [\"zones\"] = new[] { 5, 6 } },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar rule = (IReadOnlyDictionary<string, object?>)body[\"shipping_rule\"]!;\nConsole.WriteLine($\"{rule[\"id\"]} {rule[\"name\"]} {rule[\"description\"]}\");"
+    },
+    "delete_shipping_rule": {
+      "function": "DeleteShippingRuleAsync",
+      "code": "var response = await client.ShippingRules.DeleteShippingRuleAsync(31);\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

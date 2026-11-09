@@ -1,0 +1,50 @@
+{
+  "sdk": "go",
+  "module": "shipping_profiles",
+  "endpoints": {
+    "list_shipping_profiles": {
+      "function": "ListShippingProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().ListShippingProfiles(ctx, map[string]any{\n\t\"search\": \"metro\",\n\t\"sort\":   \"name\",\n\t\"order\":  \"asc\",\n\t\"limit\":  20,\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"shipping_profiles\"].([]any) {\n\tprofile := row.(map[string]any)\n\tfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rule_preference\"], profile[\"default\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "head_shipping_profiles": {
+      "function": "HeadShippingProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().HeadShippingProfiles(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "count_shipping_profiles": {
+      "function": "CountShippingProfiles",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().CountShippingProfiles(ctx, map[string]any{\"default\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"total\"])"
+    },
+    "head_shipping_profiles_count": {
+      "function": "HeadShippingProfilesCount",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().HeadShippingProfilesCount(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_shipping_profile": {
+      "function": "CreateShippingProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().CreateShippingProfile(ctx, map[string]any{\n\t\"shipping_profile\": map[string]any{\n\t\t\"name\":            \"Metro profile\",\n\t\t\"description\":     \"Metro deliveries\",\n\t\t\"rule_preference\": \"product_assigned_rule\",\n\t\t\"shipping_rules\":  []any{31},\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"shipping_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rule_preference\"])"
+    },
+    "create_shipping_profile_wizard": {
+      "function": "CreateShippingProfileWizard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().CreateShippingProfileWizard(ctx, map[string]any{\n\t\"shipping_profile\": map[string]any{\n\t\t\"name\":            \"Wizard profile\",\n\t\t\"description\":     \"Built in one call\",\n\t\t\"rule_preference\": \"product_assigned_rule\",\n\t\t\"shipping_rules\": []any{\n\t\t\tmap[string]any{\n\t\t\t\t\"name\":           \"Metro delivery\",\n\t\t\t\t\"description\":    \"Metro deliveries\",\n\t\t\t\t\"shipping_class\": 2,\n\t\t\t\t\"zones\": []any{\n\t\t\t\t\tmap[string]any{\"id\": 5},\n\t\t\t\t\tmap[string]any{\"name\": \"Inner West\"},\n\t\t\t\t},\n\t\t\t\t\"shipping_rate\": map[string]any{\n\t\t\t\t\t\"name\":          \"Metro flat rate\",\n\t\t\t\t\t\"method\":        \"flat_rate\",\n\t\t\t\t\t\"shipping_cost\": map[string]any{\"amount\": 10, \"type\": \"fixed\"},\n\t\t\t\t\t\"handling_cost\": map[string]any{\"amount\": 5, \"type\": \"percent\"},\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"shipping_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rules_count\"])"
+    },
+    "get_shipping_profile": {
+      "function": "GetShippingProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().GetShippingProfile(ctx, 12, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"shipping_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rule_preference\"], profile[\"default\"])"
+    },
+    "head_shipping_profile": {
+      "function": "HeadShippingProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().HeadShippingProfile(ctx, 12, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_shipping_profile": {
+      "function": "UpdateShippingProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().UpdateShippingProfile(ctx, 12, map[string]any{\n\t\"shipping_profile\": map[string]any{\n\t\t\"name\":            \"Metro profile\",\n\t\t\"description\":     \"Metro and inner west deliveries\",\n\t\t\"rule_preference\": \"lowest_shipping_cost_rule\",\n\t\t\"shipping_rules\":  []any{31},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"shipping_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rule_preference\"])"
+    },
+    "patch_shipping_profile": {
+      "function": "PatchShippingProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().PatchShippingProfile(ctx, 12, map[string]any{\n\t\"shipping_profile\": map[string]any{\"default\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nprofile := resp.Map().(map[string]any)[\"shipping_profile\"].(map[string]any)\nfmt.Println(profile[\"id\"], profile[\"name\"], profile[\"rule_preference\"])"
+    },
+    "delete_shipping_profile": {
+      "function": "DeleteShippingProfile",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingProfiles().DeleteShippingProfile(ctx, 12, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

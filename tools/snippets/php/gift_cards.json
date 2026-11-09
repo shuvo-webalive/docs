@@ -1,0 +1,10 @@
+{
+  "sdk": "php",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "listGiftCards",
+      "code": "use WebCommander\\Resources\\GiftCards\\GiftCards;\n\n$response = GiftCards::listGiftCards($client, ['email' => 'jane.doe@example.com', 'is_active' => 'true']);\n\nforeach ($response->map['gift_cards'] as $card) {\n    echo $card['id'], ' ', $card['code'], ' ', $card['balance'], ' of ', $card['initial_amount'], PHP_EOL;\n}"
+    }
+  }
+}

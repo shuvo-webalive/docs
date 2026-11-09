@@ -1,0 +1,34 @@
+{
+  "sdk": "dart",
+  "module": "order_previews",
+  "endpoints": {
+    "create_order_preview": {
+      "function": "createOrderPreview",
+      "code": "final response = await client.orderPreviews.createOrderPreview({\n  'customer_id': 512,\n  'delivery_type': 'shipping',\n  'products': [\n    {'product_id': 101, 'quantity': 2},\n  ],\n});\nfinal order = (response.map as Map)['order'] as Map;\nfinal session = order['session'] as Map;\nprint('${session['session_id']} ${session['expires_at']}');\nprint((order['totals'] as Map)['grand_total']);"
+    },
+    "get_order_preview": {
+      "function": "getOrderPreview",
+      "code": "final response =\n    await client.orderPreviews.getOrderPreview('PRV-3f2a9c41b7d80e65');\nfinal order = (response.map as Map)['order'] as Map;\nfinal totals = order['totals'] as Map;\nprint('${totals['sub_total']} ${totals['shipping_cost']} ${totals['grand_total']}');"
+    },
+    "confirm_order_preview": {
+      "function": "confirmOrderPreview",
+      "code": "final response = await client.orderPreviews.confirmOrderPreview(\n  'PRV-3f2a9c41b7d80e65',\n  payload: {\n    'send_email': false,\n    'transaction_no': 'TXN-ORDER-0001',\n    'payment': {\n      'amount': 10.0,\n      'payment_status': 'success',\n      'payment_method': 'manual',\n      'transaction_reference': 'REF-0001',\n      'transaction_date': '2026-11-05T06:12:00Z',\n    },\n  },\n);\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['order_status']} ${order['grand_total']}');"
+    },
+    "apply_order_preview_coupon": {
+      "function": "applyOrderPreviewCoupon",
+      "code": "final response = await client.orderPreviews\n    .applyOrderPreviewCoupon('PRV-3f2a9c41b7d80e65', {'code': 'SAVE10'});\nfinal order = (response.map as Map)['order'] as Map;\nfinal coupon = (order['discounts'] as Map)['coupon'] as Map;\nprint('${coupon['code']} ${coupon['amount']}');\nprint((order['totals'] as Map)['grand_total']);"
+    },
+    "remove_order_preview_coupon": {
+      "function": "removeOrderPreviewCoupon",
+      "code": "final response = await client.orderPreviews\n    .removeOrderPreviewCoupon('PRV-3f2a9c41b7d80e65');\nprint(response.statusCode);"
+    },
+    "apply_order_preview_gift_card": {
+      "function": "applyOrderPreviewGiftCard",
+      "code": "final response = await client.orderPreviews\n    .applyOrderPreviewGiftCard('PRV-3f2a9c41b7d80e65', {'code': 'GIFT-0001'});\nfinal order = (response.map as Map)['order'] as Map;\nfinal giftCard = (order['discounts'] as Map)['gift_card'] as Map;\nprint('${giftCard['code']} ${giftCard['applied_amount']}');\nprint((order['totals'] as Map)['due']);"
+    },
+    "remove_order_preview_gift_card": {
+      "function": "removeOrderPreviewGiftCard",
+      "code": "final response = await client.orderPreviews\n    .removeOrderPreviewGiftCard('PRV-3f2a9c41b7d80e65');\nprint(response.statusCode);"
+    }
+  }
+}

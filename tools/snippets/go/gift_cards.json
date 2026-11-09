@@ -1,0 +1,10 @@
+{
+  "sdk": "go",
+  "module": "gift_cards",
+  "endpoints": {
+    "list_gift_cards": {
+      "function": "ListGiftCards",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.GiftCards().ListGiftCards(ctx, map[string]any{\"email\": \"jane.doe@example.com\", \"is_active\": true}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"gift_cards\"].([]any) {\n\tgiftCard := row.(map[string]any)\n\tfmt.Println(giftCard[\"id\"], giftCard[\"code\"], giftCard[\"balance\"], giftCard[\"initial_amount\"], giftCard[\"is_active\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    }
+  }
+}

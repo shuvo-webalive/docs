@@ -1,0 +1,57 @@
+---
+title: "Dashboard banners"
+sidebarTitle: "Overview"
+description: "List, create, retrieve, update and delete the announcement banners on the store's admin dashboard, and read the feed the dashboard shows them from."
+---
+
+The Dashboard banners API has six endpoints, and you can call every one from all seven SDKs. Five paths start with `/api/v4/admin/dashboard/banners`, and the feed is at `/api/v4/admin/dashboard/content_info`.
+
+<Warning>
+  **Banners are store-wide: a banner you create, change or delete shows on the dashboard of every admin.**
+  A created banner appears in [Get the dashboard feed](/api-reference/dashboard-banners/get-the-dashboard-feed) at once while `active` is `true`,
+  and it stays until you delete it with [Delete a dashboard banner](/api-reference/dashboard-banners/delete-a-dashboard-banner). Creating, moving
+  or deleting a banner also changes the `position` of the banners after it. The store already has banners of its own,
+  so list them with [List dashboard banners](/api-reference/dashboard-banners/list-dashboard-banners) before you write, and change only banners you created.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [List dashboard banners](/api-reference/dashboard-banners/list-dashboard-banners) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/banners` | Returns every dashboard banner in `position` order, active and hidden ones. |
+| [Create a dashboard banner](/api-reference/dashboard-banners/create-a-dashboard-banner) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/banners` | Creates a banner that shows on every admin's dashboard and returns it. |
+| [Retrieve a dashboard banner](/api-reference/dashboard-banners/retrieve-a-dashboard-banner) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/banners/{banner_key}` | Returns the banner whose `key` you pass as `banner_key`. |
+| [Update a dashboard banner](/api-reference/dashboard-banners/update-a-dashboard-banner) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/banners/{banner_key}` | Changes only the fields you send and returns the banner. |
+| [Delete a dashboard banner](/api-reference/dashboard-banners/delete-a-dashboard-banner) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/banners/{banner_key}` | Deletes the banner whose `key` you pass as `banner_key` and returns no body. |
+| [Get the dashboard feed](/api-reference/dashboard-banners/get-the-dashboard-feed) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/admin/dashboard/content_info` | Returns the active banners the dashboard shows, with the support contact details. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Send the fields of every write as they are, with no wrapper.** Create and update take the banner's fields at
+  the top level of the body, and responses return the banner the same way. A field a banner does not have is
+  rejected with `400` and the reason `unknown_field`, and one `400` lists every field that failed.
+- **Pass the banner's `key` as `banner_key`.** The `key` is a short name such as `spring_sale`: lowercase
+  letters, digits and `_`, starting with a letter, up to 64 characters, and unique. You choose it when you
+  create the banner, and you cannot change it afterwards. A `key` that matches no banner is rejected with `404`
+  and the reason `not_found`.
+- **`learn_more` is required, and it takes one of two forms.** `{"action": "open_link", "label": "...",
+  "url": "https://..."}` opens a link. `{"action": "open_modal", "label": "...", "title": "...",
+  "subtitle": "...", "steps": [{"title": "...", "description": "..."}]}` opens a window with at least
+  one step. A `url` must start with `https`. `try_it` is optional: `{"label": "...", "url": "..."}` adds a
+  second button, and `null` means none.
+- **`position` counts from `1` over every banner, hidden ones included.** Without `position`, a new banner goes
+  last. With one, from `1` to one more than the number of banners, the banners from that place move down by one.
+  Deleting a banner moves the banners after it back up, so the positions always run `1`, `2`, `3` and on.
+- **An update changes only what you send, and replaces `learn_more` and `try_it` whole.** An `open_modal`
+  `learn_more` sent over an `open_link` one drops the `url`. `"try_it": null` removes the second button. `key` cannot
+  be sent, and an empty body is rejected with `400`. `icon` is saved as you send it and is not checked
+  against a list.
+- **A banner with `active` `false` stays in the list but leaves the feed.** [List dashboard banners](/api-reference/dashboard-banners/list-dashboard-banners)
+  returns every banner. [Get the dashboard feed](/api-reference/dashboard-banners/get-the-dashboard-feed) returns only the active ones, and beside them the
+  support contact details the dashboard shows.

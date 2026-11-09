@@ -1,0 +1,63 @@
+---
+title: "Order previews"
+sidebarTitle: "Overview"
+description: "Price an order before you place it, apply a coupon or a gift card to the price, and then place the order."
+---
+
+The Order previews API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/orders/preview`. You start a preview with the products, the customer and the delivery type, read the priced result, apply a coupon or a gift card, and place the order from the preview. Starting a preview places no order.
+
+<Warning>
+  **[Place the order from a preview](/api-reference/order-previews/place-the-order-from-a-preview) creates a real order.**
+  It closes the preview, and every later call on it, including a second confirm, is rejected with `410`.
+  A preview also ends on its own: it expires 30 minutes after it was started or after the last time you
+  applied or removed a coupon or a gift card. Start a new preview when you need one again.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Start an order preview](/api-reference/order-previews/start-an-order-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/preview` | Prices the products you send and returns a preview session, without placing an order. |
+| [Retrieve an order preview](/api-reference/order-previews/retrieve-an-order-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/preview/{preview_session_id}` | Returns the preview whose `session_id` you pass, with its current totals. |
+| [Place the order from a preview](/api-reference/order-previews/place-the-order-from-a-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/preview/{preview_session_id}/confirm` | Places a real order from the preview and closes the preview. |
+| [Apply a coupon to a preview](/api-reference/order-previews/apply-a-coupon-to-a-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/preview/{preview_session_id}/coupon` | Applies a coupon code to the preview and returns the lower totals. |
+| [Remove the coupon from a preview](/api-reference/order-previews/remove-the-coupon-from-a-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/preview/{preview_session_id}/coupon` | Removes the applied coupon, so the totals return to what they were before it. |
+| [Apply a gift card to a preview](/api-reference/order-previews/apply-a-gift-card-to-a-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/preview/{preview_session_id}/gift-card` | Applies a gift card to the preview, lowering the amount due. |
+| [Remove the gift card from a preview](/api-reference/order-previews/remove-the-gift-card-from-a-preview) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/preview/{preview_session_id}/gift-card` | Removes the applied gift card, so `due` returns to the grand total. |
+
+## Before you call
+
+Register your store's credentials once when your app starts, as shown in
+[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **The path takes the `session_id` of the preview.** [Start an order preview](/api-reference/order-previews/start-an-order-preview) returns it as
+  `order.session.session_id`, a value such as `PRV-3f2a9c41b7d80e65`. Every other call takes it as
+  `preview_session_id` in the path. An unknown value returns `404` with the code `not_found`.
+- **A preview lasts 30 minutes from its last change.** `order.session.expires_at` is 30 minutes after
+  `created_at`. Each time you apply or remove a coupon or a gift card, `expires_at` moves to 30 minutes after that
+  call. [Retrieve an order preview](/api-reference/order-previews/retrieve-an-order-preview) does not move it.
+- **You send only `product_id` and `quantity` for each product.** The store reads the prices, taxes and
+  shipping cost itself, so a `price` or `product_name` in a product line is rejected with `400` and the reason
+  `unknown_field`. A body field the call does not accept, such as `coupon_code`, is rejected the same way: apply a
+  coupon with [Apply a coupon to a preview](/api-reference/order-previews/apply-a-coupon-to-a-preview).
+- **Send `customer_id`, or send a billing address.** With `customer_id` alone, the preview uses the customer's
+  saved addresses. Without `customer_id` and without `billing_address`, the call is rejected with `400`, and so is a
+  preview that has a product to ship and no shipping address.
+- **`delivery_type` is `delivery`, `others_shipping`, `shipping` or `store_pickup`.** It is `shipping` when you leave it
+  out. With `store_pickup`, `shipping.shipping_cost` is `0` and the grand total is lower by that amount.
+- **A preview takes one coupon and one gift card at a time.** A second coupon, even the same code, is rejected with
+  `409` and the code `coupon_already_applied`, and a second gift card with `gift_card_already_applied`. Remove the
+  applied one first with [Remove the coupon from a preview](/api-reference/order-previews/remove-the-coupon-from-a-preview) or
+  [Remove the gift card from a preview](/api-reference/order-previews/remove-the-gift-card-from-a-preview).
+- **A coupon only works if its discount profile applies to every customer and every product.** Create the profile with
+  [Create a discount profile](/api-reference/discount-profiles/create-a-discount-profile) and send `is_applied_to_all_customers` `true`,
+  `is_applied_to_all_products` `true` and `category` `[]`. Without them, applying the code is rejected with `422` and
+  the message `Invalid Code`. The code you send is the profile's `default_coupon_code`.
+- **A gift card pays only for the customer whose email address it holds.** The card's `email` must equal the email of
+  the customer record you previewed; the billing address's email does not count. Find a customer's cards with
+  [List gift cards](/api-reference/gift-cards/list-gift-cards) and its `email` filter, then use the card in
+  [Apply a gift card to a preview](/api-reference/order-previews/apply-a-gift-card-to-a-preview). Applying a gift card lowers `due` and leaves
+  `grand_total` as it was, and the preview spends nothing from the card.

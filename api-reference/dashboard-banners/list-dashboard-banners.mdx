@@ -1,0 +1,9 @@
+---
+title: "List dashboard banners"
+description: "Returns every dashboard banner in `position` order, active and hidden ones."
+openapi: "GET /admin/dashboard/banners"
+---
+
+Returns all the store's dashboard banners under `banners`, in one call with no paging. Each banner has its `key`, `position`, `active`, `icon`, `title`, `description`, `tags`, `learn_more` and `try_it`. To read only the banners the dashboard shows, use [Get the dashboard feed](/api-reference/dashboard-banners/get-the-dashboard-feed). Query parameters you add are ignored.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>

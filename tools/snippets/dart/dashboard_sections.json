@@ -1,0 +1,10 @@
+{
+  "sdk": "dart",
+  "module": "dashboard_sections",
+  "endpoints": {
+    "get_dashboard_section": {
+      "function": "getDashboardSection",
+      "code": "final response = await client.dashboardSections\n    .getDashboardSection('blog', queryParams: {'duration': 'last_7_days'});\nfinal section = response.map as Map;\nprint(section['comments_to_moderate']);\nfor (final row in section['most_viewed_posts'] as List) {\n  final post = (row as Map)['post'] as Map;\n  print('${post['name']} ${row['views']}');\n}"
+    }
+  }
+}

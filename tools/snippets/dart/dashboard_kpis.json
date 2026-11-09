@@ -1,0 +1,18 @@
+{
+  "sdk": "dart",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "getDashboardKpiOptions",
+      "code": "final response = await client.dashboardKpis.getDashboardKpiOptions();\nfinal options = response.map as Map;\nprint('${options['min']} ${options['max']} ${options['selected']}');\nfor (final group in options['groups'] as List) {\n  for (final metric in (group as Map)['metrics'] as List) {\n    print('${group['key']} ${(metric as Map)['key']} ${metric['label']}');\n  }\n}"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "getDashboardKpiSelection",
+      "code": "final response = await client.dashboardKpis\n    .getDashboardKpiSelection(queryParams: {'duration': 'last_7_days'});\nfor (final kpi in (response.map as Map)['selected'] as List) {\n  print('${(kpi as Map)['key']} ${kpi['value']} ${kpi['change_percent']}');\n}"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "updateDashboardKpiSelection",
+      "code": "final response = await client.dashboardKpis.updateDashboardKpiSelection(\n  {\n    'metrics': ['total_sales', 'total_orders', 'aov'],\n  },\n  queryParams: {'duration': 'last_7_days'},\n);\nfor (final kpi in (response.map as Map)['selected'] as List) {\n  print('${(kpi as Map)['position']} ${kpi['key']} ${kpi['value']}');\n}"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "sdk": "js",
+  "module": "dashboard_sections",
+  "endpoints": {
+    "get_dashboard_section": {
+      "function": "getDashboardSection",
+      "code": "const response = await client.dashboardSections.getDashboardSection('blog', {duration: 'last_7_days'});\nconsole.log(response.map.section, response.map.comments_to_moderate, response.map.drafts_to_publish.count);\nfor (const item of response.map.most_viewed_posts) {\n    console.log(item.post.id, item.post.name, item.views);\n}\n"
+    }
+  }
+}

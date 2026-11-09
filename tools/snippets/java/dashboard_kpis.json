@@ -1,0 +1,18 @@
+{
+  "sdk": "java",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "getDashboardKpiOptions",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardKpis().getDashboardKpiOptions();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"min\") + \" \" + body.get(\"max\") + \" \" + body.get(\"selected\"));\nfor (Object row : (List<?>) body.get(\"groups\")) {\n    Map<?, ?> group = (Map<?, ?>) row;\n    System.out.println(group.get(\"key\") + \" \" + group.get(\"label\"));\n}"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "getDashboardKpiSelection",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardKpis().getDashboardKpiSelection(Map.of(\"duration\", \"last_7_days\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"selected\")) {\n    Map<?, ?> kpi = (Map<?, ?>) row;\n    System.out.println(kpi.get(\"key\") + \" \" + kpi.get(\"value\") + \" \" + kpi.get(\"change_percent\") + \" \" + kpi.get(\"direction\"));\n}"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "updateDashboardKpiSelection",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.dashboardKpis().updateDashboardKpiSelection(\n        Map.of(\"metrics\", List.of(\"total_sales\", \"total_orders\", \"aov\")),\n        Map.of(\"duration\", \"last_7_days\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"selected\")) {\n    Map<?, ?> kpi = (Map<?, ?>) row;\n    System.out.println(kpi.get(\"key\") + \" \" + kpi.get(\"value\") + \" \" + kpi.get(\"change_percent\") + \" \" + kpi.get(\"direction\"));\n}"
+    }
+  }
+}

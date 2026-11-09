@@ -1,0 +1,10 @@
+{
+  "sdk": "php",
+  "module": "dashboard_sections",
+  "endpoints": {
+    "get_dashboard_section": {
+      "function": "getDashboardSection",
+      "code": "use WebCommander\\Resources\\DashboardSections\\DashboardSections;\n\n$response = DashboardSections::getDashboardSection($client, 'blog', ['duration' => 'last_7_days']);\n\necho $response->map['section'], ': ', $response->map['comments_to_moderate'], ' comment(s) to moderate', PHP_EOL;"
+    }
+  }
+}

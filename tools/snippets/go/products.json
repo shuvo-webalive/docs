@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "DeleteProductStockLocation",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().DeleteProductStockLocation(ctx, 101, 19, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "count_products": {
+      "function": "CountProducts",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().CountProducts(ctx, map[string]any{\"search_text\": \"shirt\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"total\"], body[\"count\"])"
+    },
+    "check_product_sku": {
+      "function": "CheckProductSku",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().CheckProductSku(ctx, \"TSHIRT-001\", nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"available\"], body[\"is_exist\"], body[\"product\"])"
+    },
+    "list_special_products": {
+      "function": "ListSpecialProducts",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().ListSpecialProducts(ctx, map[string]any{\"type\": \"featured\", \"max\": 10}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"total\"], body[\"max\"])\nfor _, row := range body[\"products\"].([]any) {\n\tproduct := row.(map[string]any)\n\tfmt.Println(product[\"id\"], product[\"sku\"], product[\"name\"], product[\"effective_price\"])\n}"
+    },
+    "bulk_delete_products": {
+      "function": "BulkDeleteProducts",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().BulkDeleteProducts(ctx, map[string]any{\n\t\"ids\": []any{102, 103},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"deleted\"], body[\"failed\"], body[\"errors\"])"
+    },
+    "list_product_reviews": {
+      "function": "ListProductReviews",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().ListProductReviews(ctx, 101, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"reviews\"].([]any) {\n\treview := row.(map[string]any)\n\tfmt.Println(review[\"id\"], review[\"name\"], review[\"rating\"], review[\"status\"], review[\"comment\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"total\"], pagination[\"has_next\"])"
+    },
+    "get_product_review": {
+      "function": "GetProductReview",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().GetProductReview(ctx, 101, 31, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nreview := resp.Map().(map[string]any)[\"review\"].(map[string]any)\nfmt.Println(review[\"id\"], review[\"name\"], review[\"rating\"], review[\"status\"], review[\"comment\"])"
+    },
+    "patch_product_review": {
+      "function": "PatchProductReview",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().PatchProductReview(ctx, 101, 31, map[string]any{\"status\": \"approved\", \"rating\": 2, \"comment\": \"Runs small\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nreview := resp.Map().(map[string]any)[\"review\"].(map[string]any)\nfmt.Println(review[\"id\"], review[\"name\"], review[\"rating\"], review[\"status\"], review[\"comment\"])"
+    },
+    "delete_product_review": {
+      "function": "DeleteProductReview",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().DeleteProductReview(ctx, 101, 31, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "create_product_inventory": {
+      "function": "CreateProductInventory",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().CreateProductInventory(ctx, 101, map[string]any{\n\t\"product\": map[string]any{\n\t\t\"product_pricing_and_stock\": map[string]any{\"track_inventory\": true, \"available_stock\": 12, \"low_level_stock\": 3},\n\t},\n}, \"TXN-IMPORT-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"status\"], body[\"message\"], body[\"transaction_no\"])"
+    },
+    "create_product_image": {
+      "function": "CreateProductImage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().CreateProductImage(ctx, 101, map[string]any{\n\t\"product\": map[string]any{\n\t\t\"image_and_video\": map[string]any{\n\t\t\t\"images\": []any{\n\t\t\t\tmap[string]any{\"filename\": \"front.png\", \"base64\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\"},\n\t\t\t},\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nproduct := resp.Map().(map[string]any)[\"product\"].(map[string]any)\nfor _, row := range product[\"images\"].([]any) {\n\timage := row.(map[string]any)\n\tfmt.Println(image[\"id\"], image[\"filename\"], image[\"link\"])\n}"
+    },
+    "create_product_media": {
+      "function": "CreateProductMedia",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().CreateProductMedia(ctx, 101, map[string]any{\"type\": \"images\", \"filename\": \"side.png\", \"content\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"id\"], body[\"filename\"], body[\"position\"], body[\"primary\"], body[\"url\"])"
+    },
+    "delete_product_media_image": {
+      "function": "DeleteProductMediaImage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().DeleteProductMediaImage(ctx, 101, 1876, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     }
   }
 }

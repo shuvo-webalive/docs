@@ -1,0 +1,50 @@
+{
+  "sdk": "java",
+  "module": "shipping_profiles",
+  "endpoints": {
+    "list_shipping_profiles": {
+      "function": "listShippingProfiles",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().listShippingProfiles(Map.of(\"search\", \"metro\", \"sort\", \"name\", \"order\", \"asc\", \"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_profiles\")) {\n    Map<?, ?> profile = (Map<?, ?>) row;\n    System.out.println(profile.get(\"id\") + \" \" + profile.get(\"name\") + \" \" + profile.get(\"rule_preference\") + \" \" + profile.get(\"default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
+    },
+    "head_shipping_profiles": {
+      "function": "headShippingProfiles",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingProfiles().headShippingProfiles();\nSystem.out.println(response.getStatusCode());"
+    },
+    "count_shipping_profiles": {
+      "function": "countShippingProfiles",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().countShippingProfiles(Map.of(\"default\", \"true\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"total\"));"
+    },
+    "head_shipping_profiles_count": {
+      "function": "headShippingProfilesCount",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingProfiles().headShippingProfilesCount();\nSystem.out.println(response.getStatusCode());"
+    },
+    "create_shipping_profile": {
+      "function": "createShippingProfile",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().createShippingProfile(Map.of(\"shipping_profile\", Map.of(\n        \"name\", \"Metro profile\", \"description\", \"Metro deliveries\",\n        \"rule_preference\", \"product_assigned_rule\", \"shipping_rules\", List.of(31))));\nMap<?, ?> shippingProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_profile\");\nSystem.out.println(shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\") + \" \" + shippingProfile.get(\"rule_preference\") + \" \" + shippingProfile.get(\"default\"));"
+    },
+    "create_shipping_profile_wizard": {
+      "function": "createShippingProfileWizard",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().createShippingProfileWizard(Map.of(\"shipping_profile\", Map.of(\n        \"name\", \"Wizard profile\", \"description\", \"Built in one call\",\n        \"rule_preference\", \"product_assigned_rule\",\n        \"shipping_rules\", List.of(Map.of(\n                \"name\", \"Metro delivery\", \"description\", \"Metro deliveries\", \"shipping_class\", 2,\n                \"zones\", List.of(Map.of(\"id\", 5), Map.of(\"name\", \"Inner West\")),\n                \"shipping_rate\", Map.of(\"name\", \"Metro flat rate\", \"method\", \"flat_rate\",\n                        \"shipping_cost\", Map.of(\"amount\", 10, \"type\", \"fixed\"),\n                        \"handling_cost\", Map.of(\"amount\", 5, \"type\", \"percent\")))))));\nMap<?, ?> shippingProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_profile\");\nSystem.out.println(shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\") + \" \" + shippingProfile.get(\"rules_count\"));"
+    },
+    "get_shipping_profile": {
+      "function": "getShippingProfile",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().getShippingProfile(12);\nMap<?, ?> shippingProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_profile\");\nSystem.out.println(shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\") + \" \" + shippingProfile.get(\"rule_preference\") + \" \" + shippingProfile.get(\"default\"));"
+    },
+    "head_shipping_profile": {
+      "function": "headShippingProfile",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingProfiles().headShippingProfile(12);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_shipping_profile": {
+      "function": "updateShippingProfile",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().updateShippingProfile(12,\n        Map.of(\"shipping_profile\", Map.of(\n                \"name\", \"Metro profile\", \"description\", \"Metro and inner west deliveries\",\n                \"rule_preference\", \"lowest_shipping_cost_rule\", \"shipping_rules\", List.of(31))));\nMap<?, ?> shippingProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_profile\");\nSystem.out.println(shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\") + \" \" + shippingProfile.get(\"rule_preference\") + \" \" + shippingProfile.get(\"default\"));"
+    },
+    "patch_shipping_profile": {
+      "function": "patchShippingProfile",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingProfiles().patchShippingProfile(12, Map.of(\"shipping_profile\", Map.of(\"default\", true)));\nMap<?, ?> shippingProfile = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_profile\");\nSystem.out.println(shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\") + \" \" + shippingProfile.get(\"rule_preference\") + \" \" + shippingProfile.get(\"default\"));"
+    },
+    "delete_shipping_profile": {
+      "function": "deleteShippingProfile",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingProfiles().deleteShippingProfile(12);\nSystem.out.println(response.getStatusCode());"
+    }
+  }
+}

@@ -41,6 +41,54 @@
     "delete_product_stock_location": {
       "function": "deleteProductStockLocation",
       "code": "const response = await client.products.deleteProductStockLocation(101, 19);\nconsole.log(response.statusCode);\n"
+    },
+    "count_products": {
+      "function": "countProducts",
+      "code": "const response = await client.products.countProducts({search_text: 'shirt'});\nconsole.log(response.map.total, response.map.count);\n"
+    },
+    "check_product_sku": {
+      "function": "checkProductSku",
+      "code": "const response = await client.products.checkProductSku('TSHIRT-001');\nconsole.log(response.map.available, response.map.is_exist);\nconsole.log(response.map.product.id, response.map.product.name);\n"
+    },
+    "list_special_products": {
+      "function": "listSpecialProducts",
+      "code": "const response = await client.products.listSpecialProducts({type: 'featured', max: 10});\nfor (const product of response.map.products) {\n    console.log(product.id, product.sku, product.name, product.effective_price);\n}\nconsole.log(response.map.total, response.map.offset);\n"
+    },
+    "bulk_delete_products": {
+      "function": "bulkDeleteProducts",
+      "code": "const response = await client.products.bulkDeleteProducts({ids: [102, 103]});\nconsole.log(response.map.deleted, response.map.failed, response.map.errors);\n"
+    },
+    "list_product_reviews": {
+      "function": "listProductReviews",
+      "code": "const response = await client.products.listProductReviews(101, {limit: 20});\nfor (const review of response.map.reviews) {\n    console.log(review.id, review.rating, review.status, review.reviewer.name);\n}\n"
+    },
+    "get_product_review": {
+      "function": "getProductReview",
+      "code": "const response = await client.products.getProductReview(101, 31);\nconst review = response.map.review;\nconsole.log(review.id, review.rating, review.status, review.comment);\n"
+    },
+    "patch_product_review": {
+      "function": "patchProductReview",
+      "code": "const response = await client.products.patchProductReview(101, 31, {\n    status: 'approved',\n    rating: 2,\n    comment: 'Runs small',\n});\nconsole.log(response.map.review.status, response.map.review.rating, response.map.review.comment);\n"
+    },
+    "delete_product_review": {
+      "function": "deleteProductReview",
+      "code": "const response = await client.products.deleteProductReview(101, 31);\nconsole.log(response.statusCode);\n"
+    },
+    "create_product_inventory": {
+      "function": "createProductInventory",
+      "code": "const response = await client.products.createProductInventory(101, {\n    product: {\n        product_pricing_and_stock: {track_inventory: true, available_stock: 12, low_level_stock: 3},\n    },\n}, 'IMPORT-2026-11-05');\nconsole.log(response.map.status, response.map.message, response.map.transaction_no);\n"
+    },
+    "create_product_image": {
+      "function": "createProductImage",
+      "code": "const response = await client.products.createProductImage(101, {\n    product: {\n        image_and_video: {\n            images: [{filename: 'front.png', base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII='}],\n        },\n    },\n});\nfor (const image of response.map.product.images) {\n    console.log(image.id, image.filename, image.link);\n}\n"
+    },
+    "create_product_media": {
+      "function": "createProductMedia",
+      "code": "const response = await client.products.createProductMedia(101, {\n    type: 'images',\n    filename: 'side.png',\n    content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAen63NgAAAAASUVORK5CYII=',\n});\nconsole.log(response.map.id, response.map.filename, response.map.url);\n"
+    },
+    "delete_product_media_image": {
+      "function": "deleteProductMediaImage",
+      "code": "const response = await client.products.deleteProductMediaImage(101, 1876);\nconsole.log(response.statusCode);\n"
     }
   }
 }

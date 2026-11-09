@@ -1,0 +1,9 @@
+---
+title: "Apply a coupon to a preview"
+description: "Applies a coupon code to the preview and returns the lower totals."
+openapi: "POST /admin/orders/preview/{preview_session_id}/coupon"
+---
+
+Send the coupon's `code` at the top level of the body: the `default_coupon_code` of a discount profile that applies to every customer and every product. The response returns `discounts.coupon` with the `amount` taken off, and `totals` with the new `total_discount`, `total_tax` and `grand_total`. A preview takes one coupon: a second call, with the same or another code, is rejected with `409`. This call moves `session.expires_at` to 30 minutes after the call.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

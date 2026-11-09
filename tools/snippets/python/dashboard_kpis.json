@@ -1,0 +1,18 @@
+{
+  "sdk": "python",
+  "module": "dashboard_kpis",
+  "endpoints": {
+    "get_dashboard_kpi_options": {
+      "function": "get_dashboard_kpi_options",
+      "code": "response = client.dashboard_kpis.get_dashboard_kpi_options()\nprint(response.map[\"min\"], response.map[\"max\"], response.map[\"selected\"])\nfor group in response.map[\"groups\"]:\n    for metric in group[\"metrics\"]:\n        print(group[\"key\"], metric[\"key\"], metric[\"label\"], metric[\"in_use\"])\n"
+    },
+    "get_dashboard_kpi_selection": {
+      "function": "get_dashboard_kpi_selection",
+      "code": "response = client.dashboard_kpis.get_dashboard_kpi_selection({\"duration\": \"last_7_days\"})\nfor kpi in response.map[\"selected\"]:\n    print(kpi[\"position\"], kpi[\"key\"], kpi[\"value\"], kpi[\"change_percent\"])\n"
+    },
+    "update_dashboard_kpi_selection": {
+      "function": "update_dashboard_kpi_selection",
+      "code": "response = client.dashboard_kpis.update_dashboard_kpi_selection({\"metrics\": [\"total_sales\", \"total_orders\", \"aov\"]}, query_params={\"duration\": \"last_7_days\"})\nfor kpi in response.map[\"selected\"]:\n    print(kpi[\"position\"], kpi[\"key\"], kpi[\"value\"])\n"
+    }
+  }
+}
