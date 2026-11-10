@@ -2,31 +2,29 @@
 
 TAG = "Shipping settings"
 SLUG = "shipping-settings"
-BASE = "/admin/settings/shipping_settings"
+BASE = "/admin/settings/shipping_settings/general"
 ICON = "truck-fast"
 
 GET_PAGE = "/api-reference/shipping-settings/get-shipping-settings"
 
 OVERVIEW_DESCRIPTION = "Read and change your store's default shipping, delivery and shipping tax profiles, its default tax switches for shipping and delivery, and its shipping class switches."
-INTRO = "The Shipping settings API has three endpoints, and you can call every one from all seven SDKs. All three use one path, `/api/v4/admin/settings/shipping_settings`."
+INTRO = "The Shipping settings API has three endpoints, and you can call every one from all seven SDKs. All three use one path, `/api/v4/admin/settings/shipping_settings/general`."
 
 WARNING = (
-    "**Turning `enable_shipping_class` off also turns `enable_flat_view_class` off.** While\n"
-    "  `enable_shipping_class` is `false`, a write of `\"enable_flat_view_class\": true` returns `200`,\n"
-    "  but the value stays `false`, so check the value in the response. Turning `enable_shipping_class`\n"
-    "  back on does not turn `enable_flat_view_class` back on: write `enable_flat_view_class` as well,\n"
-    "  or it stays `false`."
+    "**Turning `enable_shipping_class` off also turns `enable_class_in_flat_view` off.** While\n"
+    "  `enable_shipping_class` is `false`, a write of `\"enable_class_in_flat_view\": true` returns `200`,\n"
+    "  but the value stays `false`, so check the value in the response."
 )
 
 NOTES = [
     "**The seven settings have no paths of their own.** Read and write all seven at\n"
-    "  `/admin/settings/shipping_settings`. A path such as\n"
-    "  `/admin/settings/shipping_settings/enable_shipping_class` returns `404 not_found` with the message\n"
-    "  `Unknown settings path: shipping_settings/enable_shipping_class`, whatever the method. `group_meta`\n"
-    "  has a single entry, `shipping_settings`, with `kind` and `writable` and no `href`.",
+    "  `/admin/settings/shipping_settings/general`. The old path `/admin/settings/shipping_settings`\n"
+    "  returns `404` with the message `Unknown settings page`. `group_meta` has three entries,\n"
+    "  `shipping_settings`, `shipping_methods` and `shipping_classes`, each with `kind`, `writable` and\n"
+    "  `href`.",
     "**`PATCH` is the only way to write, and it changes only the fields you send, with one exception.**\n"
     "  Wrap the fields in `shipping_settings` or send them bare at the top level: both are accepted.\n"
-    "  Fields you leave out keep their stored values, except `enable_flat_view_class`, which turns off\n"
+    "  Fields you leave out keep their stored values, except `enable_class_in_flat_view`, which turns off\n"
     "  when you turn `enable_shipping_class` off. You can send the settings from a read straight back as a\n"
     "  write, profile records included. `PUT`, `POST` and `DELETE` are rejected with\n"
     "  `405 method_not_allowed` and an `Allow: GET, HEAD, PATCH, OPTIONS` header.",
@@ -41,7 +39,7 @@ NOTES = [
     "  `group_meta` are still returned. `field_metadata` is keyed by field name and covers exactly the\n"
     "  seven fields. Every entry has `type`, `ui_label`, `description`, `required`, `writable`, `read_only`\n"
     "  and a `key_path` such as `shipping_settings.enable_shipping_class`. A boolean field's entry adds\n"
-    "  `default`, and the `enable_flat_view_class` entry also adds `depends_on`, which names\n"
+    "  `default`, and the `enable_class_in_flat_view` entry also adds `depends_on`, which names\n"
     "  `enable_shipping_class`. A profile field's entry adds `nullable`, `references`, `accepts`, `write_key`\n"
     "  and `options`, a list of `{id, name}` records for the profiles you can choose. The first option is\n"
     "  `No Shipping`, or `No Tax` on `shipping_tax_profile`, and its `id` is `null`.",
@@ -65,15 +63,19 @@ SAMPLE_PROFILE = {"id": 4, "name": "Standard shipping"}
 
 SAMPLE_SETTINGS = {
     "default_shipping_profile": SAMPLE_PROFILE,
-    "enable_shipping_default_tax": True,
+    "apply_store_tax_settings_to_shipping": True,
     "default_delivery_profile": SAMPLE_PROFILE,
-    "enable_delivery_default_tax": True,
+    "apply_store_tax_settings_to_delivery": True,
     "shipping_tax_profile": None,
     "enable_shipping_class": True,
-    "enable_flat_view_class": True,
+    "enable_class_in_flat_view": True,
 }
 
-SAMPLE_GROUP_META = {"shipping_settings": {"kind": "setting", "writable": True}}
+SAMPLE_GROUP_META = {
+    "shipping_settings": {"kind": "setting", "writable": True, "href": "/api/v4" + BASE},
+    "shipping_methods": {"kind": "resource", "writable": True, "href": "/api/v4/admin/shipping_methods"},
+    "shipping_classes": {"kind": "resource", "writable": True, "href": "/api/v4/admin/shipping_classes"},
+}
 
 SAMPLE_RESPONSE = {"shipping_settings": SAMPLE_SETTINGS, "group_meta": SAMPLE_GROUP_META}
 
@@ -122,12 +124,12 @@ ENDPOINTS = [
         "method": "PATCH",
         "path": BASE,
         "summary": "Changes the shipping settings you send and returns all seven after the change.",
-        "description": "Send the fields to change, wrapped in `shipping_settings` or bare at the top level: both are accepted. Fields you leave out keep their stored values, except `enable_flat_view_class`, which turns off when you turn `enable_shipping_class` off. Set a profile field with the profile's `id`; a bare name string is rejected. Returns all seven settings after the change, with `group_meta`, as [Get shipping settings](" + GET_PAGE + ") does.",
+        "description": "Send the fields to change, wrapped in `shipping_settings` or bare at the top level: both are accepted. Fields you leave out keep their stored values, except `enable_class_in_flat_view`, which turns off when you turn `enable_shipping_class` off. Set a profile field with the profile's `id`; a bare name string is rejected. Returns all seven settings after the change, with `group_meta`, as [Get shipping settings](" + GET_PAGE + ") does.",
         "body": {
             "schema": {"type": "object", "description": "Wrap the fields in `shipping_settings`, or send them bare at the top level. Send only the fields that change.", "properties": {
                 "shipping_settings": ref("ShippingSettingsInput"),
             }},
-            "example": {"shipping_settings": {"enable_shipping_default_tax": True}},
+            "example": {"shipping_settings": {"apply_store_tax_settings_to_shipping": True}},
         },
         "responses": {
             "200": {
@@ -165,19 +167,19 @@ def profile_or_null(description):
 
 SHIPPING_DEFAULT_TAX = "`true` turns on the default tax for shipping. Changing it changes no other field."
 DELIVERY_DEFAULT_TAX = "`true` turns on the default tax for delivery."
-SHIPPING_CLASS = "`true` turns on shipping classes. Turning it off also turns `enable_flat_view_class` off."
+SHIPPING_CLASS = "`true` turns on shipping classes. Turning it off also turns `enable_class_in_flat_view` off."
 FLAT_VIEW_CLASS = "Depends on `enable_shipping_class`: it stays `false` while `enable_shipping_class` is `false`, even when you write `true`."
 BOOLEAN_INPUT = " A string is rejected with `400`."
 
 SCHEMAS = {
     "ShippingSettings": {"type": "object", "description": "The seven shipping settings. None of them has a path of its own.", "properties": {
         "default_shipping_profile": profile_or_null("The default shipping profile, as the profile's `{id, name}` record, or `null` for `No Shipping`."),
-        "enable_shipping_default_tax": flag(SHIPPING_DEFAULT_TAX),
+        "apply_store_tax_settings_to_shipping": flag(SHIPPING_DEFAULT_TAX),
         "default_delivery_profile": profile_or_null("The default delivery profile, as the profile's `{id, name}` record, or `null` for `No Shipping`."),
-        "enable_delivery_default_tax": flag(DELIVERY_DEFAULT_TAX),
+        "apply_store_tax_settings_to_delivery": flag(DELIVERY_DEFAULT_TAX),
         "shipping_tax_profile": profile_or_null("The shipping tax profile, as the profile's `{id, name}` record, or `null` for `No Tax`."),
         "enable_shipping_class": flag(SHIPPING_CLASS),
-        "enable_flat_view_class": flag(FLAT_VIEW_CLASS),
+        "enable_class_in_flat_view": flag(FLAT_VIEW_CLASS),
     }},
     "ShippingSettingsProfile": {"type": "object", "description": "The profile a profile field points at.", "properties": {
         "id": {"type": "integer", "description": "The profile's `id`. Send it in a write to choose this profile."},
@@ -185,12 +187,12 @@ SCHEMAS = {
     }},
     "ShippingSettingsInput": {"type": "object", "description": "The fields to change. Every field is optional; send only the ones that change.", "properties": {
         "default_shipping_profile": dict(ref("ShippingSettingsProfileInput"), description="The profile to choose as the default shipping profile."),
-        "enable_shipping_default_tax": flag(SHIPPING_DEFAULT_TAX + BOOLEAN_INPUT),
+        "apply_store_tax_settings_to_shipping": flag(SHIPPING_DEFAULT_TAX + BOOLEAN_INPUT),
         "default_delivery_profile": dict(ref("ShippingSettingsProfileInput"), description="The profile to choose as the default delivery profile."),
-        "enable_delivery_default_tax": flag(DELIVERY_DEFAULT_TAX + BOOLEAN_INPUT),
+        "apply_store_tax_settings_to_delivery": flag(DELIVERY_DEFAULT_TAX + BOOLEAN_INPUT),
         "shipping_tax_profile": dict(ref("ShippingSettingsProfileInput"), description="The profile to choose as the shipping tax profile."),
-        "enable_shipping_class": flag(SHIPPING_CLASS + " When you turn it back on, write `enable_flat_view_class` as well." + BOOLEAN_INPUT),
-        "enable_flat_view_class": flag(FLAT_VIEW_CLASS + BOOLEAN_INPUT),
+        "enable_shipping_class": flag(SHIPPING_CLASS + BOOLEAN_INPUT),
+        "enable_class_in_flat_view": flag(FLAT_VIEW_CLASS + BOOLEAN_INPUT),
     }},
     "ShippingSettingsProfileInput": {
         "description": "The profile to choose, by its `id`. The profile `id`s you can send are in the field's `options` under `field_metadata`. A profile `id` that none of the `options` has is rejected with `400 invalid_reference`, and a bare name string with `400` and `id must be an integer`. A `{\"code\": …}` record is looked up by code, and is rejected with `400 invalid_reference` when no profile matches.",
@@ -202,17 +204,20 @@ SCHEMAS = {
             {"type": "null", "description": "The `No Shipping` or `No Tax` option."},
         ],
     },
-    "ShippingSettingsGroupMeta": {"type": "object", "description": "A single entry, `shipping_settings`.", "properties": {
+    "ShippingSettingsGroupMeta": {"type": "object", "description": "The settings area, the shipping methods and the shipping classes.", "properties": {
         "shipping_settings": ref("ShippingSettingsAreaMeta"),
+        "shipping_methods": ref("ShippingSettingsAreaMeta"),
+        "shipping_classes": ref("ShippingSettingsAreaMeta"),
     }},
-    "ShippingSettingsAreaMeta": {"type": "object", "description": "What the settings group is and whether you can write it. There is no `href`.", "properties": {
-        "kind": {"type": "string", "description": "The kind of group: `setting`."},
-        "writable": {"type": "boolean", "description": "Whether you can write these settings: `true`."},
+    "ShippingSettingsAreaMeta": {"type": "object", "description": "One `group_meta` entry: what the area is, whether you can write it, and its path.", "properties": {
+        "kind": {"type": "string", "description": "The kind of area: `setting` for `shipping_settings`, `resource` for `shipping_methods` and `shipping_classes`."},
+        "writable": {"type": "boolean", "description": "Whether you can write the area: `true` for all three."},
+        "href": {"type": "string", "description": "The area's path."},
     }},
     "ShippingSettingsFieldMetadata": {"type": "object", "description": "Describes each of the seven fields, keyed by field name. Returned only when you send `field_metadata=true`.", "properties": {
         name: ref("ShippingSettingsFieldDescription") for name in (
-            "default_shipping_profile", "enable_shipping_default_tax", "default_delivery_profile",
-            "enable_delivery_default_tax", "shipping_tax_profile", "enable_shipping_class", "enable_flat_view_class",
+            "default_shipping_profile", "apply_store_tax_settings_to_shipping", "default_delivery_profile",
+            "apply_store_tax_settings_to_delivery", "shipping_tax_profile", "enable_shipping_class", "enable_class_in_flat_view",
         )
     }},
     "ShippingSettingsFieldOption": {"type": "object", "description": "One profile you can choose for a profile field.", "properties": {
@@ -228,7 +233,7 @@ SCHEMAS = {
         "read_only": {"type": "boolean", "description": "Whether the field is read-only."},
         "key_path": {"type": "string", "description": "Where the field sits in the body, such as `shipping_settings.enable_shipping_class`."},
         "default": {"description": "The field's default value. Only on the four boolean fields."},
-        "depends_on": {"type": "string", "description": "Only on `enable_flat_view_class`: `enable_shipping_class`, the field it depends on."},
+        "depends_on": {"type": "string", "description": "Only on `enable_class_in_flat_view`: `enable_shipping_class`, the field it depends on."},
         "nullable": {"type": "boolean", "description": "Whether the field can be `null`. Only on the three profile fields, where it is `true`."},
         "references": {"type": "string", "description": "Only on the three profile fields: the kind of profile the field points at. `shipping_profile` on `default_shipping_profile` and `default_delivery_profile`, `custom_tax_profile` on `shipping_tax_profile`."},
         "accepts": {"type": "array", "items": {"type": "string"}, "description": "Only on the three profile fields: `id` and `name`, and also `code` on `shipping_tax_profile`. A bare name string is still rejected with `400`: send `{\"name\": …}` or the profile's `id` instead."},

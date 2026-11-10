@@ -53,6 +53,10 @@
     "delete_search_result_page_product_promotion": {
       "function": "DeleteSearchResultPageProductPromotion",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().DeleteSearchResultPageProductPromotion(ctx, 6, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "reindex_search": {
+      "function": "ReindexSearch",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.SearchResultPageSettings().ReindexSearch(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Map().(map[string]any)[\"status\"])"
     }
   }
 }

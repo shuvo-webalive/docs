@@ -33,6 +33,10 @@
     "bulk_delete_trash": {
       "function": "BulkDeleteTrash",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().BulkDeleteTrash(ctx, map[string]any{\n\t\"items\": []any{\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1234},\n\t\tmap[string]any{\"type\": \"Category\", \"id\": 1229},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"deleted\"].([]any) {\n\titem := row.(map[string]any)\n\tfmt.Println(item[\"type\"], item[\"id\"], item[\"name\"])\n}\nfmt.Println(body[\"failed\"])\n"
+    },
+    "get_trash_item_external_links": {
+      "function": "GetTrashItemExternalLinks",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Trash().GetTrashItemExternalLinks(ctx, \"product\", 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"type\"], body[\"id\"])\nfor _, row := range body[\"links\"].([]any) {\n\tlink := row.(map[string]any)\n\tfmt.Println(link[\"system\"], link[\"entity\"], link[\"name\"], link[\"reason\"])\n}"
     }
   }
 }

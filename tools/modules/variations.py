@@ -5,8 +5,8 @@ SLUG = "variations"
 BASE = "/admin/variations"
 ICON = "swatchbook"
 
-OVERVIEW_DESCRIPTION = "List, create, replace, update and delete variation types and their options, and list, import, retrieve, update and delete the variants of a product."
-INTRO = "The Variations API has fourteen endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`."
+OVERVIEW_DESCRIPTION = "List, create, replace, update and delete variation types and their options, and list, import, retrieve, update and delete the variants of a product, one at a time or all at once."
+INTRO = "The Variations API has sixteen endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`."
 
 PRODUCT_BASE = "/admin/products/{product_id}/variations"
 
@@ -21,6 +21,8 @@ BULK_PAGE = "/api-reference/variations/update-a-products-variants"
 IMPORT_PAGE = "/api-reference/variations/import-a-products-variants"
 RETRIEVE_VARIANT_PAGE = "/api-reference/variations/retrieve-a-products-variant"
 DELETE_VARIANT_PAGE = "/api-reference/variations/delete-a-products-variant"
+PATCH_VARIANT_PAGE = "/api-reference/variations/update-a-products-variant"
+DELETE_VARIANTS_PAGE = "/api-reference/variations/delete-all-of-a-products-variants"
 CREATE_PRODUCT_PAGE = "/api-reference/products/create-a-product"
 
 WARNING = (
@@ -64,6 +66,11 @@ NOTES = [
     "  more, send a higher `offset`, or the next `page`, while `pagination.has_next` is `true`. The listing\n"
     "  accepts only `search`, `standard`, `limit`, `offset`, `page` and `field_metadata`: any other query\n"
     "  parameter, such as `q` or `sort`, is rejected with `400` and the reason `unknown_parameter`.",
+    "**Update one variant with a bare body, and read the result back from the variant.** [Update a product's variant](" + PATCH_VARIANT_PAGE + ") takes `available`, `name`, `sku`, `custom_sku`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory` and `ordering`\n"
+    "  at the top level of the body, with no wrapper, and changes only the fields you send. It returns the variant's ids and codes, not its pricing or stock: read the rest with [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + "), which names `available` as `active`.\n"
+    "  A key the call does not know, `active`, a `variation` wrapper and a body `id` are ignored and the call still returns `200`. A SKU another variant holds is rejected with `409`.",
+    "**Delete every variant of a product in one call.** [Delete all of a product's variants](" + DELETE_VARIANTS_PAGE + ") returns `204` with no body, also when the product has no variants. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") then returns `{\"variations\": []}`.\n"
+    "  To delete one variant, use [Delete a product's variant](" + DELETE_VARIANT_PAGE + ").",
 ]
 
 VARIATION_ID = {
@@ -179,6 +186,9 @@ VARIANT_ROW = {
     "transaction_no": None,
     "url": "/api/v4/admin/products/4321/variations/91",
 }
+
+PATCH_VARIANT_BODY = {"available": False, "barcode": "9310000000014"}
+PATCHED_VARIANT = {"status": "success", "message": "Variation updated successfully", "variation": {"variation_id": 91, "name": "Cotton T-Shirt", "sku": "TSHIRT-001-S", "custom_sku": None, "barcode": "9310000000014", "country_of_origin": None, "hs_code": None}}
 
 BULK_BODY = {"variation_ids": [91], "available": True, "available_stock": 12, "min_order_quantity": 1, "max_order_quantity": 5}
 BULK_SLIM_RESULT = {"status": "success", "message": "1 variations updated", "updated": [{"id": 91, "name": "Cotton T-Shirt"}], "failed": []}
@@ -473,6 +483,42 @@ ENDPOINTS = [
         },
         "example_call": {"path": {"product_id": 4321, "variation_id": 91}},
     },
+    {
+        "key": "patch_product_variation",
+        "slug": "update-a-products-variant",
+        "title": "Update a product's variant",
+        "method": "PATCH",
+        "path": PRODUCT_BASE + "/{variation_id}",
+        "summary": "Changes the fields you send on one variant of the product and returns the variant's ids and codes.",
+        "description": "Send any of `available`, `name`, `sku`, `custom_sku`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory` and `ordering` at the top level of the body, with no wrapper. Only the fields you send change. The call returns `status`, `message` and the `variation` with its `variation_id`, `name`, `sku`, `custom_sku`, `barcode`, `country_of_origin` and `hs_code`. It does not return the pricing or stock: read them with [Retrieve a product's variant](" + RETRIEVE_VARIANT_PAGE + "), where `available: false` reads as `active: false`. A key the call does not know, `active`, a `variation` wrapper and a body `id` are ignored, and the call still returns `200`. `available` is not checked for type. To change several variants at once, use [Update a product's variants](" + BULK_PAGE + ").",
+        "parameters": [PRODUCT_ID, PRODUCT_VARIANT_ID],
+        "body": {"schema": {"$ref": "#/components/schemas/VariationProductVariantPatchInput"}, "example": PATCH_VARIANT_BODY},
+        "responses": {
+            "200": {
+                "description": "`status` is `success`, `message` is `Variation updated successfully`, and `variation` holds the variant's ids and codes after the change.",
+                "schema": {"$ref": "#/components/schemas/VariationProductVariantPatchResult"},
+                "example": PATCHED_VARIANT,
+            },
+            "400": {"description": "The body is empty, or a SKU is longer than 255 characters.", "schema": ERROR_REF},
+            "404": {"description": "The product has no variant with that `variation_id`.", "schema": ERROR_REF},
+            "409": {"description": "The `sku` you sent belongs to another variant.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 4321, "variation_id": 91}},
+    },
+    {
+        "key": "delete_product_variations",
+        "slug": "delete-all-of-a-products-variants",
+        "title": "Delete all of a product's variants",
+        "method": "DELETE",
+        "path": PRODUCT_BASE,
+        "summary": "Deletes every variant of the product whose `id` you pass as `product_id`.",
+        "description": "Deletes every variant of the product and returns `204` with no body. It also returns `204` when the product has no variants. [List a product's variants](" + PRODUCT_VARIANTS_PAGE + ") then returns `{\"variations\": []}`. To delete one variant, use [Delete a product's variant](" + DELETE_VARIANT_PAGE + ").",
+        "parameters": [PRODUCT_ID],
+        "responses": {
+            "204": {"description": "Every variant is deleted, or the product had none. No body."},
+        },
+        "example_call": {"path": {"product_id": 4321}},
+    },
 ]
 
 SCHEMAS = {
@@ -723,3 +769,32 @@ SCHEMAS = {
         "request_id": {"type": "string", "description": "Identifies this request."},
     }}}},
 }
+
+SCHEMAS["VariationProductVariantPatchInput"] = {"type": "object", "description": "Send these fields at the top level of the body, with no wrapper. Only the fields you send change. An empty body is rejected with `400`. Other keys, `active` and a `variation` wrapper are ignored.", "properties": {
+    "available": {"type": "boolean", "description": "Whether the variant is available. It is not checked for type."},
+    "name": {"type": "string", "description": "The variant's name."},
+    "sku": {"type": "string", "description": "The variant's SKU, at most 255 characters. A SKU another variant holds is rejected with `409`."},
+    "custom_sku": {"type": "string"},
+    "barcode": {"type": "string"},
+    "country_of_origin": {"type": "string"},
+    "hs_code": {"type": "string"},
+    "pricing": {"$ref": "#/components/schemas/VariationProductVariantPricing"},
+    "inventory": {"$ref": "#/components/schemas/VariationProductVariantInventory"},
+    "ordering": {"$ref": "#/components/schemas/VariationProductVariantOrdering"},
+}}
+
+SCHEMAS["VariationProductVariantPatched"] = {"type": "object", "description": "The variant's ids and codes after the change.", "properties": {
+    "variation_id": {"type": "integer", "description": "The variant's `variation_id`."},
+    "name": {"type": "string"},
+    "sku": {"type": "string"},
+    "custom_sku": {"type": ["string", "null"]},
+    "barcode": {"type": ["string", "null"]},
+    "country_of_origin": {"type": ["string", "null"]},
+    "hs_code": {"type": ["string", "null"]},
+}}
+
+SCHEMAS["VariationProductVariantPatchResult"] = {"type": "object", "properties": {
+    "status": {"type": "string", "description": "`success`."},
+    "message": {"type": "string", "description": "`Variation updated successfully`."},
+    "variation": {"$ref": "#/components/schemas/VariationProductVariantPatched"},
+}}

@@ -57,6 +57,14 @@
     "delete_product_variation": {
       "function": "deleteProductVariation",
       "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteProductVariation($client, 4321, 91);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "patch_product_variation": {
+      "function": "patchProductVariation",
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::patchProductVariation($client, 4321, 91, ['available' => false, 'barcode' => '9310000000014']);\n\n$variation = $response->map['variation'];\necho $variation['variation_id'], ' ', $variation['sku'], ' ', $variation['barcode'], PHP_EOL;"
+    },
+    "delete_product_variations": {
+      "function": "deleteProductVariations",
+      "code": "use WebCommander\\Resources\\Variations\\Variations;\n\n$response = Variations::deleteProductVariations($client, 4321);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

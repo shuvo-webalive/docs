@@ -9,6 +9,7 @@ ICON = "magnifying-glass"
 
 PAGE = "/api-reference/" + SLUG + "/"
 LIST_PAGE = PAGE + "list-product-promotions"
+REINDEX_STATUS_PAGE = "/api-reference/search-settings/get-the-reindex-status"
 
 SECTIONS = ["product_information", "seo", "reinitialise"]
 
@@ -436,6 +437,27 @@ ENDPOINTS = [
         },
         "example_call": {"path": {"promotion_id": 6}},
     },
+    {
+        "key": "reindex_search",
+        "slug": "reindex-search",
+        "title": "Reindex search",
+        "method": "POST",
+        "path": "/admin/search/reindex",
+        "summary": "Starts a rebuild of your store's search index and returns `202` with `status` set to `accepted`.",
+        "description": "Starts a rebuild of the search index for the whole store. Send no body. Returns `202` with `status`, `clean` and `message`. To read how the run is going, call [Get the reindex status](" + REINDEX_STATUS_PAGE + ").",
+        "responses": {
+            "202": {
+                "description": "The rebuild started.",
+                "schema": {"type": "object", "properties": {
+                    "status": {"type": "string", "description": "`accepted`."},
+                    "clean": {"type": "boolean", "description": "`true`."},
+                    "message": {"type": "string", "description": "`search reindex started`."},
+                }},
+                "example": {"status": "accepted", "clean": True, "message": "search reindex started"},
+            },
+        },
+        "example_call": {},
+    },
 ]
 
 
@@ -589,7 +611,7 @@ SCHEMAS = {
 }
 
 OVERVIEW_DESCRIPTION = "Read and change how your store's search result page shows products, and create, change and delete its product promotions."
-INTRO = "The Search result page API has thirteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/search_result_page`."
+INTRO = "The Search result page API has fourteen endpoints, and you can call every one from all seven SDKs. Thirteen of them start with `/api/v4/admin/settings/page_settings/search_result_page`. The other, Reindex search, uses `/api/v4/admin/search/reindex`."
 WARNING = (
     "A section read and a section write use different wrappers. `GET /search_result_page/{section}`\n"
     "  returns the section inside `search_result_page`, such as `{\"search_result_page\": {\"seo\": {...}}}`,\n"

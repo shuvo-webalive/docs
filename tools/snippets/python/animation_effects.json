@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "patch_animation_effects_section",
       "code": "response = client.animation_effects.patch_animation_effects_section(\n    \"widget_transition\", {\"widget_transition\": {\"widget_smooth_render\": True}}\n)\ntransition = response.map[\"widget_transition\"]\nprint(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])\n"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "upload_animation_effects_custom_loader",
+      "code": "with open(\"loader.png\", \"rb\") as handle:\n    response = client.animation_effects.upload_animation_effects_custom_loader({\"file\": handle})\nprint(response.status_code, response.map[\"custom_loader\"][\"file_url\"])\n"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "delete_animation_effects_custom_loader",
+      "code": "response = client.animation_effects.delete_animation_effects_custom_loader()\nprint(response.status_code)\n"
     }
   }
 }

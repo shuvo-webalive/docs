@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "patchAnimationEffectsSection",
       "code": "const response = await client.animationEffects.patchAnimationEffectsSection('widget_transition', {\n    widget_transition: {widget_smooth_render: true},\n});\nconsole.log(response.map.widget_transition.widget_smooth_render);\n"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "uploadAnimationEffectsCustomLoader",
+      "code": "import {readFileSync} from 'node:fs';\n\nconst response = await client.animationEffects.uploadAnimationEffectsCustomLoader({\n    file: ['loader.png', readFileSync('loader.png'), 'image/png'],\n});\nconsole.log(response.statusCode, response.map.custom_loader.file_url);\n"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "deleteAnimationEffectsCustomLoader",
+      "code": "const response = await client.animationEffects.deleteAnimationEffectsCustomLoader();\nconsole.log(response.statusCode);\n"
     }
   }
 }

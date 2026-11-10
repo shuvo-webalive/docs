@@ -2,85 +2,69 @@
 
 TAG = "Tax settings"
 SLUG = "tax-settings"
-BASE = "/admin/tax/settings"
+BASE = "/admin/settings/tax"
 ICON = "file-invoice-dollar"
 
 GET_PAGE = "/api-reference/tax-settings/get-tax-settings"
 
-OVERVIEW_DESCRIPTION = "Read and change your store's tax settings, such as the default country, the default tax code and the tax message."
-INTRO = "The Tax settings API has two endpoints, and you can call both from all seven SDKs. Both use the path `/api/v4/admin/tax/settings`."
+OVERVIEW_DESCRIPTION = "Read and change your store's tax settings, such as the tax rate for customers, the tax region, whether prices show with tax and the tax message."
+INTRO = "The Tax settings API has three endpoints, and you can call every one from all seven SDKs. All three use the path `/api/v4/admin/settings/tax`."
 
 WARNING = (
-    "**Wrap a write in `settings`, not in `tax_settings`.** The read returns the settings under\n"
-    "  `tax_settings`, but the write takes them under `settings`. A body wrapped in `tax_settings`,\n"
-    "  a body with no wrapper and an empty `settings` object are each rejected with\n"
-    "  `400 invalid_request` and the message `settings missing`."
+    "**Wrap a write in `tax_settings`.** The store also accepts `tax` as the wrapper. A body wrapped in\n"
+    "  `settings` and a body with no wrapper are each rejected with `400`."
 )
 
 NOTES = [
-    "**A write changes only the fields you send.** Every field you leave out keeps its stored value,\n"
-    "  and the response returns all nine settings. A field the store does not know is ignored, and a\n"
-    "  body in which every field is ignored is rejected with `400` and the message\n"
-    "  `No settings provided to update`.",
-    "**Only `default_tax_profile` and `configuration_type` are checked.** If no tax profile has the\n"
-    "  `tax_profile_id` you send as `default_tax_profile`, or the store does not know the\n"
-    "  `configuration_type` you send, the write is rejected with `400 invalid_request` and the stored\n"
-    "  value stays as it was. `default_country`, `default_tax_code` and `custom_tax_profile_id` are\n"
-    "  stored without a check: `default_country: \"ZZ\"`, a `default_tax_code` that matches no tax code\n"
-    "  and `custom_tax_profile_id: 99999999` are each accepted with `200`. Check these three values\n"
-    "  yourself before you send them.",
-    "**`default_tax_profile` follows the default tax profile.** It holds the `id` of the tax profile\n"
-    "  whose `default` is `true`, which the tax profile calls take as `tax_profile_id`, and it changes\n"
-    "  when another tax profile becomes the default. If the default tax profile is deleted,\n"
-    "  `default_tax_profile` keeps the deleted profile's `tax_profile_id`, and a write cannot send that\n"
-    "  value back: it is rejected with `400`. Leave `default_tax_profile` out of a write unless you are\n"
-    "  changing it.",
-    "**After a rejected request, the store handles your next request on the same client with the rejected\n"
-    "  value.** This applies to the id in the path, such as a `country_tax_id`, and to a query parameter\n"
-    "  such as `limit`, and it lasts for one request. After `GET /admin/tax/country_taxes/99999999`\n"
-    "  returns `404`, a `GET /admin/tax/custom_profiles/1` sent next also returns `404`, even though that\n"
-    "  profile exists. [Get tax settings](" + GET_PAGE + ") takes neither value, so it returns the settings\n"
-    "  as usual straight after a rejected request. If a call fails straight after another call failed,\n"
-    "  send it again.",
-    "**Only `GET` and `PUT` exist, on one flat path.** There is no `HEAD` endpoint: `HEAD`, `POST`,\n"
-    "  `PATCH` and `OPTIONS` on `/admin/tax/settings` return `404`. The settings have no sections, so\n"
-    "  a path below it, such as `/admin/tax/settings/bogus`, returns `404 not_found` with the message\n"
-    "  `Unknown tax path: /api/v4/admin/tax/settings/bogus`. Responses have no `ETag` or\n"
-    "  `Last-Modified` header, and `field_metadata=true` changes nothing.",
+    "**A write changes only the fields you send.** `PUT` and `PATCH` both merge: every field you leave\n"
+    "  out keeps its stored value.",
+    "**Write the custom tax profile as `custom_tax_profile_id`.** The read returns the profile as\n"
+    "  `custom_tax_profile`, but a write that contains `custom_tax_profile` or `calculated_by` is rejected\n"
+    "  with `400 unknown_field`.",
+    "**Write `tax_region` as an object.** `{\"country_code\": \"AU\"}` sets the region. `{\"country_tax_id\": 1}`\n"
+    "  is accepted but leaves `tax_region` as `null`. A bare id is rejected with `400`.",
+    "**The `group_meta` links for tax profiles and tax rules return `404`.** `group_meta` names\n"
+    "  `/api/v4/admin/tax/profiles` and `/api/v4/admin/tax/rules`. Read the tax profiles at\n"
+    "  `/admin/tax_profiles` and the tax rules at `/admin/tax_rules` instead.",
+    "**The old path `/admin/tax/settings` returns `404` with the message `Unknown tax path`.** Add\n"
+    "  `field_metadata=true` to a read to also get `field_metadata`, a description of each field.",
 ]
 
-REQUEST_ID = "7d2e4a91-3b6c-4f0e-9a58-1c2b3d4e5f60"
-
-
-def error(code, message):
-    return {"error": {"code": code, "message": message, "details": [], "request_id": REQUEST_ID}}
-
-
-SETTINGS_MISSING = error("invalid_request", "settings missing")
-
 ERROR_REF = {"$ref": "#/components/schemas/Error"}
-SETTINGS_RESPONSE = {"type": "object", "properties": {"tax_settings": {"$ref": "#/components/schemas/TaxSettings"}}}
-WRITE_BODY = {"type": "object", "required": ["settings"], "properties": {
-    "settings": {"$ref": "#/components/schemas/TaxSettingsInput"},
+SETTINGS_RESPONSE = {"type": "object", "properties": {
+    "tax_settings": {"$ref": "#/components/schemas/TaxSettings"},
+}}
+WRITE_BODY = {"type": "object", "required": ["tax_settings"], "properties": {
+    "tax_settings": {"$ref": "#/components/schemas/TaxSettingsInput"},
 }}
 
+FIELD_METADATA = {
+    "name": "field_metadata",
+    "in": "query",
+    "description": "Send `true` to also get `field_metadata`, which describes each field.",
+    "schema": {"type": "boolean", "example": True},
+}
+
 SAMPLE_SETTINGS = {
-    "configuration_type": "DEFAULT",
-    "system_default_tax": True,
-    "default_country": "AU",
-    "custom_tax_profile_id": 1,
-    "default_tax_profile": 3,
-    "show_price_with_tax": True,
-    "is_price_with_tax": False,
-    "default_tax_code": "GST",
+    "tax_rate_for_customers": "system_default",
+    "tax_region": {"country_tax_id": 1, "country_code": "AU", "country_name": "Australia"},
+    "custom_tax_profile": {"id": 1, "name": "Standard tax"},
+    "is_price_shown_with_tax": True,
+    "prices_in_catalog": "excluding_tax",
+    "calculated_by": "store_region",
+    "is_out_of_region_tax_free": False,
     "tax_message": "All prices include GST",
+    "base_price_rounding": "nearest",
+    "group_meta": {
+        "tax_settings": {"kind": "setting", "writable": True, "href": "/api/v4/admin/settings/tax"},
+        "tax_profiles": {"kind": "resource", "writable": True, "href": "/api/v4/admin/tax/profiles"},
+        "tax_rules": {"kind": "resource", "writable": True, "href": "/api/v4/admin/tax/rules"},
+    },
 }
 
 WRITE_400 = (
-    "The body is not wrapped in `settings`, or `settings` is empty: the message is `settings missing`. "
-    "Or every field in `settings` is one the store does not know: the message is `No settings provided to update`. "
-    "Or no tax profile has the `tax_profile_id` you sent as `default_tax_profile`, or `configuration_type` is a type "
-    "the store does not know: the stored value stays as it was."
+    "The body is wrapped in `settings` or has no wrapper. Or it contains `custom_tax_profile` or `calculated_by`, "
+    "which are `unknown_field` in a write. Or `tax_region` is a bare id, not an object."
 )
 
 ENDPOINTS = [
@@ -90,11 +74,12 @@ ENDPOINTS = [
         "title": "Get tax settings",
         "method": "GET",
         "path": BASE,
-        "summary": "Returns all nine tax settings in one `tax_settings` object.",
-        "description": "Returns the store's tax settings as nine fields in one flat `tax_settings` object, with no sections. Query parameters have no effect: `field_metadata=true` returns the same body and no field descriptions. The response has no `ETag` or `Last-Modified` header.",
+        "summary": "Returns the nine tax settings in one `tax_settings` object, and `group_meta`.",
+        "description": "Returns the store's tax settings as nine fields in one flat `tax_settings` object, with no sections. `group_meta` names the settings, the tax profiles and the tax rules. Send `field_metadata=true` to also get `field_metadata`, a description of each field.",
+        "parameters": [FIELD_METADATA],
         "responses": {
             "200": {
-                "description": "The nine tax settings under `tax_settings`.",
+                "description": "The nine tax settings under `tax_settings`, with `group_meta`. With `field_metadata=true`, a `field_metadata` key is added.",
                 "schema": SETTINGS_RESPONSE,
                 "example": {"tax_settings": SAMPLE_SETTINGS},
             },
@@ -107,47 +92,91 @@ ENDPOINTS = [
         "title": "Update tax settings",
         "method": "PUT",
         "path": BASE,
-        "summary": "Changes the tax settings you send inside `settings` and returns all nine.",
-        "description": "Send the fields to change inside a `settings` object. Only those fields change; the others keep their stored values. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](" + GET_PAGE + "). A body wrapped in `tax_settings`, the key the read returns, is rejected with `400` and the message `settings missing`.",
-        "body": {"schema": WRITE_BODY, "example": {"settings": {"tax_message": "All prices include GST"}}},
+        "summary": "Changes the tax settings you send inside `tax_settings` and returns all nine.",
+        "description": "Send the fields to change inside a `tax_settings` object. Only those fields change; the others keep their stored values. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](" + GET_PAGE + "). A body wrapped in `settings`, or with no wrapper, is rejected with `400`.",
+        "body": {"schema": WRITE_BODY, "example": {"tax_settings": {"tax_message": "All prices include GST"}}},
         "responses": {
             "200": {
                 "description": "All nine tax settings after the change, under `tax_settings`.",
                 "schema": SETTINGS_RESPONSE,
                 "example": {"tax_settings": SAMPLE_SETTINGS},
             },
-            "400": {"description": WRITE_400, "schema": ERROR_REF, "example": SETTINGS_MISSING},
+            "400": {"description": WRITE_400, "schema": ERROR_REF},
+        },
+        "example_call": {},
+    },
+    {
+        "key": "patch_tax_settings",
+        "slug": "patch-tax-settings",
+        "title": "Patch tax settings",
+        "method": "PATCH",
+        "path": BASE,
+        "summary": "Changes the tax settings you send inside `tax_settings` and returns all nine.",
+        "description": "Send the fields to change inside a `tax_settings` object. Like `PUT`, `PATCH` merges: only the fields you send change. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](" + GET_PAGE + "). A body wrapped in `settings`, or with no wrapper, is rejected with `400`.",
+        "body": {"schema": WRITE_BODY, "example": {"tax_settings": {"is_price_shown_with_tax": True}}},
+        "responses": {
+            "200": {
+                "description": "All nine tax settings after the change, under `tax_settings`.",
+                "schema": SETTINGS_RESPONSE,
+                "example": {"tax_settings": SAMPLE_SETTINGS},
+            },
+            "400": {"description": WRITE_400, "schema": ERROR_REF},
         },
         "example_call": {},
     },
 ]
 
+REFERENCE = {"anyOf": [{"type": "object", "properties": {
+    "id": {"type": "integer", "description": "The custom tax profile's `id`."},
+    "name": {"type": "string", "description": "The custom tax profile's name."},
+}}, {"type": "null"}], "description": "The custom tax profile: its `id` and name, or `null` when none is set."}
+
 SCHEMAS = {
-    "TaxSettings": {"type": "object", "description": "The store's tax settings: nine fields at one level, with no sections.", "properties": {
-        "configuration_type": {"type": "string", "description": "The tax configuration type, such as `DEFAULT`."},
-        "system_default_tax": {"type": "boolean"},
-        "default_country": {"type": "string", "description": "The default country, such as `AU`. The store does not check this value."},
-        "custom_tax_profile_id": {"type": "integer", "description": "A custom tax profile's `id`, such as `1`. The store does not check this value."},
-        "default_tax_profile": {"type": "integer", "description": "The `id` of the default tax profile, the one whose `default` is `true`. The tax profile calls take it as `tax_profile_id`. It changes when another tax profile becomes the default, and after the default tax profile is deleted it still holds that profile's `tax_profile_id`."},
-        "show_price_with_tax": {"type": "boolean"},
-        "is_price_with_tax": {"type": "boolean"},
-        "default_tax_code": {"type": "string", "description": "The default tax code, such as `GST`. The store does not check this value."},
+    "TaxSettings": {"type": "object", "description": "The store's tax settings: nine fields at one level, with no sections, and `group_meta`.", "properties": {
+        "tax_rate_for_customers": {"type": "string", "enum": ["system_default", "custom_tax_profile"], "description": "Which tax rate customers are charged: `system_default` or `custom_tax_profile`."},
+        "tax_region": {"anyOf": [{"type": "object", "properties": {
+            "country_tax_id": {"type": "integer", "description": "The country tax's `id`."},
+            "country_code": {"type": "string", "description": "The country code, such as `AU`."},
+            "country_name": {"type": "string", "description": "The country's name."},
+        }}, {"type": "null"}], "description": "The store's tax region, or `null` when none is set."},
+        "custom_tax_profile": REFERENCE,
+        "is_price_shown_with_tax": {"type": "boolean", "description": "`true` shows prices with tax."},
+        "prices_in_catalog": {"type": "string", "enum": ["excluding_tax", "including_tax"], "description": "Whether the prices in your catalog are `excluding_tax` or `including_tax`."},
+        "calculated_by": {"type": "string", "enum": ["store_region"], "description": "Read-only: `store_region`. A write that contains it is rejected with `400 unknown_field`."},
+        "is_out_of_region_tax_free": {"type": "boolean", "description": "`true` charges no tax outside the tax region."},
         "tax_message": {"type": "string", "description": "Free text, such as `All prices include GST`."},
+        "base_price_rounding": {"type": "string", "enum": ["nearest", "up", "down"], "description": "How base prices are rounded: `nearest`, `up` or `down`."},
+        "group_meta": {"$ref": "#/components/schemas/TaxSettingsGroupMeta"},
+        "field_metadata": {"description": "Only when you send `field_metadata=true`: a description of each field."},
     }},
-    "TaxSettingsInput": {"type": "object", "description": "Send only the fields you want to change. Every field you leave out keeps its stored value, and a field the store does not know is ignored.", "properties": {
-        "configuration_type": {"type": "string", "description": "Must be a type the store knows, such as `DEFAULT`. Any other value is rejected with `400 invalid_request`."},
-        "system_default_tax": {"type": "boolean"},
-        "default_country": {"type": "string", "description": "Stored as you send it: `ZZ` is accepted."},
-        "custom_tax_profile_id": {"type": "integer", "description": "A custom tax profile's `id`. Stored as you send it, without a check: `99999999` is accepted."},
-        "default_tax_profile": {"type": "integer", "description": "Must be the `tax_profile_id` of an existing tax profile. Any other value is rejected with `400 invalid_request`, including the `tax_profile_id` of a deleted default profile that the read still returns, and the stored value stays as it was."},
-        "show_price_with_tax": {"type": "boolean"},
-        "is_price_with_tax": {"type": "boolean"},
-        "default_tax_code": {"type": "string", "description": "Stored as you send it, including a tax code that does not exist."},
+    "TaxSettingsGroupMeta": {"type": "object", "description": "The settings area, the tax profiles and the tax rules.", "properties": {
+        "tax_settings": {"$ref": "#/components/schemas/TaxSettingsAreaMeta"},
+        "tax_profiles": {"$ref": "#/components/schemas/TaxSettingsAreaMeta"},
+        "tax_rules": {"$ref": "#/components/schemas/TaxSettingsAreaMeta"},
+    }},
+    "TaxSettingsAreaMeta": {"type": "object", "description": "One `group_meta` entry: what the area is, whether it can be written, and its path. The `href` of `tax_profiles` and `tax_rules` returns `404`.", "properties": {
+        "kind": {"type": "string", "description": "What the area is: `setting` for `tax_settings`, `resource` for `tax_profiles` and `tax_rules`."},
+        "writable": {"type": "boolean", "description": "Whether you can write the area: `true` for all three."},
+        "href": {"type": "string", "description": "The area's path."},
+    }},
+    "TaxSettingsInput": {"type": "object", "description": "Send only the fields you want to change. Every field you leave out keeps its stored value.", "properties": {
+        "tax_rate_for_customers": {"type": "string", "enum": ["system_default", "custom_tax_profile"], "description": "`system_default` or `custom_tax_profile`."},
+        "tax_region": {"$ref": "#/components/schemas/TaxRegionInput"},
+        "custom_tax_profile_id": {"type": "integer", "description": "The `id` of the custom tax profile. The read returns it as `custom_tax_profile`."},
+        "is_price_shown_with_tax": {"type": "boolean", "description": "`true` shows prices with tax."},
+        "prices_in_catalog": {"type": "string", "enum": ["excluding_tax", "including_tax"], "description": "`excluding_tax` or `including_tax`."},
+        "is_out_of_region_tax_free": {"type": "boolean", "description": "`true` charges no tax outside the tax region."},
         "tax_message": {"type": "string", "description": "Free text."},
+        "base_price_rounding": {"type": "string", "enum": ["nearest", "up", "down"], "description": "`nearest`, `up` or `down`."},
+    }},
+    "TaxRegionInput": {"type": "object", "description": "The tax region to set. `{\"country_code\": \"AU\"}` sets it. `{\"country_tax_id\": 1}` is accepted but leaves `tax_region` as `null`. A bare id is rejected with `400`.", "properties": {
+        "country_code": {"type": "string", "description": "The country code, such as `AU`."},
+        "state_code": {"type": "string", "description": "An optional state code to send with `country_code`."},
+        "country_tax_id": {"type": "integer", "description": "A country tax's `id`. The store accepts it but leaves `tax_region` as `null`."},
     }},
     "Error": {"type": "object", "properties": {"error": {"type": "object", "properties": {
-        "code": {"type": "string", "description": "A machine-readable reason, such as `invalid_request` or `not_found`."},
-        "message": {"type": "string", "description": "What was wrong, such as `settings missing`."},
+        "code": {"type": "string", "description": "A machine-readable reason, such as `invalid_request` or `unknown_field`."},
+        "message": {"type": "string", "description": "What was wrong."},
         "details": {"type": "array", "items": {"type": "object"}, "description": "Extra detail, or an empty list."},
         "request_id": {"type": "string", "description": "Identifies this request."},
     }}}},

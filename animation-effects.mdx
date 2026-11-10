@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Read and change your store's page preloader, widget and page transitions, image lazy loading and checkout page skeleton."
 ---
 
-The Animation effects API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/animation_effects`.
+The Animation effects API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/animation_effects`.
 
 <Warning>
   Every write body must be wrapped in a key, and the key depends on the path. On `/animation_effects`,
@@ -23,6 +23,8 @@ The Animation effects API has five endpoints, and you can call every one from al
 | [Get animation effects settings headers](/api-reference/animation-effects/get-animation-effects-settings-headers) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/animation_effects` | Returns the headers for the animation effects settings, with no body. |
 | [Get a settings section](/api-reference/animation-effects/get-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/animation_effects/{section}` | Returns one settings section under its own key, such as `widget_transition`. |
 | [Update a settings section](/api-reference/animation-effects/update-a-settings-section) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/animation_effects/{section}` | Changes the fields you send in one section and returns that section. |
+| [Upload a custom loader](/api-reference/animation-effects/upload-a-custom-loader) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/animation_effects/custom_loader` | Uploads your own loader image and returns `custom_loader` with `enabled` set to `true`. |
+| [Delete the custom loader](/api-reference/animation-effects/delete-the-custom-loader) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/animation_effects/custom_loader` | Removes your uploaded loader image and returns `204` with no body. |
 
 ## Before you call
 
@@ -59,6 +61,10 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `400 invalid_request`. `custom_loader` is in every read but cannot be written: a body that names only
   `custom_loader` is rejected with `400 invalid_request` and the message
   `no recognized animation_effects fields in body`.
+- **The custom loader has its own path.** [Upload a custom loader](/api-reference/animation-effects/upload-a-custom-loader) and
+  [Delete the custom loader](/api-reference/animation-effects/delete-the-custom-loader) use
+  `/animation_effects/custom_loader`, not a settings section. Upload takes a multipart part, not a
+  JSON body, so the wrapper rules above do not apply to it.
 - **Animation effects writes have their own rate limit.** If you send eleven writes with no pause,
   within about 0.8 seconds, the eleventh is rejected with `429` and a `Retry-After` header that counts
   down the time left before writes are accepted again. It is separate from the page settings limit:

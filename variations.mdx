@@ -1,10 +1,10 @@
 ---
 title: "Variations"
 sidebarTitle: "Overview"
-description: "List, create, replace, update and delete variation types and their options, and list, import, retrieve, update and delete the variants of a product."
+description: "List, create, replace, update and delete variation types and their options, and list, import, retrieve, update and delete the variants of a product, one at a time or all at once."
 ---
 
-The Variations API has fourteen endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`.
+The Variations API has sixteen endpoints, and you can call every one from all seven SDKs. Variation type paths start with `/api/v4/admin/variations`, and product variant paths start with `/api/v4/admin/products/{product_id}/variations`.
 
 <Warning>
   **Replacing a variation type deletes every option you leave out of the body.** `PUT` on a type
@@ -31,6 +31,8 @@ The Variations API has fourteen endpoints, and you can call every one from all s
 | [Update a product's variants](/api-reference/variations/update-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/admin/products/{product_id}/variations/bulk` | Sets availability, prices, stock or order quantities on several variants of one product. |
 | [Retrieve a product's variant](/api-reference/variations/retrieve-a-products-variant) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `/admin/products/{product_id}/variations/{variation_id}` | Returns one variant of the product, with its options, pricing, stock and order quantities. |
 | [Delete a product's variant](/api-reference/variations/delete-a-products-variant) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/admin/products/{product_id}/variations/{variation_id}` | Deletes one variant of the product permanently. |
+| [Update a product's variant](/api-reference/variations/update-a-products-variant) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `/admin/products/{product_id}/variations/{variation_id}` | Changes the fields you send on one variant of the product and returns the variant's ids and codes. |
+| [Delete all of a product's variants](/api-reference/variations/delete-all-of-a-products-variants) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `/admin/products/{product_id}/variations` | Deletes every variant of the product whose `id` you pass as `product_id`. |
 
 ## Before you call
 
@@ -73,3 +75,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   more, send a higher `offset`, or the next `page`, while `pagination.has_next` is `true`. The listing
   accepts only `search`, `standard`, `limit`, `offset`, `page` and `field_metadata`: any other query
   parameter, such as `q` or `sort`, is rejected with `400` and the reason `unknown_parameter`.
+- **Update one variant with a bare body, and read the result back from the variant.** [Update a product's variant](/api-reference/variations/update-a-products-variant) takes `available`, `name`, `sku`, `custom_sku`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory` and `ordering`
+  at the top level of the body, with no wrapper, and changes only the fields you send. It returns the variant's ids and codes, not its pricing or stock: read the rest with [Retrieve a product's variant](/api-reference/variations/retrieve-a-products-variant), which names `available` as `active`.
+  A key the call does not know, `active`, a `variation` wrapper and a body `id` are ignored and the call still returns `200`. A SKU another variant holds is rejected with `409`.
+- **Delete every variant of a product in one call.** [Delete all of a product's variants](/api-reference/variations/delete-all-of-a-products-variants) returns `204` with no body, also when the product has no variants. [List a product's variants](/api-reference/variations/list-a-products-variants) then returns `{"variations": []}`.
+  To delete one variant, use [Delete a product's variant](/api-reference/variations/delete-a-products-variant).

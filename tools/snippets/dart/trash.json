@@ -33,6 +33,10 @@
     "bulk_delete_trash": {
       "function": "bulkDeleteTrash",
       "code": "final response = await client.trash.bulkDeleteTrash({\n  'items': [\n    {'type': 'Category', 'id': 1234},\n    {'type': 'Category', 'id': 1229},\n  ],\n});\nfinal result = response.map as Map;\nfor (final item in result['deleted'] as List) {\n  print('${(item as Map)['type']} ${item['id']} ${item['name']}');\n}\nfor (final failure in result['failed'] as List) {\n  print('${(failure as Map)['id']} ${failure['code']} ${failure['message']}');\n}"
+    },
+    "get_trash_item_external_links": {
+      "function": "getTrashItemExternalLinks",
+      "code": "final response = await client.trash.getTrashItemExternalLinks('product', 101);\nfinal result = response.map as Map;\nprint('${result['type']} ${result['id']}');\nfor (final link in result['links'] as List) {\n  print('${(link as Map)['system']} ${link['entity']} ${link['name']} ${link['reason']}');\n}"
     }
   }
 }

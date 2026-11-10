@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "delete_product_media_image",
       "code": "response = client.products.delete_product_media_image(101, 1876)\nprint(response.status_code)\n"
+    },
+    "update_product_media_order": {
+      "function": "update_product_media_order",
+      "code": "response = client.products.update_product_media_order(101, {\"type\": \"images\", \"ids\": [1877, 1876]})\nfor image in response.map[\"images\"]:\n    print(image[\"id\"], image[\"position\"], image[\"primary\"])\n"
+    },
+    "patch_product_media_image": {
+      "function": "patch_product_media_image",
+      "code": "response = client.products.patch_product_media_image(101, 1877, {\"position\": 1})\nprint(response.map[\"id\"], response.map[\"position\"], response.map[\"primary\"])\n"
+    },
+    "get_product_seo": {
+      "function": "get_product_seo",
+      "code": "response = client.products.get_product_seo(101)\nseo = response.map[\"seo\"]\nprint(seo[\"url_handle\"], seo[\"title\"], seo[\"description\"])\n"
+    },
+    "patch_product_stock": {
+      "function": "patch_product_stock",
+      "code": "response = client.products.patch_product_stock(101, {\n    \"tracking\": {\"enabled\": True, \"available_stock\": 40},\n    \"note\": \"Restock\",\n})\nprint(response.map[\"stock\"][\"tracking\"][\"available_stock\"], response.map[\"adjustment\"])\n"
+    },
+    "list_product_stock_adjustments": {
+      "function": "list_product_stock_adjustments",
+      "code": "response = client.products.list_product_stock_adjustments(101, {\"limit\": 20})\nfor adjustment in response.map[\"adjustments\"]:\n    print(adjustment[\"id\"], adjustment[\"delta\"], adjustment[\"note\"], adjustment[\"transaction_no\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
     }
   }
 }

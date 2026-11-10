@@ -57,6 +57,14 @@
     "delete_product_variation": {
       "function": "delete_product_variation",
       "code": "response = client.variations.delete_product_variation(4321, 91)\nprint(response.status_code)\n"
+    },
+    "patch_product_variation": {
+      "function": "patch_product_variation",
+      "code": "response = client.variations.patch_product_variation(4321, 91, {\"available\": False, \"barcode\": \"9310000000014\"})\nvariation = response.map[\"variation\"]\nprint(variation[\"variation_id\"], variation[\"sku\"], variation[\"barcode\"])\n"
+    },
+    "delete_product_variations": {
+      "function": "delete_product_variations",
+      "code": "response = client.variations.delete_product_variations(4321)\nprint(response.status_code)\n"
     }
   }
 }

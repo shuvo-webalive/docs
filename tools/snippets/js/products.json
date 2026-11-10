@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "deleteProductMediaImage",
       "code": "const response = await client.products.deleteProductMediaImage(101, 1876);\nconsole.log(response.statusCode);\n"
+    },
+    "update_product_media_order": {
+      "function": "updateProductMediaOrder",
+      "code": "const response = await client.products.updateProductMediaOrder(101, {type: 'images', ids: [1877, 1876]});\nfor (const image of response.map.images) {\n    console.log(image.id, image.position, image.primary);\n}\n"
+    },
+    "patch_product_media_image": {
+      "function": "patchProductMediaImage",
+      "code": "const response = await client.products.patchProductMediaImage(101, 1877, {position: 1});\nconsole.log(response.map.id, response.map.position, response.map.primary);\n"
+    },
+    "get_product_seo": {
+      "function": "getProductSeo",
+      "code": "const response = await client.products.getProductSeo(101);\nconst seo = response.map.seo;\nconsole.log(seo.url_handle, seo.title, seo.description);\n"
+    },
+    "patch_product_stock": {
+      "function": "patchProductStock",
+      "code": "const response = await client.products.patchProductStock(101, {\n    tracking: {enabled: true, available_stock: 40},\n    note: 'Restock',\n});\nconsole.log(response.map.stock.tracking.available_stock, response.map.adjustment);\n"
+    },
+    "list_product_stock_adjustments": {
+      "function": "listProductStockAdjustments",
+      "code": "const response = await client.products.listProductStockAdjustments(101, {limit: 20});\nfor (const adjustment of response.map.adjustments) {\n    console.log(adjustment.id, adjustment.delta, adjustment.note, adjustment.transaction_no);\n}\nconsole.log(response.map.pagination.has_next);\n"
     }
   }
 }

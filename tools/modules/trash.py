@@ -5,8 +5,8 @@ SLUG = "trash"
 BASE = "/admin/trash"
 ICON = "trash-can"
 
-OVERVIEW_DESCRIPTION = "List the items in your store's trash and the types it holds, and restore items or delete them permanently, one at a time or up to 100 per call."
-INTRO = "The Trash API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/trash`."
+OVERVIEW_DESCRIPTION = "List the items in your store's trash and the types it holds, check what a permanent delete would break, and restore items or delete them permanently, one at a time or up to 100 per call."
+INTRO = "The Trash API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/trash`."
 
 LIST_PAGE = "/api-reference/trash/list-items-in-the-trash"
 TYPES_PAGE = "/api-reference/trash/list-trash-types"
@@ -14,6 +14,7 @@ RESTORE_PAGE = "/api-reference/trash/restore-an-item-from-the-trash"
 DELETE_PAGE = "/api-reference/trash/delete-an-item-permanently"
 BULK_RESTORE_PAGE = "/api-reference/trash/restore-items-in-bulk"
 BULK_DELETE_PAGE = "/api-reference/trash/delete-items-permanently-in-bulk"
+EXTERNAL_LINKS_PAGE = "/api-reference/trash/list-the-external-links-of-an-item-in-the-trash"
 DELETE_CATEGORY_PAGE = "/api-reference/categories/delete-a-category"
 DELETE_CUSTOMER_PAGE = "/api-reference/customers/delete-a-customer"
 DELETE_BLOG_POST_PAGE = "/api-reference/blogs/delete-a-blog-post"
@@ -50,6 +51,8 @@ NOTES = [
     "  `order` in lower case: `order=DESC` is accepted but sorts in ascending order.",
     "**Many writes in a row can be rejected with `429`.** The error code is `rate_limited` and the\n"
     "  `Retry-After` header gives the seconds to wait before you retry.",
+    "**Check an item's external links before you delete it permanently.** [List the external links of an item in the trash](" + EXTERNAL_LINKS_PAGE + ") returns the links outside the store that a permanent delete of the item would break.\n"
+    "  It works only for an item in the trash: an item that is live returns `404`, and a `trash_type` that is not in the list from [List trash types](" + TYPES_PAGE + ") is rejected with `400` and the reason `invalid_enum`.",
 ]
 
 TRASH_TYPE = {
@@ -102,6 +105,8 @@ RESTORED_ROW = {"type": "category", "id": 1234, "name": "Spring Collection", "ur
 FAILED_ROW = {"type": "category", "id": 99, "code": "not_found", "message": "Category with id 99 not found"}
 
 NOT_IN_TRASH = {"error": {"code": "conflict", "message": "Category with id 1234 is not in trash", "details": [], "request_id": REQUEST_ID}}
+
+EXTERNAL_LINKS_RESULT = {"type": "product", "id": 101, "links": []}
 
 BULK_BODY_400 = (
     "The body is not valid, and nothing is restored or deleted: `items` is missing, empty or not an array"
@@ -277,6 +282,26 @@ ENDPOINTS = [
         },
         "example_call": {},
     },
+    {
+        "key": "get_trash_item_external_links",
+        "slug": "list-the-external-links-of-an-item-in-the-trash",
+        "title": "List the external links of an item in the trash",
+        "method": "GET",
+        "path": BASE + "/{trash_type}/{trash_item_id}/external_links",
+        "summary": "Returns the links outside the store that deleting the trashed item permanently would break.",
+        "description": "Returns the item's `type` and `id`, and `links`, the links outside the store that a permanent delete of the item would break. Each link has the `system` and the `entity` it belongs to, a `name`, its `external_id` and the `reason` it blocks the delete. `links` is empty when nothing outside the store depends on the item. Call it before [Delete an item permanently](" + DELETE_PAGE + "). It works only for an item in the trash: an item that is not in the trash, a live one included, returns `404`.",
+        "parameters": [TRASH_TYPE, TRASH_ITEM_ID],
+        "responses": {
+            "200": {
+                "description": "The item's `type` and `id`, and its external links in `links`.",
+                "schema": {"$ref": "#/components/schemas/TrashExternalLinks"},
+                "example": EXTERNAL_LINKS_RESULT,
+            },
+            "400": {"description": "`trash_type` is not one of `album`, `article`, `blog_post`, `category`, `customer`, `form`, `navigation`, `operator`, `order`, `page`, `product` and `supplier`. The reason is `invalid_enum`.", "schema": ERROR_REF},
+            "404": {"description": "The item is not in the trash, or no item of that type has that `trash_item_id`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"trash_type": "product", "trash_item_id": 101}},
+    },
 ]
 
 BULK_ERROR_ITEMS = {"type": "array", "description": "One entry for each item that failed. Empty when every item succeeded.", "items": {"$ref": "#/components/schemas/TrashBulkError"}}
@@ -336,3 +361,17 @@ SCHEMAS = {
         "request_id": {"type": "string", "description": "Identifies this request."},
     }}}},
 }
+
+SCHEMAS["TrashExternalLink"] = {"type": "object", "description": "One link outside the store that depends on the item.", "properties": {
+    "system": {"type": "string", "description": "The system outside the store that holds the link."},
+    "entity": {"type": "string", "description": "The kind of record in that system."},
+    "name": {"type": "string", "description": "The linked record's name."},
+    "external_id": {"type": "string", "description": "The linked record's id in that system."},
+    "reason": {"type": "string", "description": "Why the link blocks a permanent delete."},
+}}
+
+SCHEMAS["TrashExternalLinks"] = {"type": "object", "properties": {
+    "type": {"type": "string", "description": "The item's type in snake_case, such as `product`."},
+    "id": {"type": "integer", "description": "The id the item has in its own resource. It is the `trash_item_id` you passed."},
+    "links": {"type": "array", "items": {"$ref": "#/components/schemas/TrashExternalLink"}, "description": "The links outside the store that a permanent delete would break, or `[]` when there are none."},
+}}

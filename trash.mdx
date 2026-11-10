@@ -1,10 +1,10 @@
 ---
 title: "Trash"
 sidebarTitle: "Overview"
-description: "List the items in your store's trash and the types it holds, and restore items or delete them permanently, one at a time or up to 100 per call."
+description: "List the items in your store's trash and the types it holds, check what a permanent delete would break, and restore items or delete them permanently, one at a time or up to 100 per call."
 ---
 
-The Trash API has eight endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/trash`.
+The Trash API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/trash`.
 
 <Warning>
   **Send a `type` other than `Customer` on every listing call.** Without `type`, or with
@@ -27,6 +27,7 @@ The Trash API has eight endpoints, and you can call every one from all seven SDK
 | [Delete an item permanently](/api-reference/trash/delete-an-item-permanently) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/trash/{trash_type}/{trash_item_id}` | Deletes one item in the trash permanently. You cannot restore it afterwards. |
 | [Restore items in bulk](/api-reference/trash/restore-items-in-bulk) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/trash/bulk-restore` | Restores up to 100 trashed items and returns the restored items and the items that failed. |
 | [Delete items permanently in bulk](/api-reference/trash/delete-items-permanently-in-bulk) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/trash/bulk-delete` | Deletes up to 100 trashed items permanently and returns the deleted items and the items that failed. |
+| [List the external links of an item in the trash](/api-reference/trash/list-the-external-links-of-an-item-in-the-trash) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/trash/{trash_type}/{trash_item_id}/external_links` | Returns the links outside the store that deleting the trashed item permanently would break. |
 
 ## Before you call
 
@@ -58,3 +59,5 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `order` in lower case: `order=DESC` is accepted but sorts in ascending order.
 - **Many writes in a row can be rejected with `429`.** The error code is `rate_limited` and the
   `Retry-After` header gives the seconds to wait before you retry.
+- **Check an item's external links before you delete it permanently.** [List the external links of an item in the trash](/api-reference/trash/list-the-external-links-of-an-item-in-the-trash) returns the links outside the store that a permanent delete of the item would break.
+  It works only for an item in the trash: an item that is live returns `404`, and a `trash_type` that is not in the list from [List trash types](/api-reference/trash/list-trash-types) is rejected with `400` and the reason `invalid_enum`.

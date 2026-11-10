@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "patchAnimationEffectsSection",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.animationEffects().patchAnimationEffectsSection(\"widget_transition\",\n        Map.of(\"widget_transition\", Map.of(\"widget_smooth_render\", true)));\nMap<?, ?> widgetTransition = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"widget_transition\");\nSystem.out.println(widgetTransition.get(\"widget_smooth_render\"));\nSystem.out.println(widgetTransition.get(\"widget_smooth_render_duration\"));"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "uploadAnimationEffectsCustomLoader",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nApiResponse response = client.animationEffects().uploadAnimationEffectsCustomLoader(Map.of(\"file\", Path.of(\"loader.png\")));\nMap<?, ?> loader = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_loader\");\nSystem.out.println(response.getStatusCode() + \" \" + loader.get(\"file_url\"));"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "deleteAnimationEffectsCustomLoader",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.animationEffects().deleteAnimationEffectsCustomLoader();\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

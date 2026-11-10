@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "deleteProductMediaImage",
       "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::deleteProductMediaImage($client, 101, 1876);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "update_product_media_order": {
+      "function": "updateProductMediaOrder",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::updateProductMediaOrder($client, 101, ['type' => 'images', 'ids' => [1877, 1876]]);\n\nforeach ($response->map['images'] as $image) {\n    echo $image['id'], ' ', $image['position'], PHP_EOL;\n}"
+    },
+    "patch_product_media_image": {
+      "function": "patchProductMediaImage",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::patchProductMediaImage($client, 101, 1877, ['position' => 1]);\n\necho $response->map['id'], ' at position ', $response->map['position'], PHP_EOL;"
+    },
+    "get_product_seo": {
+      "function": "getProductSeo",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::getProductSeo($client, 101);\n\n$seo = $response->map['seo'];\necho $seo['url_handle'], ' ', $seo['title'], PHP_EOL;"
+    },
+    "patch_product_stock": {
+      "function": "patchProductStock",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::patchProductStock($client, 101, [\n    'tracking' => ['enabled' => true, 'available_stock' => 40],\n    'note' => 'Restock',\n]);\n\necho $response->map['stock']['tracking']['available_stock'], ' in stock, change ', $response->map['adjustment']['delta'] ?? 'none', PHP_EOL;"
+    },
+    "list_product_stock_adjustments": {
+      "function": "listProductStockAdjustments",
+      "code": "use WebCommander\\Resources\\Products\\Products;\n\n$response = Products::listProductStockAdjustments($client, 101, ['limit' => 20]);\n\nforeach ($response->map['adjustments'] as $adjustment) {\n    echo $adjustment['id'], ' ', $adjustment['delta'], ' ', $adjustment['note'], PHP_EOL;\n}"
     }
   }
 }
