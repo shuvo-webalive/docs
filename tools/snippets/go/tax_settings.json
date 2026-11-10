@@ -4,11 +4,15 @@
   "endpoints": {
     "get_tax_settings": {
       "function": "GetTaxSettings",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxSettings().GetTaxSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)\nfmt.Println(settings[\"default_country\"], settings[\"default_tax_code\"], settings[\"tax_message\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxSettings().GetTaxSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)\nfmt.Println(settings[\"tax_rate_for_customers\"], settings[\"prices_in_catalog\"], settings[\"tax_message\"])"
     },
     "put_tax_settings": {
       "function": "PutTaxSettings",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxSettings().PutTaxSettings(ctx, map[string]any{\n\t\"settings\": map[string]any{\"tax_message\": \"All prices include GST\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"tax_message\"])"
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxSettings().PutTaxSettings(ctx, map[string]any{\n\t\"tax_settings\": map[string]any{\"tax_message\": \"All prices include GST\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"tax_message\"])"
+    },
+    "patch_tax_settings": {
+      "function": "PatchTaxSettings",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxSettings().PatchTaxSettings(ctx, map[string]any{\n\t\"tax_settings\": map[string]any{\"is_price_shown_with_tax\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"is_price_shown_with_tax\"])"
     }
   }
 }

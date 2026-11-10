@@ -53,6 +53,10 @@
     "delete_search_result_page_product_promotion": {
       "function": "deleteSearchResultPageProductPromotion",
       "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.searchResultPage().deleteSearchResultPageProductPromotion(6);\nSystem.out.println(response.getStatusCode());"
+    },
+    "reindex_search": {
+      "function": "reindexSearch",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.searchResultPage().reindexSearch();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(response.getStatusCode() + \" \" + body.get(\"status\"));"
     }
   }
 }

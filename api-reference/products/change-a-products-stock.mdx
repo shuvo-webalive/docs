@@ -1,0 +1,9 @@
+---
+title: "Change a product's stock"
+description: "Changes the product's stock tracking or its stock at each location, and returns the stock and the adjustment it recorded."
+openapi: "PATCH /admin/products/{product_id}/stock"
+---
+
+Send at least one of `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, with no wrapper. `tracking` takes `enabled`, `available_stock` and `low_stock_level`, and the fields you send are merged into the product's tracking. `locations` takes rows in the form [Set a product's stock](/api-reference/products/set-a-products-stock) takes. `note` and `transaction_no` go on the adjustment. The call returns the product's `stock` as it is now, and the `adjustment` it recorded. `adjustment` is `null` when the stock figure did not change, and its `note` is `via API` unless you send one. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token). To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

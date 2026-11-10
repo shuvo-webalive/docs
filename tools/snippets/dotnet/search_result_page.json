@@ -53,6 +53,10 @@
     "delete_search_result_page_product_promotion": {
       "function": "DeleteSearchResultPageProductPromotionAsync",
       "code": "var response = await client.SearchResultPage.DeleteSearchResultPageProductPromotionAsync(6);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "reindex_search": {
+      "function": "ReindexSearchAsync",
+      "code": "var response = await client.SearchResultPage.ReindexSearchAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{response.StatusCode} {body[\"status\"]}\");"
     }
   }
 }

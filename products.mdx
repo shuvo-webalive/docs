@@ -1,10 +1,10 @@
 ---
 title: "Products"
 sidebarTitle: "Overview"
-description: "List, count, create, read, update and delete products, check a SKU, list special products, delete several products at once, import, list, read, change and delete a product's reviews, upload and delete its images, set its inventory, read and set its stock at each inventory location, and unassign a location from it."
+description: "List, count, create, read, update and delete products, check a SKU, list special products, delete several products at once, import, list, read, change and delete a product's reviews, upload, reorder, move and delete its images, read its SEO settings, set its inventory, read, set and change its stock at each inventory location, list its stock adjustments, and unassign a location from it."
 ---
 
-The Products API has twenty-two endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`.
+The Products API has twenty-seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`.
 
 <Warning>
   **Setting a product's stock unassigns every location you leave out, even one that still holds stock.**
@@ -39,6 +39,11 @@ The Products API has twenty-two endpoints, and you can call every one from all s
 | [Upload images to a product](/api-reference/products/upload-images-to-a-product) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products/{product_id}/image` | Stores one or more base64-encoded images on the product and returns the images it stored. |
 | [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/products/{product_id}/media` | Stores one base64-encoded image on the product and returns the stored image as one row. |
 | [Delete a product's image](/api-reference/products/delete-a-products-image) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/products/{product_id}/media/images/{image_id}` | Deletes one image from the product. |
+| [Set the order of a product's images](/api-reference/products/set-the-order-of-a-products-images) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/products/{product_id}/media/order` | Sets the order of all of the product's images and returns them in the new order. |
+| [Move a product's image](/api-reference/products/move-a-products-image) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/products/{product_id}/media/images/{image_id}` | Moves one image of the product to the position you send and returns the image. |
+| [Retrieve a product's SEO settings](/api-reference/products/retrieve-a-products-seo-settings) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}/seo` | Returns the product's URL handle, title, description, analytics, custom code, social cards and AI visibility settings. |
+| [Change a product's stock](/api-reference/products/change-a-products-stock) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/products/{product_id}/stock` | Changes the product's stock tracking or its stock at each location, and returns the stock and the adjustment it recorded. |
+| [List a product's stock adjustments](/api-reference/products/list-a-products-stock-adjustments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/products/{product_id}/stock/adjustments` | Returns the product's stock changes, newest first, with paging details. |
 
 ## Before you call
 
@@ -136,3 +141,9 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Updating a product's inventory sets the stock figure, and a variant keeps its own.** [Update a product's inventory](/api-reference/products/update-a-products-inventory) takes `track_inventory`, `available_stock` and `low_level_stock` inside
   `product.product_pricing_and_stock` and returns `201`. Read the new stock with [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock). The stock of a product's variants does not change. The call takes the optional `X-Transaction-No` header:
   the number is stored when the product has none, but the response to that first write shows the earlier value, `null`.
+- **Set the order of all images, or move one.** [Set the order of a product's images](/api-reference/products/set-the-order-of-a-products-images) takes `{"type": "images", "ids": [...]}` and must name every image of the product exactly once, otherwise it is rejected with `400`
+  and the reason `invalid_set`. The first `id` becomes the `primary` image. [Move a product's image](/api-reference/products/move-a-products-image) takes only `{"position": n}`, counted from `1`; any other body, `alt_text` and a wrapper included, is rejected with `400` and the reason `invalid_body`.
+  Both send their fields at the top level of the body, with no wrapper.
+- **Change stock with a `PATCH`, and expect `null` transaction numbers in the history.** [Change a product's stock](/api-reference/products/change-a-products-stock) takes `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, and at least one of them.
+  A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`. It returns `adjustment` as `null` when the stock figure did not change, and the adjustment's `note` is `via API` unless you send one.
+  [List a product's stock adjustments](/api-reference/products/list-a-products-stock-adjustments) returns every row with `transaction_no` set to `null`, also for a change you sent with a `transaction_no`, so do not look a change up by its transaction number.

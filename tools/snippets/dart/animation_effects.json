@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "patchAnimationEffectsSection",
       "code": "final response = await client.animationEffects\n    .patchAnimationEffectsSection('widget_transition', {\n  'widget_transition': {'widget_smooth_render': true},\n});\nfinal section = (response.map as Map)['widget_transition'] as Map;\nprint(section['widget_smooth_render']);"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "uploadAnimationEffectsCustomLoader",
+      "code": "import 'dart:io';\n\nfinal image = await File('loader.png').readAsBytes();\nfinal response = await client.animationEffects.uploadAnimationEffectsCustomLoader({\n  'file': ['loader.png', image, 'image/png'],\n});\nfinal loader = (response.map as Map)['custom_loader'] as Map;\nprint(loader['file_url']);"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "deleteAnimationEffectsCustomLoader",
+      "code": "final response =\n    await client.animationEffects.deleteAnimationEffectsCustomLoader();\nprint(response.statusCode);"
     }
   }
 }

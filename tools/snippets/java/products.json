@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "deleteProductMediaImage",
       "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.products().deleteProductMediaImage(101, 1876);\nSystem.out.println(response.getStatusCode());"
+    },
+    "update_product_media_order": {
+      "function": "updateProductMediaOrder",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().updateProductMediaOrder(101,\n        Map.of(\"type\", \"images\", \"ids\", List.of(1877, 1876)));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"images\")) {\n    Map<?, ?> image = (Map<?, ?>) row;\n    System.out.println(image.get(\"id\") + \" \" + image.get(\"position\") + \" \" + image.get(\"primary\"));\n}"
+    },
+    "patch_product_media_image": {
+      "function": "patchProductMediaImage",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().patchProductMediaImage(101, 1877, Map.of(\"position\", 1));\nMap<?, ?> image = (Map<?, ?>) response.getMap();\nSystem.out.println(image.get(\"id\") + \" \" + image.get(\"position\") + \" \" + image.get(\"primary\"));"
+    },
+    "get_product_seo": {
+      "function": "getProductSeo",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().getProductSeo(101);\nMap<?, ?> seo = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"seo\");\nSystem.out.println(seo.get(\"url_handle\") + \" \" + seo.get(\"title\") + \" \" + seo.get(\"description\"));"
+    },
+    "patch_product_stock": {
+      "function": "patchProductStock",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.products().patchProductStock(101, Map.of(\n        \"tracking\", Map.of(\"enabled\", true, \"available_stock\", 40),\n        \"note\", \"Restock\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> stock = (Map<?, ?>) body.get(\"stock\");\nSystem.out.println(((Map<?, ?>) stock.get(\"tracking\")).get(\"available_stock\") + \" \" + body.get(\"adjustment\"));"
+    },
+    "list_product_stock_adjustments": {
+      "function": "listProductStockAdjustments",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.products().listProductStockAdjustments(101, Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"adjustments\")) {\n    Map<?, ?> adjustment = (Map<?, ?>) row;\n    System.out.println(adjustment.get(\"id\") + \" \" + adjustment.get(\"delta\") + \" \" + adjustment.get(\"note\") + \" \" + adjustment.get(\"transaction_no\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     }
   }
 }

@@ -8024,6 +8024,90 @@
         }
       }
     },
+    "/admin/search/reindex": {
+      "post": {
+        "tags": [
+          "Search result page"
+        ],
+        "summary": "Reindex search",
+        "operationId": "reindex_search",
+        "description": "Starts a rebuild of the search index for the whole store. Send no body. Returns `202` with `status`, `clean` and `message`. To read how the run is going, call [Get the reindex status](/api-reference/search-settings/get-the-reindex-status).",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "The rebuild started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "`accepted`."
+                    },
+                    "clean": {
+                      "type": "boolean",
+                      "description": "`true`."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "`search reindex started`."
+                    }
+                  }
+                },
+                "example": {
+                  "status": "accepted",
+                  "clean": true,
+                  "message": "search reindex started"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/search/reindex\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.search_result_page.reindex_search()\nprint(response.status_code, response.map[\"status\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.searchResultPage.reindexSearch();\nconsole.log(response.statusCode, response.map.status);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$client = ClientRegistry::buildClient();\n\n$response = SearchResultPage::reindexSearch($client);\n\necho $response->statusCode, ' ', $response->map['status'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.searchResultPage().reindexSearch();\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(response.getStatusCode() + \" \" + body.get(\"status\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.SearchResultPage.ReindexSearchAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{response.StatusCode} {body[\"status\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.searchResultPage.reindexSearch();\nprint(response.statusCode);\nprint((response.map as Map)['status']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.SearchResultPageSettings().ReindexSearch(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode, resp.Map().(map[string]any)[\"status\"])\n"
+          }
+        ]
+      }
+    },
     "/admin/settings/page_settings/shopping_cart": {
       "get": {
         "tags": [
@@ -9341,6 +9425,169 @@
             }
           }
         }
+      }
+    },
+    "/admin/settings/animation_effects/custom_loader": {
+      "post": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Upload a custom loader",
+        "operationId": "upload_animation_effects_custom_loader",
+        "description": "Upload one image in a multipart part named exactly `file`. The file must be an `svg`, `png`, `jpg`, `jpeg` or `gif`. Returns `201` with the stored loader under `custom_loader`: `enabled`, `file_name` and `file_url`. `preloader_design.custom_loader` then reads the same values.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The stored loader.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "custom_loader": {
+                      "$ref": "#/components/schemas/CustomLoader"
+                    }
+                  }
+                },
+                "example": {
+                  "custom_loader": {
+                    "enabled": true,
+                    "file_name": "loader.png",
+                    "file_url": "https://your-store.example.com/loader.png"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The file is not one of the accepted types: the code is `invalid_file`. Or the request has no file.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimationEffectsError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/settings/animation_effects/custom_loader\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -F \"file=@file\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nwith open(\"loader.png\", \"rb\") as handle:\n    response = client.animation_effects.upload_animation_effects_custom_loader({\"file\": handle})\nprint(response.status_code, response.map[\"custom_loader\"][\"file_url\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {readFileSync} from 'node:fs';\nimport {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.uploadAnimationEffectsCustomLoader({\n    file: ['loader.png', readFileSync('loader.png'), 'image/png'],\n});\nconsole.log(response.statusCode, response.map.custom_loader.file_url);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$handle = fopen('loader.png', 'rb');\n$response = AnimationEffects::uploadAnimationEffectsCustomLoader($client, ['file' => ['loader.png', $handle, 'image/png']]);\nfclose($handle);\n\necho $response->statusCode, ' ', $response->map['custom_loader']['file_url'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.nio.file.Path;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().uploadAnimationEffectsCustomLoader(Map.of(\"file\", Path.of(\"loader.png\")));\nMap<?, ?> loader = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"custom_loader\");\nSystem.out.println(response.getStatusCode() + \" \" + loader.get(\"file_url\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.UploadAnimationEffectsCustomLoaderAsync(new Dictionary<string, object?>\n{\n    [\"file\"] = new List<object?> { \"loader.png\", File.ReadAllBytes(\"loader.png\"), \"image/png\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar loader = (IReadOnlyDictionary<string, object?>)body[\"custom_loader\"]!;\nConsole.WriteLine($\"{response.StatusCode} {loader[\"file_url\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'dart:io';\n\nimport 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal image = await File('loader.png').readAsBytes();\nfinal response = await client.animationEffects.uploadAnimationEffectsCustomLoader({\n  'file': ['loader.png', image, 'image/png'],\n});\nfinal loader = (response.map as Map)['custom_loader'] as Map;\nprint(loader['file_url']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\t\"os\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\ncontents, err := os.ReadFile(\"loader.png\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresp, err := client.AnimationEffectsSettings().UploadAnimationEffectsCustomLoader(ctx, map[string]any{\n\t\"file\": []any{\"loader.png\", contents, \"image/png\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nloader := resp.Map().(map[string]any)[\"custom_loader\"].(map[string]any)\nfmt.Println(resp.StatusCode, loader[\"file_url\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The loader image: `svg`, `png`, `jpg`, `jpeg` or `gif`."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Animation effects"
+        ],
+        "summary": "Delete the custom loader",
+        "operationId": "delete_animation_effects_custom_loader",
+        "description": "Removes the uploaded loader image and returns `204` with no body. It also returns `204` when no loader was uploaded. Afterwards `preloader_design.custom_loader` reads `enabled: false`, with `null` for `file_name` and `file_url`.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Removed, or there was no loader to remove. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/settings/animation_effects/custom_loader\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.animation_effects.delete_animation_effects_custom_loader()\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.animationEffects.deleteAnimationEffectsCustomLoader();\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$client = ClientRegistry::buildClient();\n\n$response = AnimationEffects::deleteAnimationEffectsCustomLoader($client);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.animationEffects().deleteAnimationEffectsCustomLoader();\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.AnimationEffects.DeleteAnimationEffectsCustomLoaderAsync();\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.animationEffects.deleteAnimationEffectsCustomLoader();\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.AnimationEffectsSettings().DeleteAnimationEffectsCustomLoader(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
       }
     },
     "/admin/settings/customer_portal": {
@@ -16403,7 +16650,7 @@
         ]
       }
     },
-    "/admin/settings/shipping_settings": {
+    "/admin/settings/shipping_settings/general": {
       "get": {
         "tags": [
           "Shipping settings"
@@ -16448,20 +16695,31 @@
                       "id": 4,
                       "name": "Standard shipping"
                     },
-                    "enable_shipping_default_tax": true,
+                    "apply_store_tax_settings_to_shipping": true,
                     "default_delivery_profile": {
                       "id": 4,
                       "name": "Standard shipping"
                     },
-                    "enable_delivery_default_tax": true,
+                    "apply_store_tax_settings_to_delivery": true,
                     "shipping_tax_profile": null,
                     "enable_shipping_class": true,
-                    "enable_flat_view_class": true
+                    "enable_class_in_flat_view": true
                   },
                   "group_meta": {
                     "shipping_settings": {
                       "kind": "setting",
-                      "writable": true
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/shipping_settings/general"
+                    },
+                    "shipping_methods": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/shipping_methods"
+                    },
+                    "shipping_classes": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/shipping_classes"
                     }
                   }
                 }
@@ -16473,17 +16731,17 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings/general\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.get_shipping_settings()\nsettings = response.map[\"shipping_settings\"]\nprint(settings[\"default_shipping_profile\"], settings[\"shipping_tax_profile\"])\nprint(settings[\"enable_shipping_class\"], settings[\"enable_flat_view_class\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.get_shipping_settings()\nsettings = response.map[\"shipping_settings\"]\nprint(settings[\"default_shipping_profile\"], settings[\"shipping_tax_profile\"])\nprint(settings[\"enable_shipping_class\"], settings[\"enable_class_in_flat_view\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.shippingSettings.getShippingSettings();\nconst settings = response.map.shipping_settings;\nconsole.log(settings.default_shipping_profile?.name, settings.default_delivery_profile?.name);\nconsole.log(settings.enable_shipping_default_tax, settings.enable_delivery_default_tax);\nconsole.log(settings.enable_shipping_class, settings.enable_flat_view_class);\n"
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.shippingSettings.getShippingSettings();\nconst settings = response.map.shipping_settings;\nconsole.log(settings.default_shipping_profile?.name, settings.default_delivery_profile?.name);\nconsole.log(settings.apply_store_tax_settings_to_shipping, settings.apply_store_tax_settings_to_delivery);\nconsole.log(settings.enable_shipping_class, settings.enable_class_in_flat_view);\n"
           },
           {
             "lang": "php",
@@ -16493,12 +16751,12 @@
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().getShippingSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nMap<?, ?> shippingProfile = (Map<?, ?>) settings.get(\"default_shipping_profile\");\nSystem.out.println(shippingProfile == null ? \"No Shipping\" : shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\"));\nSystem.out.println(settings.get(\"enable_shipping_default_tax\") + \" \" + settings.get(\"enable_delivery_default_tax\"));\nSystem.out.println(settings.get(\"enable_shipping_class\") + \" \" + settings.get(\"enable_flat_view_class\"));\n"
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().getShippingSettings();\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nMap<?, ?> shippingProfile = (Map<?, ?>) settings.get(\"default_shipping_profile\");\nSystem.out.println(shippingProfile == null ? \"No Shipping\" : shippingProfile.get(\"id\") + \" \" + shippingProfile.get(\"name\"));\nSystem.out.println(settings.get(\"apply_store_tax_settings_to_shipping\") + \" \" + settings.get(\"apply_store_tax_settings_to_delivery\"));\nSystem.out.println(settings.get(\"enable_shipping_class\") + \" \" + settings.get(\"enable_class_in_flat_view\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.GetShippingSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine($\"{shippingSettings[\"enable_shipping_default_tax\"]} {shippingSettings[\"enable_shipping_class\"]}\");\n"
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.GetShippingSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine($\"{shippingSettings[\"apply_store_tax_settings_to_shipping\"]} {shippingSettings[\"enable_shipping_class\"]}\");\n"
           },
           {
             "lang": "dart",
@@ -16508,7 +16766,7 @@
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().GetShippingSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)\nfmt.Println(settings[\"enable_shipping_default_tax\"], settings[\"enable_shipping_class\"], settings[\"enable_flat_view_class\"])\nif profile, ok := settings[\"default_shipping_profile\"].(map[string]any); ok {\n\tfmt.Println(profile[\"id\"], profile[\"name\"])\n}\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().GetShippingSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)\nfmt.Println(settings[\"apply_store_tax_settings_to_shipping\"], settings[\"enable_shipping_class\"], settings[\"enable_class_in_flat_view\"])\nif profile, ok := settings[\"default_shipping_profile\"].(map[string]any); ok {\n\tfmt.Println(profile[\"id\"], profile[\"name\"])\n}\n"
           }
         ]
       },
@@ -16518,7 +16776,7 @@
         ],
         "summary": "Update shipping settings",
         "operationId": "patch_shipping_settings",
-        "description": "Send the fields to change, wrapped in `shipping_settings` or bare at the top level: both are accepted. Fields you leave out keep their stored values, except `enable_flat_view_class`, which turns off when you turn `enable_shipping_class` off. Set a profile field with the profile's `id`; a bare name string is rejected. Returns all seven settings after the change, with `group_meta`, as [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings) does.",
+        "description": "Send the fields to change, wrapped in `shipping_settings` or bare at the top level: both are accepted. Fields you leave out keep their stored values, except `enable_class_in_flat_view`, which turns off when you turn `enable_shipping_class` off. Set a profile field with the profile's `id`; a bare name string is rejected. Returns all seven settings after the change, with `group_meta`, as [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings) does.",
         "parameters": [],
         "responses": {
           "200": {
@@ -16542,20 +16800,31 @@
                       "id": 4,
                       "name": "Standard shipping"
                     },
-                    "enable_shipping_default_tax": true,
+                    "apply_store_tax_settings_to_shipping": true,
                     "default_delivery_profile": {
                       "id": 4,
                       "name": "Standard shipping"
                     },
-                    "enable_delivery_default_tax": true,
+                    "apply_store_tax_settings_to_delivery": true,
                     "shipping_tax_profile": null,
                     "enable_shipping_class": true,
-                    "enable_flat_view_class": true
+                    "enable_class_in_flat_view": true
                   },
                   "group_meta": {
                     "shipping_settings": {
                       "kind": "setting",
-                      "writable": true
+                      "writable": true,
+                      "href": "/api/v4/admin/settings/shipping_settings/general"
+                    },
+                    "shipping_methods": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/shipping_methods"
+                    },
+                    "shipping_classes": {
+                      "kind": "resource",
+                      "writable": true,
+                      "href": "/api/v4/admin/shipping_classes"
                     }
                   }
                 }
@@ -16577,42 +16846,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_settings\": {\n      \"enable_shipping_default_tax\": true\n    }\n  }'"
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings/general\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"shipping_settings\": {\n      \"apply_store_tax_settings_to_shipping\": true\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.patch_shipping_settings({\n    \"shipping_settings\": {\"enable_shipping_default_tax\": True},\n})\nprint(response.map[\"shipping_settings\"][\"enable_shipping_default_tax\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.shipping_settings.patch_shipping_settings({\n    \"shipping_settings\": {\"apply_store_tax_settings_to_shipping\": True},\n})\nprint(response.map[\"shipping_settings\"][\"apply_store_tax_settings_to_shipping\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.shippingSettings.patchShippingSettings({\n    shipping_settings: {enable_shipping_default_tax: true},\n});\nconsole.log(response.map.shipping_settings.enable_shipping_default_tax);\n"
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.shippingSettings.patchShippingSettings({\n    shipping_settings: {apply_store_tax_settings_to_shipping: true},\n});\nconsole.log(response.map.shipping_settings.apply_store_tax_settings_to_shipping);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingSettings::patchShippingSettings($client, [\n    'shipping_settings' => ['enable_shipping_default_tax' => true],\n]);\n\necho $response->map['shipping_settings']['enable_shipping_default_tax'] ? 'true' : 'false', PHP_EOL;\n"
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = ShippingSettings::patchShippingSettings($client, [\n    'shipping_settings' => ['apply_store_tax_settings_to_shipping' => true],\n]);\n\necho $response->map['shipping_settings']['apply_store_tax_settings_to_shipping'] ? 'true' : 'false', PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().patchShippingSettings(\n        Map.of(\"shipping_settings\", Map.of(\"enable_shipping_default_tax\", true)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nSystem.out.println(settings.get(\"enable_shipping_default_tax\"));\n"
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.shippingSettings().patchShippingSettings(\n        Map.of(\"shipping_settings\", Map.of(\"apply_store_tax_settings_to_shipping\", true)));\nMap<?, ?> settings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_settings\");\nSystem.out.println(settings.get(\"apply_store_tax_settings_to_shipping\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.PatchShippingSettingsAsync(new Dictionary<string, object?>\n{\n    [\"shipping_settings\"] = new Dictionary<string, object?> { [\"enable_shipping_default_tax\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine(shippingSettings[\"enable_shipping_default_tax\"]);\n"
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.ShippingSettings.PatchShippingSettingsAsync(new Dictionary<string, object?>\n{\n    [\"shipping_settings\"] = new Dictionary<string, object?> { [\"apply_store_tax_settings_to_shipping\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine(shippingSettings[\"apply_store_tax_settings_to_shipping\"]);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingSettings.patchShippingSettings({\n  'shipping_settings': {'enable_shipping_default_tax': true},\n});\nfinal shippingSettings = (response.map as Map)['shipping_settings'] as Map;\nprint(shippingSettings['enable_shipping_default_tax']);\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.shippingSettings.patchShippingSettings({\n  'shipping_settings': {'apply_store_tax_settings_to_shipping': true},\n});\nfinal shippingSettings = (response.map as Map)['shipping_settings'] as Map;\nprint(shippingSettings['apply_store_tax_settings_to_shipping']);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().PatchShippingSettings(ctx, map[string]any{\n\t\"shipping_settings\": map[string]any{\"enable_shipping_default_tax\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)[\"enable_shipping_default_tax\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.ShippingSettings().PatchShippingSettings(ctx, map[string]any{\n\t\"shipping_settings\": map[string]any{\"apply_store_tax_settings_to_shipping\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_settings\"].(map[string]any)[\"apply_store_tax_settings_to_shipping\"])\n"
           }
         ],
         "requestBody": {
@@ -16649,7 +16918,7 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -I \"$WC_BASE_URL/api/v4/admin/settings/shipping_settings/general\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
@@ -27689,18 +27958,28 @@
         ]
       }
     },
-    "/admin/tax/settings": {
+    "/admin/settings/tax": {
       "get": {
         "tags": [
           "Tax settings"
         ],
         "summary": "Get tax settings",
         "operationId": "get_tax_settings",
-        "description": "Returns the store's tax settings as nine fields in one flat `tax_settings` object, with no sections. Query parameters have no effect: `field_metadata=true` returns the same body and no field descriptions. The response has no `ETag` or `Last-Modified` header.",
-        "parameters": [],
+        "description": "Returns the store's tax settings as nine fields in one flat `tax_settings` object, with no sections. `group_meta` names the settings, the tax profiles and the tax rules. Send `field_metadata=true` to also get `field_metadata`, a description of each field.",
+        "parameters": [
+          {
+            "name": "field_metadata",
+            "in": "query",
+            "description": "Send `true` to also get `field_metadata`, which describes each field.",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "The nine tax settings under `tax_settings`.",
+            "description": "The nine tax settings under `tax_settings`, with `group_meta`. With `field_metadata=true`, a `field_metadata` key is added.",
             "content": {
               "application/json": {
                 "schema": {
@@ -27713,15 +27992,39 @@
                 },
                 "example": {
                   "tax_settings": {
-                    "configuration_type": "DEFAULT",
-                    "system_default_tax": true,
-                    "default_country": "AU",
-                    "custom_tax_profile_id": 1,
-                    "default_tax_profile": 3,
-                    "show_price_with_tax": true,
-                    "is_price_with_tax": false,
-                    "default_tax_code": "GST",
-                    "tax_message": "All prices include GST"
+                    "tax_rate_for_customers": "system_default",
+                    "tax_region": {
+                      "country_tax_id": 1,
+                      "country_code": "AU",
+                      "country_name": "Australia"
+                    },
+                    "custom_tax_profile": {
+                      "id": 1,
+                      "name": "Standard tax"
+                    },
+                    "is_price_shown_with_tax": true,
+                    "prices_in_catalog": "excluding_tax",
+                    "calculated_by": "store_region",
+                    "is_out_of_region_tax_free": false,
+                    "tax_message": "All prices include GST",
+                    "base_price_rounding": "nearest",
+                    "group_meta": {
+                      "tax_settings": {
+                        "kind": "setting",
+                        "writable": true,
+                        "href": "/api/v4/admin/settings/tax"
+                      },
+                      "tax_profiles": {
+                        "kind": "resource",
+                        "writable": true,
+                        "href": "/api/v4/admin/tax/profiles"
+                      },
+                      "tax_rules": {
+                        "kind": "resource",
+                        "writable": true,
+                        "href": "/api/v4/admin/tax/rules"
+                      }
+                    }
                   }
                 }
               }
@@ -27732,42 +28035,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/tax/settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/settings/tax\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.get_tax_settings()\nsettings = response.map[\"tax_settings\"]\nprint(settings[\"default_country\"], settings[\"default_tax_code\"])\nprint(settings[\"default_tax_profile\"], settings[\"show_price_with_tax\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.get_tax_settings()\nsettings = response.map[\"tax_settings\"]\nprint(settings[\"tax_rate_for_customers\"], settings[\"prices_in_catalog\"])\nprint(settings[\"is_price_shown_with_tax\"], settings[\"tax_message\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.getTaxSettings();\nconst settings = response.map.tax_settings;\nconsole.log(settings.default_country, settings.default_tax_code, settings.default_tax_profile);\nconsole.log(settings.show_price_with_tax, settings.tax_message);\n"
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.getTaxSettings();\nconst settings = response.map.tax_settings;\nconsole.log(settings.tax_rate_for_customers, settings.prices_in_catalog);\nconsole.log(settings.is_price_shown_with_tax, settings.tax_message);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::getTaxSettings($client);\n\n$settings = $response->map['tax_settings'];\necho $settings['default_country'], ' ', $settings['default_tax_code'], PHP_EOL;\necho $settings['tax_message'], PHP_EOL;\n"
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::getTaxSettings($client);\n\n$settings = $response->map['tax_settings'];\necho $settings['tax_rate_for_customers'], ' ', $settings['prices_in_catalog'], PHP_EOL;\necho $settings['tax_message'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().getTaxSettings();\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"default_country\") + \" \" + taxSettings.get(\"default_tax_code\"));\nSystem.out.println(taxSettings.get(\"tax_message\"));\n"
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().getTaxSettings();\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_rate_for_customers\") + \" \" + taxSettings.get(\"prices_in_catalog\"));\nSystem.out.println(taxSettings.get(\"tax_message\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.GetTaxSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine($\"{taxSettings[\"default_country\"]} {taxSettings[\"default_tax_code\"]} {taxSettings[\"tax_message\"]}\");\n"
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.GetTaxSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine($\"{taxSettings[\"tax_rate_for_customers\"]} {taxSettings[\"prices_in_catalog\"]} {taxSettings[\"tax_message\"]}\");\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.getTaxSettings();\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['default_country']);\nprint(taxSettings['default_tax_code']);\nprint(taxSettings['tax_message']);\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.getTaxSettings();\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_rate_for_customers']);\nprint(taxSettings['prices_in_catalog']);\nprint(taxSettings['tax_message']);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().GetTaxSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)\nfmt.Println(settings[\"default_country\"], settings[\"default_tax_code\"], settings[\"tax_message\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().GetTaxSettings(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nsettings := resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)\nfmt.Println(settings[\"tax_rate_for_customers\"], settings[\"prices_in_catalog\"], settings[\"tax_message\"])\n"
           }
         ]
       },
@@ -27777,7 +28080,7 @@
         ],
         "summary": "Update tax settings",
         "operationId": "put_tax_settings",
-        "description": "Send the fields to change inside a `settings` object. Only those fields change; the others keep their stored values. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](/api-reference/tax-settings/get-tax-settings). A body wrapped in `tax_settings`, the key the read returns, is rejected with `400` and the message `settings missing`.",
+        "description": "Send the fields to change inside a `tax_settings` object. Only those fields change; the others keep their stored values. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](/api-reference/tax-settings/get-tax-settings). A body wrapped in `settings`, or with no wrapper, is rejected with `400`.",
         "parameters": [],
         "responses": {
           "200": {
@@ -27794,34 +28097,50 @@
                 },
                 "example": {
                   "tax_settings": {
-                    "configuration_type": "DEFAULT",
-                    "system_default_tax": true,
-                    "default_country": "AU",
-                    "custom_tax_profile_id": 1,
-                    "default_tax_profile": 3,
-                    "show_price_with_tax": true,
-                    "is_price_with_tax": false,
-                    "default_tax_code": "GST",
-                    "tax_message": "All prices include GST"
+                    "tax_rate_for_customers": "system_default",
+                    "tax_region": {
+                      "country_tax_id": 1,
+                      "country_code": "AU",
+                      "country_name": "Australia"
+                    },
+                    "custom_tax_profile": {
+                      "id": 1,
+                      "name": "Standard tax"
+                    },
+                    "is_price_shown_with_tax": true,
+                    "prices_in_catalog": "excluding_tax",
+                    "calculated_by": "store_region",
+                    "is_out_of_region_tax_free": false,
+                    "tax_message": "All prices include GST",
+                    "base_price_rounding": "nearest",
+                    "group_meta": {
+                      "tax_settings": {
+                        "kind": "setting",
+                        "writable": true,
+                        "href": "/api/v4/admin/settings/tax"
+                      },
+                      "tax_profiles": {
+                        "kind": "resource",
+                        "writable": true,
+                        "href": "/api/v4/admin/tax/profiles"
+                      },
+                      "tax_rules": {
+                        "kind": "resource",
+                        "writable": true,
+                        "href": "/api/v4/admin/tax/rules"
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "The body is not wrapped in `settings`, or `settings` is empty: the message is `settings missing`. Or every field in `settings` is one the store does not know: the message is `No settings provided to update`. Or no tax profile has the `tax_profile_id` you sent as `default_tax_profile`, or `configuration_type` is a type the store does not know: the stored value stays as it was.",
+            "description": "The body is wrapped in `settings` or has no wrapper. Or it contains `custom_tax_profile` or `calculated_by`, which are `unknown_field` in a write. Or `tax_region` is a bare id, not an object.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TaxSettingsError"
-                },
-                "example": {
-                  "error": {
-                    "code": "invalid_request",
-                    "message": "settings missing",
-                    "details": [],
-                    "request_id": "7d2e4a91-3b6c-4f0e-9a58-1c2b3d4e5f60"
-                  }
                 }
               }
             }
@@ -27831,42 +28150,42 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/tax/settings\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"settings\": {\n      \"tax_message\": \"All prices include GST\"\n    }\n  }'"
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/settings/tax\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_settings\": {\n      \"tax_message\": \"All prices include GST\"\n    }\n  }'"
           },
           {
             "lang": "python",
             "label": "Python",
-            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.put_tax_settings({\n    \"settings\": {\"tax_message\": \"All prices include GST\"},\n})\nprint(response.map[\"tax_settings\"][\"tax_message\"])\n"
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.put_tax_settings({\n    \"tax_settings\": {\"tax_message\": \"All prices include GST\"},\n})\nprint(response.map[\"tax_settings\"][\"tax_message\"])\n"
           },
           {
             "lang": "javascript",
             "label": "JavaScript",
-            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.putTaxSettings({settings: {tax_message: 'All prices include GST'}});\nconsole.log(response.map.tax_settings.tax_message);\n"
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.putTaxSettings({tax_settings: {tax_message: 'All prices include GST'}});\nconsole.log(response.map.tax_settings.tax_message);\n"
           },
           {
             "lang": "php",
             "label": "PHP",
-            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::putTaxSettings($client, [\n    'settings' => ['tax_message' => 'All prices include GST'],\n]);\n\necho $response->map['tax_settings']['tax_message'], PHP_EOL;\n"
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::putTaxSettings($client, [\n    'tax_settings' => ['tax_message' => 'All prices include GST'],\n]);\n\necho $response->map['tax_settings']['tax_message'], PHP_EOL;\n"
           },
           {
             "lang": "java",
             "label": "Java",
-            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().putTaxSettings(\n        Map.of(\"settings\", Map.of(\"tax_message\", \"All prices include GST\")));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_message\"));\n"
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().putTaxSettings(\n        Map.of(\"tax_settings\", Map.of(\"tax_message\", \"All prices include GST\")));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_message\"));\n"
           },
           {
             "lang": "csharp",
             "label": ".NET",
-            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.PutTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"settings\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"All prices include GST\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"tax_message\"]);\n"
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.PutTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"tax_settings\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"All prices include GST\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"tax_message\"]);\n"
           },
           {
             "lang": "dart",
             "label": "Dart",
-            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.putTaxSettings({\n  'settings': {'tax_message': 'All prices include GST'},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_message']);\n"
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.putTaxSettings({\n  'tax_settings': {'tax_message': 'All prices include GST'},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_message']);\n"
           },
           {
             "lang": "go",
             "label": "Go",
-            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().PutTaxSettings(ctx, map[string]any{\n\t\"settings\": map[string]any{\"tax_message\": \"All prices include GST\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"tax_message\"])\n"
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().PutTaxSettings(ctx, map[string]any{\n\t\"tax_settings\": map[string]any{\"tax_message\": \"All prices include GST\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"tax_message\"])\n"
           }
         ],
         "requestBody": {
@@ -27876,10 +28195,143 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "settings"
+                  "tax_settings"
                 ],
                 "properties": {
-                  "settings": {
+                  "tax_settings": {
+                    "$ref": "#/components/schemas/TaxSettingsInput"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Tax settings"
+        ],
+        "summary": "Patch tax settings",
+        "operationId": "patch_tax_settings",
+        "description": "Send the fields to change inside a `tax_settings` object. Like `PUT`, `PATCH` merges: only the fields you send change. Returns all nine settings under `tax_settings`, in the same shape as [Get tax settings](/api-reference/tax-settings/get-tax-settings). A body wrapped in `settings`, or with no wrapper, is rejected with `400`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All nine tax settings after the change, under `tax_settings`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_settings": {
+                      "$ref": "#/components/schemas/TaxSettings"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_settings": {
+                    "tax_rate_for_customers": "system_default",
+                    "tax_region": {
+                      "country_tax_id": 1,
+                      "country_code": "AU",
+                      "country_name": "Australia"
+                    },
+                    "custom_tax_profile": {
+                      "id": 1,
+                      "name": "Standard tax"
+                    },
+                    "is_price_shown_with_tax": true,
+                    "prices_in_catalog": "excluding_tax",
+                    "calculated_by": "store_region",
+                    "is_out_of_region_tax_free": false,
+                    "tax_message": "All prices include GST",
+                    "base_price_rounding": "nearest",
+                    "group_meta": {
+                      "tax_settings": {
+                        "kind": "setting",
+                        "writable": true,
+                        "href": "/api/v4/admin/settings/tax"
+                      },
+                      "tax_profiles": {
+                        "kind": "resource",
+                        "writable": true,
+                        "href": "/api/v4/admin/tax/profiles"
+                      },
+                      "tax_rules": {
+                        "kind": "resource",
+                        "writable": true,
+                        "href": "/api/v4/admin/tax/rules"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped in `settings` or has no wrapper. Or it contains `custom_tax_profile` or `calculated_by`, which are `unknown_field` in a write. Or `tax_region` is a bare id, not an object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxSettingsError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/settings/tax\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tax_settings\": {\n      \"is_price_shown_with_tax\": true\n    }\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.tax_settings.patch_tax_settings({\n    \"tax_settings\": {\"is_price_shown_with_tax\": True},\n})\nprint(response.map[\"tax_settings\"][\"is_price_shown_with_tax\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.taxSettings.patchTaxSettings({tax_settings: {is_price_shown_with_tax: true}});\nconsole.log(response.map.tax_settings.is_price_shown_with_tax);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$client = ClientRegistry::buildClient();\n\n$response = TaxSettings::patchTaxSettings($client, [\n    'tax_settings' => ['is_price_shown_with_tax' => true],\n]);\n\necho $response->map['tax_settings']['is_price_shown_with_tax'] ? 'true' : 'false', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.taxSettings().patchTaxSettings(\n        Map.of(\"tax_settings\", Map.of(\"is_price_shown_with_tax\", true)));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"is_price_shown_with_tax\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.TaxSettings.PatchTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"tax_settings\"] = new Dictionary<string, object?> { [\"is_price_shown_with_tax\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"is_price_shown_with_tax\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.taxSettings.patchTaxSettings({\n  'tax_settings': {'is_price_shown_with_tax': true},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['is_price_shown_with_tax']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.TaxSettings().PatchTaxSettings(ctx, map[string]any{\n\t\"tax_settings\": map[string]any{\"is_price_shown_with_tax\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"tax_settings\"].(map[string]any)[\"is_price_shown_with_tax\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tax_settings"
+                ],
+                "properties": {
+                  "tax_settings": {
                     "$ref": "#/components/schemas/TaxSettingsInput"
                   }
                 }
@@ -49294,6 +49746,122 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Change a product's stock",
+        "operationId": "patch_product_stock",
+        "description": "Send at least one of `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, with no wrapper. `tracking` takes `enabled`, `available_stock` and `low_stock_level`, and the fields you send are merged into the product's tracking. `locations` takes rows in the form [Set a product's stock](/api-reference/products/set-a-products-stock) takes. `note` and `transaction_no` go on the adjustment. The call returns the product's `stock` as it is now, and the `adjustment` it recorded. `adjustment` is `null` when the stock figure did not change, and its `note` is `via API` unless you send one. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`stock` is the product's stock after the change, and `adjustment` is the change the store recorded, or `null` when the figure did not change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductStockPatchResult"
+                },
+                "example": {
+                  "stock": {
+                    "tracking": {
+                      "enabled": true,
+                      "available_stock": 40,
+                      "low_stock_level": 5
+                    },
+                    "multi_location_enabled": false,
+                    "locations": [],
+                    "variations": []
+                  },
+                  "adjustment": {
+                    "id": 9001,
+                    "delta": 5,
+                    "note": "Restock",
+                    "transaction_no": null,
+                    "created_by": {
+                      "id": 12,
+                      "name": "Alex Kim"
+                    },
+                    "created_at": "2026-11-11T09:30:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is wrapped, or sends `available_stock` outside `tracking`. The reason is `unknown_field`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/products/101/stock\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"tracking\": {\n      \"enabled\": true,\n      \"available_stock\": 40\n    },\n    \"note\": \"Restock\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.patch_product_stock(101, {\n    \"tracking\": {\"enabled\": True, \"available_stock\": 40},\n    \"note\": \"Restock\",\n})\nprint(response.map[\"stock\"][\"tracking\"][\"available_stock\"], response.map[\"adjustment\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.patchProductStock(101, {\n    tracking: {enabled: true, available_stock: 40},\n    note: 'Restock',\n});\nconsole.log(response.map.stock.tracking.available_stock, response.map.adjustment);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::patchProductStock($client, 101, [\n    'tracking' => ['enabled' => true, 'available_stock' => 40],\n    'note' => 'Restock',\n]);\n\necho $response->map['stock']['tracking']['available_stock'], ' in stock, change ', $response->map['adjustment']['delta'] ?? 'none', PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().patchProductStock(101, Map.of(\n        \"tracking\", Map.of(\"enabled\", true, \"available_stock\", 40),\n        \"note\", \"Restock\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nMap<?, ?> stock = (Map<?, ?>) body.get(\"stock\");\nSystem.out.println(((Map<?, ?>) stock.get(\"tracking\")).get(\"available_stock\") + \" \" + body.get(\"adjustment\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.PatchProductStockAsync(101, new Dictionary<string, object?>\n{\n    [\"tracking\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"available_stock\"] = 40 },\n    [\"note\"] = \"Restock\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar stock = (IReadOnlyDictionary<string, object?>)body[\"stock\"]!;\nvar tracking = (IReadOnlyDictionary<string, object?>)stock[\"tracking\"]!;\nConsole.WriteLine($\"{tracking[\"available_stock\"]} {body[\"adjustment\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.patchProductStock(101, {\n  'tracking': {'enabled': true, 'available_stock': 40},\n  'note': 'Restock',\n});\nfinal result = response.map as Map;\nprint(((result['stock'] as Map)['tracking'] as Map)['available_stock']);\nprint(result['adjustment']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().PatchProductStock(ctx, 101, map[string]any{\n\t\"tracking\": map[string]any{\"enabled\": true, \"available_stock\": 40},\n\t\"note\":     \"Restock\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ntracking := body[\"stock\"].(map[string]any)[\"tracking\"].(map[string]any)\nfmt.Println(tracking[\"available_stock\"], body[\"adjustment\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductStockPatchInput"
+              }
+            }
+          }
+        }
       }
     },
     "/admin/products/{product_id}/stock/locations/{inventory_location_id}": {
@@ -50791,6 +51359,526 @@
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().DeleteProductMediaImage(ctx, 101, 1876, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
           }
         ]
+      },
+      "patch": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Move a product's image",
+        "operationId": "patch_product_media_image",
+        "description": "Send `position`, counted from `1`, at the top level of the body with no wrapper. `position` is the only field the call takes: any other body, `alt_text` and a wrapper included, is rejected with `400` and the reason `invalid_body`. The call returns the image as one flat row, not wrapped in `product`. The image at position `1` is `primary`. To order all images at once, use [Set the order of a product's images](/api-reference/products/set-the-order-of-a-products-images).",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "image_id",
+            "in": "path",
+            "required": true,
+            "description": "The image's `id`. [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) returns it as `id`, [Upload images to a product](/api-reference/products/upload-images-to-a-product) as `product.images[].id`, and [Retrieve a product](/api-reference/products/retrieve-a-product) as `media.images[].id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The image after the move, as one row: `id`, `filename`, `position`, `primary`, `alt_text`, `url` and `thumbnail_url`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductMediaImage"
+                },
+                "example": {
+                  "id": 1877,
+                  "filename": "6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_side.png",
+                  "position": 1,
+                  "primary": true,
+                  "alt_text": "",
+                  "url": "https://your-store.example.com/resources/product/101/6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_side.png",
+                  "thumbnail_url": "https://your-store.example.com/resources/product/101/150-6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_side.png"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is anything other than `{\"position\": n}`. The reason is `invalid_body`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The product has no image with that `image_id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/products/101/media/images/1877\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"position\": 1\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.patch_product_media_image(101, 1877, {\"position\": 1})\nprint(response.map[\"id\"], response.map[\"position\"], response.map[\"primary\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.patchProductMediaImage(101, 1877, {position: 1});\nconsole.log(response.map.id, response.map.position, response.map.primary);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::patchProductMediaImage($client, 101, 1877, ['position' => 1]);\n\necho $response->map['id'], ' at position ', $response->map['position'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().patchProductMediaImage(101, 1877, Map.of(\"position\", 1));\nMap<?, ?> image = (Map<?, ?>) response.getMap();\nSystem.out.println(image.get(\"id\") + \" \" + image.get(\"position\") + \" \" + image.get(\"primary\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.PatchProductMediaImageAsync(101, 1877,\n    new Dictionary<string, object?> { [\"position\"] = 1 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"id\"]} {body[\"position\"]} {body[\"primary\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.patchProductMediaImage(101, 1877, {'position': 1});\nfinal image = response.map as Map;\nprint('${image['id']} ${image['position']} ${image['primary']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().PatchProductMediaImage(ctx, 101, 1877, map[string]any{\"position\": 1}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"id\"], body[\"position\"], body[\"primary\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductMediaImagePatchInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/products/{product_id}/media/order": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Set the order of a product's images",
+        "operationId": "update_product_media_order",
+        "description": "Send `type` set to `images` and `ids`, the `id` of every image of the product in the order you want, at the top level of the body with no wrapper. You must name every image exactly once. The first `id` becomes the `primary` image. The call returns the product's images in the new order under `images`. To move one image, use [Move a product's image](/api-reference/products/move-a-products-image).",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product's images in the new order, under `images`. The first one has `position` `1` and `primary` `true`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductMediaOrder"
+                },
+                "example": {
+                  "images": [
+                    {
+                      "id": 1877,
+                      "filename": "6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_side.png",
+                      "position": 1,
+                      "primary": true,
+                      "alt_text": "",
+                      "url": "https://your-store.example.com/resources/product/101/6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_side.png",
+                      "thumbnail_url": "https://your-store.example.com/resources/product/101/150-6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_side.png"
+                    },
+                    {
+                      "id": 1876,
+                      "filename": "6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_front.png",
+                      "position": 2,
+                      "primary": false,
+                      "alt_text": "",
+                      "url": "https://your-store.example.com/resources/product/101/6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_front.png",
+                      "thumbnail_url": "https://your-store.example.com/resources/product/101/150-6f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f_front.png"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`ids` does not name every image of the product exactly once. The reason is `invalid_set`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PUT \"$WC_BASE_URL/api/v4/admin/products/101/media/order\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"type\": \"images\",\n    \"ids\": [\n      1877,\n      1876\n    ]\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.update_product_media_order(101, {\"type\": \"images\", \"ids\": [1877, 1876]})\nfor image in response.map[\"images\"]:\n    print(image[\"id\"], image[\"position\"], image[\"primary\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.updateProductMediaOrder(101, {type: 'images', ids: [1877, 1876]});\nfor (const image of response.map.images) {\n    console.log(image.id, image.position, image.primary);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::updateProductMediaOrder($client, 101, ['type' => 'images', 'ids' => [1877, 1876]]);\n\nforeach ($response->map['images'] as $image) {\n    echo $image['id'], ' ', $image['position'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().updateProductMediaOrder(101,\n        Map.of(\"type\", \"images\", \"ids\", List.of(1877, 1876)));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"images\")) {\n    Map<?, ?> image = (Map<?, ?>) row;\n    System.out.println(image.get(\"id\") + \" \" + image.get(\"position\") + \" \" + image.get(\"primary\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.UpdateProductMediaOrderAsync(101, new Dictionary<string, object?>\n{\n    [\"type\"] = \"images\", [\"ids\"] = new object[] { 1877, 1876 },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var image in ((IReadOnlyList<object?>)body[\"images\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{image[\"id\"]} {image[\"position\"]} {image[\"primary\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.updateProductMediaOrder(101, {\n  'type': 'images',\n  'ids': [1877, 1876],\n});\nfinal result = response.map as Map;\nfor (final image in result['images'] as List) {\n  print('${(image as Map)['id']} ${image['position']} ${image['primary']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().UpdateProductMediaOrder(ctx, 101, map[string]any{\"type\": \"images\", \"ids\": []any{1877, 1876}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"images\"].([]any) {\n\timage := row.(map[string]any)\n\tfmt.Println(image[\"id\"], image[\"position\"], image[\"primary\"])\n}\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductMediaOrderInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/products/{product_id}/seo": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Retrieve a product's SEO settings",
+        "operationId": "get_product_seo",
+        "description": "Returns the product's SEO settings under `seo`: `url_handle`, `title`, `description`, `advanced_settings`, `analytics` (Google Analytics, Facebook Pixel and Google Ads), `custom_code`, `social` and `ai_visibility`. The call ignores `field_metadata`. `HEAD` on this path returns `404`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The product's SEO settings under `seo`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "seo": {
+                      "$ref": "#/components/schemas/ProductSeo"
+                    }
+                  }
+                },
+                "example": {
+                  "seo": {
+                    "url_handle": "blue-cotton-shirt",
+                    "title": null,
+                    "description": null,
+                    "advanced_settings": {
+                      "enabled": false,
+                      "robots_meta": "index",
+                      "canonical_url": null
+                    },
+                    "analytics": {
+                      "enabled": false,
+                      "platform": "google_analytics",
+                      "google_analytics": {
+                        "enabled": false,
+                        "measurement_id": null,
+                        "events": {
+                          "enabled": false,
+                          "view_item": false,
+                          "view_item_list": false,
+                          "view_cart": false,
+                          "add_to_wish_list": false,
+                          "remove_from_cart": false,
+                          "begin_checkout": false,
+                          "add_shipping_info": false,
+                          "add_payment_info": false,
+                          "purchase": false
+                        }
+                      },
+                      "facebook_pixel": {
+                        "enabled": false,
+                        "pixel_id": null,
+                        "events": {
+                          "enabled": false,
+                          "search": false,
+                          "add_to_cart": false,
+                          "add_to_wish_list": false,
+                          "initiate_checkout": false,
+                          "add_payment_info": false,
+                          "purchase": false
+                        }
+                      },
+                      "google_ads": {
+                        "conversion_id": null,
+                        "conversion_label": null
+                      }
+                    },
+                    "custom_code": {
+                      "header": {
+                        "enabled": false,
+                        "code": null
+                      },
+                      "footer": {
+                        "enabled": false,
+                        "code": null
+                      }
+                    },
+                    "social": {
+                      "title": null,
+                      "description": null,
+                      "image_url": null,
+                      "facebook": {
+                        "title": null,
+                        "description": null,
+                        "image_url": null
+                      },
+                      "twitter": {
+                        "title": null,
+                        "description": null,
+                        "image_url": null
+                      },
+                      "linkedin": {
+                        "title": null,
+                        "description": null,
+                        "image_url": null
+                      }
+                    },
+                    "ai_visibility": {
+                      "structured_attributes": null,
+                      "product_faq": null,
+                      "citability_score": null,
+                      "json_ld": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/products/101/seo\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.get_product_seo(101)\nseo = response.map[\"seo\"]\nprint(seo[\"url_handle\"], seo[\"title\"], seo[\"description\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.getProductSeo(101);\nconst seo = response.map.seo;\nconsole.log(seo.url_handle, seo.title, seo.description);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::getProductSeo($client, 101);\n\n$seo = $response->map['seo'];\necho $seo['url_handle'], ' ', $seo['title'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().getProductSeo(101);\nMap<?, ?> seo = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"seo\");\nSystem.out.println(seo.get(\"url_handle\") + \" \" + seo.get(\"title\") + \" \" + seo.get(\"description\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.GetProductSeoAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar seo = (IReadOnlyDictionary<string, object?>)body[\"seo\"]!;\nConsole.WriteLine($\"{seo[\"url_handle\"]} {seo[\"title\"]} {seo[\"description\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.products.getProductSeo(101);\nfinal seo = (response.map as Map)['seo'] as Map;\nprint('${seo['url_handle']} ${seo['title']} ${seo['description']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().GetProductSeo(ctx, 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nseo := resp.Map().(map[string]any)[\"seo\"].(map[string]any)\nfmt.Println(seo[\"url_handle\"], seo[\"title\"], seo[\"description\"])\n"
+          }
+        ]
+      }
+    },
+    "/admin/products/{product_id}/stock/adjustments": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "List a product's stock adjustments",
+        "operationId": "list_product_stock_adjustments",
+        "description": "Returns the product's stock adjustments under `adjustments`, newest first, with a `pagination` block. Page with `limit`, which defaults to `20`, and `offset`. Each row has the change as `delta` (the new figure minus the old one), its `note`, who made it and when. Every row returns `transaction_no` as `null`, also for a change you sent with a `transaction_no`. `HEAD` on this path returns `404`.",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`, and [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location) returns it as `items[].product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of adjustments to return. The default is `20`.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "The number of adjustments to skip.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "example": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The adjustments on this page under `adjustments`, and `pagination` with five keys: `total`, `limit`, `offset`, `has_previous` and `has_next`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductStockAdjustmentPage"
+                },
+                "example": {
+                  "adjustments": [
+                    {
+                      "id": 9001,
+                      "delta": 5,
+                      "note": "Restock",
+                      "transaction_no": null,
+                      "created_by": {
+                        "id": 12,
+                        "name": "Alex Kim"
+                      },
+                      "created_at": "2026-11-11T09:30:00Z"
+                    }
+                  ],
+                  "pagination": {
+                    "total": 1,
+                    "limit": 20,
+                    "offset": 0,
+                    "has_previous": false,
+                    "has_next": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/products/101/stock/adjustments?limit=20\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.products.list_product_stock_adjustments(101, {\"limit\": 20})\nfor adjustment in response.map[\"adjustments\"]:\n    print(adjustment[\"id\"], adjustment[\"delta\"], adjustment[\"note\"], adjustment[\"transaction_no\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.products.listProductStockAdjustments(101, {limit: 20});\nfor (const adjustment of response.map.adjustments) {\n    console.log(adjustment.id, adjustment.delta, adjustment.note, adjustment.transaction_no);\n}\nconsole.log(response.map.pagination.has_next);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Products\\Products;\n\n$client = ClientRegistry::buildClient();\n\n$response = Products::listProductStockAdjustments($client, 101, ['limit' => 20]);\n\nforeach ($response->map['adjustments'] as $adjustment) {\n    echo $adjustment['id'], ' ', $adjustment['delta'], ' ', $adjustment['note'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.products().listProductStockAdjustments(101, Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"adjustments\")) {\n    Map<?, ?> adjustment = (Map<?, ?>) row;\n    System.out.println(adjustment.get(\"id\") + \" \" + adjustment.get(\"delta\") + \" \" + adjustment.get(\"note\") + \" \" + adjustment.get(\"transaction_no\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Products.ListProductStockAdjustmentsAsync(101,\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var adjustment in ((IReadOnlyList<object?>)body[\"adjustments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{adjustment[\"id\"]} {adjustment[\"delta\"]} {adjustment[\"note\"]} {adjustment[\"transaction_no\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine(pagination[\"has_next\"]);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response =\n    await client.products.listProductStockAdjustments(101, queryParams: {'limit': 20});\nfinal result = response.map as Map;\nfor (final adjustment in result['adjustments'] as List) {\n  print('${(adjustment as Map)['id']} ${adjustment['delta']} ${adjustment['note']} ${adjustment['transaction_no']}');\n}\nprint((result['pagination'] as Map)['has_next']);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Products().ListProductStockAdjustments(ctx, 101, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"adjustments\"].([]any) {\n\tadjustment := row.(map[string]any)\n\tfmt.Println(adjustment[\"id\"], adjustment[\"delta\"], adjustment[\"note\"], adjustment[\"transaction_no\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"has_next\"])\n"
+          }
+        ]
       }
     },
     "/admin/variations": {
@@ -52072,6 +53160,72 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Delete all of a product's variants",
+        "operationId": "delete_product_variations",
+        "description": "Deletes every variant of the product and returns `204` with no body. It also returns `204` when the product has no variants. [List a product's variants](/api-reference/variations/list-a-products-variants) then returns `{\"variations\": []}`. To delete one variant, use [Delete a product's variant](/api-reference/variations/delete-a-products-variant).",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Every variant is deleted, or the product had none. No body."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X DELETE \"$WC_BASE_URL/api/v4/admin/products/4321/variations\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.delete_product_variations(4321)\nprint(response.status_code)\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.deleteProductVariations(4321);\nconsole.log(response.statusCode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::deleteProductVariations($client, 4321);\n\necho $response->statusCode, PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().deleteProductVariations(4321);\nSystem.out.println(response.getStatusCode());\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.DeleteProductVariationsAsync(4321);\nConsole.WriteLine(response.StatusCode);\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.deleteProductVariations(4321);\nprint(response.statusCode);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().DeleteProductVariations(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
+          }
+        ]
       }
     },
     "/admin/products/{product_id}/variations/bulk": {
@@ -52427,6 +53581,141 @@
             "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().DeleteProductVariation(ctx, 4321, 91, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)\n"
           }
         ]
+      },
+      "patch": {
+        "tags": [
+          "Variations"
+        ],
+        "summary": "Update a product's variant",
+        "operationId": "patch_product_variation",
+        "description": "Send any of `available`, `name`, `sku`, `custom_sku`, `barcode`, `country_of_origin`, `hs_code`, `pricing`, `inventory` and `ordering` at the top level of the body, with no wrapper. Only the fields you send change. The call returns `status`, `message` and the `variation` with its `variation_id`, `name`, `sku`, `custom_sku`, `barcode`, `country_of_origin` and `hs_code`. It does not return the pricing or stock: read them with [Retrieve a product's variant](/api-reference/variations/retrieve-a-products-variant), where `available: false` reads as `active: false`. A key the call does not know, `active`, a `variation` wrapper and a body `id` are ignored, and the call still returns `200`. `available` is not checked for type. To change several variants at once, use [Update a product's variants](/api-reference/variations/update-a-products-variants).",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product's `id`. [Create a product](/api-reference/products/create-a-product) returns it as `product.id`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "variation_id",
+            "in": "path",
+            "required": true,
+            "description": "The variant's `variation_id`. [List a product's variants](/api-reference/variations/list-a-products-variants) returns it as `variation_id` and `id`. It is not a variation type's `id`, and it is not the variant's own product `id`. The variant must belong to the product you pass as `product_id`.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`status` is `success`, `message` is `Variation updated successfully`, and `variation` holds the variant's ids and codes after the change.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationProductVariantPatchResult"
+                },
+                "example": {
+                  "status": "success",
+                  "message": "Variation updated successfully",
+                  "variation": {
+                    "variation_id": 91,
+                    "name": "Cotton T-Shirt",
+                    "sku": "TSHIRT-001-S",
+                    "custom_sku": null,
+                    "barcode": "9310000000014",
+                    "country_of_origin": null,
+                    "hs_code": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is empty, or a SKU is longer than 255 characters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The product has no variant with that `variation_id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The `sku` you sent belongs to another variant.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariationError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X PATCH \"$WC_BASE_URL/api/v4/admin/products/4321/variations/91\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"available\": false,\n    \"barcode\": \"9310000000014\"\n  }'"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.variations.patch_product_variation(4321, 91, {\"available\": False, \"barcode\": \"9310000000014\"})\nvariation = response.map[\"variation\"]\nprint(variation[\"variation_id\"], variation[\"sku\"], variation[\"barcode\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.variations.patchProductVariation(4321, 91, {\n    available: false,\n    barcode: '9310000000014',\n});\nconst variation = response.map.variation;\nconsole.log(variation.variation_id, variation.sku, variation.barcode);\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Variations\\Variations;\n\n$client = ClientRegistry::buildClient();\n\n$response = Variations::patchProductVariation($client, 4321, 91, ['available' => false, 'barcode' => '9310000000014']);\n\n$variation = $response->map['variation'];\necho $variation['variation_id'], ' ', $variation['sku'], ' ', $variation['barcode'], PHP_EOL;\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.variations().patchProductVariation(4321, 91,\n        Map.of(\"available\", false, \"barcode\", \"9310000000014\"));\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nSystem.out.println(variation.get(\"variation_id\") + \" \" + variation.get(\"sku\") + \" \" + variation.get(\"barcode\"));\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Variations.PatchProductVariationAsync(4321, 91, new Dictionary<string, object?>\n{\n    [\"available\"] = false, [\"barcode\"] = \"9310000000014\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nConsole.WriteLine($\"{variation[\"variation_id\"]} {variation[\"sku\"]} {variation[\"barcode\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.variations.patchProductVariation(4321, 91, {\n  'available': false,\n  'barcode': '9310000000014',\n});\nfinal variation = (response.map as Map)['variation'] as Map;\nprint('${variation['variation_id']} ${variation['sku']} ${variation['barcode']}');\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Variations().PatchProductVariation(ctx, 4321, 91, map[string]any{\"available\": false, \"barcode\": \"9310000000014\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\nfmt.Println(variation[\"variation_id\"], variation[\"sku\"], variation[\"barcode\"])\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VariationProductVariantPatchInput"
+              }
+            }
+          }
+        }
       }
     },
     "/admin/countries": {
@@ -57754,6 +59043,115 @@
             }
           }
         }
+      }
+    },
+    "/admin/trash/{trash_type}/{trash_item_id}/external_links": {
+      "get": {
+        "tags": [
+          "Trash"
+        ],
+        "summary": "List the external links of an item in the trash",
+        "operationId": "get_trash_item_external_links",
+        "description": "Returns the item's `type` and `id`, and `links`, the links outside the store that a permanent delete of the item would break. Each link has the `system` and the `entity` it belongs to, a `name`, its `external_id` and the `reason` it blocks the delete. `links` is empty when nothing outside the store depends on the item. Call it before [Delete an item permanently](/api-reference/trash/delete-an-item-permanently). It works only for an item in the trash: an item that is not in the trash, a live one included, returns `404`.",
+        "parameters": [
+          {
+            "name": "trash_type",
+            "in": "path",
+            "required": true,
+            "description": "The item's type, as returned by [List trash types](/api-reference/trash/list-trash-types), such as `category`, `customer` or `blog_post`. Letter case does not matter, and the PascalCase names such as `BlogPost` work too.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "trash_item_id",
+            "in": "path",
+            "required": true,
+            "description": "The id the item has in its own resource: a category's `id`, or a customer's `customer_id`. The same number is the item's `id` in [List items in the trash](/api-reference/trash/list-items-in-the-trash).",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The item's `type` and `id`, and its external links in `links`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashExternalLinks"
+                },
+                "example": {
+                  "type": "product",
+                  "id": 101,
+                  "links": []
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`trash_type` is not one of `album`, `article`, `blog_post`, `category`, `customer`, `form`, `navigation`, `operator`, `order`, `page`, `product` and `supplier`. The reason is `invalid_enum`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The item is not in the trash, or no item of that type has that `trash_item_id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrashError"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/trash/product/101/external_links\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from webcommander import build_client\n\nclient = build_client()\n\nresponse = client.trash.get_trash_item_external_links(\"product\", 101)\nprint(response.map[\"type\"], response.map[\"id\"])\nfor link in response.map[\"links\"]:\n    print(link[\"system\"], link[\"entity\"], link[\"name\"], link[\"external_id\"], link[\"reason\"])\n"
+          },
+          {
+            "lang": "javascript",
+            "label": "JavaScript",
+            "source": "import {buildClient} from '@webcommander/webcommander';\n\nconst client = await buildClient();\n\nconst response = await client.trash.getTrashItemExternalLinks('product', 101);\nconsole.log(response.map.type, response.map.id);\nfor (const link of response.map.links) {\n    console.log(link.system, link.entity, link.name, link.external_id, link.reason);\n}\n"
+          },
+          {
+            "lang": "php",
+            "label": "PHP",
+            "source": "use WebCommander\\Client\\ClientRegistry;\nuse WebCommander\\Resources\\Trash\\Trash;\n\n$client = ClientRegistry::buildClient();\n\n$response = Trash::getTrashItemExternalLinks($client, 'product', 101);\n\nforeach ($response->map['links'] as $link) {\n    echo $link['system'], ' ', $link['entity'], ' ', $link['name'], ' ', $link['reason'], PHP_EOL;\n}\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.webcommander.client.ApiResponse;\nimport com.webcommander.client.ClientRegistry;\nimport com.webcommander.client.WebCommanderClient;\nimport java.util.List;\nimport java.util.Map;\n\nWebCommanderClient client = ClientRegistry.buildClient();\n\nApiResponse response = client.trash().getTrashItemExternalLinks(\"product\", 101);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"type\") + \" \" + body.get(\"id\"));\nfor (Object row : (List<?>) body.get(\"links\")) {\n    Map<?, ?> link = (Map<?, ?>) row;\n    System.out.println(link.get(\"system\") + \" \" + link.get(\"entity\") + \" \" + link.get(\"name\") + \" \" + link.get(\"reason\"));\n}\n"
+          },
+          {
+            "lang": "csharp",
+            "label": ".NET",
+            "source": "using WebCommander.Client;\n\nawait using var client = WebCommanderClient.BuildClient();\n\nvar response = await client.Trash.GetTrashItemExternalLinksAsync(\"product\", 101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"type\"]} {body[\"id\"]}\");\nforeach (var link in ((IReadOnlyList<object?>)body[\"links\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{link[\"system\"]} {link[\"entity\"]} {link[\"name\"]} {link[\"reason\"]}\");\n"
+          },
+          {
+            "lang": "dart",
+            "label": "Dart",
+            "source": "import 'package:webcommander/webcommander.dart';\n\nfinal client = buildClient();\n\nfinal response = await client.trash.getTrashItemExternalLinks('product', 101);\nfinal result = response.map as Map;\nprint('${result['type']} ${result['id']}');\nfor (final link in result['links'] as List) {\n  print('${(link as Map)['system']} ${link['entity']} ${link['name']} ${link['reason']}');\n}\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n\t\"context\"\n\t\"fmt\"\n\t\"log\"\n\n\twc \"github.com/WebCommanderCMS/webcommander-sdk-go/v4\"\n)\n\nctx := context.Background()\nclient, err := wc.BuildClient(nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ndefer client.Close()\n\nresp, err := client.Trash().GetTrashItemExternalLinks(ctx, \"product\", 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"type\"], body[\"id\"])\nfor _, row := range body[\"links\"].([]any) {\n\tlink := row.(map[string]any)\n\tfmt.Println(link[\"system\"], link[\"entity\"], link[\"name\"], link[\"reason\"])\n}\n"
+          }
+        ]
       }
     },
     "/admin/pages": {
@@ -68105,7 +69503,7 @@
             ],
             "description": "The default shipping profile, as the profile's `{id, name}` record, or `null` for `No Shipping`."
           },
-          "enable_shipping_default_tax": {
+          "apply_store_tax_settings_to_shipping": {
             "type": "boolean",
             "description": "`true` turns on the default tax for shipping. Changing it changes no other field."
           },
@@ -68120,7 +69518,7 @@
             ],
             "description": "The default delivery profile, as the profile's `{id, name}` record, or `null` for `No Shipping`."
           },
-          "enable_delivery_default_tax": {
+          "apply_store_tax_settings_to_delivery": {
             "type": "boolean",
             "description": "`true` turns on the default tax for delivery."
           },
@@ -68137,9 +69535,9 @@
           },
           "enable_shipping_class": {
             "type": "boolean",
-            "description": "`true` turns on shipping classes. Turning it off also turns `enable_flat_view_class` off."
+            "description": "`true` turns on shipping classes. Turning it off also turns `enable_class_in_flat_view` off."
           },
-          "enable_flat_view_class": {
+          "enable_class_in_flat_view": {
             "type": "boolean",
             "description": "Depends on `enable_shipping_class`: it stays `false` while `enable_shipping_class` is `false`, even when you write `true`."
           }
@@ -68167,7 +69565,7 @@
             "$ref": "#/components/schemas/ShippingSettingsProfileInput",
             "description": "The profile to choose as the default shipping profile."
           },
-          "enable_shipping_default_tax": {
+          "apply_store_tax_settings_to_shipping": {
             "type": "boolean",
             "description": "`true` turns on the default tax for shipping. Changing it changes no other field. A string is rejected with `400`."
           },
@@ -68175,7 +69573,7 @@
             "$ref": "#/components/schemas/ShippingSettingsProfileInput",
             "description": "The profile to choose as the default delivery profile."
           },
-          "enable_delivery_default_tax": {
+          "apply_store_tax_settings_to_delivery": {
             "type": "boolean",
             "description": "`true` turns on the default tax for delivery. A string is rejected with `400`."
           },
@@ -68185,9 +69583,9 @@
           },
           "enable_shipping_class": {
             "type": "boolean",
-            "description": "`true` turns on shipping classes. Turning it off also turns `enable_flat_view_class` off. When you turn it back on, write `enable_flat_view_class` as well. A string is rejected with `400`."
+            "description": "`true` turns on shipping classes. Turning it off also turns `enable_class_in_flat_view` off. A string is rejected with `400`."
           },
-          "enable_flat_view_class": {
+          "enable_class_in_flat_view": {
             "type": "boolean",
             "description": "Depends on `enable_shipping_class`: it stays `false` while `enable_shipping_class` is `false`, even when you write `true`. A string is rejected with `400`."
           }
@@ -68238,24 +69636,34 @@
       },
       "ShippingSettingsGroupMeta": {
         "type": "object",
-        "description": "A single entry, `shipping_settings`.",
+        "description": "The settings area, the shipping methods and the shipping classes.",
         "properties": {
           "shipping_settings": {
+            "$ref": "#/components/schemas/ShippingSettingsAreaMeta"
+          },
+          "shipping_methods": {
+            "$ref": "#/components/schemas/ShippingSettingsAreaMeta"
+          },
+          "shipping_classes": {
             "$ref": "#/components/schemas/ShippingSettingsAreaMeta"
           }
         }
       },
       "ShippingSettingsAreaMeta": {
         "type": "object",
-        "description": "What the settings group is and whether you can write it. There is no `href`.",
+        "description": "One `group_meta` entry: what the area is, whether you can write it, and its path.",
         "properties": {
           "kind": {
             "type": "string",
-            "description": "The kind of group: `setting`."
+            "description": "The kind of area: `setting` for `shipping_settings`, `resource` for `shipping_methods` and `shipping_classes`."
           },
           "writable": {
             "type": "boolean",
-            "description": "Whether you can write these settings: `true`."
+            "description": "Whether you can write the area: `true` for all three."
+          },
+          "href": {
+            "type": "string",
+            "description": "The area's path."
           }
         }
       },
@@ -68266,13 +69674,13 @@
           "default_shipping_profile": {
             "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
           },
-          "enable_shipping_default_tax": {
+          "apply_store_tax_settings_to_shipping": {
             "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
           },
           "default_delivery_profile": {
             "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
           },
-          "enable_delivery_default_tax": {
+          "apply_store_tax_settings_to_delivery": {
             "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
           },
           "shipping_tax_profile": {
@@ -68281,7 +69689,7 @@
           "enable_shipping_class": {
             "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
           },
-          "enable_flat_view_class": {
+          "enable_class_in_flat_view": {
             "$ref": "#/components/schemas/ShippingSettingsFieldDescription"
           }
         }
@@ -68339,7 +69747,7 @@
           },
           "depends_on": {
             "type": "string",
-            "description": "Only on `enable_flat_view_class`: `enable_shipping_class`, the field it depends on."
+            "description": "Only on `enable_class_in_flat_view`: `enable_shipping_class`, the field it depends on."
           },
           "nullable": {
             "type": "boolean",
@@ -72048,79 +73456,204 @@
       },
       "TaxSettings": {
         "type": "object",
-        "description": "The store's tax settings: nine fields at one level, with no sections.",
+        "description": "The store's tax settings: nine fields at one level, with no sections, and `group_meta`.",
         "properties": {
-          "configuration_type": {
+          "tax_rate_for_customers": {
             "type": "string",
-            "description": "The tax configuration type, such as `DEFAULT`."
+            "enum": [
+              "system_default",
+              "custom_tax_profile"
+            ],
+            "description": "Which tax rate customers are charged: `system_default` or `custom_tax_profile`."
           },
-          "system_default_tax": {
-            "type": "boolean"
+          "tax_region": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "country_tax_id": {
+                    "type": "integer",
+                    "description": "The country tax's `id`."
+                  },
+                  "country_code": {
+                    "type": "string",
+                    "description": "The country code, such as `AU`."
+                  },
+                  "country_name": {
+                    "type": "string",
+                    "description": "The country's name."
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The store's tax region, or `null` when none is set."
           },
-          "default_country": {
+          "custom_tax_profile": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The custom tax profile's `id`."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The custom tax profile's name."
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The custom tax profile: its `id` and name, or `null` when none is set."
+          },
+          "is_price_shown_with_tax": {
+            "type": "boolean",
+            "description": "`true` shows prices with tax."
+          },
+          "prices_in_catalog": {
             "type": "string",
-            "description": "The default country, such as `AU`. The store does not check this value."
+            "enum": [
+              "excluding_tax",
+              "including_tax"
+            ],
+            "description": "Whether the prices in your catalog are `excluding_tax` or `including_tax`."
           },
-          "custom_tax_profile_id": {
-            "type": "integer",
-            "description": "A custom tax profile's `id`, such as `1`. The store does not check this value."
-          },
-          "default_tax_profile": {
-            "type": "integer",
-            "description": "The `id` of the default tax profile, the one whose `default` is `true`. The tax profile calls take it as `tax_profile_id`. It changes when another tax profile becomes the default, and after the default tax profile is deleted it still holds that profile's `tax_profile_id`."
-          },
-          "show_price_with_tax": {
-            "type": "boolean"
-          },
-          "is_price_with_tax": {
-            "type": "boolean"
-          },
-          "default_tax_code": {
+          "calculated_by": {
             "type": "string",
-            "description": "The default tax code, such as `GST`. The store does not check this value."
+            "enum": [
+              "store_region"
+            ],
+            "description": "Read-only: `store_region`. A write that contains it is rejected with `400 unknown_field`."
+          },
+          "is_out_of_region_tax_free": {
+            "type": "boolean",
+            "description": "`true` charges no tax outside the tax region."
           },
           "tax_message": {
             "type": "string",
             "description": "Free text, such as `All prices include GST`."
+          },
+          "base_price_rounding": {
+            "type": "string",
+            "enum": [
+              "nearest",
+              "up",
+              "down"
+            ],
+            "description": "How base prices are rounded: `nearest`, `up` or `down`."
+          },
+          "group_meta": {
+            "$ref": "#/components/schemas/TaxSettingsGroupMeta"
+          },
+          "field_metadata": {
+            "description": "Only when you send `field_metadata=true`: a description of each field."
+          }
+        }
+      },
+      "TaxSettingsGroupMeta": {
+        "type": "object",
+        "description": "The settings area, the tax profiles and the tax rules.",
+        "properties": {
+          "tax_settings": {
+            "$ref": "#/components/schemas/TaxSettingsAreaMeta"
+          },
+          "tax_profiles": {
+            "$ref": "#/components/schemas/TaxSettingsAreaMeta"
+          },
+          "tax_rules": {
+            "$ref": "#/components/schemas/TaxSettingsAreaMeta"
+          }
+        }
+      },
+      "TaxSettingsAreaMeta": {
+        "type": "object",
+        "description": "One `group_meta` entry: what the area is, whether it can be written, and its path. The `href` of `tax_profiles` and `tax_rules` returns `404`.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "What the area is: `setting` for `tax_settings`, `resource` for `tax_profiles` and `tax_rules`."
+          },
+          "writable": {
+            "type": "boolean",
+            "description": "Whether you can write the area: `true` for all three."
+          },
+          "href": {
+            "type": "string",
+            "description": "The area's path."
           }
         }
       },
       "TaxSettingsInput": {
         "type": "object",
-        "description": "Send only the fields you want to change. Every field you leave out keeps its stored value, and a field the store does not know is ignored.",
+        "description": "Send only the fields you want to change. Every field you leave out keeps its stored value.",
         "properties": {
-          "configuration_type": {
+          "tax_rate_for_customers": {
             "type": "string",
-            "description": "Must be a type the store knows, such as `DEFAULT`. Any other value is rejected with `400 invalid_request`."
+            "enum": [
+              "system_default",
+              "custom_tax_profile"
+            ],
+            "description": "`system_default` or `custom_tax_profile`."
           },
-          "system_default_tax": {
-            "type": "boolean"
-          },
-          "default_country": {
-            "type": "string",
-            "description": "Stored as you send it: `ZZ` is accepted."
+          "tax_region": {
+            "$ref": "#/components/schemas/TaxRegionInput"
           },
           "custom_tax_profile_id": {
             "type": "integer",
-            "description": "A custom tax profile's `id`. Stored as you send it, without a check: `99999999` is accepted."
+            "description": "The `id` of the custom tax profile. The read returns it as `custom_tax_profile`."
           },
-          "default_tax_profile": {
-            "type": "integer",
-            "description": "Must be the `tax_profile_id` of an existing tax profile. Any other value is rejected with `400 invalid_request`, including the `tax_profile_id` of a deleted default profile that the read still returns, and the stored value stays as it was."
+          "is_price_shown_with_tax": {
+            "type": "boolean",
+            "description": "`true` shows prices with tax."
           },
-          "show_price_with_tax": {
-            "type": "boolean"
-          },
-          "is_price_with_tax": {
-            "type": "boolean"
-          },
-          "default_tax_code": {
+          "prices_in_catalog": {
             "type": "string",
-            "description": "Stored as you send it, including a tax code that does not exist."
+            "enum": [
+              "excluding_tax",
+              "including_tax"
+            ],
+            "description": "`excluding_tax` or `including_tax`."
+          },
+          "is_out_of_region_tax_free": {
+            "type": "boolean",
+            "description": "`true` charges no tax outside the tax region."
           },
           "tax_message": {
             "type": "string",
             "description": "Free text."
+          },
+          "base_price_rounding": {
+            "type": "string",
+            "enum": [
+              "nearest",
+              "up",
+              "down"
+            ],
+            "description": "`nearest`, `up` or `down`."
+          }
+        }
+      },
+      "TaxRegionInput": {
+        "type": "object",
+        "description": "The tax region to set. `{\"country_code\": \"AU\"}` sets it. `{\"country_tax_id\": 1}` is accepted but leaves `tax_region` as `null`. A bare id is rejected with `400`.",
+        "properties": {
+          "country_code": {
+            "type": "string",
+            "description": "The country code, such as `AU`."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "An optional state code to send with `country_code`."
+          },
+          "country_tax_id": {
+            "type": "integer",
+            "description": "A country tax's `id`. The store accepts it but leaves `tax_region` as `null`."
           }
         }
       },
@@ -72132,11 +73665,11 @@
             "properties": {
               "code": {
                 "type": "string",
-                "description": "A machine-readable reason, such as `invalid_request` or `not_found`."
+                "description": "A machine-readable reason, such as `invalid_request` or `unknown_field`."
               },
               "message": {
                 "type": "string",
-                "description": "What was wrong, such as `settings missing`."
+                "description": "What was wrong."
               },
               "details": {
                 "type": "array",
@@ -83188,7 +84721,7 @@
       },
       "ProductMediaImage": {
         "type": "object",
-        "description": "One image of the product. [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) returns it as the whole response.",
+        "description": "One image of the product. [Add an image to a product's media](/api-reference/products/add-an-image-to-a-products-media) and [Move a product's image](/api-reference/products/move-a-products-image) return it as the whole response, and [Set the order of a product's images](/api-reference/products/set-the-order-of-a-products-images) returns a list of them.",
         "properties": {
           "id": {
             "type": "integer",
@@ -84028,7 +85561,7 @@
       },
       "ProductError": {
         "type": "object",
-        "description": "Rejections return this shape, except a `PATCH` body wrapped in `product`, which returns `ProductValidationError`. A method a path does not support is rejected too: `HEAD` on `/api/v4/admin/products`, on a product and on a product's `reviews` returns `404`, although a product's `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.",
+        "description": "Rejections return this shape, except a `PATCH` body wrapped in `product`, which returns `ProductValidationError`. A method a path does not support is rejected too: `HEAD` on `/api/v4/admin/products`, on a product and on a product's `reviews` returns `404`, although a product's `Allow` header lists `HEAD`; `HEAD`, `POST` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.",
         "properties": {
           "error": {
             "type": "object",
@@ -84849,6 +86382,528 @@
           "position": {
             "type": "integer",
             "description": "Optional. The image's place among the product's images, counted from `1`."
+          }
+        }
+      },
+      "ProductMediaOrderInput": {
+        "type": "object",
+        "required": [
+          "type",
+          "ids"
+        ],
+        "description": "Send these fields at the top level of the body, with no wrapper.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "images"
+            ],
+            "description": "`images`."
+          },
+          "ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "integer"
+            },
+            "description": "The `id` of every image of the product, each once, in the order you want. The first becomes the `primary` image. Any other set of `id` values is rejected with `400` and the reason `invalid_set`."
+          }
+        }
+      },
+      "ProductMediaOrder": {
+        "type": "object",
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductMediaImage"
+            },
+            "description": "The product's images in the new order."
+          }
+        }
+      },
+      "ProductMediaImagePatchInput": {
+        "type": "object",
+        "required": [
+          "position"
+        ],
+        "description": "Send `position` at the top level of the body, with no wrapper. It is the only field the call takes.",
+        "properties": {
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The image's new place among the product's images, counted from `1`. The image at position `1` is `primary`."
+          }
+        }
+      },
+      "ProductSeoAdvancedSettings": {
+        "type": "object",
+        "description": "The robots and canonical URL settings.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "robots_meta": {
+            "type": "string"
+          },
+          "canonical_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          }
+        }
+      },
+      "ProductSeoGoogleAnalyticsEvents": {
+        "type": "object",
+        "description": "Which Google Analytics events the product page sends.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "view_item": {
+            "type": "boolean"
+          },
+          "view_item_list": {
+            "type": "boolean"
+          },
+          "view_cart": {
+            "type": "boolean"
+          },
+          "add_to_wish_list": {
+            "type": "boolean"
+          },
+          "remove_from_cart": {
+            "type": "boolean"
+          },
+          "begin_checkout": {
+            "type": "boolean"
+          },
+          "add_shipping_info": {
+            "type": "boolean"
+          },
+          "add_payment_info": {
+            "type": "boolean"
+          },
+          "purchase": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductSeoGoogleAnalytics": {
+        "type": "object",
+        "description": "Google Analytics on the product page.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "measurement_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "events": {
+            "$ref": "#/components/schemas/ProductSeoGoogleAnalyticsEvents"
+          }
+        }
+      },
+      "ProductSeoFacebookPixelEvents": {
+        "type": "object",
+        "description": "Which Facebook Pixel events the product page sends.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "search": {
+            "type": "boolean"
+          },
+          "add_to_cart": {
+            "type": "boolean"
+          },
+          "add_to_wish_list": {
+            "type": "boolean"
+          },
+          "initiate_checkout": {
+            "type": "boolean"
+          },
+          "add_payment_info": {
+            "type": "boolean"
+          },
+          "purchase": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductSeoFacebookPixel": {
+        "type": "object",
+        "description": "The Facebook Pixel on the product page.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "pixel_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "events": {
+            "$ref": "#/components/schemas/ProductSeoFacebookPixelEvents"
+          }
+        }
+      },
+      "ProductSeoGoogleAds": {
+        "type": "object",
+        "description": "The Google Ads conversion the product page reports.",
+        "properties": {
+          "conversion_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "conversion_label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          }
+        }
+      },
+      "ProductSeoAnalytics": {
+        "type": "object",
+        "description": "The product page's analytics settings.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "google_analytics": {
+            "$ref": "#/components/schemas/ProductSeoGoogleAnalytics"
+          },
+          "facebook_pixel": {
+            "$ref": "#/components/schemas/ProductSeoFacebookPixel"
+          },
+          "google_ads": {
+            "$ref": "#/components/schemas/ProductSeoGoogleAds"
+          }
+        }
+      },
+      "ProductSeoCode": {
+        "type": "object",
+        "description": "One custom code block and whether it is on.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          }
+        }
+      },
+      "ProductSeoCustomCode": {
+        "type": "object",
+        "description": "The custom code added to the product page's header and footer.",
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/ProductSeoCode"
+          },
+          "footer": {
+            "$ref": "#/components/schemas/ProductSeoCode"
+          }
+        }
+      },
+      "ProductSeoSocialCard": {
+        "type": "object",
+        "description": "The title, description and image one network shows for the product.",
+        "properties": {
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "image_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          }
+        }
+      },
+      "ProductSeoSocial": {
+        "type": "object",
+        "description": "The product's social card, and one card for each network.",
+        "properties": {
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "image_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` until set."
+          },
+          "facebook": {
+            "$ref": "#/components/schemas/ProductSeoSocialCard"
+          },
+          "twitter": {
+            "$ref": "#/components/schemas/ProductSeoSocialCard"
+          },
+          "linkedin": {
+            "$ref": "#/components/schemas/ProductSeoSocialCard"
+          }
+        }
+      },
+      "ProductSeoAiVisibility": {
+        "type": "object",
+        "description": "What the product offers AI search. Each field is `null` until it is set.",
+        "properties": {
+          "structured_attributes": {
+            "description": "`null` until set."
+          },
+          "product_faq": {
+            "description": "`null` until set."
+          },
+          "citability_score": {
+            "description": "`null` until set."
+          },
+          "json_ld": {
+            "description": "`null` until set."
+          }
+        }
+      },
+      "ProductSeo": {
+        "type": "object",
+        "description": "A product's SEO settings.",
+        "properties": {
+          "url_handle": {
+            "type": "string",
+            "description": "The product's URL slug."
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The page title, or `null` until set."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The page description, or `null` until set."
+          },
+          "advanced_settings": {
+            "$ref": "#/components/schemas/ProductSeoAdvancedSettings"
+          },
+          "analytics": {
+            "$ref": "#/components/schemas/ProductSeoAnalytics"
+          },
+          "custom_code": {
+            "$ref": "#/components/schemas/ProductSeoCustomCode"
+          },
+          "social": {
+            "$ref": "#/components/schemas/ProductSeoSocial"
+          },
+          "ai_visibility": {
+            "$ref": "#/components/schemas/ProductSeoAiVisibility"
+          }
+        }
+      },
+      "ProductStockTracking": {
+        "type": "object",
+        "description": "Whether the product tracks stock, its stock figure and its low-stock level.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the product tracks stock."
+          },
+          "available_stock": {
+            "type": "integer",
+            "description": "The units available."
+          },
+          "low_stock_level": {
+            "type": "integer",
+            "description": "The low-stock level."
+          }
+        }
+      },
+      "ProductStockSummary": {
+        "type": "object",
+        "description": "The product's stock after the change.",
+        "properties": {
+          "tracking": {
+            "$ref": "#/components/schemas/ProductStockTracking"
+          },
+          "multi_location_enabled": {
+            "type": "boolean"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockLocation"
+            },
+            "description": "One row per inventory location the product is assigned to, or `[]` when it has none."
+          },
+          "variations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockVariation"
+            },
+            "description": "One entry per variant, on a product with variations."
+          }
+        }
+      },
+      "ProductStockAdjustmentUser": {
+        "type": "object",
+        "description": "The admin who made a stock change.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The admin's `id`."
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductStockAdjustment": {
+        "type": "object",
+        "description": "One stock change.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The adjustment's `id`."
+          },
+          "delta": {
+            "type": "integer",
+            "description": "The new stock figure minus the old one."
+          },
+          "note": {
+            "type": "string",
+            "description": "The note you sent, or `via API`."
+          },
+          "transaction_no": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` on every row [List a product's stock adjustments](/api-reference/products/list-a-products-stock-adjustments) returns, also for a change you sent with a `transaction_no`."
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ProductStockAdjustmentUser"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "When the change was made."
+          }
+        }
+      },
+      "ProductStockPatchInput": {
+        "type": "object",
+        "description": "Send these fields at the top level of the body, with no wrapper, and at least one of them. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.",
+        "properties": {
+          "tracking": {
+            "type": "object",
+            "description": "The tracking fields to change. They are merged into the product's tracking.",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "Whether the product tracks stock."
+              },
+              "available_stock": {
+                "type": "integer",
+                "description": "The units available."
+              },
+              "low_stock_level": {
+                "type": "integer",
+                "description": "The low-stock level."
+              }
+            }
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockLocationInput"
+            },
+            "description": "Stock per location, with rows in the form [Set a product's stock](/api-reference/products/set-a-products-stock) takes."
+          },
+          "note": {
+            "type": "string",
+            "description": "The note to record on the adjustment."
+          },
+          "transaction_no": {
+            "type": "string",
+            "description": "The transaction number to record on the adjustment."
+          }
+        }
+      },
+      "ProductStockPatchResult": {
+        "type": "object",
+        "properties": {
+          "stock": {
+            "$ref": "#/components/schemas/ProductStockSummary"
+          },
+          "adjustment": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProductStockAdjustment"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The change the store recorded, or `null` when the stock figure did not change."
+          }
+        }
+      },
+      "ProductStockAdjustmentPage": {
+        "type": "object",
+        "properties": {
+          "adjustments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStockAdjustment"
+            },
+            "description": "The adjustments on this page, newest first."
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/ProductPagination"
           }
         }
       },
@@ -85789,6 +87844,101 @@
                 "description": "Identifies this request."
               }
             }
+          }
+        }
+      },
+      "VariationProductVariantPatchInput": {
+        "type": "object",
+        "description": "Send these fields at the top level of the body, with no wrapper. Only the fields you send change. An empty body is rejected with `400`. Other keys, `active` and a `variation` wrapper are ignored.",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Whether the variant is available. It is not checked for type."
+          },
+          "name": {
+            "type": "string",
+            "description": "The variant's name."
+          },
+          "sku": {
+            "type": "string",
+            "description": "The variant's SKU, at most 255 characters. A SKU another variant holds is rejected with `409`."
+          },
+          "custom_sku": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "country_of_origin": {
+            "type": "string"
+          },
+          "hs_code": {
+            "type": "string"
+          },
+          "pricing": {
+            "$ref": "#/components/schemas/VariationProductVariantPricing"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/VariationProductVariantInventory"
+          },
+          "ordering": {
+            "$ref": "#/components/schemas/VariationProductVariantOrdering"
+          }
+        }
+      },
+      "VariationProductVariantPatched": {
+        "type": "object",
+        "description": "The variant's ids and codes after the change.",
+        "properties": {
+          "variation_id": {
+            "type": "integer",
+            "description": "The variant's `variation_id`."
+          },
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "custom_sku": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "barcode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country_of_origin": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hs_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "VariationProductVariantPatchResult": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "`success`."
+          },
+          "message": {
+            "type": "string",
+            "description": "`Variation updated successfully`."
+          },
+          "variation": {
+            "$ref": "#/components/schemas/VariationProductVariantPatched"
           }
         }
       },
@@ -87587,6 +89737,52 @@
                 "description": "Identifies this request."
               }
             }
+          }
+        }
+      },
+      "TrashExternalLink": {
+        "type": "object",
+        "description": "One link outside the store that depends on the item.",
+        "properties": {
+          "system": {
+            "type": "string",
+            "description": "The system outside the store that holds the link."
+          },
+          "entity": {
+            "type": "string",
+            "description": "The kind of record in that system."
+          },
+          "name": {
+            "type": "string",
+            "description": "The linked record's name."
+          },
+          "external_id": {
+            "type": "string",
+            "description": "The linked record's id in that system."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the link blocks a permanent delete."
+          }
+        }
+      },
+      "TrashExternalLinks": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The item's type in snake_case, such as `product`."
+          },
+          "id": {
+            "type": "integer",
+            "description": "The id the item has in its own resource. It is the `trash_item_id` you passed."
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrashExternalLink"
+            },
+            "description": "The links outside the store that a permanent delete would break, or `[]` when there are none."
           }
         }
       },

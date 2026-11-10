@@ -4,11 +4,15 @@
   "endpoints": {
     "get_tax_settings": {
       "function": "getTaxSettings",
-      "code": "use WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::getTaxSettings($client);\n\n$settings = $response->map['tax_settings'];\necho $settings['default_country'], ' ', $settings['default_tax_code'], PHP_EOL;\necho $settings['tax_message'], PHP_EOL;"
+      "code": "use WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::getTaxSettings($client);\n\n$settings = $response->map['tax_settings'];\necho $settings['tax_rate_for_customers'], ' ', $settings['prices_in_catalog'], PHP_EOL;\necho $settings['tax_message'], PHP_EOL;"
     },
     "put_tax_settings": {
       "function": "putTaxSettings",
-      "code": "use WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::putTaxSettings($client, [\n    'settings' => ['tax_message' => 'All prices include GST'],\n]);\n\necho $response->map['tax_settings']['tax_message'], PHP_EOL;"
+      "code": "use WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::putTaxSettings($client, [\n    'tax_settings' => ['tax_message' => 'All prices include GST'],\n]);\n\necho $response->map['tax_settings']['tax_message'], PHP_EOL;"
+    },
+    "patch_tax_settings": {
+      "function": "patchTaxSettings",
+      "code": "use WebCommander\\Resources\\TaxSettings\\TaxSettings;\n\n$response = TaxSettings::patchTaxSettings($client, [\n    'tax_settings' => ['is_price_shown_with_tax' => true],\n]);\n\necho $response->map['tax_settings']['is_price_shown_with_tax'] ? 'true' : 'false', PHP_EOL;"
     }
   }
 }

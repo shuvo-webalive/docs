@@ -4,11 +4,15 @@
   "endpoints": {
     "get_tax_settings": {
       "function": "getTaxSettings",
-      "code": "final response = await client.taxSettings.getTaxSettings();\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['default_country']);\nprint(taxSettings['default_tax_code']);\nprint(taxSettings['tax_message']);"
+      "code": "final response = await client.taxSettings.getTaxSettings();\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_rate_for_customers']);\nprint(taxSettings['prices_in_catalog']);\nprint(taxSettings['tax_message']);"
     },
     "put_tax_settings": {
       "function": "putTaxSettings",
-      "code": "final response = await client.taxSettings.putTaxSettings({\n  'settings': {'tax_message': 'All prices include GST'},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_message']);"
+      "code": "final response = await client.taxSettings.putTaxSettings({\n  'tax_settings': {'tax_message': 'All prices include GST'},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['tax_message']);"
+    },
+    "patch_tax_settings": {
+      "function": "patchTaxSettings",
+      "code": "final response = await client.taxSettings.patchTaxSettings({\n  'tax_settings': {'is_price_shown_with_tax': true},\n});\nfinal taxSettings = (response.map as Map)['tax_settings'] as Map;\nprint(taxSettings['is_price_shown_with_tax']);"
     }
   }
 }

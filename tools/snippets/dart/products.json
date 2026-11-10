@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "deleteProductMediaImage",
       "code": "final response = await client.products.deleteProductMediaImage(101, 1876);\nprint(response.statusCode);"
+    },
+    "update_product_media_order": {
+      "function": "updateProductMediaOrder",
+      "code": "final response = await client.products.updateProductMediaOrder(101, {\n  'type': 'images',\n  'ids': [1877, 1876],\n});\nfinal result = response.map as Map;\nfor (final image in result['images'] as List) {\n  print('${(image as Map)['id']} ${image['position']} ${image['primary']}');\n}"
+    },
+    "patch_product_media_image": {
+      "function": "patchProductMediaImage",
+      "code": "final response = await client.products.patchProductMediaImage(101, 1877, {'position': 1});\nfinal image = response.map as Map;\nprint('${image['id']} ${image['position']} ${image['primary']}');"
+    },
+    "get_product_seo": {
+      "function": "getProductSeo",
+      "code": "final response = await client.products.getProductSeo(101);\nfinal seo = (response.map as Map)['seo'] as Map;\nprint('${seo['url_handle']} ${seo['title']} ${seo['description']}');"
+    },
+    "patch_product_stock": {
+      "function": "patchProductStock",
+      "code": "final response = await client.products.patchProductStock(101, {\n  'tracking': {'enabled': true, 'available_stock': 40},\n  'note': 'Restock',\n});\nfinal result = response.map as Map;\nprint(((result['stock'] as Map)['tracking'] as Map)['available_stock']);\nprint(result['adjustment']);"
+    },
+    "list_product_stock_adjustments": {
+      "function": "listProductStockAdjustments",
+      "code": "final response =\n    await client.products.listProductStockAdjustments(101, queryParams: {'limit': 20});\nfinal result = response.map as Map;\nfor (final adjustment in result['adjustments'] as List) {\n  print('${(adjustment as Map)['id']} ${adjustment['delta']} ${adjustment['note']} ${adjustment['transaction_no']}');\n}\nprint((result['pagination'] as Map)['has_next']);"
     }
   }
 }

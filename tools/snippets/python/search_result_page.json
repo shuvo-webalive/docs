@@ -53,6 +53,10 @@
     "delete_search_result_page_product_promotion": {
       "function": "delete_search_result_page_product_promotion",
       "code": "response = client.search_result_page.delete_search_result_page_product_promotion(6)\nprint(response.status_code)\n"
+    },
+    "reindex_search": {
+      "function": "reindex_search",
+      "code": "response = client.search_result_page.reindex_search()\nprint(response.status_code, response.map[\"status\"])\n"
     }
   }
 }

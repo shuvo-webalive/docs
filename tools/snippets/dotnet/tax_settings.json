@@ -4,11 +4,15 @@
   "endpoints": {
     "get_tax_settings": {
       "function": "GetTaxSettingsAsync",
-      "code": "var response = await client.TaxSettings.GetTaxSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine($\"{taxSettings[\"default_country\"]} {taxSettings[\"default_tax_code\"]} {taxSettings[\"tax_message\"]}\");"
+      "code": "var response = await client.TaxSettings.GetTaxSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine($\"{taxSettings[\"tax_rate_for_customers\"]} {taxSettings[\"prices_in_catalog\"]} {taxSettings[\"tax_message\"]}\");"
     },
     "put_tax_settings": {
       "function": "PutTaxSettingsAsync",
-      "code": "var response = await client.TaxSettings.PutTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"settings\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"All prices include GST\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"tax_message\"]);"
+      "code": "var response = await client.TaxSettings.PutTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"tax_settings\"] = new Dictionary<string, object?> { [\"tax_message\"] = \"All prices include GST\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"tax_message\"]);"
+    },
+    "patch_tax_settings": {
+      "function": "PatchTaxSettingsAsync",
+      "code": "var response = await client.TaxSettings.PatchTaxSettingsAsync(new Dictionary<string, object?>\n{\n    [\"tax_settings\"] = new Dictionary<string, object?> { [\"is_price_shown_with_tax\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar taxSettings = (IReadOnlyDictionary<string, object?>)body[\"tax_settings\"]!;\nConsole.WriteLine(taxSettings[\"is_price_shown_with_tax\"]);"
     }
   }
 }

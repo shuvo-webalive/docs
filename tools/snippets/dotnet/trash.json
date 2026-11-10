@@ -33,6 +33,10 @@
     "bulk_delete_trash": {
       "function": "BulkDeleteTrashAsync",
       "code": "var response = await client.Trash.BulkDeleteTrashAsync(new Dictionary<string, object?>\n{\n    [\"items\"] = new object[]\n    {\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1234 },\n        new Dictionary<string, object?> { [\"type\"] = \"Category\", [\"id\"] = 1229 },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var deletedItem in ((IReadOnlyList<object?>)body[\"deleted\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{deletedItem[\"type\"]} {deletedItem[\"id\"]} {deletedItem[\"name\"]}\");\nforeach (var failure in ((IReadOnlyList<object?>)body[\"failed\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{failure[\"type\"]} {failure[\"id\"]} {failure[\"code\"]} {failure[\"message\"]}\");"
+    },
+    "get_trash_item_external_links": {
+      "function": "GetTrashItemExternalLinksAsync",
+      "code": "var response = await client.Trash.GetTrashItemExternalLinksAsync(\"product\", 101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"type\"]} {body[\"id\"]}\");\nforeach (var link in ((IReadOnlyList<object?>)body[\"links\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{link[\"system\"]} {link[\"entity\"]} {link[\"name\"]} {link[\"reason\"]}\");"
     }
   }
 }

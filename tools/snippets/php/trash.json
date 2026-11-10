@@ -33,6 +33,10 @@
     "bulk_delete_trash": {
       "function": "bulkDeleteTrash",
       "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::bulkDeleteTrash($client, ['items' => [\n    ['type' => 'Category', 'id' => 1234],\n    ['type' => 'Category', 'id' => 1229],\n]]);\n\necho count($response->map['deleted']), ' deleted, ', count($response->map['failed']), ' failed', PHP_EOL;\nforeach ($response->map['failed'] as $failure) {\n    echo $failure['type'], ' ', $failure['id'], ': ', $failure['code'], ' ', $failure['message'], PHP_EOL;\n}"
+    },
+    "get_trash_item_external_links": {
+      "function": "getTrashItemExternalLinks",
+      "code": "use WebCommander\\Resources\\Trash\\Trash;\n\n$response = Trash::getTrashItemExternalLinks($client, 'product', 101);\n\nforeach ($response->map['links'] as $link) {\n    echo $link['system'], ' ', $link['entity'], ' ', $link['name'], ' ', $link['reason'], PHP_EOL;\n}"
     }
   }
 }

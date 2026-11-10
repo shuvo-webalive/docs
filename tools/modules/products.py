@@ -34,9 +34,14 @@ INVENTORY_PAGE = "/api-reference/products/update-a-products-inventory"
 UPLOAD_IMAGES_PAGE = "/api-reference/products/upload-images-to-a-product"
 ADD_MEDIA_PAGE = "/api-reference/products/add-an-image-to-a-products-media"
 DELETE_IMAGE_PAGE = "/api-reference/products/delete-a-products-image"
+MEDIA_ORDER_PAGE = "/api-reference/products/set-the-order-of-a-products-images"
+MOVE_IMAGE_PAGE = "/api-reference/products/move-a-products-image"
+SEO_PAGE = "/api-reference/products/retrieve-a-products-seo-settings"
+PATCH_STOCK_PAGE = "/api-reference/products/change-a-products-stock"
+ADJUSTMENTS_PAGE = "/api-reference/products/list-a-products-stock-adjustments"
 
-OVERVIEW_DESCRIPTION = "List, count, create, read, update and delete products, check a SKU, list special products, delete several products at once, import, list, read, change and delete a product's reviews, upload and delete its images, set its inventory, read and set its stock at each inventory location, and unassign a location from it."
-INTRO = "The Products API has twenty-two endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
+OVERVIEW_DESCRIPTION = "List, count, create, read, update and delete products, check a SKU, list special products, delete several products at once, import, list, read, change and delete a product's reviews, upload, reorder, move and delete its images, read its SEO settings, set its inventory, read, set and change its stock at each inventory location, list its stock adjustments, and unassign a location from it."
+INTRO = "The Products API has twenty-seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/products`."
 
 WARNING = (
     "**Setting a product's stock unassigns every location you leave out, even one that still holds stock.**\n"
@@ -134,6 +139,12 @@ NOTES = [
     "**Updating a product's inventory sets the stock figure, and a variant keeps its own.** [Update a product's inventory](" + INVENTORY_PAGE + ") takes `track_inventory`, `available_stock` and `low_level_stock` inside\n"
     "  `product.product_pricing_and_stock` and returns `201`. Read the new stock with [Retrieve a product's stock](" + STOCK_PAGE + "). The stock of a product's variants does not change. The call takes the optional `X-Transaction-No` header:\n"
     "  the number is stored when the product has none, but the response to that first write shows the earlier value, `null`.",
+    "**Set the order of all images, or move one.** [Set the order of a product's images](" + MEDIA_ORDER_PAGE + ") takes `{\"type\": \"images\", \"ids\": [...]}` and must name every image of the product exactly once, otherwise it is rejected with `400`\n"
+    "  and the reason `invalid_set`. The first `id` becomes the `primary` image. [Move a product's image](" + MOVE_IMAGE_PAGE + ") takes only `{\"position\": n}`, counted from `1`; any other body, `alt_text` and a wrapper included, is rejected with `400` and the reason `invalid_body`.\n"
+    "  Both send their fields at the top level of the body, with no wrapper.",
+    "**Change stock with a `PATCH`, and expect `null` transaction numbers in the history.** [Change a product's stock](" + PATCH_STOCK_PAGE + ") takes `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, and at least one of them.\n"
+    "  A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`. It returns `adjustment` as `null` when the stock figure did not change, and the adjustment's `note` is `via API` unless you send one.\n"
+    "  [List a product's stock adjustments](" + ADJUSTMENTS_PAGE + ") returns every row with `transaction_no` set to `null`, also for a change you sent with a `transaction_no`, so do not look a change up by its transaction number.",
 ]
 
 
@@ -419,6 +430,53 @@ IMAGE_RESULT = {"product": {"images": [{"id": 1876, "filename": IMAGE_UUID + "_f
 
 MEDIA_BODY = {"type": "images", "filename": "side.png", "content": PNG_BASE64}
 MEDIA_RESULT = {"id": 1877, "filename": IMAGE_UUID + "_side.png", "position": 2, "primary": False, "alt_text": "", "url": "https://your-store.example.com/resources/product/101/" + IMAGE_UUID + "_side.png", "thumbnail_url": "https://your-store.example.com/resources/product/101/150-" + IMAGE_UUID + "_side.png"}
+
+IMAGE_ORDER_BODY = {"type": "images", "ids": [1877, 1876]}
+IMAGE_ORDER_RESULT = {"images": [
+    {"id": 1877, "filename": IMAGE_UUID + "_side.png", "position": 1, "primary": True, "alt_text": "", "url": "https://your-store.example.com/resources/product/101/" + IMAGE_UUID + "_side.png", "thumbnail_url": "https://your-store.example.com/resources/product/101/150-" + IMAGE_UUID + "_side.png"},
+    {"id": 1876, "filename": IMAGE_UUID + "_front.png", "position": 2, "primary": False, "alt_text": "", "url": "https://your-store.example.com/resources/product/101/" + IMAGE_UUID + "_front.png", "thumbnail_url": "https://your-store.example.com/resources/product/101/150-" + IMAGE_UUID + "_front.png"},
+]}
+IMAGE_MOVE_BODY = {"position": 1}
+IMAGE_MOVED = IMAGE_ORDER_RESULT["images"][0]
+
+SEO_CARD = {"title": None, "description": None, "image_url": None}
+SEO_RESULT = {"seo": {
+    "url_handle": "blue-cotton-shirt",
+    "title": None,
+    "description": None,
+    "advanced_settings": {"enabled": False, "robots_meta": "index", "canonical_url": None},
+    "analytics": {
+        "enabled": False,
+        "platform": "google_analytics",
+        "google_analytics": {"enabled": False, "measurement_id": None, "events": {"enabled": False, "view_item": False, "view_item_list": False, "view_cart": False, "add_to_wish_list": False, "remove_from_cart": False, "begin_checkout": False, "add_shipping_info": False, "add_payment_info": False, "purchase": False}},
+        "facebook_pixel": {"enabled": False, "pixel_id": None, "events": {"enabled": False, "search": False, "add_to_cart": False, "add_to_wish_list": False, "initiate_checkout": False, "add_payment_info": False, "purchase": False}},
+        "google_ads": {"conversion_id": None, "conversion_label": None},
+    },
+    "custom_code": {"header": {"enabled": False, "code": None}, "footer": {"enabled": False, "code": None}},
+    "social": dict(SEO_CARD, facebook=dict(SEO_CARD), twitter=dict(SEO_CARD), linkedin=dict(SEO_CARD)),
+    "ai_visibility": {"structured_attributes": None, "product_faq": None, "citability_score": None, "json_ld": None},
+}}
+
+STOCK_PATCH_BODY = {
+    "tracking": {"enabled": True, "available_stock": 40},
+    "note": "Restock",
+}
+ADJUSTMENT_ROW = {"id": 9001, "delta": 5, "note": "Restock", "transaction_no": None, "created_by": {"id": 12, "name": "Alex Kim"}, "created_at": "2026-11-11T09:30:00Z"}
+STOCK_PATCH_RESULT = {
+    "stock": {
+        "tracking": {"enabled": True, "available_stock": 40, "low_stock_level": 5},
+        "multi_location_enabled": False,
+        "locations": [],
+        "variations": [],
+    },
+    "adjustment": ADJUSTMENT_ROW,
+}
+ADJUSTMENTS_RESULT = {"adjustments": [ADJUSTMENT_ROW], "pagination": {"total": 1, "limit": 20, "offset": 0, "has_previous": False, "has_next": False}}
+
+ADJUSTMENT_PARAMETERS = [
+    {"name": "limit", "in": "query", "description": "The number of adjustments to return. The default is `20`.", "schema": {"type": "integer", "minimum": 1, "example": 20}},
+    {"name": "offset", "in": "query", "description": "The number of adjustments to skip.", "schema": {"type": "integer", "minimum": 0, "example": 0}},
+]
 
 
 LIST_PAGINATION = {"total": 2, "limit": 20, "offset": 0, "has_previous": False, "has_next": False}
@@ -888,6 +946,103 @@ ENDPOINTS = [
         },
         "example_call": {"path": {"product_id": 101, "image_id": 1876}},
     },
+    {
+        "key": "update_product_media_order",
+        "slug": "set-the-order-of-a-products-images",
+        "title": "Set the order of a product's images",
+        "method": "PUT",
+        "path": BASE + "/{product_id}/media/order",
+        "summary": "Sets the order of all of the product's images and returns them in the new order.",
+        "description": "Send `type` set to `images` and `ids`, the `id` of every image of the product in the order you want, at the top level of the body with no wrapper. You must name every image exactly once. The first `id` becomes the `primary` image. The call returns the product's images in the new order under `images`. To move one image, use [Move a product's image](" + MOVE_IMAGE_PAGE + ").",
+        "parameters": [PRODUCT_ID],
+        "body": {"schema": ref("ProductMediaOrderInput"), "example": IMAGE_ORDER_BODY},
+        "responses": {
+            "200": {
+                "description": "The product's images in the new order, under `images`. The first one has `position` `1` and `primary` `true`.",
+                "schema": ref("ProductMediaOrder"),
+                "example": IMAGE_ORDER_RESULT,
+            },
+            "400": {"description": "`ids` does not name every image of the product exactly once. The reason is `invalid_set`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "patch_product_media_image",
+        "slug": "move-a-products-image",
+        "title": "Move a product's image",
+        "method": "PATCH",
+        "path": BASE + "/{product_id}/media/images/{image_id}",
+        "summary": "Moves one image of the product to the position you send and returns the image.",
+        "description": "Send `position`, counted from `1`, at the top level of the body with no wrapper. `position` is the only field the call takes: any other body, `alt_text` and a wrapper included, is rejected with `400` and the reason `invalid_body`. The call returns the image as one flat row, not wrapped in `product`. The image at position `1` is `primary`. To order all images at once, use [Set the order of a product's images](" + MEDIA_ORDER_PAGE + ").",
+        "parameters": [PRODUCT_ID, IMAGE_ID],
+        "body": {"schema": ref("ProductMediaImagePatchInput"), "example": IMAGE_MOVE_BODY},
+        "responses": {
+            "200": {
+                "description": "The image after the move, as one row: `id`, `filename`, `position`, `primary`, `alt_text`, `url` and `thumbnail_url`.",
+                "schema": ref("ProductMediaImage"),
+                "example": IMAGE_MOVED,
+            },
+            "400": {"description": "The body is anything other than `{\"position\": n}`. The reason is `invalid_body`.", "schema": ERROR_REF},
+            "404": {"description": "The product has no image with that `image_id`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101, "image_id": 1877}},
+    },
+    {
+        "key": "get_product_seo",
+        "slug": "retrieve-a-products-seo-settings",
+        "title": "Retrieve a product's SEO settings",
+        "method": "GET",
+        "path": BASE + "/{product_id}/seo",
+        "summary": "Returns the product's URL handle, title, description, analytics, custom code, social cards and AI visibility settings.",
+        "description": "Returns the product's SEO settings under `seo`: `url_handle`, `title`, `description`, `advanced_settings`, `analytics` (Google Analytics, Facebook Pixel and Google Ads), `custom_code`, `social` and `ai_visibility`. The call ignores `field_metadata`. `HEAD` on this path returns `404`.",
+        "parameters": [PRODUCT_ID],
+        "responses": {
+            "200": {
+                "description": "The product's SEO settings under `seo`.",
+                "schema": {"type": "object", "properties": {"seo": ref("ProductSeo")}},
+                "example": SEO_RESULT,
+            },
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "patch_product_stock",
+        "slug": "change-a-products-stock",
+        "title": "Change a product's stock",
+        "method": "PATCH",
+        "path": BASE + "/{product_id}/stock",
+        "summary": "Changes the product's stock tracking or its stock at each location, and returns the stock and the adjustment it recorded.",
+        "description": "Send at least one of `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, with no wrapper. `tracking` takes `enabled`, `available_stock` and `low_stock_level`, and the fields you send are merged into the product's tracking. `locations` takes rows in the form [Set a product's stock](" + SET_STOCK_PAGE + ") takes. `note` and `transaction_no` go on the adjustment. The call returns the product's `stock` as it is now, and the `adjustment` it recorded. `adjustment` is `null` when the stock figure did not change, and its `note` is `via API` unless you send one. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.",
+        "parameters": [PRODUCT_ID],
+        "body": {"schema": ref("ProductStockPatchInput"), "example": STOCK_PATCH_BODY},
+        "responses": {
+            "200": {
+                "description": "`stock` is the product's stock after the change, and `adjustment` is the change the store recorded, or `null` when the figure did not change.",
+                "schema": ref("ProductStockPatchResult"),
+                "example": STOCK_PATCH_RESULT,
+            },
+            "400": {"description": "The body is wrapped, or sends `available_stock` outside `tracking`. The reason is `unknown_field`.", "schema": ERROR_REF},
+        },
+        "example_call": {"path": {"product_id": 101}},
+    },
+    {
+        "key": "list_product_stock_adjustments",
+        "slug": "list-a-products-stock-adjustments",
+        "title": "List a product's stock adjustments",
+        "method": "GET",
+        "path": BASE + "/{product_id}/stock/adjustments",
+        "summary": "Returns the product's stock changes, newest first, with paging details.",
+        "description": "Returns the product's stock adjustments under `adjustments`, newest first, with a `pagination` block. Page with `limit`, which defaults to `20`, and `offset`. Each row has the change as `delta` (the new figure minus the old one), its `note`, who made it and when. Every row returns `transaction_no` as `null`, also for a change you sent with a `transaction_no`. `HEAD` on this path returns `404`.",
+        "parameters": [PRODUCT_ID] + ADJUSTMENT_PARAMETERS,
+        "responses": {
+            "200": {
+                "description": "The adjustments on this page under `adjustments`, and `pagination` with five keys: `total`, `limit`, `offset`, `has_previous` and `has_next`.",
+                "schema": ref("ProductStockAdjustmentPage"),
+                "example": ADJUSTMENTS_RESULT,
+            },
+        },
+        "example_call": {"path": {"product_id": 101}, "query": {"limit": 20}},
+    },
 ]
 
 READ_ONLY = "Read-only: a changed value is rejected with `400` and the reason `read_only_field`."
@@ -1290,7 +1445,7 @@ SCHEMAS = {
         "parent_in_trash": typed("boolean"),
         "disposable": typed("boolean"),
     }},
-    "ProductMediaImage": {"type": "object", "description": "One image of the product. [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") returns it as the whole response.", "properties": {
+    "ProductMediaImage": {"type": "object", "description": "One image of the product. [Add an image to a product's media](" + ADD_MEDIA_PAGE + ") and [Move a product's image](" + MOVE_IMAGE_PAGE + ") return it as the whole response, and [Set the order of a product's images](" + MEDIA_ORDER_PAGE + ") returns a list of them.", "properties": {
         "id": typed("integer", "The image's id."),
         "filename": typed("string"),
         "position": typed("integer"),
@@ -1529,7 +1684,7 @@ SCHEMAS = {
         "locations": {"type": "array", "minItems": 1, "items": ref("ProductStockLocationInput"), "description": "Required and not empty. Replaces the product's whole set of locations: a location you leave out is unassigned, even while it holds stock."},
     }},
     "ProductFieldMetadata": {"type": "object", "additionalProperties": True, "description": "Returned beside `product` when you send `field_metadata=true` or `1`. An object keyed by field name, such as `id`: `{\"type\": \"integer\", \"read_only\": true}`. The `password` entry has `write_only: true`. It lists `mpn`, `upc`, `barcode`, `hs_code`, `length`, `width`, `height`, `weight` and `sold_out_label` as writable at the top level, but an update rejects each of them there."},
-    "ProductError": {"type": "object", "description": "Rejections return this shape, except a `PATCH` body wrapped in `product`, which returns `ProductValidationError`. A method a path does not support is rejected too: `HEAD` on `/api/v4/admin/products`, on a product and on a product's `reviews` returns `404`, although a product's `Allow` header lists `HEAD`; `HEAD`, `POST`, `PATCH` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.", "properties": {"error": {"type": "object", "properties": {
+    "ProductError": {"type": "object", "description": "Rejections return this shape, except a `PATCH` body wrapped in `product`, which returns `ProductValidationError`. A method a path does not support is rejected too: `HEAD` on `/api/v4/admin/products`, on a product and on a product's `reviews` returns `404`, although a product's `Allow` header lists `HEAD`; `HEAD`, `POST` and `OPTIONS` on a product's `stock` return `404` with the message `No such endpoint: <METHOD> /api/v4/admin/products/<product_id>/stock`; and `GET` on `stock/locations/{inventory_location_id}` returns `405` with the reason `method_not_allowed`.", "properties": {"error": {"type": "object", "properties": {
         "code": typed("string", "A machine-readable reason, such as `invalid_request`, `not_found` or `conflict`."),
         "message": typed("string", "What went wrong, such as `locations is required`."),
         "details": {"type": "array", "description": "One entry per rejected field or parameter, or an empty list.", "items": {"type": "object", "properties": {
@@ -1703,4 +1858,162 @@ SCHEMAS["ProductMediaUploadInput"] = {"type": "object", "required": ["type", "fi
     "filename": typed("string", "The file name, such as `side.png`."),
     "content": typed("string", "The file's bytes as base64 text, or a `data:image/png;base64,...` address."),
     "position": typed("integer", "Optional. The image's place among the product's images, counted from `1`."),
+}}
+
+SCHEMAS["ProductMediaOrderInput"] = {"type": "object", "required": ["type", "ids"], "description": "Send these fields at the top level of the body, with no wrapper.", "properties": {
+    "type": {"type": "string", "enum": ["images"], "description": "`images`."},
+    "ids": {"type": "array", "minItems": 1, "items": {"type": "integer"}, "description": "The `id` of every image of the product, each once, in the order you want. The first becomes the `primary` image. Any other set of `id` values is rejected with `400` and the reason `invalid_set`."},
+}}
+
+SCHEMAS["ProductMediaOrder"] = {"type": "object", "properties": {
+    "images": array_of("ProductMediaImage", "The product's images in the new order."),
+}}
+
+SCHEMAS["ProductMediaImagePatchInput"] = {"type": "object", "required": ["position"], "description": "Send `position` at the top level of the body, with no wrapper. It is the only field the call takes.", "properties": {
+    "position": {"type": "integer", "minimum": 1, "description": "The image's new place among the product's images, counted from `1`. The image at position `1` is `primary`."},
+}}
+
+SCHEMAS["ProductSeoAdvancedSettings"] = {"type": "object", "description": "The robots and canonical URL settings.", "properties": {
+    "enabled": typed("boolean"),
+    "robots_meta": typed("string"),
+    "canonical_url": nullable("string", "`null` until set."),
+}}
+
+SCHEMAS["ProductSeoGoogleAnalyticsEvents"] = {"type": "object", "description": "Which Google Analytics events the product page sends.", "properties": {
+    "enabled": typed("boolean"),
+    "view_item": typed("boolean"),
+    "view_item_list": typed("boolean"),
+    "view_cart": typed("boolean"),
+    "add_to_wish_list": typed("boolean"),
+    "remove_from_cart": typed("boolean"),
+    "begin_checkout": typed("boolean"),
+    "add_shipping_info": typed("boolean"),
+    "add_payment_info": typed("boolean"),
+    "purchase": typed("boolean"),
+}}
+
+SCHEMAS["ProductSeoGoogleAnalytics"] = {"type": "object", "description": "Google Analytics on the product page.", "properties": {
+    "enabled": typed("boolean"),
+    "measurement_id": nullable("string", "`null` until set."),
+    "events": ref("ProductSeoGoogleAnalyticsEvents"),
+}}
+
+SCHEMAS["ProductSeoFacebookPixelEvents"] = {"type": "object", "description": "Which Facebook Pixel events the product page sends.", "properties": {
+    "enabled": typed("boolean"),
+    "search": typed("boolean"),
+    "add_to_cart": typed("boolean"),
+    "add_to_wish_list": typed("boolean"),
+    "initiate_checkout": typed("boolean"),
+    "add_payment_info": typed("boolean"),
+    "purchase": typed("boolean"),
+}}
+
+SCHEMAS["ProductSeoFacebookPixel"] = {"type": "object", "description": "The Facebook Pixel on the product page.", "properties": {
+    "enabled": typed("boolean"),
+    "pixel_id": nullable("string", "`null` until set."),
+    "events": ref("ProductSeoFacebookPixelEvents"),
+}}
+
+SCHEMAS["ProductSeoGoogleAds"] = {"type": "object", "description": "The Google Ads conversion the product page reports.", "properties": {
+    "conversion_id": nullable("string", "`null` until set."),
+    "conversion_label": nullable("string", "`null` until set."),
+}}
+
+SCHEMAS["ProductSeoAnalytics"] = {"type": "object", "description": "The product page's analytics settings.", "properties": {
+    "enabled": typed("boolean"),
+    "platform": typed("string"),
+    "google_analytics": ref("ProductSeoGoogleAnalytics"),
+    "facebook_pixel": ref("ProductSeoFacebookPixel"),
+    "google_ads": ref("ProductSeoGoogleAds"),
+}}
+
+SCHEMAS["ProductSeoCode"] = {"type": "object", "description": "One custom code block and whether it is on.", "properties": {
+    "enabled": typed("boolean"),
+    "code": nullable("string", "`null` until set."),
+}}
+
+SCHEMAS["ProductSeoCustomCode"] = {"type": "object", "description": "The custom code added to the product page's header and footer.", "properties": {
+    "header": ref("ProductSeoCode"),
+    "footer": ref("ProductSeoCode"),
+}}
+
+SCHEMAS["ProductSeoSocialCard"] = {"type": "object", "description": "The title, description and image one network shows for the product.", "properties": {
+    "title": nullable("string", "`null` until set."),
+    "description": nullable("string", "`null` until set."),
+    "image_url": nullable("string", "`null` until set."),
+}}
+
+SCHEMAS["ProductSeoSocial"] = {"type": "object", "description": "The product's social card, and one card for each network.", "properties": {
+    "title": nullable("string", "`null` until set."),
+    "description": nullable("string", "`null` until set."),
+    "image_url": nullable("string", "`null` until set."),
+    "facebook": ref("ProductSeoSocialCard"),
+    "twitter": ref("ProductSeoSocialCard"),
+    "linkedin": ref("ProductSeoSocialCard"),
+}}
+
+SCHEMAS["ProductSeoAiVisibility"] = {"type": "object", "description": "What the product offers AI search. Each field is `null` until it is set.", "properties": {
+    "structured_attributes": {"description": "`null` until set."},
+    "product_faq": {"description": "`null` until set."},
+    "citability_score": {"description": "`null` until set."},
+    "json_ld": {"description": "`null` until set."},
+}}
+
+SCHEMAS["ProductSeo"] = {"type": "object", "description": "A product's SEO settings.", "properties": {
+    "url_handle": typed("string", "The product's URL slug."),
+    "title": nullable("string", "The page title, or `null` until set."),
+    "description": nullable("string", "The page description, or `null` until set."),
+    "advanced_settings": ref("ProductSeoAdvancedSettings"),
+    "analytics": ref("ProductSeoAnalytics"),
+    "custom_code": ref("ProductSeoCustomCode"),
+    "social": ref("ProductSeoSocial"),
+    "ai_visibility": ref("ProductSeoAiVisibility"),
+}}
+
+SCHEMAS["ProductStockTracking"] = {"type": "object", "description": "Whether the product tracks stock, its stock figure and its low-stock level.", "properties": {
+    "enabled": typed("boolean", "Whether the product tracks stock."),
+    "available_stock": typed("integer", "The units available."),
+    "low_stock_level": typed("integer", "The low-stock level."),
+}}
+
+SCHEMAS["ProductStockSummary"] = {"type": "object", "description": "The product's stock after the change.", "properties": {
+    "tracking": ref("ProductStockTracking"),
+    "multi_location_enabled": typed("boolean"),
+    "locations": array_of("ProductStockLocation", "One row per inventory location the product is assigned to, or `[]` when it has none."),
+    "variations": array_of("ProductStockVariation", "One entry per variant, on a product with variations."),
+}}
+
+SCHEMAS["ProductStockAdjustmentUser"] = {"type": "object", "description": "The admin who made a stock change.", "properties": {
+    "id": typed("integer", "The admin's `id`."),
+    "name": typed("string"),
+}}
+
+SCHEMAS["ProductStockAdjustment"] = {"type": "object", "description": "One stock change.", "properties": {
+    "id": typed("integer", "The adjustment's `id`."),
+    "delta": typed("integer", "The new stock figure minus the old one."),
+    "note": typed("string", "The note you sent, or `via API`."),
+    "transaction_no": nullable("string", "`null` on every row [List a product's stock adjustments](" + ADJUSTMENTS_PAGE + ") returns, also for a change you sent with a `transaction_no`."),
+    "created_by": ref("ProductStockAdjustmentUser"),
+    "created_at": typed("string", "When the change was made."),
+}}
+
+SCHEMAS["ProductStockPatchInput"] = {"type": "object", "description": "Send these fields at the top level of the body, with no wrapper, and at least one of them. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.", "properties": {
+    "tracking": {"type": "object", "description": "The tracking fields to change. They are merged into the product's tracking.", "properties": {
+        "enabled": typed("boolean", "Whether the product tracks stock."),
+        "available_stock": typed("integer", "The units available."),
+        "low_stock_level": typed("integer", "The low-stock level."),
+    }},
+    "locations": {"type": "array", "items": ref("ProductStockLocationInput"), "description": "Stock per location, with rows in the form [Set a product's stock](" + SET_STOCK_PAGE + ") takes."},
+    "note": typed("string", "The note to record on the adjustment."),
+    "transaction_no": typed("string", "The transaction number to record on the adjustment."),
+}}
+
+SCHEMAS["ProductStockPatchResult"] = {"type": "object", "properties": {
+    "stock": ref("ProductStockSummary"),
+    "adjustment": {"oneOf": [ref("ProductStockAdjustment"), {"type": "null"}], "description": "The change the store recorded, or `null` when the stock figure did not change."},
+}}
+
+SCHEMAS["ProductStockAdjustmentPage"] = {"type": "object", "properties": {
+    "adjustments": array_of("ProductStockAdjustment", "The adjustments on this page, newest first."),
+    "pagination": ref("ProductPagination"),
 }}

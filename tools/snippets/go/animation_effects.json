@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "PatchAnimationEffectsSection",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().PatchAnimationEffectsSection(ctx, \"widget_transition\", map[string]any{\n\t\"widget_transition\": map[string]any{\"widget_smooth_render\": true},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ntransition := resp.Map().(map[string]any)[\"widget_transition\"].(map[string]any)\nfmt.Println(transition[\"widget_smooth_render\"], transition[\"widget_smooth_render_duration\"])"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "UploadAnimationEffectsCustomLoader",
+      "code": "import (\n\t\"fmt\"\n\t\"os\"\n)\n\ncontents, err := os.ReadFile(\"loader.png\")\nif err != nil {\n\tlog.Fatal(err)\n}\nresp, err := client.AnimationEffectsSettings().UploadAnimationEffectsCustomLoader(ctx, map[string]any{\n\t\"file\": []any{\"loader.png\", contents, \"image/png\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nloader := resp.Map().(map[string]any)[\"custom_loader\"].(map[string]any)\nfmt.Println(resp.StatusCode, loader[\"file_url\"])"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "DeleteAnimationEffectsCustomLoader",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AnimationEffectsSettings().DeleteAnimationEffectsCustomLoader(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     }
   }
 }

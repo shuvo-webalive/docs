@@ -33,6 +33,10 @@
     "bulk_delete_trash": {
       "function": "bulkDeleteTrash",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().bulkDeleteTrash(Map.of(\"items\", List.of(\n        Map.of(\"type\", \"Category\", \"id\", 1234), Map.of(\"type\", \"Category\", \"id\", 1229))));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(((List<?>) body.get(\"deleted\")).size());\nfor (Object row : (List<?>) body.get(\"failed\")) {\n    Map<?, ?> failure = (Map<?, ?>) row;\n    System.out.println(failure.get(\"type\") + \" \" + failure.get(\"id\") + \" \" + failure.get(\"code\") + \" \" + failure.get(\"message\"));\n}"
+    },
+    "get_trash_item_external_links": {
+      "function": "getTrashItemExternalLinks",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.trash().getTrashItemExternalLinks(\"product\", 101);\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nSystem.out.println(body.get(\"type\") + \" \" + body.get(\"id\"));\nfor (Object row : (List<?>) body.get(\"links\")) {\n    Map<?, ?> link = (Map<?, ?>) row;\n    System.out.println(link.get(\"system\") + \" \" + link.get(\"entity\") + \" \" + link.get(\"name\") + \" \" + link.get(\"reason\"));\n}"
     }
   }
 }

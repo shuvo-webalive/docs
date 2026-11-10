@@ -4,11 +4,11 @@
   "endpoints": {
     "get_shipping_settings": {
       "function": "GetShippingSettingsAsync",
-      "code": "var response = await client.ShippingSettings.GetShippingSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine($\"{shippingSettings[\"enable_shipping_default_tax\"]} {shippingSettings[\"enable_shipping_class\"]}\");"
+      "code": "var response = await client.ShippingSettings.GetShippingSettingsAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine($\"{shippingSettings[\"apply_store_tax_settings_to_shipping\"]} {shippingSettings[\"enable_shipping_class\"]}\");"
     },
     "patch_shipping_settings": {
       "function": "PatchShippingSettingsAsync",
-      "code": "var response = await client.ShippingSettings.PatchShippingSettingsAsync(new Dictionary<string, object?>\n{\n    [\"shipping_settings\"] = new Dictionary<string, object?> { [\"enable_shipping_default_tax\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine(shippingSettings[\"enable_shipping_default_tax\"]);"
+      "code": "var response = await client.ShippingSettings.PatchShippingSettingsAsync(new Dictionary<string, object?>\n{\n    [\"shipping_settings\"] = new Dictionary<string, object?> { [\"apply_store_tax_settings_to_shipping\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingSettings = (IReadOnlyDictionary<string, object?>)body[\"shipping_settings\"]!;\nConsole.WriteLine(shippingSettings[\"apply_store_tax_settings_to_shipping\"]);"
     },
     "head_shipping_settings": {
       "function": "HeadShippingSettingsAsync",

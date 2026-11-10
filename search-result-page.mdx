@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "Read and change how your store's search result page shows products, and create, change and delete its product promotions."
 ---
 
-The Search result page API has thirteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/page_settings/search_result_page`.
+The Search result page API has fourteen endpoints, and you can call every one from all seven SDKs. Thirteen of them start with `/api/v4/admin/settings/page_settings/search_result_page`. The other, Reindex search, uses `/api/v4/admin/search/reindex`.
 
 <Warning>
   A section read and a section write use different wrappers. `GET /search_result_page/{section}`
@@ -32,6 +32,7 @@ The Search result page API has thirteen endpoints, and you can call every one fr
 | [Update a product promotion](/api-reference/search-result-page/update-a-product-promotion) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_result_page/product_promotion/{promotion_id}` | Changes the promotion fields you send and returns the whole promotion. |
 | [Turn a product promotion on or off](/api-reference/search-result-page/turn-a-product-promotion-on-or-off) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/search_result_page/product_promotion/{promotion_id}/active` | Turns a product promotion on or off and returns the whole promotion. |
 | [Delete a product promotion](/api-reference/search-result-page/delete-a-product-promotion) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/search_result_page/product_promotion/{promotion_id}` | Deletes a product promotion permanently and returns `204` with no body. |
+| [Reindex search](/api-reference/search-result-page/reindex-search) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/admin/search/reindex` | Starts a rebuild of your store's search index and returns `202` with `status` set to `accepted`. |
 
 ## Before you call
 

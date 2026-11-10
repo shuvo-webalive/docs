@@ -33,6 +33,10 @@
     "bulk_delete_trash": {
       "function": "bulkDeleteTrash",
       "code": "const response = await client.trash.bulkDeleteTrash({\n    items: [{type: 'Category', id: 1234}, {type: 'Category', id: 1229}],\n});\nfor (const item of response.map.deleted) {\n    console.log(item.type, item.id, item.name);\n}\nfor (const failure of response.map.failed) {\n    console.log(failure.type, failure.id, failure.code, failure.message);\n}\n"
+    },
+    "get_trash_item_external_links": {
+      "function": "getTrashItemExternalLinks",
+      "code": "const response = await client.trash.getTrashItemExternalLinks('product', 101);\nconsole.log(response.map.type, response.map.id);\nfor (const link of response.map.links) {\n    console.log(link.system, link.entity, link.name, link.external_id, link.reason);\n}\n"
     }
   }
 }

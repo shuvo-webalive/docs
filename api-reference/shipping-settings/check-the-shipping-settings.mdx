@@ -1,7 +1,7 @@
 ---
 title: "Check the shipping settings"
 description: "Checks that the shipping settings are reachable. Returns headers only, with no body."
-openapi: "HEAD /admin/settings/shipping_settings"
+openapi: "HEAD /admin/settings/shipping_settings/general"
 ---
 
 Returns `200` with headers only and no body. The headers include `Content-Length: 0`, and there is no `ETag`. Use it to check that the settings are reachable without downloading them.

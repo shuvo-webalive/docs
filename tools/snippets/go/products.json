@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "DeleteProductMediaImage",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().DeleteProductMediaImage(ctx, 101, 1876, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "update_product_media_order": {
+      "function": "UpdateProductMediaOrder",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().UpdateProductMediaOrder(ctx, 101, map[string]any{\"type\": \"images\", \"ids\": []any{1877, 1876}}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"images\"].([]any) {\n\timage := row.(map[string]any)\n\tfmt.Println(image[\"id\"], image[\"position\"], image[\"primary\"])\n}"
+    },
+    "patch_product_media_image": {
+      "function": "PatchProductMediaImage",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().PatchProductMediaImage(ctx, 101, 1877, map[string]any{\"position\": 1}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfmt.Println(body[\"id\"], body[\"position\"], body[\"primary\"])"
+    },
+    "get_product_seo": {
+      "function": "GetProductSeo",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().GetProductSeo(ctx, 101, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nseo := resp.Map().(map[string]any)[\"seo\"].(map[string]any)\nfmt.Println(seo[\"url_handle\"], seo[\"title\"], seo[\"description\"])"
+    },
+    "patch_product_stock": {
+      "function": "PatchProductStock",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().PatchProductStock(ctx, 101, map[string]any{\n\t\"tracking\": map[string]any{\"enabled\": true, \"available_stock\": 40},\n\t\"note\":     \"Restock\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\ntracking := body[\"stock\"].(map[string]any)[\"tracking\"].(map[string]any)\nfmt.Println(tracking[\"available_stock\"], body[\"adjustment\"])"
+    },
+    "list_product_stock_adjustments": {
+      "function": "ListProductStockAdjustments",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Products().ListProductStockAdjustments(ctx, 101, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nbody := resp.Map().(map[string]any)\nfor _, row := range body[\"adjustments\"].([]any) {\n\tadjustment := row.(map[string]any)\n\tfmt.Println(adjustment[\"id\"], adjustment[\"delta\"], adjustment[\"note\"], adjustment[\"transaction_no\"])\n}\npagination := body[\"pagination\"].(map[string]any)\nfmt.Println(pagination[\"has_next\"])"
     }
   }
 }

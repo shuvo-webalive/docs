@@ -12,7 +12,7 @@ SECTIONS = ["preloader_design", "widget_transition", "page_transition", "image_l
 GET_PAGE = "/api-reference/animation-effects/get-animation-effects-settings"
 
 OVERVIEW_DESCRIPTION = "Read and change your store's page preloader, widget and page transitions, image lazy loading and checkout page skeleton."
-INTRO = "The Animation effects API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/animation_effects`."
+INTRO = "The Animation effects API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/settings/animation_effects`."
 
 WARNING = (
     "Every write body must be wrapped in a key, and the key depends on the path. On `/animation_effects`,\n"
@@ -50,6 +50,10 @@ NOTES = [
     "  `400 invalid_request`. `custom_loader` is in every read but cannot be written: a body that names only\n"
     "  `custom_loader` is rejected with `400 invalid_request` and the message\n"
     "  `no recognized animation_effects fields in body`.",
+    "**The custom loader has its own path.** [Upload a custom loader](/api-reference/animation-effects/upload-a-custom-loader) and\n"
+    "  [Delete the custom loader](/api-reference/animation-effects/delete-the-custom-loader) use\n"
+    "  `/animation_effects/custom_loader`, not a settings section. Upload takes a multipart part, not a\n"
+    "  JSON body, so the wrapper rules above do not apply to it.",
     "**Animation effects writes have their own rate limit.** If you send eleven writes with no pause,\n"
     "  within about 0.8 seconds, the eleventh is rejected with `429` and a `Retry-After` header that counts\n"
     "  down the time left before writes are accepted again. It is separate from the page settings limit:\n"
@@ -288,6 +292,39 @@ ENDPOINTS = [
             "429": RATE_LIMITED,
         },
         "example_call": {"path": {"section": "widget_transition"}},
+    },
+    {
+        "key": "upload_animation_effects_custom_loader",
+        "slug": "upload-a-custom-loader",
+        "title": "Upload a custom loader",
+        "method": "POST",
+        "path": BASE + "/custom_loader",
+        "summary": "Uploads your own loader image and returns `custom_loader` with `enabled` set to `true`.",
+        "description": "Upload one image in a multipart part named exactly `file`. The file must be an `svg`, `png`, `jpg`, `jpeg` or `gif`. Returns `201` with the stored loader under `custom_loader`: `enabled`, `file_name` and `file_url`. `preloader_design.custom_loader` then reads the same values.",
+        "multipart": True,
+        "body": {"schema": {"type": "object", "required": ["file"], "properties": {"file": {"type": "string", "format": "binary", "description": "The loader image: `svg`, `png`, `jpg`, `jpeg` or `gif`."}}}},
+        "responses": {
+            "201": {
+                "description": "The stored loader.",
+                "schema": {"type": "object", "properties": {"custom_loader": ref("CustomLoader")}},
+                "example": {"custom_loader": {"enabled": True, "file_name": "loader.png", "file_url": "https://your-store.example.com/loader.png"}},
+            },
+            "400": {"description": "The file is not one of the accepted types: the code is `invalid_file`. Or the request has no file.", "schema": ERROR},
+        },
+        "example_call": {},
+    },
+    {
+        "key": "delete_animation_effects_custom_loader",
+        "slug": "delete-the-custom-loader",
+        "title": "Delete the custom loader",
+        "method": "DELETE",
+        "path": BASE + "/custom_loader",
+        "summary": "Removes your uploaded loader image and returns `204` with no body.",
+        "description": "Removes the uploaded loader image and returns `204` with no body. It also returns `204` when no loader was uploaded. Afterwards `preloader_design.custom_loader` reads `enabled: false`, with `null` for `file_name` and `file_url`.",
+        "responses": {
+            "204": {"description": "Removed, or there was no loader to remove. No body."},
+        },
+        "example_call": {},
     },
 ]
 

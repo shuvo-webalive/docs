@@ -8,7 +8,7 @@
     },
     "patch_shipping_settings": {
       "function": "patchShippingSettings",
-      "code": "use WebCommander\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$response = ShippingSettings::patchShippingSettings($client, [\n    'shipping_settings' => ['enable_shipping_default_tax' => true],\n]);\n\necho $response->map['shipping_settings']['enable_shipping_default_tax'] ? 'true' : 'false', PHP_EOL;"
+      "code": "use WebCommander\\Resources\\Settings\\ShippingSettings\\ShippingSettings;\n\n$response = ShippingSettings::patchShippingSettings($client, [\n    'shipping_settings' => ['apply_store_tax_settings_to_shipping' => true],\n]);\n\necho $response->map['shipping_settings']['apply_store_tax_settings_to_shipping'] ? 'true' : 'false', PHP_EOL;"
     },
     "head_shipping_settings": {
       "function": "headShippingSettings",

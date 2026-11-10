@@ -57,6 +57,14 @@
     "delete_product_variation": {
       "function": "DeleteProductVariation",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().DeleteProductVariation(ctx, 4321, 91, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "patch_product_variation": {
+      "function": "PatchProductVariation",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().PatchProductVariation(ctx, 4321, 91, map[string]any{\"available\": false, \"barcode\": \"9310000000014\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nvariation := resp.Map().(map[string]any)[\"variation\"].(map[string]any)\nfmt.Println(variation[\"variation_id\"], variation[\"sku\"], variation[\"barcode\"])"
+    },
+    "delete_product_variations": {
+      "function": "DeleteProductVariations",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.Variations().DeleteProductVariations(ctx, 4321, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     }
   }
 }

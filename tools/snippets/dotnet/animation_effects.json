@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "PatchAnimationEffectsSectionAsync",
       "code": "var response = await client.AnimationEffects.PatchAnimationEffectsSectionAsync(\"widget_transition\", new Dictionary<string, object?>\n{\n    [\"widget_transition\"] = new Dictionary<string, object?> { [\"widget_smooth_render\"] = true },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar widgetTransition = (IReadOnlyDictionary<string, object?>)body[\"widget_transition\"]!;\nConsole.WriteLine(widgetTransition[\"widget_smooth_render\"]);"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "UploadAnimationEffectsCustomLoaderAsync",
+      "code": "var response = await client.AnimationEffects.UploadAnimationEffectsCustomLoaderAsync(new Dictionary<string, object?>\n{\n    [\"file\"] = new List<object?> { \"loader.png\", File.ReadAllBytes(\"loader.png\"), \"image/png\" },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar loader = (IReadOnlyDictionary<string, object?>)body[\"custom_loader\"]!;\nConsole.WriteLine($\"{response.StatusCode} {loader[\"file_url\"]}\");"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "DeleteAnimationEffectsCustomLoaderAsync",
+      "code": "var response = await client.AnimationEffects.DeleteAnimationEffectsCustomLoaderAsync();\nConsole.WriteLine(response.StatusCode);"
     }
   }
 }

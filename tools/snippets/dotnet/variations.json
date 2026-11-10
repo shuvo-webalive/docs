@@ -57,6 +57,14 @@
     "delete_product_variation": {
       "function": "DeleteProductVariationAsync",
       "code": "var response = await client.Variations.DeleteProductVariationAsync(4321, 91);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "patch_product_variation": {
+      "function": "PatchProductVariationAsync",
+      "code": "var response = await client.Variations.PatchProductVariationAsync(4321, 91, new Dictionary<string, object?>\n{\n    [\"available\"] = false, [\"barcode\"] = \"9310000000014\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar variation = (IReadOnlyDictionary<string, object?>)body[\"variation\"]!;\nConsole.WriteLine($\"{variation[\"variation_id\"]} {variation[\"sku\"]} {variation[\"barcode\"]}\");"
+    },
+    "delete_product_variations": {
+      "function": "DeleteProductVariationsAsync",
+      "code": "var response = await client.Variations.DeleteProductVariationsAsync(4321);\nConsole.WriteLine(response.StatusCode);"
     }
   }
 }

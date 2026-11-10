@@ -89,6 +89,26 @@
     "delete_product_media_image": {
       "function": "DeleteProductMediaImageAsync",
       "code": "var response = await client.Products.DeleteProductMediaImageAsync(101, 1876);\nConsole.WriteLine(response.StatusCode);"
+    },
+    "update_product_media_order": {
+      "function": "UpdateProductMediaOrderAsync",
+      "code": "var response = await client.Products.UpdateProductMediaOrderAsync(101, new Dictionary<string, object?>\n{\n    [\"type\"] = \"images\", [\"ids\"] = new object[] { 1877, 1876 },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var image in ((IReadOnlyList<object?>)body[\"images\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{image[\"id\"]} {image[\"position\"]} {image[\"primary\"]}\");"
+    },
+    "patch_product_media_image": {
+      "function": "PatchProductMediaImageAsync",
+      "code": "var response = await client.Products.PatchProductMediaImageAsync(101, 1877,\n    new Dictionary<string, object?> { [\"position\"] = 1 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nConsole.WriteLine($\"{body[\"id\"]} {body[\"position\"]} {body[\"primary\"]}\");"
+    },
+    "get_product_seo": {
+      "function": "GetProductSeoAsync",
+      "code": "var response = await client.Products.GetProductSeoAsync(101);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar seo = (IReadOnlyDictionary<string, object?>)body[\"seo\"]!;\nConsole.WriteLine($\"{seo[\"url_handle\"]} {seo[\"title\"]} {seo[\"description\"]}\");"
+    },
+    "patch_product_stock": {
+      "function": "PatchProductStockAsync",
+      "code": "var response = await client.Products.PatchProductStockAsync(101, new Dictionary<string, object?>\n{\n    [\"tracking\"] = new Dictionary<string, object?> { [\"enabled\"] = true, [\"available_stock\"] = 40 },\n    [\"note\"] = \"Restock\",\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar stock = (IReadOnlyDictionary<string, object?>)body[\"stock\"]!;\nvar tracking = (IReadOnlyDictionary<string, object?>)stock[\"tracking\"]!;\nConsole.WriteLine($\"{tracking[\"available_stock\"]} {body[\"adjustment\"]}\");"
+    },
+    "list_product_stock_adjustments": {
+      "function": "ListProductStockAdjustmentsAsync",
+      "code": "var response = await client.Products.ListProductStockAdjustmentsAsync(101,\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var adjustment in ((IReadOnlyList<object?>)body[\"adjustments\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{adjustment[\"id\"]} {adjustment[\"delta\"]} {adjustment[\"note\"]} {adjustment[\"transaction_no\"]}\");\nvar pagination = (IReadOnlyDictionary<string, object?>)body[\"pagination\"]!;\nConsole.WriteLine(pagination[\"has_next\"]);"
     }
   }
 }

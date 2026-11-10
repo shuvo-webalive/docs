@@ -1,7 +1,7 @@
 ---
 title: "Get shipping settings"
 description: "Returns all seven shipping settings, and `group_meta` saying whether you can write them."
-openapi: "GET /admin/settings/shipping_settings"
+openapi: "GET /admin/settings/shipping_settings/general"
 ---
 
 Returns the seven shipping settings under `shipping_settings`, with `group_meta` beside them. The three profile fields each hold the profile's `{id, name}` record or `null`, and the other four are `true` or `false`. Send `field_metadata=true` to also get a description of each field, keyed by field name. The response has no `ETag` header.

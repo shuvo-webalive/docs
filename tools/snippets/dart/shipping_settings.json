@@ -8,7 +8,7 @@
     },
     "patch_shipping_settings": {
       "function": "patchShippingSettings",
-      "code": "final response = await client.shippingSettings.patchShippingSettings({\n  'shipping_settings': {'enable_shipping_default_tax': true},\n});\nfinal shippingSettings = (response.map as Map)['shipping_settings'] as Map;\nprint(shippingSettings['enable_shipping_default_tax']);"
+      "code": "final response = await client.shippingSettings.patchShippingSettings({\n  'shipping_settings': {'apply_store_tax_settings_to_shipping': true},\n});\nfinal shippingSettings = (response.map as Map)['shipping_settings'] as Map;\nprint(shippingSettings['apply_store_tax_settings_to_shipping']);"
     },
     "head_shipping_settings": {
       "function": "headShippingSettings",

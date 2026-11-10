@@ -21,6 +21,14 @@
     "patch_animation_effects_section": {
       "function": "patchAnimationEffectsSection",
       "code": "use WebCommander\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::patchAnimationEffectsSection($client, 'widget_transition', [\n    'widget_transition' => ['widget_smooth_render' => true],\n]);\n\necho $response->map['widget_transition']['widget_smooth_render'] ? 'true' : 'false', PHP_EOL;"
+    },
+    "upload_animation_effects_custom_loader": {
+      "function": "uploadAnimationEffectsCustomLoader",
+      "code": "use WebCommander\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$handle = fopen('loader.png', 'rb');\n$response = AnimationEffects::uploadAnimationEffectsCustomLoader($client, ['file' => ['loader.png', $handle, 'image/png']]);\nfclose($handle);\n\necho $response->statusCode, ' ', $response->map['custom_loader']['file_url'], PHP_EOL;"
+    },
+    "delete_animation_effects_custom_loader": {
+      "function": "deleteAnimationEffectsCustomLoader",
+      "code": "use WebCommander\\Resources\\Settings\\AnimationEffects\\AnimationEffects;\n\n$response = AnimationEffects::deleteAnimationEffectsCustomLoader($client);\n\necho $response->statusCode, PHP_EOL;"
     }
   }
 }

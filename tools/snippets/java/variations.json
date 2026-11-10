@@ -57,6 +57,14 @@
     "delete_product_variation": {
       "function": "deleteProductVariation",
       "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.variations().deleteProductVariation(4321, 91);\nSystem.out.println(response.getStatusCode());"
+    },
+    "patch_product_variation": {
+      "function": "patchProductVariation",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.variations().patchProductVariation(4321, 91,\n        Map.of(\"available\", false, \"barcode\", \"9310000000014\"));\nMap<?, ?> variation = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"variation\");\nSystem.out.println(variation.get(\"variation_id\") + \" \" + variation.get(\"sku\") + \" \" + variation.get(\"barcode\"));"
+    },
+    "delete_product_variations": {
+      "function": "deleteProductVariations",
+      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.variations().deleteProductVariations(4321);\nSystem.out.println(response.getStatusCode());"
     }
   }
 }

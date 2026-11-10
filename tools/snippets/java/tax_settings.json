@@ -4,11 +4,15 @@
   "endpoints": {
     "get_tax_settings": {
       "function": "getTaxSettings",
-      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().getTaxSettings();\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"default_country\") + \" \" + taxSettings.get(\"default_tax_code\"));\nSystem.out.println(taxSettings.get(\"tax_message\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().getTaxSettings();\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_rate_for_customers\") + \" \" + taxSettings.get(\"prices_in_catalog\"));\nSystem.out.println(taxSettings.get(\"tax_message\"));"
     },
     "put_tax_settings": {
       "function": "putTaxSettings",
-      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().putTaxSettings(\n        Map.of(\"settings\", Map.of(\"tax_message\", \"All prices include GST\")));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_message\"));"
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().putTaxSettings(\n        Map.of(\"tax_settings\", Map.of(\"tax_message\", \"All prices include GST\")));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"tax_message\"));"
+    },
+    "patch_tax_settings": {
+      "function": "patchTaxSettings",
+      "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxSettings().patchTaxSettings(\n        Map.of(\"tax_settings\", Map.of(\"is_price_shown_with_tax\", true)));\nMap<?, ?> taxSettings = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_settings\");\nSystem.out.println(taxSettings.get(\"is_price_shown_with_tax\"));"
     }
   }
 }

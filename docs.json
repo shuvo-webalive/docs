@@ -143,7 +143,8 @@
                   "api-reference/search-result-page/get-a-product-promotion-headers",
                   "api-reference/search-result-page/update-a-product-promotion",
                   "api-reference/search-result-page/turn-a-product-promotion-on-or-off",
-                  "api-reference/search-result-page/delete-a-product-promotion"
+                  "api-reference/search-result-page/delete-a-product-promotion",
+                  "api-reference/search-result-page/reindex-search"
                 ]
               },
               {
@@ -174,7 +175,9 @@
                   "api-reference/animation-effects/update-animation-effects-settings",
                   "api-reference/animation-effects/get-animation-effects-settings-headers",
                   "api-reference/animation-effects/get-a-settings-section",
-                  "api-reference/animation-effects/update-a-settings-section"
+                  "api-reference/animation-effects/update-a-settings-section",
+                  "api-reference/animation-effects/upload-a-custom-loader",
+                  "api-reference/animation-effects/delete-the-custom-loader"
                 ]
               },
               {
@@ -456,7 +459,8 @@
                 "pages": [
                   "tax-settings",
                   "api-reference/tax-settings/get-tax-settings",
-                  "api-reference/tax-settings/update-tax-settings"
+                  "api-reference/tax-settings/update-tax-settings",
+                  "api-reference/tax-settings/patch-tax-settings"
                 ]
               },
               {
@@ -774,7 +778,12 @@
                   "api-reference/products/update-a-products-inventory",
                   "api-reference/products/upload-images-to-a-product",
                   "api-reference/products/add-an-image-to-a-products-media",
-                  "api-reference/products/delete-a-products-image"
+                  "api-reference/products/delete-a-products-image",
+                  "api-reference/products/set-the-order-of-a-products-images",
+                  "api-reference/products/move-a-products-image",
+                  "api-reference/products/retrieve-a-products-seo-settings",
+                  "api-reference/products/change-a-products-stock",
+                  "api-reference/products/list-a-products-stock-adjustments"
                 ]
               },
               {
@@ -795,7 +804,9 @@
                   "api-reference/variations/import-a-products-variants",
                   "api-reference/variations/update-a-products-variants",
                   "api-reference/variations/retrieve-a-products-variant",
-                  "api-reference/variations/delete-a-products-variant"
+                  "api-reference/variations/delete-a-products-variant",
+                  "api-reference/variations/update-a-products-variant",
+                  "api-reference/variations/delete-all-of-a-products-variants"
                 ]
               }
             ]
@@ -892,7 +903,8 @@
               "api-reference/trash/restore-an-item-from-the-trash",
               "api-reference/trash/delete-an-item-permanently",
               "api-reference/trash/restore-items-in-bulk",
-              "api-reference/trash/delete-items-permanently-in-bulk"
+              "api-reference/trash/delete-items-permanently-in-bulk",
+              "api-reference/trash/list-the-external-links-of-an-item-in-the-trash"
             ]
           },
           {

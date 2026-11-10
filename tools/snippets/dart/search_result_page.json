@@ -53,6 +53,10 @@
     "delete_search_result_page_product_promotion": {
       "function": "deleteSearchResultPageProductPromotion",
       "code": "final response =\n    await client.searchResultPage.deleteSearchResultPageProductPromotion(6);\nprint(response.statusCode);"
+    },
+    "reindex_search": {
+      "function": "reindexSearch",
+      "code": "final response = await client.searchResultPage.reindexSearch();\nprint(response.statusCode);\nprint((response.map as Map)['status']);"
     }
   }
 }

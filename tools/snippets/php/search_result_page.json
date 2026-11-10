@@ -53,6 +53,10 @@
     "delete_search_result_page_product_promotion": {
       "function": "deleteSearchResultPageProductPromotion",
       "code": "use WebCommander\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::deleteSearchResultPageProductPromotion($client, 6);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "reindex_search": {
+      "function": "reindexSearch",
+      "code": "use WebCommander\\Resources\\Settings\\PageSettings\\SearchResultPage;\n\n$response = SearchResultPage::reindexSearch($client);\n\necho $response->statusCode, ' ', $response->map['status'], PHP_EOL;"
     }
   }
 }
