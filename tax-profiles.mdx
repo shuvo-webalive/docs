@@ -40,9 +40,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `name` is rejected with `500`, and so is one with an `id` field.
 - **At most one profile is the default, and you move the flag rather than clear it.** Send `default: true`
   in [Update a tax profile](/api-reference/tax-profiles/update-a-tax-profile) to make a profile the default. The profile that had the
-  flag loses it, and `default_tax_profile` in the [tax settings](/api-reference/tax-settings/get-tax-settings) changes to
-  this profile's `id`. `default: false` returns `200` and leaves the flag on. Deleting the default
-  profile leaves `default_tax_profile` holding the deleted profile's `id`.
+  flag loses it. `default: false` returns `200` and leaves the flag on. The default profile can be
+  deleted like any other.
 - **A listing returns at most 20 profiles per call.** A larger `limit` is capped at `20`, and
   `pagination.limit` shows `20`. To get every profile, step `offset` by the number of profiles each
   page returned until you reach `pagination.total`.

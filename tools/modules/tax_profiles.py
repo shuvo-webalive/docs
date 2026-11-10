@@ -28,9 +28,8 @@ NOTES = [
     "  `name` is rejected with `500`, and so is one with an `id` field.",
     "**At most one profile is the default, and you move the flag rather than clear it.** Send `default: true`\n"
     "  in [Update a tax profile](" + UPDATE_PAGE + ") to make a profile the default. The profile that had the\n"
-    "  flag loses it, and `default_tax_profile` in the [tax settings](" + TAX_SETTINGS_PAGE + ") changes to\n"
-    "  this profile's `id`. `default: false` returns `200` and leaves the flag on. Deleting the default\n"
-    "  profile leaves `default_tax_profile` holding the deleted profile's `id`.",
+    "  flag loses it. `default: false` returns `200` and leaves the flag on. The default profile can be\n"
+    "  deleted like any other.",
     "**A listing returns at most 20 profiles per call.** A larger `limit` is capped at `20`, and\n"
     "  `pagination.limit` shows `20`. To get every profile, step `offset` by the number of profiles each\n"
     "  page returned until you reach `pagination.total`.",
@@ -187,7 +186,7 @@ ENDPOINTS = [
         "method": "PUT",
         "path": BASE + "/{tax_profile_id}",
         "summary": "Changes the fields you send and returns the updated tax profile.",
-        "description": "Changes the fields you send, wrapped in `tax_profile`, and returns the whole tax profile. A field you leave out keeps its value. Sending `default: true` makes this profile the default, takes the flag from the profile that had it, and sets `default_tax_profile` in the tax settings to this profile's `id`. Sending `default: false` returns `200` and leaves the flag on, so to move the default, set it on another profile.",
+        "description": "Changes the fields you send, wrapped in `tax_profile`, and returns the whole tax profile. A field you leave out keeps its value. Sending `default: true` makes this profile the default, and takes the flag from the profile that had it. Sending `default: false` returns `200` and leaves the flag on, so to move the default, set it on another profile.",
         "parameters": [TAX_PROFILE_ID],
         "body": {"schema": WRITE_BODY, "example": {"tax_profile": {"name": "Wholesale AU"}}},
         "responses": {
@@ -207,7 +206,7 @@ ENDPOINTS = [
         "method": "DELETE",
         "path": BASE + "/{tax_profile_id}",
         "summary": "Deletes a tax profile permanently. The default profile can be deleted too.",
-        "description": "Deletes the tax profile permanently and returns `204` with no body. Retrieving it afterwards returns `404` with `Profile not found`. The default profile is deleted like any other, and `default_tax_profile` in the tax settings then still holds the deleted profile's `id`. To keep a default, first make another profile the default with [Update a tax profile](" + UPDATE_PAGE + ").",
+        "description": "Deletes the tax profile permanently and returns `204` with no body. Retrieving it afterwards returns `404` with `Profile not found`. The default profile is deleted like any other. To keep a default, first make another profile the default with [Update a tax profile](" + UPDATE_PAGE + ").",
         "parameters": [TAX_PROFILE_ID],
         "responses": {
             "204": {"description": "Deleted. No body."},
