@@ -6,4 +6,4 @@ openapi: "POST /admin/search/reindex"
 
 Starts a rebuild of the search index for the whole store. Send no body. Returns `202` with `status`, `clean` and `message`. To read how the run is going, call [Get the reindex status](/api-reference/search-settings/get-the-reindex-status).
 
-<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token (New)](/api-reference/authentication/get-an-access-token-new), or from [Get an access token (Legacy)](/api-reference/authentication/get-an-access-token) if your store signs in with a redirect URI and an auth string.</Note>

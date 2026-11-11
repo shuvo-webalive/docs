@@ -1,8 +1,12 @@
 ---
-title: "Get an access token"
-description: "Exchange your store's credentials for the token every other call needs."
+title: "Get an access token (Legacy)"
+description: "Exchange your store's credentials, including the redirect URI and auth string, for a token."
 openapi: "POST /oauth2/token"
 ---
+
+This is the legacy sign-in, for a store that still uses a redirect URI and an auth string. New API
+applications use [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).
+See [Authentication (Legacy)](/authentication-legacy) for the full flow.
 
 Every call to the API needs an access token. Request one here with your store's credentials, then send
 it as `Authorization: Bearer ACCESS_TOKEN`. The SDKs make this call for you, so you only need it for

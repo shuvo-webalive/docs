@@ -1,0 +1,252 @@
+<CodeGroup>
+```python Python
+import os
+
+from webcommander import AuthConfig, SdkConfig, build_client, register_instances
+
+register_instances([
+    SdkConfig(
+        AuthConfig(
+            client_name="default",
+            base_url=os.environ["WC_BASE_URL"],
+            client_id=os.environ["WC_CLIENT_ID"],
+            client_secret=os.environ["WC_CLIENT_SECRET"],
+            auth_base_url=os.environ["WC_AUTH_BASE_URL"],
+        ),
+        raise_on_error=True,
+    ),
+    SdkConfig(
+        AuthConfig(
+            client_name="legacy",
+            base_url=os.environ["WC_LEGACY_BASE_URL"],
+            client_id=os.environ["WC_LEGACY_CLIENT_ID"],
+            client_secret=os.environ["WC_LEGACY_CLIENT_SECRET"],
+            redirect_uri=os.environ["WC_LEGACY_REDIRECT_URI"],
+            auth_string=os.environ["WC_LEGACY_AUTH_STRING"],
+        ),
+        raise_on_error=True,
+    ),
+])
+
+client = build_client()
+legacy_client = build_client(instance="legacy")
+```
+
+```javascript JavaScript
+import {AuthConfig, SdkConfig, buildClient, registerInstances} from '@webcommander/webcommander';
+
+registerInstances([
+    new SdkConfig(
+        new AuthConfig({
+            clientName: 'default',
+            baseUrl: process.env.WC_BASE_URL,
+            clientId: process.env.WC_CLIENT_ID,
+            clientSecret: process.env.WC_CLIENT_SECRET,
+            authBaseUrl: process.env.WC_AUTH_BASE_URL,
+        }),
+        {raiseOnError: true},
+    ),
+    new SdkConfig(
+        new AuthConfig({
+            clientName: 'legacy',
+            grantType: 'client_credentials',
+            baseUrl: process.env.WC_LEGACY_BASE_URL,
+            clientId: process.env.WC_LEGACY_CLIENT_ID,
+            clientSecret: process.env.WC_LEGACY_CLIENT_SECRET,
+            redirectUri: process.env.WC_LEGACY_REDIRECT_URI,
+            authString: process.env.WC_LEGACY_AUTH_STRING,
+        }),
+        {raiseOnError: true},
+    ),
+]);
+
+const client = await buildClient();
+const legacyClient = await buildClient('legacy');
+```
+
+```php PHP
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use WebCommander\Client\ClientRegistry;
+use WebCommander\Config\AuthConfig;
+use WebCommander\Config\SdkConfig;
+
+$auth = new AuthConfig(
+    baseUrl: (string) getenv('WC_BASE_URL'),
+    clientId: (string) getenv('WC_CLIENT_ID'),
+    clientSecret: (string) getenv('WC_CLIENT_SECRET'),
+    clientName: 'default',
+    grantType: 'client_credentials',
+    authBaseUrl: (string) getenv('WC_AUTH_BASE_URL'),
+);
+$legacyAuth = new AuthConfig(
+    baseUrl: (string) getenv('WC_LEGACY_BASE_URL'),
+    clientId: (string) getenv('WC_LEGACY_CLIENT_ID'),
+    clientSecret: (string) getenv('WC_LEGACY_CLIENT_SECRET'),
+    redirectUri: (string) getenv('WC_LEGACY_REDIRECT_URI'),
+    authString: (string) getenv('WC_LEGACY_AUTH_STRING'),
+    clientName: 'legacy',
+    grantType: 'client_credentials',
+);
+
+ClientRegistry::registerInstances([
+    new SdkConfig($auth, raiseOnError: true),
+    new SdkConfig($legacyAuth, raiseOnError: true),
+]);
+
+$client = ClientRegistry::buildClient();
+$legacyClient = ClientRegistry::buildClient('legacy');
+```
+
+```java Java
+import com.webcommander.client.ClientRegistry;
+import com.webcommander.client.WebCommanderClient;
+import com.webcommander.config.AuthConfig;
+import com.webcommander.config.SdkConfig;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        AuthConfig auth = AuthConfig.builder()
+                .baseUrl(System.getenv("WC_BASE_URL"))
+                .clientId(System.getenv("WC_CLIENT_ID"))
+                .clientSecret(System.getenv("WC_CLIENT_SECRET"))
+                .authBaseUrl(System.getenv("WC_AUTH_BASE_URL"))
+                .clientName("default")
+                .build();
+        AuthConfig legacyAuth = AuthConfig.builder()
+                .baseUrl(System.getenv("WC_LEGACY_BASE_URL"))
+                .clientId(System.getenv("WC_LEGACY_CLIENT_ID"))
+                .clientSecret(System.getenv("WC_LEGACY_CLIENT_SECRET"))
+                .redirectUri(System.getenv("WC_LEGACY_REDIRECT_URI"))
+                .authString(System.getenv("WC_LEGACY_AUTH_STRING"))
+                .clientName("legacy")
+                .build();
+        ClientRegistry.registerInstances(List.of(
+                SdkConfig.builder(auth).raiseOnError(true).build(),
+                SdkConfig.builder(legacyAuth).raiseOnError(true).build()));
+
+        WebCommanderClient client = ClientRegistry.buildClient();
+        WebCommanderClient legacyClient = ClientRegistry.buildClient("legacy");
+    }
+}
+```
+
+```csharp .NET
+using WebCommander.Client;
+using WebCommander.Config;
+
+var auth = new AuthConfig(
+    baseUrl: Environment.GetEnvironmentVariable("WC_BASE_URL")!,
+    clientId: Environment.GetEnvironmentVariable("WC_CLIENT_ID")!,
+    clientSecret: Environment.GetEnvironmentVariable("WC_CLIENT_SECRET")!,
+    clientName: "default",
+    authBaseUrl: Environment.GetEnvironmentVariable("WC_AUTH_BASE_URL"));
+var legacyAuth = new AuthConfig(
+    baseUrl: Environment.GetEnvironmentVariable("WC_LEGACY_BASE_URL")!,
+    clientId: Environment.GetEnvironmentVariable("WC_LEGACY_CLIENT_ID")!,
+    clientSecret: Environment.GetEnvironmentVariable("WC_LEGACY_CLIENT_SECRET")!,
+    redirectUri: Environment.GetEnvironmentVariable("WC_LEGACY_REDIRECT_URI")!,
+    authString: Environment.GetEnvironmentVariable("WC_LEGACY_AUTH_STRING")!,
+    clientName: "legacy");
+
+ClientRegistry.RegisterInstances([
+    new SdkConfig(auth, raiseOnError: true),
+    new SdkConfig(legacyAuth, raiseOnError: true),
+]);
+
+await using var client = WebCommanderClient.BuildClient();
+await using var legacyClient = WebCommanderClient.BuildClient("legacy");
+```
+
+```dart Dart
+import 'dart:io';
+
+import 'package:webcommander/webcommander.dart';
+
+Future<void> main() async {
+  final env = Platform.environment;
+  ClientRegistry.registerInstances([
+    SdkConfig(
+      AuthConfig(
+        clientName: 'default',
+        baseUrl: env['WC_BASE_URL']!,
+        clientId: env['WC_CLIENT_ID']!,
+        clientSecret: env['WC_CLIENT_SECRET']!,
+        authBaseUrl: env['WC_AUTH_BASE_URL']!,
+      ),
+      raiseOnError: true,
+    ),
+    SdkConfig(
+      AuthConfig(
+        clientName: 'legacy',
+        baseUrl: env['WC_LEGACY_BASE_URL']!,
+        clientId: env['WC_LEGACY_CLIENT_ID']!,
+        clientSecret: env['WC_LEGACY_CLIENT_SECRET']!,
+        redirectUri: env['WC_LEGACY_REDIRECT_URI']!,
+        authString: env['WC_LEGACY_AUTH_STRING']!,
+      ),
+      raiseOnError: true,
+    ),
+  ]);
+
+  final client = buildClient();
+  final legacyClient = buildClient(instance: 'legacy');
+}
+```
+
+```go Go
+package main
+
+import (
+	"log"
+	"os"
+
+	wc "github.com/WebCommanderCMS/webcommander-sdk-go/v4"
+)
+
+func main() {
+	err := wc.RegisterInstances(
+		wc.SdkConfig{
+			Auth: wc.AuthConfig{
+				ClientName:   "default",
+				BaseURL:      os.Getenv("WC_BASE_URL"),
+				ClientID:     os.Getenv("WC_CLIENT_ID"),
+				ClientSecret: os.Getenv("WC_CLIENT_SECRET"),
+				AuthBaseURL:  os.Getenv("WC_AUTH_BASE_URL"),
+			},
+			RaiseOnError: true,
+		},
+		wc.SdkConfig{
+			Auth: wc.AuthConfig{
+				ClientName:   "legacy",
+				BaseURL:      os.Getenv("WC_LEGACY_BASE_URL"),
+				ClientID:     os.Getenv("WC_LEGACY_CLIENT_ID"),
+				ClientSecret: os.Getenv("WC_LEGACY_CLIENT_SECRET"),
+				RedirectURI:  os.Getenv("WC_LEGACY_REDIRECT_URI"),
+				AuthString:   os.Getenv("WC_LEGACY_AUTH_STRING"),
+			},
+			RaiseOnError: true,
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client, err := wc.BuildClient(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	legacyClient, err := wc.BuildClient("legacy")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer legacyClient.Close()
+}
+```
+
+</CodeGroup>

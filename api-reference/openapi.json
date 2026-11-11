@@ -194,6 +194,108 @@
     }
   ],
   "paths": {
+    "/oauth/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get an access token (New)",
+        "operationId": "get_access_token_new",
+        "description": "Exchanges your API application's client ID and client secret for an access token, or exchanges a refresh token for a new one. Send the request as form data, not JSON. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call, which go to your store, not to this address. The SDKs make this call for you and renew the token before it expires.",
+        "servers": [
+          {
+            "url": "https://manage-hykmah-api.exsited.com/api/v1"
+          }
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "grant_type",
+                  "client_id",
+                  "client_secret"
+                ],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": [
+                      "client_credentials",
+                      "refresh_token"
+                    ],
+                    "description": "Choose `client_credentials` to get a token, or `refresh_token` to renew one."
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Your API application's client ID."
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "The secret paired with the client ID."
+                  },
+                  "refresh_token": {
+                    "type": "string",
+                    "description": "The `refresh_token` from an earlier response. Send it only when `grant_type` is `refresh_token`."
+                  }
+                }
+              },
+              "example": {
+                "grant_type": "client_credentials",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "description": "Always `Bearer`."
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Seconds until the token expires. Currently 3600."
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "description": "Exchanged for a new access token when this one expires."
+                    },
+                    "scope": {
+                      "type": "string",
+                      "description": "The access the token grants."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request was rejected. For example, the body was sent as JSON instead of form data."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl -X POST \"https://manage-hykmah-api.exsited.com/api/v1/oauth/token\" \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  --data-urlencode \"grant_type=client_credentials\" \\\n  --data-urlencode \"client_id=YOUR_CLIENT_ID\" \\\n  --data-urlencode \"client_secret=YOUR_CLIENT_SECRET\""
+          }
+        ]
+      }
+    },
     "/oauth2/token": {
       "post": {
         "tags": [
@@ -201,7 +303,7 @@
         ],
         "summary": "Get an access token",
         "operationId": "get_access_token",
-        "description": "Exchanges your store's credentials for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires.",
+        "description": "Legacy sign-in. Exchanges your store's credentials, including the redirect URI and auth string, for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires. Applications that use the new sign-in request their token from [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).",
         "security": [],
         "requestBody": {
           "required": true,
@@ -62507,7 +62609,7 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "An access token from `POST /api/v4/oauth2/token`. The SDKs get and renew it for you."
+        "description": "An access token from `POST /api/v1/oauth/token` on the Hykmah address (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."
       }
     },
     "schemas": {

@@ -1,0 +1,111 @@
+---
+title: "Authentication (Legacy)"
+description: "Give the client your store's credentials once; it gets, caches and renews the access token."
+---
+
+import ClientSetup from '/snippets/client-setup-legacy.mdx';
+import ClientBuild from '/snippets/client-build.mdx';
+
+Every call to the API must include an access token. The SDKs get that token for you from your store's
+credentials, cache it and renew it before it expires. With cURL, or any HTTP client, you request the
+token yourself and send it with each call.
+
+<Note>
+  This page covers the legacy sign-in, which gets the token from your store with a redirect URI and an
+  auth string. New API applications use [Authentication (New)](/authentication), which needs only a
+  client ID and a client secret.
+</Note>
+
+## Your credentials
+
+| Credential | What it is |
+| --- | --- |
+| Base URL | Your store's address, including `https://`. |
+| Client ID | Identifies your integration. |
+| Client secret | The secret paired with the client ID. |
+| Redirect URI | Sent with the token request. |
+| Auth string | Decides which user the token acts as. |
+
+<Warning>
+  The client secret and auth string give access to your store's data. Keep them in environment
+  variables or a secrets manager, never in source code.
+</Warning>
+
+## Set up a client
+
+Register your store's credentials once, when your app starts. These samples read them from
+environment variables named `WC_BASE_URL`, `WC_CLIENT_ID`, `WC_CLIENT_SECRET`, `WC_REDIRECT_URI` and
+`WC_AUTH_STRING`.
+
+<ClientSetup />
+
+Then get a client wherever you make calls. Every SDK sample in the API reference starts this
+way:
+
+<ClientBuild />
+
+The registration turns on the raise-on-error option (`raise_on_error=True` in Python) for every
+client you build, so a failed call raises an exception or throws an error instead of going
+unnoticed. A `200` whose body contains `"isSuccess": false` also counts as a failure: the API
+returns that for a URL it cannot route, such as `/api/v4/admin/customerz`.
+
+## What the SDKs handle
+
+<CardGroup cols={2}>
+  <Card title="Getting the token" icon="key">
+    On the first call, the SDK exchanges your credentials for an access token.
+  </Card>
+  <Card title="Caching and renewal" icon="rotate">
+    The SDK caches the token and renews it before it expires, trying the refresh token first.
+  </Card>
+  <Card title="An expired token" icon="clock-rotate-left">
+    If a call returns `401` because the token has expired, the SDK refreshes the token once and sends
+    the call again.
+  </Card>
+  <Card title="A real refusal" icon="ban">
+    Any other `401`, such as a wrong `old_password` when you change a password, is returned to you
+    and not retried, so a write is never sent twice.
+  </Card>
+</CardGroup>
+
+## Calling the API directly
+
+Request a token from `POST /api/v4/oauth2/token` on your store's base URL with a JSON body of
+`grant_type` (`client_credentials`), `client_id`, `client_secret`, `redirect_uri` and `auth_string`.
+The cURL tab under [Set up a client](#set-up-a-client) shows the full request. A successful request
+returns `201 Created` with these fields:
+
+| Field | Meaning |
+| --- | --- |
+| `access_token` | The token to send with each call. |
+| `expires_in` | Seconds until the token expires. |
+| `refresh_token` | Exchanged for a new access token when this one expires. |
+
+Send the access token in the `Authorization` header on every call:
+
+```bash
+curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+## Try it in the docs
+
+Every endpoint page has a **Try it** button that calls your store from this site.
+
+<Steps>
+  <Step title="Get a token">
+    Open [Get an access token (Legacy)](/api-reference/authentication/get-an-access-token), click
+    **Try it**, set `store` to your store's host name (without `https://`), choose `client_credentials`
+    for `grant_type`, fill in your credentials and click **Send**. Copy `access_token` from the
+    response.
+  </Step>
+  <Step title="Call an endpoint">
+    Open any endpoint, click **Try it**, set the same `store`, paste the token into
+    **Authorization**, and click **Send**.
+  </Step>
+</Steps>
+
+<Warning>
+  These calls run against your real store: creating, changing and deleting data is real. Requests
+  are sent through Mintlify's servers. Use test data, and never share your credentials.
+</Warning>

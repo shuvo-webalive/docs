@@ -24,6 +24,8 @@ SDKS = [
     ("dart", "dart", "Dart"),
     ("go", "go", "Go"),
 ]
+HYKMAH_URL = "https://manage-hykmah-api.exsited.com"
+GUIDE_PAGES = ["introduction", "installation", "api-credentials", "authentication", "authentication-legacy"]
 STORE_ADDRESS = re.compile(r"[a-z0-9-]+\.mywebcommander\.com", re.I)
 METHOD_COLOURS = {"GET": "#0f7b6c", "POST": "#2563eb", "PUT": "#b45309", "PATCH": "#7a5af8",
                   "DELETE": "#c2410c", "HEAD": "#475467"}
@@ -237,7 +239,7 @@ def token_operation():
         "tags": ["Authentication"],
         "summary": "Get an access token",
         "operationId": "get_access_token",
-        "description": "Exchanges your store's credentials for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires.",
+        "description": "Legacy sign-in. Exchanges your store's credentials, including the redirect URI and auth string, for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires. Applications that use the new sign-in request their token from [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).",
         "security": [],
         "requestBody": {"required": True, "content": {"application/json": {
             "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret", "redirect_uri", "auth_string"], "properties": {
@@ -261,11 +263,86 @@ def token_operation():
     }
 
 
+TOKEN_CURL_NEW = """curl -X POST "%s/api/v1/oauth/token" \\
+  -H "Content-Type: application/x-www-form-urlencoded" \\
+  --data-urlencode "grant_type=client_credentials" \\
+  --data-urlencode "client_id=YOUR_CLIENT_ID" \\
+  --data-urlencode "client_secret=YOUR_CLIENT_SECRET\"""" % HYKMAH_URL
+
+
+def token_operation_new():
+    return {
+        "tags": ["Authentication"],
+        "summary": "Get an access token (New)",
+        "operationId": "get_access_token_new",
+        "description": "Exchanges your API application's client ID and client secret for an access token, or exchanges a refresh token for a new one. Send the request as form data, not JSON. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call, which go to your store, not to this address. The SDKs make this call for you and renew the token before it expires.",
+        "servers": [{"url": HYKMAH_URL + "/api/v1"}],
+        "security": [],
+        "requestBody": {"required": True, "content": {"application/x-www-form-urlencoded": {
+            "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret"], "properties": {
+                "grant_type": {"type": "string", "enum": ["client_credentials", "refresh_token"], "description": "Choose `client_credentials` to get a token, or `refresh_token` to renew one."},
+                "client_id": {"type": "string", "description": "Your API application's client ID."},
+                "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
+                "refresh_token": {"type": "string", "description": "The `refresh_token` from an earlier response. Send it only when `grant_type` is `refresh_token`."},
+            }},
+            "example": {"grant_type": "client_credentials", "client_id": "YOUR_CLIENT_ID", "client_secret": "YOUR_CLIENT_SECRET"},
+        }}},
+        "responses": {
+            "200": {"description": "The access token.", "content": {"application/json": {"schema": {"type": "object", "properties": {
+                "access_token": {"type": "string", "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."},
+                "token_type": {"type": "string", "description": "Always `Bearer`."},
+                "expires_in": {"type": "integer", "description": "Seconds until the token expires. Currently 3600."},
+                "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires."},
+                "scope": {"type": "string", "description": "The access the token grants."},
+            }}}}},
+            "400": {"description": "The request was rejected. For example, the body was sent as JSON instead of form data."},
+        },
+        "x-codeSamples": [{"lang": "bash", "label": "cURL", "source": TOKEN_CURL_NEW}],
+    }
+
+
+TOKEN_PAGE_NEW = """---
+title: "Get an access token (New)"
+description: "Exchange your API application's client ID and client secret for the token every other call needs."
+openapi: "POST /oauth/token"
+---
+
+Every call to the API needs an access token. Request one here with your API application's client ID
+and client secret, then send it as `Authorization: Bearer ACCESS_TOKEN`. The request goes to
+`%s` and must be form data, not JSON. The SDKs make
+this call for you, so you only need it for cURL, another HTTP client, or to try the API on this site.
+To renew a token, send the same request with `grant_type` set to `refresh_token` and your
+`refresh_token`. See [Authentication (New)](/authentication) for the full flow.
+
+<Steps>
+  <Step title="Enter your credentials">
+    Click **Try it**, choose `client_credentials` for `grant_type`, and fill in your client ID and
+    client secret.
+  </Step>
+  <Step title="Send the request">
+    The response holds `access_token`.
+  </Step>
+  <Step title="Use the token">
+    On any other endpoint, click **Try it**, set `store` to your store's host name (without
+    `https://`), and paste the token into **Authorization**.
+  </Step>
+</Steps>
+
+<Warning>
+  Requests are sent through Mintlify's servers. Never share your client secret or a refresh token.
+</Warning>
+""" % HYKMAH_URL
+
+
 TOKEN_PAGE = """---
-title: "Get an access token"
-description: "Exchange your store's credentials for the token every other call needs."
+title: "Get an access token (Legacy)"
+description: "Exchange your store's credentials, including the redirect URI and auth string, for a token."
 openapi: "POST /oauth2/token"
 ---
+
+This is the legacy sign-in, for a store that still uses a redirect URI and an auth string. New API
+applications use [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).
+See [Authentication (Legacy)](/authentication-legacy) for the full flow.
 
 Every call to the API needs an access token. Request one here with your store's credentials, then send
 it as `Authorization: Bearer ACCESS_TOKEN`. The SDKs make this call for you, so you only need it for
@@ -291,6 +368,12 @@ cURL, another HTTP client, or to try the API on this site.
   Requests are sent through Mintlify's servers. Use test data, and never share your credentials.
 </Warning>
 """
+
+CURL_SETUP_NEW = """curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \\
+  -H "Content-Type: application/x-www-form-urlencoded" \\
+  --data-urlencode "grant_type=client_credentials" \\
+  --data-urlencode "client_id=$WC_CLIENT_ID" \\
+  --data-urlencode "client_secret=$WC_CLIENT_SECRET\""""
 
 CURL_SETUP = """curl -X POST "$WC_BASE_URL/api/v4/oauth2/token" \\
   -H "Content-Type: application/json" \\
@@ -325,7 +408,7 @@ def rename_refs(text, mapping):
 
 
 def spec(areas, snippets, setups, schemas, renames):
-    paths = {"/oauth2/token": {"post": token_operation()}}
+    paths = {"/oauth/token": {"post": token_operation_new()}, "/oauth2/token": {"post": token_operation()}}
     tags = [{"name": "Authentication"}]
     for area in areas:
         for module in area["modules"]:
@@ -345,7 +428,7 @@ def spec(areas, snippets, setups, schemas, renames):
         "tags": tags,
         "paths": paths,
         "components": {
-            "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from `POST /api/v4/oauth2/token`. The SDKs get and renew it for you."}},
+            "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from `POST /api/v1/oauth/token` on the Hykmah address (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."}},
             "schemas": schemas,
         },
     }
@@ -353,8 +436,9 @@ def spec(areas, snippets, setups, schemas, renames):
 
 def page(endpoint):
     note = ("The SDK samples get their client from credentials your app registers once when it starts, as shown in "
-            "[Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from "
-            "[Get an access token](/api-reference/authentication/get-an-access-token).")
+            "[Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from "
+            "[Get an access token (New)](/api-reference/authentication/get-an-access-token-new), or from "
+            "[Get an access token (Legacy)](/api-reference/authentication/get-an-access-token) if your store signs in with a redirect URI and an auth string.")
     if endpoint.get("body") and not endpoint.get("multipart"):
         note += " To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload."
     return "\n".join([
@@ -416,8 +500,9 @@ def overview(module):
         "",
         "## Before you call",
         "",
-        "Register your store's credentials once when your app starts, as shown in",
-        "[Authentication](/authentication). Every SDK sample on these pages then gets its client in one line.",
+        "Register your credentials once when your app starts, as shown in",
+        "[Authentication (New)](/authentication), or in [Authentication (Legacy)](/authentication-legacy) if your store",
+        "signs in with a redirect URI and an auth string. Every SDK sample on these pages then gets its client in one line.",
         "With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.",
         "",
     ]
@@ -432,7 +517,8 @@ def module_pages(module):
 
 def navigation(areas):
     groups = [{"group": "Authentication", "icon": "key", "expanded": False,
-               "pages": ["api-reference/authentication/get-an-access-token"]}]
+               "pages": ["api-reference/authentication/get-an-access-token-new",
+                         "api-reference/authentication/get-an-access-token"]}]
     for area in areas:
         modules = area["modules"]
         if len(modules) == 1 and modules[0].TAG == area["name"]:
@@ -448,10 +534,11 @@ def write_programs(target, areas, snippets, setups):
     own, one folder each. Samples leave out the registration, so an import it provides cannot hide a missing one."""
     count = 0
     for sdk, _, _ in SDKS:
-        folder = target / sdk / "authentication" / "register"
-        folder.mkdir(parents=True, exist_ok=True)
-        (folder / PROGRAM_FILES[sdk]).write_bytes(program(sdk, [setups[sdk]["register"]], complete=True).encode("utf-8"))
-        count += 1
+        for name, field in (("register_new", "register_hykmah"), ("register_legacy", "register"), ("register_both", "register_both")):
+            folder = target / sdk / "authentication" / name
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / PROGRAM_FILES[sdk]).write_bytes(program(sdk, [setups[sdk][field]], complete=True).encode("utf-8"))
+            count += 1
     for area in areas:
         for module in area["modules"]:
             for endpoint in module.ENDPOINTS:
@@ -512,14 +599,21 @@ def main():
             (DOCS / (module.SLUG + ".mdx")).write_text(overview(module), encoding="utf-8")
     (OUT / "authentication").mkdir(exist_ok=True)
     (OUT / "authentication" / "get-an-access-token.mdx").write_text(TOKEN_PAGE, encoding="utf-8")
+    (OUT / "authentication" / "get-an-access-token-new.mdx").write_text(TOKEN_PAGE_NEW, encoding="utf-8")
     (DOCS / "snippets").mkdir(exist_ok=True)
-    (DOCS / "snippets" / "client-setup.mdx").write_text(code_group(setups, "register", CURL_SETUP, complete=True), encoding="utf-8")
+    (DOCS / "snippets" / "client-setup.mdx").write_text(code_group(setups, "register_hykmah", CURL_SETUP_NEW, complete=True), encoding="utf-8")
+    (DOCS / "snippets" / "client-setup-legacy.mdx").write_text(code_group(setups, "register", CURL_SETUP, complete=True), encoding="utf-8")
+    (DOCS / "snippets" / "client-setup-both.mdx").write_text(code_group(setups, "register_both", complete=True), encoding="utf-8")
     (DOCS / "snippets" / "client-build.mdx").write_text(code_group(setups, "client"), encoding="utf-8")
 
     docs_json = json.loads((DOCS / "docs.json").read_text(encoding="utf-8"))
     for group in docs_json["navigation"]["groups"]:
         if group["group"] == "API reference":
             group["pages"] = navigation(areas)
+        elif group["group"] == "Guides":
+            for section in group["pages"]:
+                if isinstance(section, dict) and section.get("group") == "Get started":
+                    section["pages"] = list(GUIDE_PAGES)
     (DOCS / "docs.json").write_text(json.dumps(docs_json, indent=2) + "\n", encoding="utf-8")
 
     modules = sum(len(area["modules"]) for area in areas)

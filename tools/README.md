@@ -1,9 +1,10 @@
 # API reference generator
 
 Builds `api-reference/openapi.json`, every module's endpoint pages under `api-reference/<module>/`,
-each module's overview page (`<module>.mdx` at the docs root), `snippets/client-setup.mdx` and
-`snippets/client-build.mdx` (the registration and client line the Authentication page imports), and
-the **API reference** part of the `docs.json` navigation.
+each module's overview page (`<module>.mdx` at the docs root), `snippets/client-setup.mdx` (Hykmah registration), `snippets/client-setup-legacy.mdx`,
+`snippets/client-setup-both.mdx` and `snippets/client-build.mdx` (the registration and client line the
+Authentication pages import), the Get started pages and the **API reference** part of the `docs.json`
+navigation.
 This folder is listed in `.mintignore`, so it is never published.
 
 ```bash
@@ -16,7 +17,7 @@ python build_reference.py
 | `modules.json` | The areas and modules to publish, in sidebar order. Add a module here to publish it. |
 | `modules/<module>.py` | One module's facts: `TAG`, `SLUG`, `BASE`, overview text (`INTRO`, `WARNING`, `NOTES`), `ENDPOINTS` (paths, parameters, bodies, responses, plain-language wording, `example_call` for the cURL sample) and `SCHEMAS`. Written from the SDKs' `ENDPOINTS.md`, which records live-store measurements. |
 | `modules/customers_copy.json` | The reviewed plain-language wording for Customers, applied by `modules/customers.py`. |
-| `snippets/<sdk>/setup.json` | `register`: the credentials registration an app runs once at startup, shown only on the Authentication page. `client`: the line that gets a client from that registration, shown at the top of every sample. Raise-on-error is set in `register`. |
+| `snippets/<sdk>/setup.json` | `register_hykmah`: the registration for the new sign-in, shown on Authentication (New). `register`: the legacy store sign-in registration, shown on Authentication (Legacy). `register_both`: one app registering both. Each is run once at startup and shown only on the Authentication pages. `client`: the line that gets a client from that registration, shown at the top of every sample. Raise-on-error is set in `register`. |
 | `snippets/<sdk>/<module>.json` | One sample per endpoint: the call and any imports it needs. The build puts the `client` line in front and merges the imports. |
 | `build_reference.py` | Writes everything listed above. |
 

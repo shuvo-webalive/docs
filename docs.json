@@ -24,7 +24,9 @@
             "pages": [
               "introduction",
               "installation",
-              "authentication"
+              "api-credentials",
+              "authentication",
+              "authentication-legacy"
             ]
           }
         ]
@@ -37,6 +39,7 @@
             "icon": "key",
             "expanded": false,
             "pages": [
+              "api-reference/authentication/get-an-access-token-new",
               "api-reference/authentication/get-an-access-token"
             ]
           },

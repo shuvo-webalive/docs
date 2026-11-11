@@ -1,35 +1,54 @@
 ---
-title: "Authentication"
-description: "Give the client your store's credentials once; it gets, caches and renews the access token."
+title: "Authentication (New)"
+description: "Give the client your API application's credentials once; it gets, caches and renews the access token."
 ---
 
 import ClientSetup from '/snippets/client-setup.mdx';
+import ClientSetupBoth from '/snippets/client-setup-both.mdx';
 import ClientBuild from '/snippets/client-build.mdx';
 
-Every call to the API must include an access token. The SDKs get that token for you from your store's
-credentials, cache it and renew it before it expires. With cURL, or any HTTP client, you request the
-token yourself and send it with each call.
+Every call to the API must include an access token. With the new sign-in, you create an API
+application, and the SDKs get the token for you from its client ID and client secret, cache it and
+renew it before it expires. With cURL, or any HTTP client, you request the token yourself and send it
+with each call.
+
+<Note>
+  This page covers the new sign-in, which needs only a client ID and a client secret. If your store
+  still uses a redirect URI and an auth string, follow [Authentication (Legacy)](/authentication-legacy)
+  instead.
+</Note>
+
+The token request and the API calls go to two different addresses:
+
+| Request | Goes to |
+| --- | --- |
+| Get or renew the access token | The auth base URL, `https://manage-hykmah-api.exsited.com` |
+| Every API call | Your store's base URL |
 
 ## Your credentials
 
 | Credential | What it is |
 | --- | --- |
-| Base URL | Your store's address, including `https://`. |
-| Client ID | Identifies your integration. |
+| Base URL | Your store's address, including `https://`. Every API call goes here. |
+| Auth base URL | The address that issues access tokens: `https://manage-hykmah-api.exsited.com`. Only the token request goes here. |
+| Client ID | Identifies your API application. |
 | Client secret | The secret paired with the client ID. |
-| Redirect URI | Sent with the token request. |
-| Auth string | Decides which user the token acts as. |
+
+You get the client ID and client secret when you create an API application in the WebCommander admin.
+See [Create API credentials](/api-credentials) for the steps. There is no redirect URI and no auth
+string to configure.
 
 <Warning>
-  The client secret and auth string give access to your store's data. Keep them in environment
-  variables or a secrets manager, never in source code.
+  The client secret gives access to your store's data. Keep it in an environment variable or a secrets
+  manager, never in source code.
 </Warning>
 
 ## Set up a client
 
-Register your store's credentials once, when your app starts. These samples read them from
-environment variables named `WC_BASE_URL`, `WC_CLIENT_ID`, `WC_CLIENT_SECRET`, `WC_REDIRECT_URI` and
-`WC_AUTH_STRING`.
+Register your credentials once, when your app starts. These samples read them from environment
+variables named `WC_BASE_URL`, `WC_AUTH_BASE_URL`, `WC_CLIENT_ID` and `WC_CLIENT_SECRET`. The auth base
+URL is the one new option: set it to `https://manage-hykmah-api.exsited.com`. The cURL tab shows the
+token request itself, sent as form data.
 
 <ClientSetup />
 
@@ -43,11 +62,15 @@ client you build, so a failed call raises an exception or throws an error instea
 unnoticed. A `200` whose body contains `"isSuccess": false` also counts as a failure: the API
 returns that for a URL it cannot route, such as `/api/v4/admin/customerz`.
 
+The auth base URL option is named `auth_base_url` in Python, `authBaseUrl` in JavaScript, PHP, Java
+and Dart, `AuthBaseUrl` (a property, passed as `authBaseUrl:`) in .NET and `AuthBaseURL` in Go.
+
 ## What the SDKs handle
 
 <CardGroup cols={2}>
   <Card title="Getting the token" icon="key">
-    On the first call, the SDK exchanges your credentials for an access token.
+    On the first call, the SDK sends your client ID and client secret to the auth base URL and gets
+    an access token.
   </Card>
   <Card title="Caching and renewal" icon="rotate">
     The SDK caches the token and renews it before it expires, trying the refresh token first.
@@ -64,22 +87,63 @@ returns that for a URL it cannot route, such as `/api/v4/admin/customerz`.
 
 ## Calling the API directly
 
-Request a token from `POST /api/v4/oauth2/token` with a JSON body of `grant_type`
-(`client_credentials`), `client_id`, `client_secret`, `redirect_uri` and `auth_string`. The cURL tab
-under [Set up a client](#set-up-a-client) shows the full request. A successful request returns `201 Created` with these fields:
+Request a token from `POST /api/v1/oauth/token` on the auth base URL. Send the body as form data with
+the header `Content-Type: application/x-www-form-urlencoded`. A JSON body is rejected with `400`. The
+fields are:
+
+| Field | Value |
+| --- | --- |
+| `grant_type` | `client_credentials` |
+| `client_id` | Your client ID. |
+| `client_secret` | Your client secret. |
+
+The cURL tab under [Set up a client](#set-up-a-client) shows the full request. A successful request
+returns `200 OK` with these fields:
 
 | Field | Meaning |
 | --- | --- |
 | `access_token` | The token to send with each call. |
-| `expires_in` | Seconds until the token expires. |
+| `token_type` | Always `Bearer`. |
+| `expires_in` | Seconds until the token expires. Currently `3600`. |
 | `refresh_token` | Exchanged for a new access token when this one expires. |
+| `scope` | The access the token grants. |
 
-Send the access token in the `Authorization` header on every call:
+Send the access token in the `Authorization` header on every call. These calls go to your store's base
+URL, not to the auth base URL:
 
 ```bash
 curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
+
+### Renewing the token
+
+Before the token expires, exchange the refresh token for a new one. Send a form to the same URL with
+`grant_type` set to `refresh_token`, your `refresh_token`, and your client ID and client secret:
+
+```bash
+curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=$REFRESH_TOKEN" \
+  --data-urlencode "client_id=$WC_CLIENT_ID" \
+  --data-urlencode "client_secret=$WC_CLIENT_SECRET"
+```
+
+The response has the same fields as the first request. The SDKs do this for you.
+
+## Using both sign-ins in one app
+
+One app can talk to a store that uses the new sign-in and to a store that still uses the legacy one.
+Register one configuration for each and give each a client name. The configuration with an auth base
+URL signs in the new way. The one without it signs in with its redirect URI and auth string, as
+described in [Authentication (Legacy)](/authentication-legacy). Build a client by name to choose which
+store you call; with no name you get the first one registered.
+
+These samples read the second store's credentials from environment variables that start with
+`WC_LEGACY_`:
+
+<ClientSetupBoth />
 
 ## Try it in the docs
 
@@ -87,13 +151,13 @@ Every endpoint page has a **Try it** button that calls your store from this site
 
 <Steps>
   <Step title="Get a token">
-    Open [Get an access token](/api-reference/authentication/get-an-access-token), click **Try it**,
-    set `store` to your store's host name (without `https://`), choose `client_credentials` for
-    `grant_type`, fill in your credentials and click **Send**. Copy `access_token` from the response.
+    Open [Get an access token (New)](/api-reference/authentication/get-an-access-token-new), click
+    **Try it**, choose `client_credentials` for `grant_type`, fill in your client ID and client secret
+    and click **Send**. The request goes to the auth base URL. Copy `access_token` from the response.
   </Step>
   <Step title="Call an endpoint">
-    Open any endpoint, click **Try it**, set the same `store`, paste the token into
-    **Authorization**, and click **Send**.
+    Open any endpoint, click **Try it**, set `store` to your store's host name (without `https://`),
+    paste the token into **Authorization**, and click **Send**.
   </Step>
 </Steps>
 
