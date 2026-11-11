@@ -6,4 +6,14 @@ openapi: "PATCH /admin/products/{product_id}/stock"
 
 Send at least one of `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, with no wrapper. `tracking` takes `enabled`, `available_stock` and `low_stock_level`, and the fields you send are merged into the product's tracking. `locations` takes rows in the form [Set a product's stock](/api-reference/products/set-a-products-stock) takes. `note` and `transaction_no` go on the adjustment. The call returns the product's `stock` as it is now, and the `adjustment` it recorded. `adjustment` is `null` when the stock figure did not change, and its `note` is `via API` unless you send one. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.
 
+**Before you set stock, make sure tracking is on.**
+
+1. Read the product with [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock).
+2. If `track_inventory` is `true`, send `{"tracking": {"available_stock": 25}}`.
+3. If it is `false`, turn tracking on and set the figure in the same call: `{"tracking": {"enabled": true, "available_stock": 25}}`.
+
+Setting `available_stock` while tracking is off is refused with `409` and the message `inventory tracking is off for this product - turn tracking.enabled on to set its stock` (field `tracking.available_stock`, reason `tracking_disabled`); resend it with `"enabled": true`.
+
+To turn tracking off, send `{"tracking": {"enabled": false}}` on its own: the same `409` refuses a call that also sends `available_stock`, so set the figure first and turn tracking off in a second call.
+
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string. To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

@@ -54,6 +54,11 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
+- **Turn stock tracking on before you sync stock.** A product that does not track its stock reads `available_stock: 0`, refuses a new
+  figure with `409` and the reason `tracking_disabled`, and keeps its stock when an order ships. Check `track_inventory` with
+  [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock), then send `{"tracking": {"enabled": true, "available_stock": 25}}` to
+  [Change a product's stock](/api-reference/products/change-a-products-stock) to turn tracking on and set the figure in one call. Creating an order does not
+  lower stock; [creating a shipment](/api-reference/orders/create-a-shipment) does, for products that track it.
 - **Send product fields at the top level of the body, not inside `product`.** Responses return the
   product inside `product`, but a create or `PUT` body wrapped in `product` is rejected with `400` and
   the message `product: is not a recognised product field`. A `PATCH` body wrapped in `product` is
