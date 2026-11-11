@@ -51,6 +51,11 @@ WARNING = (
 )
 
 NOTES = [
+    "**Turn stock tracking on before you sync stock.** A product that does not track its stock reads `available_stock: 0`, refuses a new\n"
+    "  figure with `409` and the reason `tracking_disabled`, and keeps its stock when an order ships. Check `track_inventory` with\n"
+    "  [Retrieve a product's stock](" + STOCK_PAGE + "), then send `{\"tracking\": {\"enabled\": true, \"available_stock\": 25}}` to\n"
+    "  [Change a product's stock](" + PATCH_STOCK_PAGE + ") to turn tracking on and set the figure in one call. Creating an order does not\n"
+    "  lower stock; [creating a shipment](/api-reference/orders/create-a-shipment) does, for products that track it.",
     "**Send product fields at the top level of the body, not inside `product`.** Responses return the\n"
     "  product inside `product`, but a create or `PUT` body wrapped in `product` is rejected with `400` and\n"
     "  the message `product: is not a recognised product field`. A `PATCH` body wrapped in `product` is\n"
@@ -648,7 +653,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{product_id}/stock",
         "summary": "Returns the product's stock at each inventory location it is assigned to, and the total.",
-        "description": "Returns one row in `locations` for each inventory location the product is assigned to, with the location's `id` as `warehouse`, its name as `warehouse_name`, the product's `stock` there and the `low_stock_level`, and whether it is the product's default. `available_stock` is the sum of the rows' `stock`, and exactly one row has `is_default` set to `true`. A product with no location returns `multi_location_enabled: false` and `locations: []`, and a product with variations also returns `variations`. Query parameters are ignored.",
+        "description": "Returns one row in `locations` for each inventory location the product is assigned to, with the location's `id` as `warehouse`, its name as `warehouse_name`, the product's `stock` there and the `low_stock_level`, and whether it is the product's default. `available_stock` is the sum of the rows' `stock`, and exactly one row has `is_default` set to `true`. A product with no location returns `multi_location_enabled: false` and `locations: []`, and a product with variations also returns `variations`. Query parameters are ignored." + "\n\n**Check this before you change stock.** `track_inventory` says whether the product tracks its stock. While it is `false`, `available_stock` reads `0`, the stock cannot be set, and shipping an order does not lower it. Turn tracking on with [Change a product's stock](/api-reference/products/change-a-products-stock) before you sync stock. `locations: []` means the store keeps the product's stock without inventory locations: change it with `tracking` in [Change a product's stock](/api-reference/products/change-a-products-stock), not with [Set a product's stock](/api-reference/products/set-a-products-stock).",
         "parameters": [PRODUCT_ID],
         "responses": {
             "200": {
@@ -667,7 +672,7 @@ ENDPOINTS = [
         "method": "PUT",
         "path": BASE + "/{product_id}/stock",
         "summary": "Sets the product's stock at each location you send and unassigns every location you leave out.",
-        "description": "Send `locations` with one row for every location the product keeps; a location you leave out is unassigned, even while it holds stock. Each row takes the location's `id` as `warehouse`, the units as `stock`, and optionally `low_stock_level` and `is_default`. When no row has `is_default: true`, the first row you send becomes the product's default. The rows [Retrieve a product's stock](" + STOCK_PAGE + ") returns can be sent back as they are: `warehouse_name` and other extra keys are ignored.",
+        "description": "Send `locations` with one row for every location the product keeps; a location you leave out is unassigned, even while it holds stock. Each row takes the location's `id` as `warehouse`, the units as `stock`, and optionally `low_stock_level` and `is_default`. When no row has `is_default: true`, the first row you send becomes the product's default. The rows [Retrieve a product's stock](" + STOCK_PAGE + ") returns can be sent back as they are: `warehouse_name` and other extra keys are ignored." + "\n\n**Use this only for a product assigned to inventory locations.** When [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock) returns `locations: []`, the store keeps the product's stock without locations: this call then answers `400` with the message `locations is required`. Set the figure with `tracking` in [Change a product's stock](/api-reference/products/change-a-products-stock) instead.",
         "parameters": [PRODUCT_ID],
         "body": {"schema": ref("ProductStockInput"), "example": STOCK_BODY},
         "responses": {
@@ -1012,7 +1017,7 @@ ENDPOINTS = [
         "method": "PATCH",
         "path": BASE + "/{product_id}/stock",
         "summary": "Changes the product's stock tracking or its stock at each location, and returns the stock and the adjustment it recorded.",
-        "description": "Send at least one of `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, with no wrapper. `tracking` takes `enabled`, `available_stock` and `low_stock_level`, and the fields you send are merged into the product's tracking. `locations` takes rows in the form [Set a product's stock](" + SET_STOCK_PAGE + ") takes. `note` and `transaction_no` go on the adjustment. The call returns the product's `stock` as it is now, and the `adjustment` it recorded. `adjustment` is `null` when the stock figure did not change, and its `note` is `via API` unless you send one. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`.",
+        "description": "Send at least one of `tracking`, `locations`, `note` and `transaction_no` at the top level of the body, with no wrapper. `tracking` takes `enabled`, `available_stock` and `low_stock_level`, and the fields you send are merged into the product's tracking. `locations` takes rows in the form [Set a product's stock](" + SET_STOCK_PAGE + ") takes. `note` and `transaction_no` go on the adjustment. The call returns the product's `stock` as it is now, and the `adjustment` it recorded. `adjustment` is `null` when the stock figure did not change, and its `note` is `via API` unless you send one. A wrapper, or `available_stock` outside `tracking`, is rejected with `400` and the reason `unknown_field`." + "\n\n**Before you set stock, make sure tracking is on.**\n\n1. Read the product with [Retrieve a product's stock](/api-reference/products/retrieve-a-products-stock).\n2. If `track_inventory` is `true`, send `{\"tracking\": {\"available_stock\": 25}}`.\n3. If it is `false`, turn tracking on and set the figure in the same call: `{\"tracking\": {\"enabled\": true, \"available_stock\": 25}}`.\n\nSetting `available_stock` while tracking is off is refused with `409` and the message `inventory tracking is off for this product - turn tracking.enabled on to set its stock` (field `tracking.available_stock`, reason `tracking_disabled`); resend it with `\"enabled\": true`.\n\nTo turn tracking off, send `{\"tracking\": {\"enabled\": false}}` on its own: the same `409` refuses a call that also sends `available_stock`, so set the figure first and turn tracking off in a second call.",
         "parameters": [PRODUCT_ID],
         "body": {"schema": ref("ProductStockPatchInput"), "example": STOCK_PATCH_BODY},
         "responses": {
@@ -1022,6 +1027,7 @@ ENDPOINTS = [
                 "example": STOCK_PATCH_RESULT,
             },
             "400": {"description": "The body is wrapped, or sends `available_stock` outside `tracking`. The reason is `unknown_field`.", "schema": ERROR_REF},
+            "409": {"description": "`tracking.available_stock` was sent while the product's stock tracking is off. The message is `inventory tracking is off for this product - turn tracking.enabled on to set its stock` and the reason `tracking_disabled`. Resend with `tracking.enabled` set to `true`.", "schema": ERROR_REF},
         },
         "example_call": {"path": {"product_id": 101}},
     },
