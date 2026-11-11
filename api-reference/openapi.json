@@ -204,7 +204,13 @@
         "description": "Exchanges your API application's client ID and client secret for an access token, or exchanges a refresh token for a new one. Send the request as form data, not JSON. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call, which go to your store, not to this address. The SDKs make this call for you and renew the token before it expires.",
         "servers": [
           {
-            "url": "https://manage-hykmah-api.exsited.com/api/v1"
+            "url": "https://{hykmah}/api/v1",
+            "variables": {
+              "hykmah": {
+                "default": "your-hykmah-host",
+                "description": "Your Hykmah base URL's host name, without https://."
+              }
+            }
           }
         ],
         "security": [],
@@ -291,7 +297,7 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"https://manage-hykmah-api.exsited.com/api/v1/oauth/token\" \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  --data-urlencode \"grant_type=client_credentials\" \\\n  --data-urlencode \"client_id=YOUR_CLIENT_ID\" \\\n  --data-urlencode \"client_secret=YOUR_CLIENT_SECRET\""
+            "source": "curl -X POST \"$WC_AUTH_BASE_URL/api/v1/oauth/token\" \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  --data-urlencode \"grant_type=client_credentials\" \\\n  --data-urlencode \"client_id=YOUR_CLIENT_ID\" \\\n  --data-urlencode \"client_secret=YOUR_CLIENT_SECRET\""
           }
         ]
       }
@@ -62609,7 +62615,7 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "An access token from `POST /api/v1/oauth/token` on the Hykmah address (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."
+        "description": "An access token from `POST /api/v1/oauth/token` on your Hykmah base URL (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."
       }
     },
     "schemas": {

@@ -22,7 +22,7 @@ The token request and the API calls go to two different addresses:
 
 | Request | Goes to |
 | --- | --- |
-| Get or renew the access token | The auth base URL, `https://manage-hykmah-api.exsited.com` |
+| Get or renew the access token | Your Hykmah base URL |
 | Every API call | Your store's base URL |
 
 ## Your credentials
@@ -30,12 +30,12 @@ The token request and the API calls go to two different addresses:
 | Credential | What it is |
 | --- | --- |
 | Base URL | Your store's address, including `https://`. Every API call goes here. |
-| Auth base URL | The address that issues access tokens: `https://manage-hykmah-api.exsited.com`. Only the token request goes here. |
+| Hykmah base URL | The address that issues access tokens. Only the token request goes here. |
 | Client ID | Identifies your API application. |
 | Client secret | The secret paired with the client ID. |
 
 You get the client ID and client secret when you create an API application in the WebCommander admin.
-See [Create API credentials](/api-credentials) for the steps. There is no redirect URI and no auth
+See [Create API Application](/api-application) for the steps. There is no redirect URI and no auth
 string to configure.
 
 <Warning>
@@ -46,9 +46,9 @@ string to configure.
 ## Set up a client
 
 Register your credentials once, when your app starts. These samples read them from environment
-variables named `WC_BASE_URL`, `WC_AUTH_BASE_URL`, `WC_CLIENT_ID` and `WC_CLIENT_SECRET`. The auth base
-URL is the one new option: set it to `https://manage-hykmah-api.exsited.com`. The cURL tab shows the
-token request itself, sent as form data.
+variables named `WC_BASE_URL`, `WC_AUTH_BASE_URL`, `WC_CLIENT_ID` and `WC_CLIENT_SECRET`.
+`WC_AUTH_BASE_URL` holds your Hykmah base URL, the one new setting. The cURL tab shows the token
+request itself, sent as form data.
 
 <ClientSetup />
 
@@ -62,14 +62,14 @@ client you build, so a failed call raises an exception or throws an error instea
 unnoticed. A `200` whose body contains `"isSuccess": false` also counts as a failure: the API
 returns that for a URL it cannot route, such as `/api/v4/admin/customerz`.
 
-The auth base URL option is named `auth_base_url` in Python, `authBaseUrl` in JavaScript, PHP, Java
+The Hykmah base URL option is named `auth_base_url` in Python, `authBaseUrl` in JavaScript, PHP, Java
 and Dart, `AuthBaseUrl` (a property, passed as `authBaseUrl:`) in .NET and `AuthBaseURL` in Go.
 
 ## What the SDKs handle
 
 <CardGroup cols={2}>
   <Card title="Getting the token" icon="key">
-    On the first call, the SDK sends your client ID and client secret to the auth base URL and gets
+    On the first call, the SDK sends your client ID and client secret to your Hykmah base URL and gets
     an access token.
   </Card>
   <Card title="Caching and renewal" icon="rotate">
@@ -87,7 +87,7 @@ and Dart, `AuthBaseUrl` (a property, passed as `authBaseUrl:`) in .NET and `Auth
 
 ## Calling the API directly
 
-Request a token from `POST /api/v1/oauth/token` on the auth base URL. Send the body as form data with
+Request a token from `POST /api/v1/oauth/token` on your Hykmah base URL. Send the body as form data with
 the header `Content-Type: application/x-www-form-urlencoded`. A JSON body is rejected with `400`. The
 fields are:
 
@@ -109,7 +109,7 @@ returns `200 OK` with these fields:
 | `scope` | The access the token grants. |
 
 Send the access token in the `Authorization` header on every call. These calls go to your store's base
-URL, not to the auth base URL:
+URL, not to your Hykmah base URL:
 
 ```bash
 curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \
@@ -152,8 +152,9 @@ Every endpoint page has a **Try it** button that calls your store from this site
 <Steps>
   <Step title="Get a token">
     Open [Get an access token (New)](/api-reference/authentication/get-an-access-token-new), click
-    **Try it**, choose `client_credentials` for `grant_type`, fill in your client ID and client secret
-    and click **Send**. The request goes to the auth base URL. Copy `access_token` from the response.
+    **Try it**, set `hykmah` to your Hykmah base URL's host name (without `https://`), choose
+    `client_credentials` for `grant_type`, fill in your client ID and client secret and click
+    **Send**. Copy `access_token` from the response.
   </Step>
   <Step title="Call an endpoint">
     Open any endpoint, click **Try it**, set `store` to your store's host name (without `https://`),

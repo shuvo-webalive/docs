@@ -1,66 +1,42 @@
 ---
-title: "Create API credentials"
+title: "Create API Application"
 description: "Create an API application in the WebCommander admin to get the client ID and client secret your integration signs in with."
 ---
 
 To call the API with [Authentication (New)](/authentication), your integration needs a **client ID** and
 a **client secret**. Both belong to an API application, which you create in your store's WebCommander
-admin. You reach the admin by signing in to Hykmah.
+admin.
 
 ## Before you start
 
-- A Hykmah account with access to the company that owns the store.
-- Permission to change the store's settings in the WebCommander admin.
+- Sign in to Hykmah and open the dashboard of the company that owns the store.
+- You need permission to change the store's settings in the WebCommander admin.
 
 The numbers on each screenshot match the numbered actions in that step.
 
 ## Steps
 
 <Steps>
-  <Step title="Sign in to Hykmah">
-    Go to [manage-hykmah.exsited.com](https://manage-hykmah.exsited.com/select-organisation). Enter your
-    email address **(1)** and click **Continue (2)**.
-
-    <Frame>
-      <img src="/images/api-credentials/step-01-sign-in.png" alt="Hykmah sign-in page with the email address field and the Continue button marked" />
-    </Frame>
-  </Step>
-  <Step title="Enter your password">
-    Enter your password **(1)** and click **Continue (2)**. You can also sign in with Google, LinkedIn
-    or GitHub if your account is linked to one of them.
-
-    <Frame>
-      <img src="/images/api-credentials/step-02-password.png" alt="Password page with the password field and the Continue button marked" />
-    </Frame>
-  </Step>
-  <Step title="Select your company">
-    Under **Select company**, click the company that owns the store **(1)**. Use the search box if you
-    have access to many companies.
-
-    <Frame>
-      <img src="/images/api-credentials/step-03-select-company.png" alt="Select company page with one company marked" />
-    </Frame>
-  </Step>
   <Step title="Open the WebCommander admin">
     On the company dashboard, click **WebCommander (1)** in the top bar, next to the notifications bell.
     The WebCommander admin opens in a new browser tab.
 
     <Frame>
-      <img src="/images/api-credentials/step-04-open-webcommander.png" alt="Hykmah company dashboard with the WebCommander button marked" />
+      <img src="/images/api-application/step-01-open-webcommander.png" alt="Hykmah company dashboard with the WebCommander button marked" />
     </Frame>
   </Step>
   <Step title="Open Settings">
     In the WebCommander admin, click **Settings (1)** at the bottom of the left sidebar.
 
     <Frame>
-      <img src="/images/api-credentials/step-05-admin-settings.png" alt="WebCommander admin dashboard with Settings in the sidebar marked" />
+      <img src="/images/api-application/step-02-admin-settings.png" alt="WebCommander admin dashboard with Settings in the sidebar marked" />
     </Frame>
   </Step>
   <Step title="Open API Applications">
     Under **General**, click **API Applications (1)**.
 
     <Frame>
-      <img src="/images/api-credentials/step-06-api-applications-card.png" alt="Settings page with the API Applications card marked" />
+      <img src="/images/api-application/step-03-api-applications-card.png" alt="Settings page with the API Applications card marked" />
     </Frame>
   </Step>
   <Step title="Start a new application">
@@ -68,14 +44,14 @@ The numbers on each screenshot match the numbered actions in that step.
     until you create the first one.
 
     <Frame>
-      <img src="/images/api-credentials/step-07-applications-list.png" alt="API Applications page with the Create application button marked" />
+      <img src="/images/api-application/step-04-applications-list.png" alt="API Applications page with the Create application button marked" />
     </Frame>
   </Step>
   <Step title="Fill in the application">
-    Complete the form and click **Create application (7)**.
+    Complete the form and click **Create application (6)**.
 
     <Frame>
-      <img src="/images/api-credentials/step-08-create-form.png" alt="Create application form with seven fields and controls marked" />
+      <img src="/images/api-application/step-05-create-form.png" alt="Create application form with six fields and controls marked" />
     </Frame>
 
     | # | Field | What to enter |
@@ -85,8 +61,7 @@ The numbers on each screenshot match the numbered actions in that step.
     | 3 | **Description** | Optional. What the integration does, so others can recognise it later. |
     | 4 | **API version** | Choose **v4**, the version the SDKs and this documentation use. |
     | 5 | **Redirect URI** | Required by the form. The new sign-in does not send it, but the [legacy token request](/authentication-legacy) must send exactly this value. |
-    | 6 | **Allow client credentials** | Turn it on. Without it, the application cannot get an access token from its client ID and client secret. |
-    | 7 | **Create application** | Saves the application. |
+    | 6 | **Create application** | Saves the application. |
 
     Leave **Enabled** on: a disabled application cannot get or use tokens. **Enforce scopes** is on by
     default; while it is on, the application can call only the endpoints its scopes allow.
@@ -104,12 +79,12 @@ The numbers on each screenshot match the numbered actions in that step.
 
 ## Use the credentials
 
-Give the SDK your store's base URL, the auth base URL and the two credentials. The SDK gets the access
-token, caches it and renews it for you:
+Give the SDK your store's base URL, your Hykmah base URL and the two credentials. The SDK gets the
+access token, caches it and renews it for you:
 
 ```bash
-WC_BASE_URL=https://your-store.mywebcommander.com
-WC_AUTH_BASE_URL=https://manage-hykmah-api.exsited.com
+WC_BASE_URL=https://your-store.example.com
+WC_AUTH_BASE_URL=your-hykmah-base-url
 WC_CLIENT_ID=your-client-id
 WC_CLIENT_SECRET=your-client-secret
 ```

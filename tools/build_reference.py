@@ -24,8 +24,7 @@ SDKS = [
     ("dart", "dart", "Dart"),
     ("go", "go", "Go"),
 ]
-HYKMAH_URL = "https://manage-hykmah-api.exsited.com"
-GUIDE_PAGES = ["introduction", "installation", "api-credentials", "authentication", "authentication-legacy"]
+GUIDE_PAGES = ["introduction", "installation", "api-application", "authentication", "authentication-legacy"]
 STORE_ADDRESS = re.compile(r"[a-z0-9-]+\.mywebcommander\.com", re.I)
 METHOD_COLOURS = {"GET": "#0f7b6c", "POST": "#2563eb", "PUT": "#b45309", "PATCH": "#7a5af8",
                   "DELETE": "#c2410c", "HEAD": "#475467"}
@@ -263,11 +262,11 @@ def token_operation():
     }
 
 
-TOKEN_CURL_NEW = """curl -X POST "%s/api/v1/oauth/token" \\
+TOKEN_CURL_NEW = """curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \\
   -H "Content-Type: application/x-www-form-urlencoded" \\
   --data-urlencode "grant_type=client_credentials" \\
   --data-urlencode "client_id=YOUR_CLIENT_ID" \\
-  --data-urlencode "client_secret=YOUR_CLIENT_SECRET\"""" % HYKMAH_URL
+  --data-urlencode "client_secret=YOUR_CLIENT_SECRET\""""
 
 
 def token_operation_new():
@@ -276,7 +275,7 @@ def token_operation_new():
         "summary": "Get an access token (New)",
         "operationId": "get_access_token_new",
         "description": "Exchanges your API application's client ID and client secret for an access token, or exchanges a refresh token for a new one. Send the request as form data, not JSON. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call, which go to your store, not to this address. The SDKs make this call for you and renew the token before it expires.",
-        "servers": [{"url": HYKMAH_URL + "/api/v1"}],
+        "servers": [{"url": "https://{hykmah}/api/v1", "variables": {"hykmah": {"default": "your-hykmah-host", "description": "Your Hykmah base URL's host name, without https://."}}}],
         "security": [],
         "requestBody": {"required": True, "content": {"application/x-www-form-urlencoded": {
             "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret"], "properties": {
@@ -308,16 +307,16 @@ openapi: "POST /oauth/token"
 ---
 
 Every call to the API needs an access token. Request one here with your API application's client ID
-and client secret, then send it as `Authorization: Bearer ACCESS_TOKEN`. The request goes to
-`%s` and must be form data, not JSON. The SDKs make
+and client secret, then send it as `Authorization: Bearer ACCESS_TOKEN`. The request goes to your
+Hykmah base URL, not to your store, and must be form data, not JSON. The SDKs make
 this call for you, so you only need it for cURL, another HTTP client, or to try the API on this site.
 To renew a token, send the same request with `grant_type` set to `refresh_token` and your
 `refresh_token`. See [Authentication (New)](/authentication) for the full flow.
 
 <Steps>
   <Step title="Enter your credentials">
-    Click **Try it**, choose `client_credentials` for `grant_type`, and fill in your client ID and
-    client secret.
+    Click **Try it**, set `hykmah` to your Hykmah base URL's host name (without `https://`), choose
+    `client_credentials` for `grant_type`, and fill in your client ID and client secret.
   </Step>
   <Step title="Send the request">
     The response holds `access_token`.
@@ -331,7 +330,7 @@ To renew a token, send the same request with `grant_type` set to `refresh_token`
 <Warning>
   Requests are sent through Mintlify's servers. Never share your client secret or a refresh token.
 </Warning>
-""" % HYKMAH_URL
+"""
 
 
 TOKEN_PAGE = """---
@@ -428,7 +427,7 @@ def spec(areas, snippets, setups, schemas, renames):
         "tags": tags,
         "paths": paths,
         "components": {
-            "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from `POST /api/v1/oauth/token` on the Hykmah address (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."}},
+            "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from `POST /api/v1/oauth/token` on your Hykmah base URL (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."}},
             "schemas": schemas,
         },
     }

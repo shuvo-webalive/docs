@@ -9,7 +9,7 @@ The reference covers the WebCommander REST API and its seven SDKs: Python, JavaS
 | Path | What it holds |
 | --- | --- |
 | `docs.json` | Site configuration and navigation |
-| `introduction.mdx`, `installation.mdx`, `authentication.mdx`, `authentication-legacy.mdx`, `api-credentials.mdx` | Hand-written guide pages |
+| `introduction.mdx`, `installation.mdx`, `authentication.mdx`, `authentication-legacy.mdx`, `api-application.mdx` | Hand-written guide pages |
 | `<module>.mdx` | Generated overview page for each module |
 | `api-reference/` | Generated endpoint pages and `openapi.json` |
 | `snippets/` | Generated client setup snippets used by the two Authentication pages |

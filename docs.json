@@ -24,7 +24,7 @@
             "pages": [
               "introduction",
               "installation",
-              "api-credentials",
+              "api-application",
               "authentication",
               "authentication-legacy"
             ]
