@@ -25,6 +25,12 @@ The token request and the API calls go to two different addresses:
 | Get or renew the access token | Your Hykmah base URL |
 | Every API call | Your store's base URL |
 
+<Info>
+  Only the token request changes. Every API call still goes to your WebCommander store's base URL,
+  with the same paths, parameters and responses as before. Your Hykmah base URL is used for nothing
+  but getting and renewing the access token.
+</Info>
+
 ## Your credentials
 
 | Credential | What it is |

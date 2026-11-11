@@ -80,7 +80,8 @@ The numbers on each screenshot match the numbered actions in that step.
 ## Use the credentials
 
 Give the SDK your store's base URL, your Hykmah base URL and the two credentials. The SDK gets the
-access token, caches it and renews it for you:
+access token from your Hykmah base URL, caches it and renews it for you. Every API call still goes to
+your store's base URL, exactly as before:
 
 ```bash
 WC_BASE_URL=https://your-store.example.com
