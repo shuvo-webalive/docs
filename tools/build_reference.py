@@ -307,11 +307,38 @@ openapi: "POST /oauth/token"
 ---
 
 Every call to the API needs an access token. Request one here with your API application's client ID
-and client secret, then send it as `Authorization: Bearer ACCESS_TOKEN`. The request goes to your
-Hykmah base URL, not to your store, and must be form data, not JSON. The SDKs make
-this call for you, so you only need it for cURL, another HTTP client, or to try the API on this site.
-To renew a token, send the same request with `grant_type` set to `refresh_token` and your
-`refresh_token`. See [Authentication (New)](/authentication) for the full flow.
+and client secret, then send it as `Authorization: Bearer ACCESS_TOKEN`. The request must be form
+data, not JSON. The SDKs make this call for you, so you only need it for cURL, another HTTP client, or
+to try the API on this site. To renew a token, send the same request with `grant_type` set to
+`refresh_token` and your `refresh_token`.
+
+<Info>
+  Only this request goes to your Hykmah base URL. Every other call in this API reference still goes to
+  your WebCommander store's base URL, with the same paths, parameters and responses as before.
+</Info>
+
+| Request | Goes to | Example |
+| --- | --- | --- |
+| Get or renew the access token (this page) | Your Hykmah base URL | `POST $WC_AUTH_BASE_URL/api/v1/oauth/token` |
+| Every other API call | Your store's base URL | `GET https://your-store.example.com/api/v4/admin/customers` |
+
+For example, with a store at `https://your-store.example.com`:
+
+```bash
+# 1. Get the token from your Hykmah base URL
+curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \\
+  -H "Content-Type: application/x-www-form-urlencoded" \\
+  --data-urlencode "grant_type=client_credentials" \\
+  --data-urlencode "client_id=$WC_CLIENT_ID" \\
+  --data-urlencode "client_secret=$WC_CLIENT_SECRET"
+
+# 2. Call the API on your store's base URL, exactly as before
+curl "https://your-store.example.com/api/v4/admin/customers?limit=20" \\
+  -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+See [Which address each request uses](/authentication#which-address-each-request-uses) for the full
+explanation and the common mistakes to avoid.
 
 <Steps>
   <Step title="Enter your credentials">
@@ -342,6 +369,13 @@ openapi: "POST /oauth2/token"
 This is the legacy sign-in, for a store that still uses a redirect URI and an auth string. New API
 applications use [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).
 See [Authentication (Legacy)](/authentication-legacy) for the full flow.
+
+<Info>
+  Here the token request goes to your store's base URL, the same address as every API call. With the
+  new sign-in, only this token request moves to your Hykmah base URL; every API call still goes to your
+  store's base URL, with the same paths, parameters and responses. See
+  [What changes from the legacy sign-in](/authentication#what-changes-from-the-legacy-sign-in).
+</Info>
 
 Every call to the API needs an access token. Request one here with your store's credentials, then send
 it as `Authorization: Bearer ACCESS_TOKEN`. The SDKs make this call for you, so you only need it for

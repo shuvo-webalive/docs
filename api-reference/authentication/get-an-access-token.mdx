@@ -8,6 +8,13 @@ This is the legacy sign-in, for a store that still uses a redirect URI and an au
 applications use [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).
 See [Authentication (Legacy)](/authentication-legacy) for the full flow.
 
+<Info>
+  Here the token request goes to your store's base URL, the same address as every API call. With the
+  new sign-in, only this token request moves to your Hykmah base URL; every API call still goes to your
+  store's base URL, with the same paths, parameters and responses. See
+  [What changes from the legacy sign-in](/authentication#what-changes-from-the-legacy-sign-in).
+</Info>
+
 Every call to the API needs an access token. Request one here with your store's credentials, then send
 it as `Authorization: Bearer ACCESS_TOKEN`. The SDKs make this call for you, so you only need it for
 cURL, another HTTP client, or to try the API on this site.
