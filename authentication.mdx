@@ -31,6 +31,109 @@ The token request and the API calls go to two different addresses:
   but getting and renewing the access token.
 </Info>
 
+## Which address each request uses
+
+Your integration works with two addresses. Keep them apart:
+
+- **Base URL** is your WebCommander store's own address, for example
+  `https://your-store.example.com`. It is the same address you use today, and every API call goes to
+  it: customers, orders, products, settings and every other endpoint in this documentation.
+- **Hykmah base URL** is the address that issues access tokens. Your integration sends exactly one
+  kind of request there: getting or renewing a token. It never receives an API call.
+
+### Example: one token request, then normal API calls
+
+Say your store is at `https://your-store.example.com`. With the new sign-in, the requests your
+integration makes look like this:
+
+<Steps>
+  <Step title="Get a token from your Hykmah base URL">
+    ```bash
+    curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      --data-urlencode "grant_type=client_credentials" \
+      --data-urlencode "client_id=$WC_CLIENT_ID" \
+      --data-urlencode "client_secret=$WC_CLIENT_SECRET"
+    ```
+
+    The response holds `access_token`. This is the only request that goes to your Hykmah base URL.
+  </Step>
+  <Step title="Call the API on your store's base URL, as before">
+    ```bash
+    curl "https://your-store.example.com/api/v4/admin/customers?limit=20" \
+      -H "Authorization: Bearer $ACCESS_TOKEN"
+
+    curl "https://your-store.example.com/api/v4/admin/orders?limit=20" \
+      -H "Authorization: Bearer $ACCESS_TOKEN"
+    ```
+
+    The address, path, parameters and response are exactly what they were with the legacy sign-in.
+    Only the token in the `Authorization` header came from somewhere else.
+  </Step>
+  <Step title="Renew the token on your Hykmah base URL when it expires">
+    Send the same token request with `grant_type=refresh_token` and your `refresh_token`. Then keep
+    calling your store's base URL with the new token.
+  </Step>
+</Steps>
+
+With an SDK you never write these requests yourself. You give the client both addresses once, and it
+sends the token request to your Hykmah base URL and every API call to your store's base URL:
+
+```bash
+WC_BASE_URL=https://your-store.example.com   # every API call
+WC_AUTH_BASE_URL=your-hykmah-base-url        # token requests only
+WC_CLIENT_ID=your-client-id
+WC_CLIENT_SECRET=your-client-secret
+```
+
+```mermaid
+sequenceDiagram
+    participant App as Your integration
+    participant Hykmah as Hykmah base URL
+    participant Store as Store base URL
+    App->>Hykmah: POST /api/v1/oauth/token (client ID and secret)
+    Hykmah-->>App: access_token, refresh_token
+    App->>Store: GET /api/v4/admin/customers (Bearer token)
+    Store-->>App: Customers
+    App->>Store: Every other API call (Bearer token)
+    Store-->>App: Responses
+```
+
+### What changes from the legacy sign-in
+
+| | Authentication (Legacy) | Authentication (New) |
+| --- | --- | --- |
+| Where the token request goes | Your store's base URL, `POST /api/v4/oauth2/token` | Your Hykmah base URL, `POST /api/v1/oauth/token` |
+| Token request body | JSON with `grant_type`, `client_id`, `client_secret`, `redirect_uri` and `auth_string` | Form data with `grant_type`, `client_id` and `client_secret` |
+| Where API calls go | Your store's base URL | Your store's base URL (**unchanged**) |
+| API paths, parameters and responses | `/api/v4/...` | Same (**unchanged**) |
+| How the token is sent | `Authorization: Bearer ACCESS_TOKEN` | Same (**unchanged**) |
+
+Moving an existing integration to the new sign-in therefore means changing only how it gets the
+token. With an SDK, add the Hykmah base URL option and drop the redirect URI and auth string; leave
+the base URL and every call exactly as they are.
+
+### Common mistakes
+
+<AccordionGroup>
+  <Accordion title="Sending API calls to the Hykmah base URL">
+    The Hykmah base URL only issues tokens. A call such as `GET /api/v4/admin/customers` sent there
+    fails. Send every API call to your store's base URL.
+  </Accordion>
+  <Accordion title="Replacing the base URL with the Hykmah base URL">
+    Keep `WC_BASE_URL` set to your store's address. The Hykmah base URL is a separate, additional
+    setting (`WC_AUTH_BASE_URL`), not a replacement.
+  </Accordion>
+  <Accordion title="Requesting the token from the store">
+    With the new sign-in, `POST /api/v4/oauth2/token` on your store is the legacy token request and
+    expects a redirect URI and an auth string. Request the token from your Hykmah base URL instead.
+  </Accordion>
+  <Accordion title="Sending the token request as JSON">
+    The token request on your Hykmah base URL accepts form data only
+    (`application/x-www-form-urlencoded`). A JSON body is rejected with `400`.
+  </Accordion>
+</AccordionGroup>
+
 ## Your credentials
 
 | Credential | What it is |
