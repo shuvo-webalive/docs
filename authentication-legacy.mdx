@@ -88,10 +88,23 @@ returns `201 Created` with these fields:
 | `expires_in` | Seconds until the token expires. |
 | `refresh_token` | Exchanged for a new access token when this one expires. |
 
-Send the access token in the `Authorization` header on every call:
+Send the access token in the `Authorization` header on every call. Both requests go to your store's
+base URL. For example, with a store at `https://your-store.example.com`:
 
 ```bash
-curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \
+# 1. Get the token from your store's base URL
+curl -X POST "https://your-store.example.com/api/v4/oauth2/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "YOUR_CLIENT_ID",
+    "client_secret": "YOUR_CLIENT_SECRET",
+    "redirect_uri": "YOUR_REDIRECT_URI",
+    "auth_string": "YOUR_AUTH_STRING"
+  }'
+
+# 2. Call the API on the same base URL
+curl "https://your-store.example.com/api/v4/admin/customers?limit=20" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -101,10 +114,8 @@ Every endpoint page has a **Try it** button that calls your store from this site
 
 <Steps>
   <Step title="Get a token">
-    Open [Get an access token (Legacy)](/api-reference/authentication/get-an-access-token), click
-    **Try it**, set `store` to your store's host name (without `https://`), choose `client_credentials`
-    for `grant_type`, fill in your credentials and click **Send**. Copy `access_token` from the
-    response.
+    Request a token from your store's base URL with the cURL request in
+    [Calling the API directly](#calling-the-api-directly), and copy `access_token` from the response.
   </Step>
   <Step title="Call an endpoint">
     Open any endpoint, click **Try it**, set the same `store`, paste the token into

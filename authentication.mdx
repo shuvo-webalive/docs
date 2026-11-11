@@ -101,6 +101,19 @@ sequenceDiagram
 
 ### What changes from the legacy sign-in
 
+The two screenshots below show the same task in each sign-in: get a token, then list customers. The
+marked addresses are the only difference. In the legacy sign-in both requests go to your store's base
+URL **(1, 2)**. In the new sign-in only the token request moves to your Hykmah base URL **(1)**; the API
+call stays on your store's base URL **(2)**.
+
+<Frame caption="Authentication (Legacy): the token request and the API call both go to your store's base URL.">
+  <img src="/images/authentication/flow-legacy.png" alt="Legacy sign-in cURL example with the token request URL and the API call URL both marked as your store's base URL" />
+</Frame>
+
+<Frame caption="Authentication (New): only the token request goes to your Hykmah base URL; the API call is unchanged.">
+  <img src="/images/authentication/flow-new.png" alt="New sign-in cURL example with the token request URL marked as your Hykmah base URL and the API call URL marked as your store's base URL, unchanged" />
+</Frame>
+
 | | Authentication (Legacy) | Authentication (New) |
 | --- | --- | --- |
 | Where the token request goes | Your store's base URL, `POST /api/v4/oauth2/token` | Your Hykmah base URL, `POST /api/v1/oauth/token` |
@@ -218,10 +231,18 @@ returns `200 OK` with these fields:
 | `scope` | The access the token grants. |
 
 Send the access token in the `Authorization` header on every call. These calls go to your store's base
-URL, not to your Hykmah base URL:
+URL, not to your Hykmah base URL. For example, with a store at `https://your-store.example.com`:
 
 ```bash
-curl "$WC_BASE_URL/api/v4/admin/customers?limit=20" \
+# 1. Get the token from your Hykmah base URL
+curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "grant_type=client_credentials" \
+  --data-urlencode "client_id=$WC_CLIENT_ID" \
+  --data-urlencode "client_secret=$WC_CLIENT_SECRET"
+
+# 2. Call the API on your store's base URL, exactly as before
+curl "https://your-store.example.com/api/v4/admin/customers?limit=20" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -260,10 +281,8 @@ Every endpoint page has a **Try it** button that calls your store from this site
 
 <Steps>
   <Step title="Get a token">
-    Open [Get an access token (New)](/api-reference/authentication/get-an-access-token-new), click
-    **Try it**, set `hykmah` to your Hykmah base URL's host name (without `https://`), choose
-    `client_credentials` for `grant_type`, fill in your client ID and client secret and click
-    **Send**. Copy `access_token` from the response.
+    Request a token from your Hykmah base URL with the cURL request in
+    [Calling the API directly](#calling-the-api-directly), and copy `access_token` from the response.
   </Step>
   <Step title="Call an endpoint">
     Open any endpoint, click **Try it**, set `store` to your store's host name (without `https://`),

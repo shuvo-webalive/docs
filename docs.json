@@ -35,15 +35,6 @@
         "group": "API reference",
         "pages": [
           {
-            "group": "Authentication",
-            "icon": "key",
-            "expanded": false,
-            "pages": [
-              "api-reference/authentication/get-an-access-token-new",
-              "api-reference/authentication/get-an-access-token"
-            ]
-          },
-          {
             "group": "Customers",
             "icon": "users",
             "expanded": false,

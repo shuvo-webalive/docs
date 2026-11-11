@@ -222,186 +222,6 @@ def operation(module, endpoint, snippets, setups):
     return op
 
 
-TOKEN_CURL = """curl -X POST "$WC_BASE_URL/api/v4/oauth2/token" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "grant_type": "client_credentials",
-    "client_id": "YOUR_CLIENT_ID",
-    "client_secret": "YOUR_CLIENT_SECRET",
-    "redirect_uri": "YOUR_REDIRECT_URI",
-    "auth_string": "YOUR_AUTH_STRING"
-  }'"""
-
-
-def token_operation():
-    return {
-        "tags": ["Authentication"],
-        "summary": "Get an access token",
-        "operationId": "get_access_token",
-        "description": "Legacy sign-in. Exchanges your store's credentials, including the redirect URI and auth string, for an access token. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call. The SDKs make this call for you and renew the token before it expires. Applications that use the new sign-in request their token from [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).",
-        "security": [],
-        "requestBody": {"required": True, "content": {"application/json": {
-            "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret", "redirect_uri", "auth_string"], "properties": {
-                "grant_type": {"type": "string", "enum": ["client_credentials"], "description": "Choose `client_credentials` from the list."},
-                "client_id": {"type": "string", "description": "Your integration's client ID."},
-                "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
-                "redirect_uri": {"type": "string", "description": "The redirect URI registered for your integration."},
-                "auth_string": {"type": "string", "description": "Decides which user the token acts as."},
-            }},
-            "example": {"grant_type": "client_credentials", "client_id": "YOUR_CLIENT_ID", "client_secret": "YOUR_CLIENT_SECRET", "redirect_uri": "YOUR_REDIRECT_URI", "auth_string": "YOUR_AUTH_STRING"},
-        }}},
-        "responses": {
-            "201": {"description": "The access token.", "content": {"application/json": {"schema": {"type": "object", "properties": {
-                "access_token": {"type": "string", "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."},
-                "expires_in": {"type": "integer", "description": "Seconds until the token expires."},
-                "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires."},
-            }}}}},
-            "401": {"description": "The credentials were not accepted.", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
-        },
-        "x-codeSamples": [{"lang": "bash", "label": "cURL", "source": TOKEN_CURL}],
-    }
-
-
-TOKEN_CURL_NEW = """curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \\
-  -H "Content-Type: application/x-www-form-urlencoded" \\
-  --data-urlencode "grant_type=client_credentials" \\
-  --data-urlencode "client_id=YOUR_CLIENT_ID" \\
-  --data-urlencode "client_secret=YOUR_CLIENT_SECRET\""""
-
-
-def token_operation_new():
-    return {
-        "tags": ["Authentication"],
-        "summary": "Get an access token (New)",
-        "operationId": "get_access_token_new",
-        "description": "Exchanges your API application's client ID and client secret for an access token, or exchanges a refresh token for a new one. Send the request as form data, not JSON. Send the token as `Authorization: Bearer ACCESS_TOKEN` on every other call, which go to your store, not to this address. The SDKs make this call for you and renew the token before it expires.",
-        "servers": [{"url": "https://{hykmah}/api/v1", "variables": {"hykmah": {"default": "your-hykmah-host", "description": "Your Hykmah base URL's host name, without https://."}}}],
-        "security": [],
-        "requestBody": {"required": True, "content": {"application/x-www-form-urlencoded": {
-            "schema": {"type": "object", "required": ["grant_type", "client_id", "client_secret"], "properties": {
-                "grant_type": {"type": "string", "enum": ["client_credentials", "refresh_token"], "description": "Choose `client_credentials` to get a token, or `refresh_token` to renew one."},
-                "client_id": {"type": "string", "description": "Your API application's client ID."},
-                "client_secret": {"type": "string", "description": "The secret paired with the client ID."},
-                "refresh_token": {"type": "string", "description": "The `refresh_token` from an earlier response. Send it only when `grant_type` is `refresh_token`."},
-            }},
-            "example": {"grant_type": "client_credentials", "client_id": "YOUR_CLIENT_ID", "client_secret": "YOUR_CLIENT_SECRET"},
-        }}},
-        "responses": {
-            "200": {"description": "The access token.", "content": {"application/json": {"schema": {"type": "object", "properties": {
-                "access_token": {"type": "string", "description": "Send this as `Authorization: Bearer ACCESS_TOKEN`."},
-                "token_type": {"type": "string", "description": "Always `Bearer`."},
-                "expires_in": {"type": "integer", "description": "Seconds until the token expires. Currently 3600."},
-                "refresh_token": {"type": "string", "description": "Exchanged for a new access token when this one expires."},
-                "scope": {"type": "string", "description": "The access the token grants."},
-            }}}}},
-            "400": {"description": "The request was rejected. For example, the body was sent as JSON instead of form data."},
-        },
-        "x-codeSamples": [{"lang": "bash", "label": "cURL", "source": TOKEN_CURL_NEW}],
-    }
-
-
-TOKEN_PAGE_NEW = """---
-title: "Get an access token (New)"
-description: "Exchange your API application's client ID and client secret for the token every other call needs."
-openapi: "POST /oauth/token"
----
-
-Every call to the API needs an access token. Request one here with your API application's client ID
-and client secret, then send it as `Authorization: Bearer ACCESS_TOKEN`. The request must be form
-data, not JSON. The SDKs make this call for you, so you only need it for cURL, another HTTP client, or
-to try the API on this site. To renew a token, send the same request with `grant_type` set to
-`refresh_token` and your `refresh_token`.
-
-<Info>
-  Only this request goes to your Hykmah base URL. Every other call in this API reference still goes to
-  your WebCommander store's base URL, with the same paths, parameters and responses as before.
-</Info>
-
-| Request | Goes to | Example |
-| --- | --- | --- |
-| Get or renew the access token (this page) | Your Hykmah base URL | `POST $WC_AUTH_BASE_URL/api/v1/oauth/token` |
-| Every other API call | Your store's base URL | `GET https://your-store.example.com/api/v4/admin/customers` |
-
-For example, with a store at `https://your-store.example.com`:
-
-```bash
-# 1. Get the token from your Hykmah base URL
-curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \\
-  -H "Content-Type: application/x-www-form-urlencoded" \\
-  --data-urlencode "grant_type=client_credentials" \\
-  --data-urlencode "client_id=$WC_CLIENT_ID" \\
-  --data-urlencode "client_secret=$WC_CLIENT_SECRET"
-
-# 2. Call the API on your store's base URL, exactly as before
-curl "https://your-store.example.com/api/v4/admin/customers?limit=20" \\
-  -H "Authorization: Bearer $ACCESS_TOKEN"
-```
-
-See [Which address each request uses](/authentication#which-address-each-request-uses) for the full
-explanation and the common mistakes to avoid.
-
-<Steps>
-  <Step title="Enter your credentials">
-    Click **Try it**, set `hykmah` to your Hykmah base URL's host name (without `https://`), choose
-    `client_credentials` for `grant_type`, and fill in your client ID and client secret.
-  </Step>
-  <Step title="Send the request">
-    The response holds `access_token`.
-  </Step>
-  <Step title="Use the token">
-    On any other endpoint, click **Try it**, set `store` to your store's host name (without
-    `https://`), and paste the token into **Authorization**.
-  </Step>
-</Steps>
-
-<Warning>
-  Requests are sent through Mintlify's servers. Never share your client secret or a refresh token.
-</Warning>
-"""
-
-
-TOKEN_PAGE = """---
-title: "Get an access token (Legacy)"
-description: "Exchange your store's credentials, including the redirect URI and auth string, for a token."
-openapi: "POST /oauth2/token"
----
-
-This is the legacy sign-in, for a store that still uses a redirect URI and an auth string. New API
-applications use [Get an access token (New)](/api-reference/authentication/get-an-access-token-new).
-See [Authentication (Legacy)](/authentication-legacy) for the full flow.
-
-<Info>
-  Here the token request goes to your store's base URL, the same address as every API call. With the
-  new sign-in, only this token request moves to your Hykmah base URL; every API call still goes to your
-  store's base URL, with the same paths, parameters and responses. See
-  [What changes from the legacy sign-in](/authentication#what-changes-from-the-legacy-sign-in).
-</Info>
-
-Every call to the API needs an access token. Request one here with your store's credentials, then send
-it as `Authorization: Bearer ACCESS_TOKEN`. The SDKs make this call for you, so you only need it for
-cURL, another HTTP client, or to try the API on this site.
-
-<Steps>
-  <Step title="Enter your store and credentials">
-    Click **Try it**, set `store` to your store's host name (without `https://`), choose
-    `client_credentials` for `grant_type`, and fill in your client ID, client secret, redirect URI
-    and auth string.
-  </Step>
-  <Step title="Send the request">
-    The response holds `access_token`.
-  </Step>
-  <Step title="Use the token">
-    On any other endpoint, click **Try it**, set the same `store`, and paste the token into
-    **Authorization**.
-  </Step>
-</Steps>
-
-<Warning>
-  Calls you make here run against your real store: creating, changing and deleting data is real.
-  Requests are sent through Mintlify's servers. Use test data, and never share your credentials.
-</Warning>
-"""
-
 CURL_SETUP_NEW = """curl -X POST "$WC_AUTH_BASE_URL/api/v1/oauth/token" \\
   -H "Content-Type: application/x-www-form-urlencoded" \\
   --data-urlencode "grant_type=client_credentials" \\
@@ -441,8 +261,8 @@ def rename_refs(text, mapping):
 
 
 def spec(areas, snippets, setups, schemas, renames):
-    paths = {"/oauth/token": {"post": token_operation_new()}, "/oauth2/token": {"post": token_operation()}}
-    tags = [{"name": "Authentication"}]
+    paths = {}
+    tags = []
     for area in areas:
         for module in area["modules"]:
             tags.append({"name": module.TAG})
@@ -461,7 +281,7 @@ def spec(areas, snippets, setups, schemas, renames):
         "tags": tags,
         "paths": paths,
         "components": {
-            "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from `POST /api/v1/oauth/token` on your Hykmah base URL (new sign-in) or from `POST /api/v4/oauth2/token` on your store (legacy sign-in). The SDKs get and renew it for you."}},
+            "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer", "description": "An access token from your Hykmah base URL (new sign-in) or from your store (legacy sign-in). See Authentication (New) and Authentication (Legacy). The SDKs get and renew it for you."}},
             "schemas": schemas,
         },
     }
@@ -469,9 +289,9 @@ def spec(areas, snippets, setups, schemas, renames):
 
 def page(endpoint):
     note = ("The SDK samples get their client from credentials your app registers once when it starts, as shown in "
-            "[Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from "
-            "[Get an access token (New)](/api-reference/authentication/get-an-access-token-new), or from "
-            "[Get an access token (Legacy)](/api-reference/authentication/get-an-access-token) if your store signs in with a redirect URI and an auth string.")
+            "[Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. "
+            "Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in "
+            "[Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.")
     if endpoint.get("body") and not endpoint.get("multipart"):
         note += " To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload."
     return "\n".join([
@@ -549,9 +369,7 @@ def module_pages(module):
 
 
 def navigation(areas):
-    groups = [{"group": "Authentication", "icon": "key", "expanded": False,
-               "pages": ["api-reference/authentication/get-an-access-token-new",
-                         "api-reference/authentication/get-an-access-token"]}]
+    groups = []
     for area in areas:
         modules = area["modules"]
         if len(modules) == 1 and modules[0].TAG == area["name"]:
@@ -630,9 +448,6 @@ def main():
                 (OUT / module.SLUG / (endpoint["slug"] + ".mdx")).write_text(page(endpoint), encoding="utf-8")
                 count += 1
             (DOCS / (module.SLUG + ".mdx")).write_text(overview(module), encoding="utf-8")
-    (OUT / "authentication").mkdir(exist_ok=True)
-    (OUT / "authentication" / "get-an-access-token.mdx").write_text(TOKEN_PAGE, encoding="utf-8")
-    (OUT / "authentication" / "get-an-access-token-new.mdx").write_text(TOKEN_PAGE_NEW, encoding="utf-8")
     (DOCS / "snippets").mkdir(exist_ok=True)
     (DOCS / "snippets" / "client-setup.mdx").write_text(code_group(setups, "register_hykmah", CURL_SETUP_NEW, complete=True), encoding="utf-8")
     (DOCS / "snippets" / "client-setup-legacy.mdx").write_text(code_group(setups, "register", CURL_SETUP, complete=True), encoding="utf-8")
