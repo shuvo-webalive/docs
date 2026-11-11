@@ -6,4 +6,4 @@ openapi: "HEAD /admin/payment_gateways/{payment_gateway_id}"
 
 Returns `200` with headers only and no body when a listed gateway has that `payment_gateway_id`, and `404` when none does. To read the gateway's fields, use [Retrieve a payment gateway](/api-reference/payment-gateways/retrieve-a-payment-gateway).
 
-<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token from [Get an access token](/api-reference/authentication/get-an-access-token).</Note>
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>
