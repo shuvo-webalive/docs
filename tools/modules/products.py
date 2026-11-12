@@ -54,8 +54,9 @@ NOTES = [
     "**Turn stock tracking on before you sync stock.** A product that does not track its stock reads `available_stock: 0`, refuses a new\n"
     "  figure with `409` and the reason `tracking_disabled`, and keeps its stock when an order ships. Check `track_inventory` with\n"
     "  [Retrieve a product's stock](" + STOCK_PAGE + "), then send `{\"tracking\": {\"enabled\": true, \"available_stock\": 25}}` to\n"
-    "  [Change a product's stock](" + PATCH_STOCK_PAGE + ") to turn tracking on and set the figure in one call. Creating an order does not\n"
-    "  lower stock; [creating a shipment](/api-reference/orders/create-a-shipment) does, for products that track it.",
+    "  [Change a product's stock](" + PATCH_STOCK_PAGE + ") to turn tracking on and set the figure in one call. When an order lowers\n"
+    "  stock is a store setting: read `update_stock` in the `product_inventory` section of\n"
+    "  [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section). It is `after_order`, `after_payment` or `after_shipment`.",
     "**Send product fields at the top level of the body, not inside `product`.** Responses return the\n"
     "  product inside `product`, but a create or `PUT` body wrapped in `product` is rejected with `400` and\n"
     "  the message `product: is not a recognised product field`. A `PATCH` body wrapped in `product` is\n"
@@ -653,7 +654,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{product_id}/stock",
         "summary": "Returns the product's stock at each inventory location it is assigned to, and the total.",
-        "description": "Returns one row in `locations` for each inventory location the product is assigned to, with the location's `id` as `warehouse`, its name as `warehouse_name`, the product's `stock` there and the `low_stock_level`, and whether it is the product's default. `available_stock` is the sum of the rows' `stock`, and exactly one row has `is_default` set to `true`. A product with no location returns `multi_location_enabled: false` and `locations: []`, and a product with variations also returns `variations`. Query parameters are ignored." + "\n\n**Check this before you change stock.** `track_inventory` says whether the product tracks its stock. While it is `false`, `available_stock` reads `0`, the stock cannot be set, and shipping an order does not lower it. Turn tracking on with [Change a product's stock](/api-reference/products/change-a-products-stock) before you sync stock. `locations: []` means the store keeps the product's stock without inventory locations: change it with `tracking` in [Change a product's stock](/api-reference/products/change-a-products-stock), not with [Set a product's stock](/api-reference/products/set-a-products-stock).",
+        "description": "Returns one row in `locations` for each inventory location the product is assigned to, with the location's `id` as `warehouse`, its name as `warehouse_name`, the product's `stock` there and the `low_stock_level`, and whether it is the product's default. `available_stock` is the sum of the rows' `stock`, and exactly one row has `is_default` set to `true`. A product with no location returns `multi_location_enabled: false` and `locations: []`, and a product with variations also returns `variations`. Query parameters are ignored." + "\n\n**Check this before you change stock.** `track_inventory` says whether the product tracks its stock. While it is `false`, `available_stock` reads `0`, the stock cannot be set, and no order lowers it. Turn tracking on with [Change a product's stock](/api-reference/products/change-a-products-stock) before you sync stock. `locations: []` means the store keeps the product's stock without inventory locations: change it with `tracking` in [Change a product's stock](/api-reference/products/change-a-products-stock), not with [Set a product's stock](/api-reference/products/set-a-products-stock).",
         "parameters": [PRODUCT_ID],
         "responses": {
             "200": {

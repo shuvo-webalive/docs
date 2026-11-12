@@ -71,6 +71,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Payments and refunds change different totals.** [Record a payment on an order](/api-reference/orders/record-a-payment-on-an-order) raises
   `paid`. [Refund a payment](/api-reference/orders/refund-a-payment) lowers `paid` and raises `refunded`, and needs an
   `Idempotency-Key` header. [Refund an order](/api-reference/orders/refund-an-order) raises `refunded` and leaves `paid` as it was.
-- **Shipping lowers stock, and deleting the order does not restore it.** [Create a shipment](/api-reference/orders/create-a-shipment)
-  lowers the stock of a product that tracks its stock by the units shipped. Creating, paying, cancelling,
-  completing and deleting an order change no stock.
+- **The store decides when an order lowers stock.** The `update_stock` setting in the `product_inventory` section of
+  [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section) is `after_order`, `after_payment`
+  or `after_shipment`: stock drops when the order is created, when it is paid, or when you
+  [create a shipment](/api-reference/orders/create-a-shipment), by the units ordered, and only for products that track their stock.
+  Read the setting before you sync stock. Deleting an order does not give back the stock it took.
