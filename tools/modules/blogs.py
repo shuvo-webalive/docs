@@ -48,11 +48,10 @@ NOTES = [
     "**After the listing rejects `limit=0`, a `sort` or a `dir`, your next request on the same client returns the same `400`.**\n"
     "  It does so even when its own parameters are valid. The request after that runs normally, and so\n"
     "  does every request on a new client: send the request that got the repeated `400` again.",
-    "**A restricted blog post names its audience by each customer's `internal_id`.** Set `visibility` to\n"
+    "**A restricted blog post names its audience by each customer's `customer_id`.** Set `visibility` to\n"
     "  `restricted` and `visible_to` to `selected`, and send `selected_customers` as\n"
-    "  `{\"customers\": [...], \"groups\": [...]}`, with each customer's `internal_id` from\n"
-    "  [List customers](" + CUSTOMERS_PAGE + ") and each customer group's `id`. A customer's `customer_id`\n"
-    "  there is dropped without an error, which leaves the audience empty. A post returns `selected_customers` as\n"
+    "  `{\"customers\": [...], \"groups\": [...]}`, with each customer's `customer_id` from\n"
+    "  [List customers](" + CUSTOMERS_PAGE + ") and each customer group's `id`. A post returns `selected_customers` as\n"
     "  an object once it names anyone, and as `[]`, a list, while it names no one.",
 ]
 
@@ -363,7 +362,7 @@ ENDPOINTS = [
         "body": {"schema": WRITE_BODY, "example": REPLACE_BODY},
         "responses": {
             "200": {
-                "description": "The blog post after the replace, under `blog`, without `group_meta`. A customer in the audience reads as the customer's `internal_id` and name.",
+                "description": "The blog post after the replace, under `blog`, without `group_meta`. A customer in the audience reads as the customer's `customer_id` and name.",
                 "schema": ROW_RESPONSE,
                 "example": {"blog": REPLACED_ROW},
             },
@@ -582,11 +581,11 @@ SCHEMAS = {
         "name": {"type": "string", "description": "The creator's name."},
     }},
     "BlogAudience": {"type": "object", "description": "The customers and customer groups a restricted post is shown to.", "properties": {
-        "customers": {"type": "array", "items": ref("BlogAudienceMember"), "description": "One entry per customer: the customer's `internal_id` as `id`, and the customer's first and last name as `name`."},
+        "customers": {"type": "array", "items": ref("BlogAudienceMember"), "description": "One entry per customer: the customer's `customer_id` as `id`, and the customer's first and last name as `name`."},
         "groups": {"type": "array", "items": ref("BlogAudienceMember"), "description": "One entry per customer group: the group's `id` and `name`."},
     }},
     "BlogAudienceMember": {"type": "object", "properties": {
-        "id": {"type": "integer", "description": "For a customer, the customer's `internal_id`; for a customer group, the group's `id`."},
+        "id": {"type": "integer", "description": "For a customer, the customer's `customer_id`; for a customer group, the group's `id`."},
         "name": {"type": "string", "description": "The customer's or customer group's name."},
     }},
     "BlogSeoConfigs": {"type": "object", "description": "The post's SEO meta tags, the same on a write and a read. Other keys inside it are ignored on a write.", "properties": {
@@ -652,7 +651,7 @@ SCHEMAS = {
         "alternative_text": {"type": "string", "description": "The image's alternative text."},
     }},
     "BlogAudienceInput": {"type": "object", "description": "Who a restricted post is shown to. Needed when `visibility` is `restricted` and `visible_to` is `selected`: without anyone in it, the write is rejected with `400`. With `visibility` `open`, or `visible_to` `all`, the audience is dropped and reads `[]`.", "properties": {
-        "customers": {"type": "array", "items": {"type": "integer"}, "description": "Each customer's `internal_id`, from [List customers](" + CUSTOMERS_PAGE + "). A customer's `customer_id` here is dropped without an error."},
+        "customers": {"type": "array", "items": {"type": "integer"}, "description": "Each customer's `customer_id`, from [List customers](" + CUSTOMERS_PAGE + ")."},
         "groups": {"type": "array", "items": {"type": "integer"}, "description": "Each customer group's `id`."},
     }},
     "BlogComment": {"type": "object", "description": "One comment on a blog post. The comment listing, a retrieve, and the response to adding, approving or marking a comment as spam return the same twelve fields.", "properties": {

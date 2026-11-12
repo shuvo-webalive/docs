@@ -4,6 +4,6 @@ description: "Returns all of a customer's orders, newest first, leaving out canc
 openapi: "GET /admin/customers/{customer_id}/orders"
 ---
 
-Pass the customer's `customer_id`; the customer's `internal_id` returns `404` with the message `Customer Not Found`. Returns the customer's `customer_id` and `internal_id` and their orders in the flat shape, newest first, without paging; cancelled orders are left out. A customer with no orders returns `"orders": []`, and query parameters such as `limit`, `offset` and `sort` are ignored.
+Pass the customer's `customer_id`. Returns the customer's `customer_id` and `internal_id` and their orders in the flat shape, newest first, without paging; cancelled orders are left out. A customer with no orders returns `"orders": []`, and query parameters such as `limit`, `offset` and `sort` are ignored.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

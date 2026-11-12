@@ -65,9 +65,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **After the listing rejects `limit=0`, a `sort` or a `dir`, your next request on the same client returns the same `400`.**
   It does so even when its own parameters are valid. The request after that runs normally, and so
   does every request on a new client: send the request that got the repeated `400` again.
-- **A restricted blog post names its audience by each customer's `internal_id`.** Set `visibility` to
+- **A restricted blog post names its audience by each customer's `customer_id`.** Set `visibility` to
   `restricted` and `visible_to` to `selected`, and send `selected_customers` as
-  `{"customers": [...], "groups": [...]}`, with each customer's `internal_id` from
-  [List customers](/api-reference/customers/list-customers) and each customer group's `id`. A customer's `customer_id`
-  there is dropped without an error, which leaves the audience empty. A post returns `selected_customers` as
+  `{"customers": [...], "groups": [...]}`, with each customer's `customer_id` from
+  [List customers](/api-reference/customers/list-customers) and each customer group's `id`. A post returns `selected_customers` as
   an object once it names anyone, and as `[]`, a list, while it names no one.

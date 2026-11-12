@@ -3439,7 +3439,7 @@
             "name": "customer_id",
             "in": "path",
             "required": true,
-            "description": "The customer's `customer_id`, which is the `id` of the customer's entry in the group's `customers` list. Do not send the customer's `internal_id`: the store reads the value as a `customer_id` and looks up that customer instead.",
+            "description": "The customer's `customer_id`, which is the `id` of the customer's entry in the group's `customers` list.",
             "schema": {
               "type": "integer"
             }
@@ -30970,10 +30970,10 @@
           {
             "name": "customerId",
             "in": "query",
-            "description": "Keeps the orders of one customer. Send the customer's `internal_id`: the customer's `customer_id` matches nothing here.",
+            "description": "Keeps the orders of one customer. Send the customer's `customer_id`.",
             "schema": {
               "type": "integer",
-              "example": 88
+              "example": 512
             }
           },
           {
@@ -31124,10 +31124,10 @@
           {
             "name": "orderIds",
             "in": "query",
-            "description": "Keeps the order with this `internal_id`. The order's `order_id` matches nothing here.",
+            "description": "Keeps the order with this `order_id`.",
             "schema": {
               "type": "integer",
-              "example": 2187
+              "example": 1043
             }
           },
           {
@@ -31879,10 +31879,10 @@
           {
             "name": "customerId",
             "in": "query",
-            "description": "Keeps the orders of one customer. Send the customer's `internal_id`: the customer's `customer_id` matches nothing here.",
+            "description": "Keeps the orders of one customer. Send the customer's `customer_id`.",
             "schema": {
               "type": "integer",
-              "example": 88
+              "example": 512
             }
           },
           {
@@ -32033,10 +32033,10 @@
           {
             "name": "orderIds",
             "in": "query",
-            "description": "Keeps the order with this `internal_id`. The order's `order_id` matches nothing here.",
+            "description": "Keeps the order with this `order_id`.",
             "schema": {
               "type": "integer",
-              "example": 2187
+              "example": 1043
             }
           },
           {
@@ -32413,7 +32413,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -32738,7 +32738,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -33041,7 +33041,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -33344,7 +33344,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -33442,7 +33442,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -33607,7 +33607,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -33873,7 +33873,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -33974,7 +33974,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34071,20 +34071,20 @@
         }
       }
     },
-    "/admin/orders/{order_internal_id}/custom_fields": {
+    "/admin/orders/{order_id}/custom_fields": {
       "get": {
         "tags": [
           "Orders"
         ],
         "summary": "Retrieve an order's custom fields",
         "operationId": "get_order_custom_fields",
-        "description": "Pass the order's `internal_id`, not its `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or the custom fields of the order whose `internal_id` has that number. The response's `order_id` field holds the `internal_id` you passed, and `custom_fields` lists the order's custom field values. An order with `delivery_type` `delivery` also returns `delivery_cost`.",
+        "description": "Pass the order's `order_id`. The response returns the order's `order_id`, and `custom_fields` lists the order's custom field values. An order with `delivery_type` `delivery` also returns `delivery_cost`.",
         "parameters": [
           {
-            "name": "order_internal_id",
+            "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `internal_id`, from any response that returns the order. Do not pass the order's `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or reaches the order whose `internal_id` has that number.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34099,14 +34099,14 @@
                   "$ref": "#/components/schemas/OrderCustomFields"
                 },
                 "example": {
-                  "order_id": 2187,
+                  "order_id": 1043,
                   "custom_fields": []
                 }
               }
             }
           },
           "404": {
-            "description": "No order has that `internal_id`. The message is `Order not found`.",
+            "description": "No order has that `order_id`. The message is `Order not found`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -34120,7 +34120,7 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/orders/2187/custom_fields\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X GET \"$WC_BASE_URL/api/v4/admin/orders/1043/custom_fields\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
@@ -34173,7 +34173,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34303,13 +34303,13 @@
         ],
         "summary": "List an order's refunds",
         "operationId": "list_order_refunds",
-        "description": "Returns the order's refunds under `refunds`, newest first, with `order_id`, `order_no` and a `pagination` block. `order_id` in the response is the order's `internal_id`, and `order_no` is the `order_id` you passed in the path. `limit` takes `1` to `20`: a larger value is capped at `20`, and `0` is rejected with `400`. Page with `offset`, which a negative value makes `400`, or with `page`. Any other query parameter, `sort` and `dir` included, is ignored. [Refund a payment](/api-reference/orders/refund-a-payment) fills `record_only`, `initiated_by`, `cancelled_with_order`, `notify_customer`, `allocation` and `other_amount`, and lists one `lines` entry for each order line it was spread over, with the money as decimal text. [Refund an order](/api-reference/orders/refund-an-order) records the refund on a separate `pis` payment, leaves those fields `null` and `lines` empty, whatever `line_items` you sent. An unknown order returns `404`, and a `HEAD` request returns `404`.",
+        "description": "Returns the order's refunds under `refunds`, newest first, with `order_id`, `order_no` and a `pagination` block. `limit` takes `1` to `20`: a larger value is capped at `20`, and `0` is rejected with `400`. Page with `offset`, which a negative value makes `400`, or with `page`. Any other query parameter, `sort` and `dir` included, is ignored. [Refund a payment](/api-reference/orders/refund-a-payment) fills `record_only`, `initiated_by`, `cancelled_with_order`, `notify_customer`, `allocation` and `other_amount`, and lists one `lines` entry for each order line it was spread over, with the money as decimal text. [Refund an order](/api-reference/orders/refund-an-order) records the refund on a separate `pis` payment, leaves those fields `null` and `lines` empty, whatever `line_items` you sent. An unknown order returns `404`, and a `HEAD` request returns `404`.",
         "parameters": [
           {
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34355,7 +34355,7 @@
                   "$ref": "#/components/schemas/OrderRefundPage"
                 },
                 "example": {
-                  "order_id": 2187,
+                  "order_id": 1043,
                   "order_no": 1043,
                   "refunds": [
                     {
@@ -34474,7 +34474,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34578,7 +34578,7 @@
         ],
         "summary": "Refund a payment",
         "operationId": "create_payment_refund",
-        "description": "Send an `Idempotency-Key` header with a value you choose, and the refund wrapped in `refund`, with `transaction_no` beside the wrapper if you send it. The refund lowers the order's `paid` and raises `refunded`; after a partial refund, the order's `refund_status` and the payment's `status` in the order's `payments` show `partial`. Sending the same key again returns the first refund again, with `idempotent_replay` set to `true`, and refunds nothing more. In the response, `order_id` holds the order's `internal_id` and `order_no` holds its `order_id`.",
+        "description": "Send an `Idempotency-Key` header with a value you choose, and the refund wrapped in `refund`, with `transaction_no` beside the wrapper if you send it. The refund lowers the order's `paid` and raises `refunded`; after a partial refund, the order's `refund_status` and the payment's `status` in the order's `payments` show `partial`. Sending the same key again returns the first refund again, with `idempotent_replay` set to `true`, and refunds nothing more.",
         "parameters": [
           {
             "name": "payment_id",
@@ -34612,7 +34612,7 @@
                   "status": "success",
                   "refund_id": 62,
                   "payment_id": 7712,
-                  "order_id": 2187,
+                  "order_id": 1043,
                   "order_no": 1043,
                   "currency": "AUD",
                   "amount": 5.0,
@@ -34722,20 +34722,20 @@
         }
       }
     },
-    "/admin/orders/{order_internal_id}/send-invoice": {
+    "/admin/orders/{order_id}/send-invoice": {
       "post": {
         "tags": [
           "Orders"
         ],
         "summary": "Send an order's invoice",
         "operationId": "send_order_invoice",
-        "description": "Pass the order's `internal_id`, not its `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or emails the invoice of the order whose `internal_id` has that number. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.",
+        "description": "Pass the order's `order_id`. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.",
         "parameters": [
           {
-            "name": "order_internal_id",
+            "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `internal_id`, from any response that returns the order. Do not pass the order's `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or reaches the order whose `internal_id` has that number.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34762,7 +34762,7 @@
             }
           },
           "404": {
-            "description": "No order has that `internal_id`. The message is `Order Not Found`.",
+            "description": "No order has that `order_id`. The message is `Order Not Found`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -34776,7 +34776,7 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/orders/2187/send-invoice\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/admin/orders/1043/send-invoice\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\""
           },
           {
             "lang": "python",
@@ -34829,7 +34829,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -34916,7 +34916,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -35072,7 +35072,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -35250,7 +35250,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -35437,7 +35437,7 @@
             "name": "order_id",
             "in": "path",
             "required": true,
-            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+            "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
             "schema": {
               "type": "integer"
             }
@@ -35796,13 +35796,13 @@
         ],
         "summary": "List a customer's orders",
         "operationId": "list_customer_orders",
-        "description": "Pass the customer's `customer_id`; the customer's `internal_id` returns `404` with the message `Customer Not Found`. Returns the customer's `customer_id` and `internal_id` and their orders in the flat shape, newest first, without paging; cancelled orders are left out. A customer with no orders returns `\"orders\": []`, and query parameters such as `limit`, `offset` and `sort` are ignored.",
+        "description": "Pass the customer's `customer_id`. Returns the customer's `customer_id` and `internal_id` and their orders in the flat shape, newest first, without paging; cancelled orders are left out. A customer with no orders returns `\"orders\": []`, and query parameters such as `limit`, `offset` and `sort` are ignored.",
         "parameters": [
           {
             "name": "customer_id",
             "in": "path",
             "required": true,
-            "description": "The customer's `customer_id`. The customer's `internal_id` returns `404` with the message `Customer Not Found`.",
+            "description": "The customer's `customer_id`.",
             "schema": {
               "type": "integer"
             }
@@ -36006,7 +36006,7 @@
             }
           },
           "404": {
-            "description": "No customer has that `customer_id`, for example because you passed the customer's `internal_id`. The body is flat, not wrapped in `error`.",
+            "description": "No customer has that `customer_id`. The body is flat, not wrapped in `error`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -37896,7 +37896,7 @@
         ],
         "summary": "Add a product to a cart",
         "operationId": "add_cart_item",
-        "description": "Adds a product to the cart named by `session_id`, creating the cart if needed, and returns the whole cart under `cart`. Send the product's `id` as `product_id`, a `quantity`, and the customer's `internal_id` as `customer_id`, at the top level of the body. If you leave out `session_id`, the store names the cart with your HTTP session's `JSESSIONID` cookie value, and `cart.session_id` in the response shows that name. Adding a product that is already in the cart raises that cart item's `quantity` and keeps its `id`.",
+        "description": "Adds a product to the cart named by `session_id`, creating the cart if needed, and returns the whole cart under `cart`. Send the product's `id` as `product_id`, a `quantity`, and the customer's `customer_id`, at the top level of the body. If you leave out `session_id`, the store names the cart with your HTTP session's `JSESSIONID` cookie value, and `cart.session_id` in the response shows that name. Adding a product that is already in the cart raises that cart item's `quantity` and keeps its `id`.",
         "parameters": [],
         "responses": {
           "201": {
@@ -37913,7 +37913,7 @@
                 },
                 "example": {
                   "cart": {
-                    "customer_id": 45,
+                    "customer_id": 123,
                     "session_id": "cart-7f3a9c2e1b",
                     "currency_code": "AUD",
                     "currency_symbol": "$",
@@ -37983,7 +37983,7 @@
             }
           },
           "400": {
-            "description": "`customer_id` or `quantity` is missing: the message is `customer_id not found` or `quantity not found`. You sent the customer's `customer_id` instead of the customer's `internal_id`: the message is `No Customer Found`. No product has that `product_id`, or the product was deleted: the message is `No product found`. A deleted product can still appear in [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location). The cart would hold more of the product than its stock: the message is `f:<n> quantity of this product is not available`. Carts do not reserve stock, so this limit applies to each cart on its own.",
+            "description": "`customer_id` or `quantity` is missing: the message is `customer_id not found` or `quantity not found`. No customer has that `customer_id`: the message is `No Customer Found`. No product has that `product_id`, or the product was deleted: the message is `No product found`. A deleted product can still appear in [List stock at an inventory location](/api-reference/inventory-locations/list-stock-at-an-inventory-location). The cart would hold more of the product than its stock: the message is `f:<n> quantity of this product is not available`. Carts do not reserve stock, so this limit applies to each cart on its own.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38005,7 +38005,7 @@
           {
             "lang": "bash",
             "label": "cURL",
-            "source": "curl -X POST \"$WC_BASE_URL/api/v4/carts\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_id\": 101,\n    \"quantity\": 1,\n    \"customer_id\": 45,\n    \"session_id\": \"cart-7f3a9c2e1b\",\n    \"shipping_address\": {\n      \"first_name\": \"Alex\",\n      \"last_name\": \"Taylor\",\n      \"address_line1\": \"1 Example Street\",\n      \"address_line2\": \"\",\n      \"city\": \"Sydney\",\n      \"post_code\": \"2000\",\n      \"phone\": \"\",\n      \"mobile\": \"\",\n      \"fax\": \"\",\n      \"email\": \"alex.taylor@example.com\",\n      \"country_code\": \"AU\",\n      \"state_code\": \"NSW\"\n    }\n  }'"
+            "source": "curl -X POST \"$WC_BASE_URL/api/v4/carts\" \\\n  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"product_id\": 101,\n    \"quantity\": 1,\n    \"customer_id\": 123,\n    \"session_id\": \"cart-7f3a9c2e1b\",\n    \"shipping_address\": {\n      \"first_name\": \"Alex\",\n      \"last_name\": \"Taylor\",\n      \"address_line1\": \"1 Example Street\",\n      \"address_line2\": \"\",\n      \"city\": \"Sydney\",\n      \"post_code\": \"2000\",\n      \"phone\": \"\",\n      \"mobile\": \"\",\n      \"fax\": \"\",\n      \"email\": \"alex.taylor@example.com\",\n      \"country_code\": \"AU\",\n      \"state_code\": \"NSW\"\n    }\n  }'"
           },
           {
             "lang": "python",
@@ -38689,7 +38689,7 @@
         ],
         "summary": "Create an order from a cart",
         "operationId": "create_order_from_cart",
-        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
         "parameters": [
           {
             "name": "session_id",
@@ -46125,7 +46125,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The blog post after the replace, under `blog`, without `group_meta`. A customer in the audience reads as the customer's `internal_id` and name.",
+            "description": "The blog post after the replace, under `blog`, without `group_meta`. A customer in the audience reads as the customer's `customer_id` and name.",
             "content": {
               "application/json": {
                 "schema": {
@@ -50293,7 +50293,7 @@
           {
             "name": "customerId",
             "in": "query",
-            "description": "A customer's `customer_id` or `internal_id`. `lastBought` and `lastViewed` need it or `customer_email`. A `customerId` that no customer has is rejected with `400` and the reason `unknown_reference`. `customer_id` is not read.",
+            "description": "A customer's `customer_id`. `lastBought` and `lastViewed` need it or `customer_email`. A `customerId` that no customer has is rejected with `400` and the reason `unknown_reference`. `customer_id` is not read.",
             "schema": {
               "type": "integer",
               "example": 74479
@@ -62546,7 +62546,7 @@
           },
           "internal_id": {
             "type": "integer",
-            "description": "A second number for the same customer. No path parameter takes it."
+            "description": "A second number for the same customer, returned for reference. Paths and fields take `customer_id`."
           },
           "uuid": {
             "type": "string",
@@ -74168,7 +74168,7 @@
         "properties": {
           "order_id": {
             "type": "integer",
-            "description": "The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."
+            "description": "The order's number in every order path. Equals `order_no`."
           },
           "order_no": {
             "type": "integer",
@@ -74176,7 +74176,7 @@
           },
           "internal_id": {
             "type": "integer",
-            "description": "A second number for the order. [Retrieve an order's custom fields](/api-reference/orders/retrieve-an-orders-custom-fields) and [Send an order's invoice](/api-reference/orders/send-an-orders-invoice) take it, and the listing's `orderIds` filter matches it."
+            "description": "A second number for the order, returned for reference. Paths and filters take `order_id`."
           },
           "uuid": {
             "type": "string",
@@ -74283,7 +74283,7 @@
         "properties": {
           "order_id": {
             "type": "integer",
-            "description": "The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."
+            "description": "The order's number in every order path. Equals `order_no`."
           },
           "order_no": {
             "type": "integer",
@@ -74291,7 +74291,7 @@
           },
           "internal_id": {
             "type": "integer",
-            "description": "A second number for the order, taken by the custom fields and invoice paths."
+            "description": "A second number for the order, returned for reference. Paths and filters take `order_id`."
           },
           "uuid": {
             "type": "string",
@@ -74534,14 +74534,14 @@
               "integer",
               "null"
             ],
-            "description": "The customer's `customer_id`, which [List a customer's orders](/api-reference/orders/list-a-customers-orders) takes."
+            "description": "The customer's `customer_id`, which [List a customer's orders](/api-reference/orders/list-a-customers-orders) and the listing's `customerId` filter take."
           },
           "internal_id": {
             "type": [
               "integer",
               "null"
             ],
-            "description": "The customer's `internal_id`, which the listing's `customerId` filter takes."
+            "description": "The customer's `internal_id`, returned for reference. Paths and filters take `customer_id`."
           },
           "email": {
             "type": "string",
@@ -75168,7 +75168,7 @@
         "properties": {
           "order_id": {
             "type": "integer",
-            "description": "The order's `internal_id`: the number you passed."
+            "description": "The order's `order_id`: the number you passed."
           },
           "custom_fields": {
             "type": "array",
@@ -75270,7 +75270,7 @@
         "properties": {
           "id": {
             "type": "integer",
-            "description": "The customer's `customer_id`, not the customer's `internal_id`."
+            "description": "The customer's `customer_id`."
           },
           "internal_id": {
             "type": "integer",
@@ -75312,11 +75312,11 @@
         "properties": {
           "order_id": {
             "type": "integer",
-            "description": "The order's `internal_id`."
+            "description": "The order's `order_id`."
           },
           "order_no": {
             "type": "integer",
-            "description": "The `order_id` you passed in the path."
+            "description": "Equals `order_id`."
           },
           "refunds": {
             "type": "array",
@@ -75411,7 +75411,7 @@
           },
           "order_id": {
             "type": "integer",
-            "description": "The order's `internal_id`."
+            "description": "The order's `order_id`."
           },
           "amount": {
             "type": "number",
@@ -75570,7 +75570,7 @@
           },
           "order_id": {
             "type": "integer",
-            "description": "The order's `internal_id`, not its `order_id`."
+            "description": "The order's `order_id`."
           },
           "order_no": {
             "type": "integer",
@@ -77756,7 +77756,7 @@
               "integer",
               "null"
             ],
-            "description": "The customer's `internal_id`, as you sent it to [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart). Only that call's response shows it: [Retrieve a cart](/api-reference/carts/retrieve-a-cart) and [Update a cart item](/api-reference/carts/update-a-cart-item) return `null`."
+            "description": "The customer's `customer_id`, as you sent it to [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart). Only that call's response shows it: [Retrieve a cart](/api-reference/carts/retrieve-a-cart) and [Update a cart item](/api-reference/carts/update-a-cart-item) return `null`."
           },
           "session_id": {
             "type": "string",
@@ -78022,7 +78022,7 @@
           },
           "customer_id": {
             "type": "integer",
-            "description": "Required. The customer's `internal_id`. The customer's `customer_id` is rejected with `400` and the message `No Customer Found`."
+            "description": "Required. The customer's `customer_id`."
           },
           "session_id": {
             "type": "string",
@@ -78131,7 +78131,7 @@
         "properties": {
           "customer_id": {
             "type": "integer",
-            "description": "Required. The customer's `customer_id`, not the `internal_id` that [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes."
+            "description": "Required. The customer's `customer_id`."
           },
           "payment_gateway": {
             "type": "string",
@@ -78316,7 +78316,7 @@
           },
           "internal_id": {
             "type": "integer",
-            "description": "The customer's `internal_id`: the number [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes."
+            "description": "The customer's `internal_id`, returned for reference. Paths and fields take `customer_id`."
           },
           "email": {
             "type": "string"
@@ -82525,7 +82525,7 @@
             "items": {
               "$ref": "#/components/schemas/BlogAudienceMember"
             },
-            "description": "One entry per customer: the customer's `internal_id` as `id`, and the customer's first and last name as `name`."
+            "description": "One entry per customer: the customer's `customer_id` as `id`, and the customer's first and last name as `name`."
           },
           "groups": {
             "type": "array",
@@ -82541,7 +82541,7 @@
         "properties": {
           "id": {
             "type": "integer",
-            "description": "For a customer, the customer's `internal_id`; for a customer group, the group's `id`."
+            "description": "For a customer, the customer's `customer_id`; for a customer group, the group's `id`."
           },
           "name": {
             "type": "string",
@@ -82814,7 +82814,7 @@
             "items": {
               "type": "integer"
             },
-            "description": "Each customer's `internal_id`, from [List customers](/api-reference/customers/list-customers). A customer's `customer_id` here is dropped without an error."
+            "description": "Each customer's `customer_id`, from [List customers](/api-reference/customers/list-customers)."
           },
           "groups": {
             "type": "array",

@@ -45,7 +45,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `{"customer_group": {"tax_configuration": {"tax_exempt": true}}}` changes `tax_exempt` and keeps
   the other five tax settings. There is no replace: `PUT` on a group is rejected with `405`.
 - **Members are customers, identified by their `customer_id`.** The member calls take the customer's
-  `customer_id`, as a number or a string, not its `internal_id`. A customer's groups are listed
+  `customer_id`, as a number or a string. A customer's groups are listed
   under `customer_groups` when you [retrieve the customer](/api-reference/customers/retrieve-a-customer).
 - **A listing returns 20 groups per call unless you send `limit`.** `limit` takes `1` to `100`. To get
   more, send a higher `offset`, or `page`, while `pagination.has_next` is `true`. To sort by date,
