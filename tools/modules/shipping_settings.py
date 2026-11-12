@@ -17,6 +17,10 @@ WARNING = (
 )
 
 NOTES = [
+    "**A store ships only once it has a default shipping profile.** A new store's `default_shipping_profile` is `null`, and orders\n"
+    "  with `delivery_type` `shipping` or `delivery` are refused with `400` and the message `We do not ship to your location.`\n"
+    "  Create a profile with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then send its `id` here as\n"
+    "  `{\"shipping_settings\": {\"default_shipping_profile\": 1}}`.",
     "**The seven settings have no paths of their own.** Read and write all seven at\n"
     "  `/admin/settings/shipping_settings/general`. The old path `/admin/settings/shipping_settings`\n"
     "  returns `404` with the message `Unknown settings page`. `group_meta` has three entries,\n"
