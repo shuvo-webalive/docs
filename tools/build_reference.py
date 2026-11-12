@@ -24,7 +24,7 @@ SDKS = [
     ("dart", "dart", "Dart"),
     ("go", "go", "Go"),
 ]
-GUIDE_PAGES = ["introduction", "installation", "api-application", "authentication", "authentication-legacy", "prepare-a-new-store"]
+GUIDE_PAGES = ["introduction", "installation", "api-application", "authentication", "authentication-legacy"]
 STORE_ADDRESS = re.compile(r"[a-z0-9-]+\.mywebcommander\.com", re.I)
 METHOD_COLOURS = {"GET": "#0f7b6c", "POST": "#2563eb", "PUT": "#b45309", "PATCH": "#7a5af8",
                   "DELETE": "#c2410c", "HEAD": "#475467"}

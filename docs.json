@@ -26,8 +26,7 @@
               "installation",
               "api-application",
               "authentication",
-              "authentication-legacy",
-              "prepare-a-new-store"
+              "authentication-legacy"
             ]
           }
         ]
