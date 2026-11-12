@@ -33,7 +33,7 @@ NOTES = [
     "  `{\"customer_group\": {\"tax_configuration\": {\"tax_exempt\": true}}}` changes `tax_exempt` and keeps\n"
     "  the other five tax settings. There is no replace: `PUT` on a group is rejected with `405`.",
     "**Members are customers, identified by their `customer_id`.** The member calls take the customer's\n"
-    "  `customer_id`, as a number or a string, not its `internal_id`. A customer's groups are listed\n"
+    "  `customer_id`, as a number or a string. A customer's groups are listed\n"
     "  under `customer_groups` when you [retrieve the customer](" + CUSTOMER_PAGE + ").",
     "**A listing returns 20 groups per call unless you send `limit`.** `limit` takes `1` to `100`. To get\n"
     "  more, send a higher `offset`, or `page`, while `pagination.has_next` is `true`. To sort by date,\n"
@@ -59,7 +59,7 @@ CUSTOMER_ID = {
     "name": "customer_id",
     "in": "path",
     "required": True,
-    "description": "The customer's `customer_id`, which is the `id` of the customer's entry in the group's `customers` list. Do not send the customer's `internal_id`: the store reads the value as a `customer_id` and looks up that customer instead.",
+    "description": "The customer's `customer_id`, which is the `id` of the customer's entry in the group's `customers` list.",
     "schema": {"type": "integer", "example": 5678},
 }
 

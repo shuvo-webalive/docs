@@ -37,14 +37,6 @@ INTRO = (
     " [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") uses `/api/v4/admin/customers`."
 )
 
-WARNING = (
-    "**Two paths take the order's `internal_id`, not its `order_id`.**\n"
-    "  [Retrieve an order's custom fields](" + CUSTOM_FIELDS_PAGE + ") and [Send an order's invoice](" + INVOICE_PAGE + ")\n"
-    "  find the order by its `internal_id`. If you pass an `order_id`, they return `404`, or, when another order\n"
-    "  has that number as its `internal_id`, they return that order's custom fields or email that order's invoice.\n"
-    "  Every other order path takes the `order_id`. Responses that return an order include both numbers."
-)
-
 NOTES = [
     "**An order comes back in one of two shapes.** [Retrieve an order](" + RETRIEVE_PAGE + "),\n"
     "  [List orders](" + LIST_PAGE + "), [Update an order](" + UPDATE_PAGE + ") and\n"
@@ -54,10 +46,10 @@ NOTES = [
     "  [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") return it flat: the totals and fulfillment fields at the\n"
     "  top level, the customer in `customer_summary` and the lines in `order_line_details`. A listing row has no\n"
     "  `billing_address` or `shipping_address`.",
-    "**The customer filters take different customer numbers.** The `customerId` filter of\n"
-    "  [List orders](" + LIST_PAGE + ") and [Count orders](" + COUNT_PAGE + ") takes the customer's `internal_id`, and the\n"
-    "  customer's `customer_id` matches nothing there. [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") takes the\n"
-    "  `customer_id`, and the customer's `internal_id` returns `404` there.",
+    "**Paths and filters take `order_id` and `customer_id`.** Every order path takes the order's `order_id`, and\n"
+    "  the `customerId` filter of [List orders](" + LIST_PAGE + ") and [Count orders](" + COUNT_PAGE + ") and\n"
+    "  [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") take the customer's `customer_id`. Responses also\n"
+    "  return an `internal_id` for the order and the customer: keep it for reference, but do not send it.",
     "**Every address you send replaces the whole stored address.** This holds when you create an order and in\n"
     "  [Update an order](" + UPDATE_PAGE + "), [Update selected order fields](" + PATCH_PAGE + ") and\n"
     "  [Update an order's addresses](" + ADDRESSES_PAGE + "): a field you leave out becomes `\"\"`. `company_name` is\n"
@@ -93,16 +85,8 @@ ORDER_ID = {
     "name": "order_id",
     "in": "path",
     "required": True,
-    "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no` and is not the order's `internal_id`.",
+    "description": "The order's `order_id`, from a listing or from the response to creating the order. It equals the order's `order_no`.",
     "schema": {"type": "integer", "example": 1043},
-}
-
-ORDER_INTERNAL_ID = {
-    "name": "order_internal_id",
-    "in": "path",
-    "required": True,
-    "description": "The order's `internal_id`, from any response that returns the order. Do not pass the order's `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or reaches the order whose `internal_id` has that number.",
-    "schema": {"type": "integer", "example": 2187},
 }
 
 PAYMENT_ID = {
@@ -125,7 +109,7 @@ CUSTOMER_ID = {
     "name": "customer_id",
     "in": "path",
     "required": True,
-    "description": "The customer's `customer_id`. The customer's `internal_id` returns `404` with the message `Customer Not Found`.",
+    "description": "The customer's `customer_id`.",
     "schema": {"type": "integer", "example": 512},
 }
 
@@ -151,7 +135,7 @@ def query(name, description, schema):
 
 
 FILTERS = [
-    query("customerId", "Keeps the orders of one customer. Send the customer's `internal_id`: the customer's `customer_id` matches nothing here.", {"type": "integer", "example": 88}),
+    query("customerId", "Keeps the orders of one customer. Send the customer's `customer_id`.", {"type": "integer", "example": 512}),
     query("customerName", "Keeps orders whose customer name contains this text, in any letter case.", {"type": "string", "example": "doe"}),
     query("search_text", "Keeps orders whose customer's email address matches this text.", {"type": "string", "example": "jane.doe@example.com"}),
     query("order_status", "Keeps orders with this status. Cancelled orders are listed only when you send `cancelled`. A value outside this list, such as a custom status from [Add a custom order status](" + CUSTOM_STATUS_PAGE + "), is rejected. `orderStatus` and `status` are other names for this parameter.", {"type": "string", "enum": ORDER_STATUSES, "example": "in_progress"}),
@@ -167,7 +151,7 @@ FILTERS = [
     query("orderTo", "Keeps orders created up to this date, written `YYYY-MM-DD`.", {"type": "string", "format": "date", "example": "2026-10-31"}),
     query("order_id", "Keeps the order with this `order_id`. `orderId` is another name for this parameter.", {"type": "integer", "example": 1043}),
     query("order_no", "Keeps the order with this `order_no`.", {"type": "integer", "example": 1043}),
-    query("orderIds", "Keeps the order with this `internal_id`. The order's `order_id` matches nothing here.", {"type": "integer", "example": 2187}),
+    query("orderIds", "Keeps the order with this `order_id`.", {"type": "integer", "example": 1043}),
     query("externalReferenceOrderId", "Keeps orders with this `external_reference_order_id`. `external_reference_order_id` is another name for this parameter.", {"type": "string", "example": "EXT-0001"}),
     query("flag", "Keeps orders that have this order flag. Send the flag's `id` from [List order flags](" + ORDER_FLAGS_PAGE + "). Orders with no flag are left out, and no Orders endpoint puts a flag on an order.", {"type": "integer", "example": 3}),
 ]
@@ -646,19 +630,19 @@ ENDPOINTS = [
         "slug": "retrieve-an-orders-custom-fields",
         "title": "Retrieve an order's custom fields",
         "method": "GET",
-        "path": BASE + "/{order_internal_id}/custom_fields",
-        "summary": "Returns the custom field values of the order whose `internal_id` you pass.",
-        "description": "Pass the order's `internal_id`, not its `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or the custom fields of the order whose `internal_id` has that number. The response's `order_id` field holds the `internal_id` you passed, and `custom_fields` lists the order's custom field values. An order with `delivery_type` `delivery` also returns `delivery_cost`.",
-        "parameters": [ORDER_INTERNAL_ID],
+        "path": BASE + "/{order_id}/custom_fields",
+        "summary": "Returns the custom field values of an order.",
+        "description": "Pass the order's `order_id`. The response returns the order's `order_id`, and `custom_fields` lists the order's custom field values. An order with `delivery_type` `delivery` also returns `delivery_cost`.",
+        "parameters": [ORDER_ID],
         "responses": {
             "200": {
                 "description": "The order's custom field values.",
                 "schema": ref("OrderCustomFields"),
-                "example": {"order_id": 2187, "custom_fields": []},
+                "example": {"order_id": 1043, "custom_fields": []},
             },
-            "404": {"description": "No order has that `internal_id`. The message is `Order not found`.", "schema": ERROR_REF},
+            "404": {"description": "No order has that `order_id`. The message is `Order not found`.", "schema": ERROR_REF},
         },
-        "example_call": {"path": {"order_internal_id": 2187}},
+        "example_call": {"path": {"order_id": 1043}},
     },
     {
         "key": "create_order_payment",
@@ -701,13 +685,13 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{order_id}/refunds",
         "summary": "Returns the refunds recorded against an order, newest first, with paging details.",
-        "description": "Returns the order's refunds under `refunds`, newest first, with `order_id`, `order_no` and a `pagination` block. `order_id` in the response is the order's `internal_id`, and `order_no` is the `order_id` you passed in the path. `limit` takes `1` to `20`: a larger value is capped at `20`, and `0` is rejected with `400`. Page with `offset`, which a negative value makes `400`, or with `page`. Any other query parameter, `sort` and `dir` included, is ignored. [Refund a payment](" + PAYMENT_REFUND_PAGE + ") fills `record_only`, `initiated_by`, `cancelled_with_order`, `notify_customer`, `allocation` and `other_amount`, and lists one `lines` entry for each order line it was spread over, with the money as decimal text. [Refund an order](" + ORDER_REFUND_PAGE + ") records the refund on a separate `pis` payment, leaves those fields `null` and `lines` empty, whatever `line_items` you sent. An unknown order returns `404`, and a `HEAD` request returns `404`.",
+        "description": "Returns the order's refunds under `refunds`, newest first, with `order_id`, `order_no` and a `pagination` block. `limit` takes `1` to `20`: a larger value is capped at `20`, and `0` is rejected with `400`. Page with `offset`, which a negative value makes `400`, or with `page`. Any other query parameter, `sort` and `dir` included, is ignored. [Refund a payment](" + PAYMENT_REFUND_PAGE + ") fills `record_only`, `initiated_by`, `cancelled_with_order`, `notify_customer`, `allocation` and `other_amount`, and lists one `lines` entry for each order line it was spread over, with the money as decimal text. [Refund an order](" + ORDER_REFUND_PAGE + ") records the refund on a separate `pis` payment, leaves those fields `null` and `lines` empty, whatever `line_items` you sent. An unknown order returns `404`, and a `HEAD` request returns `404`.",
         "parameters": [ORDER_ID, REFUNDS_LIMIT, REFUNDS_PAGE, REFUNDS_OFFSET],
         "responses": {
             "200": {
                 "description": "The order's refunds in `refunds`, newest first, and the paging details in `pagination`.",
                 "schema": ref("OrderRefundPage"),
-                "example": {"order_id": 2187, "order_no": 1043, "refunds": [REFUND_RECORD], "pagination": SAMPLE_REFUND_PAGINATION},
+                "example": {"order_id": 1043, "order_no": 1043, "refunds": [REFUND_RECORD], "pagination": SAMPLE_REFUND_PAGINATION},
             },
             "400": {"description": "`limit` is `0`, or `offset` is negative.", "schema": ERROR_REF},
             "404": {"description": "No order has this `order_id`.", "schema": ERROR_REF},
@@ -744,7 +728,7 @@ ENDPOINTS = [
         "method": "POST",
         "path": "/admin/payment/{payment_id}/refunds",
         "summary": "Refunds an amount from a payment, lowering the order's `paid`. Needs an `Idempotency-Key` header.",
-        "description": "Send an `Idempotency-Key` header with a value you choose, and the refund wrapped in `refund`, with `transaction_no` beside the wrapper if you send it. The refund lowers the order's `paid` and raises `refunded`; after a partial refund, the order's `refund_status` and the payment's `status` in the order's `payments` show `partial`. Sending the same key again returns the first refund again, with `idempotent_replay` set to `true`, and refunds nothing more. In the response, `order_id` holds the order's `internal_id` and `order_no` holds its `order_id`.",
+        "description": "Send an `Idempotency-Key` header with a value you choose, and the refund wrapped in `refund`, with `transaction_no` beside the wrapper if you send it. The refund lowers the order's `paid` and raises `refunded`; after a partial refund, the order's `refund_status` and the payment's `status` in the order's `payments` show `partial`. Sending the same key again returns the first refund again, with `idempotent_replay` set to `true`, and refunds nothing more.",
         "parameters": [PAYMENT_ID, IDEMPOTENCY_KEY],
         "body": {
             "schema": {"type": "object", "required": ["refund"], "properties": {
@@ -758,7 +742,7 @@ ENDPOINTS = [
                 "description": "The refund, with `status` set to `success` and `amount` as a number. A repeat under the same `Idempotency-Key` returns the same `refund_id`, adds `\"idempotent_replay\": true`, and leaves out `adjust_with_order`, `gateway_refund`, `inventory_readjusted` and `refund_email_queued`.",
                 "schema": ref("OrderPaymentRefund"),
                 "example": {
-                    "status": "success", "refund_id": 62, "payment_id": 7712, "order_id": 2187, "order_no": 1043, "currency": "AUD",
+                    "status": "success", "refund_id": 62, "payment_id": 7712, "order_id": 1043, "order_no": 1043, "currency": "AUD",
                     "amount": 5.0, "reason": "Damaged item", "gateway_refund": False, "gateway_transaction_id": None,
                     "transaction_status": None, "payment_status": "partial", "payment_refund_status": None, "order_refund_status": "partial",
                     "order_refunded_total": 5.0, "order_adjustment": 0.0, "order_total": 40.0, "available_for_refund": 15.0,
@@ -776,19 +760,19 @@ ENDPOINTS = [
         "slug": "send-an-orders-invoice",
         "title": "Send an order's invoice",
         "method": "POST",
-        "path": BASE + "/{order_internal_id}/send-invoice",
-        "summary": "Emails the invoice of the order whose `internal_id` you pass to its billing email address.",
-        "description": "Pass the order's `internal_id`, not its `order_id`: this path finds the order by `internal_id`, so an `order_id` returns `404` or emails the invoice of the order whose `internal_id` has that number. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.",
-        "parameters": [ORDER_INTERNAL_ID],
+        "path": BASE + "/{order_id}/send-invoice",
+        "summary": "Emails an order's invoice to its billing email address.",
+        "description": "Pass the order's `order_id`. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.",
+        "parameters": [ORDER_ID],
         "responses": {
             "200": {
                 "description": "`status` is `success`. `sent_to` is the email address of the order's billing address.",
                 "schema": ref("OrderInvoiceDispatch"),
                 "example": {"status": "success", "order_id": 1043, "internal_id": 2187, "sent_to": "jane.doe@example.com", "template": "send-invoice", "invoice_document": None, "sent_at": "2026-10-07T09:40:12Z"},
             },
-            "404": {"description": "No order has that `internal_id`. The message is `Order Not Found`.", "schema": ERROR_REF},
+            "404": {"description": "No order has that `order_id`. The message is `Order Not Found`.", "schema": ERROR_REF},
         },
-        "example_call": {"path": {"order_internal_id": 2187}},
+        "example_call": {"path": {"order_id": 1043}},
     },
     {
         "key": "get_order_shipment_status",
@@ -924,7 +908,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": "/admin/customers/{customer_id}/orders",
         "summary": "Returns all of a customer's orders, newest first, leaving out cancelled orders.",
-        "description": "Pass the customer's `customer_id`; the customer's `internal_id` returns `404` with the message `Customer Not Found`. Returns the customer's `customer_id` and `internal_id` and their orders in the flat shape, newest first, without paging; cancelled orders are left out. A customer with no orders returns `\"orders\": []`, and query parameters such as `limit`, `offset` and `sort` are ignored.",
+        "description": "Pass the customer's `customer_id`. Returns the customer's `customer_id` and `internal_id` and their orders in the flat shape, newest first, without paging; cancelled orders are left out. A customer with no orders returns `\"orders\": []`, and query parameters such as `limit`, `offset` and `sort` are ignored.",
         "parameters": [CUSTOMER_ID],
         "responses": {
             "200": {
@@ -937,7 +921,7 @@ ENDPOINTS = [
                 "example": {"customer_id": 512, "internal_id": 88, "orders": [CUSTOMER_FLAT_ORDER]},
             },
             "404": {
-                "description": "No customer has that `customer_id`, for example because you passed the customer's `internal_id`. The body is flat, not wrapped in `error`.",
+                "description": "No customer has that `customer_id`. The body is flat, not wrapped in `error`.",
                 "schema": FLAT_ERROR_REF,
                 "example": {"status": "error", "code": 404, "message": "Customer Not Found"},
             },
@@ -1012,9 +996,9 @@ WITH_PAYMENT_PROPERTIES = dict(
 
 SCHEMAS = {
     "Order": {"type": "object", "description": "One order in sections. A listing row has no `billing_address` or `shipping_address`, and its `customer` has only `customer_id`, `internal_id`, `first_name`, `last_name` and `customer_group`.", "properties": {
-        "order_id": whole("The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."),
+        "order_id": whole("The order's number in every order path. Equals `order_no`."),
         "order_no": whole("Equals `order_id`."),
-        "internal_id": whole("A second number for the order. [Retrieve an order's custom fields](" + CUSTOM_FIELDS_PAGE + ") and [Send an order's invoice](" + INVOICE_PAGE + ") take it, and the listing's `orderIds` filter matches it."),
+        "internal_id": whole("A second number for the order, returned for reference. Paths and filters take `order_id`."),
         "uuid": text("A UUID the store assigns to the order. You cannot set it: [Update selected order fields](" + PATCH_PAGE + ") rejects a body that names `uuid` with `400` and the reason `unknown_field`."),
         "order_status": {"type": "string", "enum": ORDER_STATUSES, "description": "`in_progress` on a new order."},
         "payment_status": text("`unpaid` on a new order, and `partial` after a payment for part of the total."),
@@ -1036,9 +1020,9 @@ SCHEMAS = {
         "fulfillment": ref("OrderFulfillment"),
     }},
     "OrderFlat": {"type": "object", "description": "One order in the flat shape: the totals and fulfillment fields at the top level, the customer in `customer_summary` and the lines in `order_line_details`. Creating, cancelling and changing the status of an order, and listing a customer's orders, return this shape.", "properties": {
-        "order_id": whole("The order's number in every order path except the custom fields and invoice paths. Equals `order_no`."),
+        "order_id": whole("The order's number in every order path. Equals `order_no`."),
         "order_no": whole("Equals `order_id`."),
-        "internal_id": whole("A second number for the order, taken by the custom fields and invoice paths."),
+        "internal_id": whole("A second number for the order, returned for reference. Paths and filters take `order_id`."),
         "uuid": text("A UUID the store assigns to the order."),
         "transaction_no": nullable_text("The transaction number the order is filed under, sent when the order was created in the `X-Transaction-No` header or the body's `transaction_no`; when you sent both, the header's number. [Create an order with a payment](" + WITH_PAYMENT_PAGE + ") does not store it."),
         "currency_code": text("The order's currency code."),
@@ -1083,8 +1067,8 @@ SCHEMAS = {
         "last_name": text("The customer's last name."),
         "customer_group": nullable_text("The customer's group."),
         "gender": nullable_text("The customer's gender."),
-        "customer_id": {"type": ["integer", "null"], "description": "The customer's `customer_id`, which [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") takes."},
-        "internal_id": {"type": ["integer", "null"], "description": "The customer's `internal_id`, which the listing's `customerId` filter takes."},
+        "customer_id": {"type": ["integer", "null"], "description": "The customer's `customer_id`, which [List a customer's orders](" + CUSTOMER_ORDERS_PAGE + ") and the listing's `customerId` filter take."},
+        "internal_id": {"type": ["integer", "null"], "description": "The customer's `internal_id`, returned for reference. Paths and filters take `customer_id`."},
         "email": text("The customer's email address."),
         "address_line_1": text("The first address line."),
         "address_line_2": text("The second address line."),
@@ -1231,7 +1215,7 @@ SCHEMAS = {
         "created": text("When the comment was added, written `M/D/YYYY`, two spaces and a time, such as `10/7/2026  14:05:09`. Not ISO 8601."),
     }},
     "OrderCustomFields": {"type": "object", "properties": {
-        "order_id": whole("The order's `internal_id`: the number you passed."),
+        "order_id": whole("The order's `order_id`: the number you passed."),
         "custom_fields": {"type": "array", "items": {}, "description": "The order's custom field values."},
         "delivery_cost": number("Only on an order with `delivery_type` `delivery`."),
     }},
@@ -1254,7 +1238,7 @@ SCHEMAS = {
         "created_at": text("When the payment was recorded."),
     }},
     "OrderPaymentReceiptCustomer": {"type": "object", "description": "The order's customer.", "properties": {
-        "id": whole("The customer's `customer_id`, not the customer's `internal_id`."),
+        "id": whole("The customer's `customer_id`."),
         "internal_id": whole("The customer's `internal_id`."),
         "name": text("The customer's name."),
     }},
@@ -1266,8 +1250,8 @@ SCHEMAS = {
         "amount": text("The `amount` you sent, as text."),
     }},
     "OrderRefundPage": {"type": "object", "properties": {
-        "order_id": whole("The order's `internal_id`."),
-        "order_no": whole("The `order_id` you passed in the path."),
+        "order_id": whole("The order's `order_id`."),
+        "order_no": whole("Equals `order_id`."),
         "refunds": {"type": "array", "items": ref("OrderRefundRecord"), "description": "The refunds on this page, newest first."},
         "pagination": ref("OrderRefundPagination"),
     }},
@@ -1284,7 +1268,7 @@ SCHEMAS = {
         "lines": {"type": "array", "items": ref("OrderRefundRecordLine"), "description": "One entry for each order line the refund was spread over. Empty for a refund made with [Refund an order](" + ORDER_REFUND_PAGE + ")."},
         "refund_id": whole("Identifies the refund."),
         "payment_id": whole("Identifies the payment the refund is filed on."),
-        "order_id": whole("The order's `internal_id`."),
+        "order_id": whole("The order's `order_id`."),
         "amount": number("The amount refunded, as a number."),
         "status": text("The refund's status."),
         "transaction_status": nullable_text("The refund's transaction status."),
@@ -1321,7 +1305,7 @@ SCHEMAS = {
         "status": text("`success`."),
         "refund_id": whole("Identifies the refund. A repeat under the same `Idempotency-Key` returns the same value."),
         "payment_id": whole("The `payment_id` you passed."),
-        "order_id": whole("The order's `internal_id`, not its `order_id`."),
+        "order_id": whole("The order's `order_id`."),
         "order_no": whole("The order's `order_id`."),
         "currency": text("The currency code."),
         "amount": number("The amount refunded, as a number."),

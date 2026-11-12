@@ -6,14 +6,6 @@ description: "List, count, create, change, cancel and delete orders, add comment
 
 The Orders API has 25 endpoints, and you can call every one from all seven SDKs. Most paths start with `/api/v4/admin/orders`; [Refund a payment](/api-reference/orders/refund-a-payment) uses `/api/v4/admin/payment`, [Add a custom order status](/api-reference/orders/add-a-custom-order-status) uses `/api/v4/admin/order`, and [List a customer's orders](/api-reference/orders/list-a-customers-orders) uses `/api/v4/admin/customers`.
 
-<Warning>
-  **Two paths take the order's `internal_id`, not its `order_id`.**
-  [Retrieve an order's custom fields](/api-reference/orders/retrieve-an-orders-custom-fields) and [Send an order's invoice](/api-reference/orders/send-an-orders-invoice)
-  find the order by its `internal_id`. If you pass an `order_id`, they return `404`, or, when another order
-  has that number as its `internal_id`, they return that order's custom fields or email that order's invoice.
-  Every other order path takes the `order_id`. Responses that return an order include both numbers.
-</Warning>
-
 ## At a glance
 
 | Endpoint | Method | Path | What it does |
@@ -30,12 +22,12 @@ The Orders API has 25 endpoints, and you can call every one from all seven SDKs.
 | [Cancel an order](/api-reference/orders/cancel-an-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_id}/cancel` | Cancels an order and returns it with `order_status` set to `cancelled`. |
 | [List an order's comments](/api-reference/orders/list-an-orders-comments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/{order_id}/comments` | Returns all of an order's comments, oldest first, in one list. |
 | [Add a comment to an order](/api-reference/orders/add-a-comment-to-an-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_id}/comments` | Adds a comment to an order and returns it. |
-| [Retrieve an order's custom fields](/api-reference/orders/retrieve-an-orders-custom-fields) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/{order_internal_id}/custom_fields` | Returns the custom field values of the order whose `internal_id` you pass. |
+| [Retrieve an order's custom fields](/api-reference/orders/retrieve-an-orders-custom-fields) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/{order_id}/custom_fields` | Returns the custom field values of an order. |
 | [Record a payment on an order](/api-reference/orders/record-a-payment-on-an-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_id}/payments` | Records a payment on an order and returns a receipt whose `id` is the payment's `payment_id`. |
 | [List an order's refunds](/api-reference/orders/list-an-orders-refunds) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/{order_id}/refunds` | Returns the refunds recorded against an order, newest first, with paging details. |
 | [Refund an order](/api-reference/orders/refund-an-order) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_id}/refunds` | Records a refund against an order, raising `refunded` and leaving `paid` unchanged. |
 | [Refund a payment](/api-reference/orders/refund-a-payment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `/admin/payment/{payment_id}/refunds` | Refunds an amount from a payment, lowering the order's `paid`. Needs an `Idempotency-Key` header. |
-| [Send an order's invoice](/api-reference/orders/send-an-orders-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_internal_id}/send-invoice` | Emails the invoice of the order whose `internal_id` you pass to its billing email address. |
+| [Send an order's invoice](/api-reference/orders/send-an-orders-invoice) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_id}/send-invoice` | Emails an order's invoice to its billing email address. |
 | [Retrieve an order's shipment status](/api-reference/orders/retrieve-an-orders-shipment-status) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/{order_id}/shipment-status` | Returns how far an order has shipped, with tracking details for each shipment. |
 | [List an order's shipments](/api-reference/orders/list-an-orders-shipments) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/{order_id}/shipments` | Returns all of an order's shipments in one list. |
 | [Create a shipment](/api-reference/orders/create-a-shipment) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/{order_id}/shipments` | Ships units of an order's lines and returns the new shipment with its `shipping_id`. |
@@ -61,10 +53,10 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   [List a customer's orders](/api-reference/orders/list-a-customers-orders) return it flat: the totals and fulfillment fields at the
   top level, the customer in `customer_summary` and the lines in `order_line_details`. A listing row has no
   `billing_address` or `shipping_address`.
-- **The customer filters take different customer numbers.** The `customerId` filter of
-  [List orders](/api-reference/orders/list-orders) and [Count orders](/api-reference/orders/count-orders) takes the customer's `internal_id`, and the
-  customer's `customer_id` matches nothing there. [List a customer's orders](/api-reference/orders/list-a-customers-orders) takes the
-  `customer_id`, and the customer's `internal_id` returns `404` there.
+- **Paths and filters take `order_id` and `customer_id`.** Every order path takes the order's `order_id`, and
+  the `customerId` filter of [List orders](/api-reference/orders/list-orders) and [Count orders](/api-reference/orders/count-orders) and
+  [List a customer's orders](/api-reference/orders/list-a-customers-orders) take the customer's `customer_id`. Responses also
+  return an `internal_id` for the order and the customer: keep it for reference, but do not send it.
 - **Every address you send replaces the whole stored address.** This holds when you create an order and in
   [Update an order](/api-reference/orders/update-an-order), [Update selected order fields](/api-reference/orders/update-selected-order-fields) and
   [Update an order's addresses](/api-reference/orders/update-an-orders-addresses): a field you leave out becomes `""`. `company_name` is

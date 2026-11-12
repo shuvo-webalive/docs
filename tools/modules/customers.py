@@ -7,7 +7,7 @@ CUSTOMER_ID = {
     "name": "customer_id",
     "in": "path",
     "required": True,
-    "description": "The customer's `customer_id`, as returned by the listing. Not `internal_id`.",
+    "description": "The customer's `customer_id`, as returned by the listing.",
     "schema": {"type": "integer", "example": 123},
 }
 
@@ -98,7 +98,7 @@ ENDPOINTS = [
         "method": "GET",
         "path": BASE + "/{customer_id}",
         "summary": "One customer by `customer_id`.",
-        "description": "Returns one customer. Use the `customer_id` from a listing. `internal_id` is a second id space over the same records: sending it can return a different customer with a `200` rather than a `404`, so check the record you get back is the one you asked for.",
+        "description": "Returns one customer. Use the `customer_id` from a listing.",
         "parameters": [CUSTOMER_ID],
         "responses": {
             "200": {"description": "The customer.", "schema": {"type": "object", "properties": {"customer": {"$ref": "#/components/schemas/Customer"}}}, "example": {"customer": dict(SAMPLE_CUSTOMER, email_verified=True)}},
@@ -317,7 +317,7 @@ SCHEMAS = {
     "CustomProperty": {"type": "object", "properties": {"id": {"type": "integer"}, "label": {"type": "string"}, "description": {"type": "string"}}},
     "Customer": {"type": "object", "properties": {
         "customer_id": {"type": "integer", "description": "The customer's number that every `{customer_id}` path parameter takes."},
-        "internal_id": {"type": "integer", "description": "A second number for the same customer. No path parameter takes it."},
+        "internal_id": {"type": "integer", "description": "A second number for the same customer, returned for reference. Paths and fields take `customer_id`."},
         "uuid": {"type": "string", "description": "A UUID the store assigns to the customer. Every customer in a listing has one. A `uuid` you send in a write is ignored."},
         "email_verified": {"type": "boolean", "description": "Whether the customer's email address is verified. Only a single customer read returns it; listing rows do not have it. It does not change `status`."},
         "first_name": {"type": "string"}, "last_name": {"type": "string"}, "name": {"type": "string"},
@@ -401,10 +401,8 @@ ICON = "users"
 OVERVIEW_DESCRIPTION = "Read, create, update and remove customers, and manage their addresses, passwords and store credit."
 INTRO = "The Customers API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/customers`."
 WARNING = (
-    "Paths take the customer's `customer_id`. Each customer also has an `internal_id`, a separate\n"
-    "  number that no path takes. If you send an `internal_id` by mistake and it matches another\n"
-    "  customer's `customer_id`, you get **that other customer with a `200`** instead of a `404`.\n"
-    "  Check that the customer you get back is the one you asked for."
+    "Paths and fields take the customer's `customer_id`. Responses also return an `internal_id`:\n"
+    "  keep it for reference, but do not send it."
 )
 NOTES = [
     "**A listing returns at most 20 records per call.** A larger `limit` is not rejected, but you\n"

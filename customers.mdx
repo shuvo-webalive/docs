@@ -7,10 +7,8 @@ description: "Read, create, update and remove customers, and manage their addres
 The Customers API has fifteen endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/customers`.
 
 <Warning>
-  Paths take the customer's `customer_id`. Each customer also has an `internal_id`, a separate
-  number that no path takes. If you send an `internal_id` by mistake and it matches another
-  customer's `customer_id`, you get **that other customer with a `200`** instead of a `404`.
-  Check that the customer you get back is the one you asked for.
+  Paths and fields take the customer's `customer_id`. Responses also return an `internal_id`:
+  keep it for reference, but do not send it.
 </Warning>
 
 ## At a glance

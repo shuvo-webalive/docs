@@ -21,14 +21,6 @@ INTRO = (
     " [Create an order from a cart](" + ORDER_PAGE + ") uses `/api/v4/admin/orders/carts/{session_id}`."
 )
 
-WARNING = (
-    "**Adding a product and creating an order take different numbers for the same customer.**\n"
-    "  [Add a product to a cart](" + ADD_PAGE + ") takes the customer's `internal_id` in its `customer_id`\n"
-    "  field, and rejects the customer's `customer_id` with `400` and the message `No Customer Found`.\n"
-    "  [Create an order from a cart](" + ORDER_PAGE + ") takes the customer's `customer_id`.\n"
-    "  [Create a customer](" + CREATE_CUSTOMER_PAGE + ") returns both values."
-)
-
 NOTES = [
     "**You name each cart with a `session_id` you choose.** Send it in the body each time you add a product,\n"
     "  and pass the same value as the `session_id` path parameter in every other cart call. If you add a\n"
@@ -39,10 +31,9 @@ NOTES = [
     "  or turn it into an order, and for a `session_id` you never used. Emptying a cart that is already empty\n"
     "  returns the same `400`.",
     "**Only the response to adding a product shows the customer.** Its `cart.customer_id` is the customer's\n"
-    "  `internal_id` you sent. [Retrieve a cart](" + RETRIEVE_PAGE + ") and [Update a cart item](" + UPDATE_PAGE + ")\n"
+    "  `customer_id` you sent. [Retrieve a cart](" + RETRIEVE_PAGE + ") and [Update a cart item](" + UPDATE_PAGE + ")\n"
     "  return `cart.customer_id` as `null`, even when your client sends back the `JSESSIONID` cookie the store set.\n"
-    "  A cart never holds the customer's `customer_id`, so keep it yourself:\n"
-    "  [Create an order from a cart](" + ORDER_PAGE + ") needs it.",
+    "  Keep the customer's `customer_id` yourself: [Create an order from a cart](" + ORDER_PAGE + ") needs it.",
     "**The shipping address sets the cart's shipping taxes, but no cart response returns an address.** The\n"
     "  `shipping_address.country_code` you send when you add a product or update an item decides\n"
     "  `shipping.shipping_tax` and `shipping.handling_tax`, and every later read of the cart shows the result.\n"
@@ -217,19 +208,19 @@ ENDPOINTS = [
         "method": "POST",
         "path": BASE,
         "summary": "Adds a product to a cart, creating the cart if needed, and returns the cart.",
-        "description": "Adds a product to the cart named by `session_id`, creating the cart if needed, and returns the whole cart under `cart`. Send the product's `id` as `product_id`, a `quantity`, and the customer's `internal_id` as `customer_id`, at the top level of the body. If you leave out `session_id`, the store names the cart with your HTTP session's `JSESSIONID` cookie value, and `cart.session_id` in the response shows that name. Adding a product that is already in the cart raises that cart item's `quantity` and keeps its `id`.",
+        "description": "Adds a product to the cart named by `session_id`, creating the cart if needed, and returns the whole cart under `cart`. Send the product's `id` as `product_id`, a `quantity`, and the customer's `customer_id`, at the top level of the body. If you leave out `session_id`, the store names the cart with your HTTP session's `JSESSIONID` cookie value, and `cart.session_id` in the response shows that name. Adding a product that is already in the cart raises that cart item's `quantity` and keeps its `id`.",
         "body": {
             "schema": ref("CartItemInput"),
-            "example": {"product_id": 101, "quantity": 1, "customer_id": 45, "session_id": SESSION, "shipping_address": ADDRESS},
+            "example": {"product_id": 101, "quantity": 1, "customer_id": 123, "session_id": SESSION, "shipping_address": ADDRESS},
         },
         "responses": {
             "201": {
                 "description": "The cart under `cart`, with the `customer_id` you sent. The response has no `group_meta`. When your request sends no `JSESSIONID` cookie, the response sets one in a `Set-Cookie` header. If the product needs options and you send none, the call also returns `201`, but the body is not valid JSON: it has `\"status\": \"incomplete-info\"` instead of `cart`.",
                 "schema": CART_RESPONSE,
-                "example": {"cart": sample_cart(1, 45)},
+                "example": {"cart": sample_cart(1, 123)},
             },
             "400": {
-                "description": "`customer_id` or `quantity` is missing: the message is `customer_id not found` or `quantity not found`. You sent the customer's `customer_id` instead of the customer's `internal_id`: the message is `No Customer Found`. No product has that `product_id`, or the product was deleted: the message is `No product found`. A deleted product can still appear in [List stock at an inventory location](" + STOCK_PAGE + "). The cart would hold more of the product than its stock: the message is `f:<n> quantity of this product is not available`. Carts do not reserve stock, so this limit applies to each cart on its own.",
+                "description": "`customer_id` or `quantity` is missing: the message is `customer_id not found` or `quantity not found`. No customer has that `customer_id`: the message is `No Customer Found`. No product has that `product_id`, or the product was deleted: the message is `No product found`. A deleted product can still appear in [List stock at an inventory location](" + STOCK_PAGE + "). The cart would hold more of the product than its stock: the message is `f:<n> quantity of this product is not available`. Carts do not reserve stock, so this limit applies to each cart on its own.",
                 "schema": ERROR_REF,
                 "example": NO_CUSTOMER,
             },
@@ -354,7 +345,7 @@ ENDPOINTS = [
         "method": "POST",
         "path": "/admin/orders/carts/{session_id}",
         "summary": "Turns the cart into an order, empties the cart and returns the new order.",
-        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`, not the `internal_id` that [Add a product to a cart](" + ADD_PAGE + ") takes; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](" + UPDATE_PAGE + ") with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](" + UPDATE_PAGE + ") with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
         "parameters": [SESSION_ID, TRANSACTION_NO],
         "body": {"schema": ref("CartOrderInput"), "example": ORDER_BODY},
         "responses": {
@@ -391,7 +382,7 @@ REFERENCE_REF = ref("CartReference")
 
 SCHEMAS = {
     "Cart": {"type": "object", "properties": {
-        "customer_id": {"type": ["integer", "null"], "description": "The customer's `internal_id`, as you sent it to [Add a product to a cart](" + ADD_PAGE + "). Only that call's response shows it: [Retrieve a cart](" + RETRIEVE_PAGE + ") and [Update a cart item](" + UPDATE_PAGE + ") return `null`."},
+        "customer_id": {"type": ["integer", "null"], "description": "The customer's `customer_id`, as you sent it to [Add a product to a cart](" + ADD_PAGE + "). Only that call's response shows it: [Retrieve a cart](" + RETRIEVE_PAGE + ") and [Update a cart item](" + UPDATE_PAGE + ") return `null`."},
         "session_id": text("The cart's `session_id`. Pass it as the `session_id` path parameter in the other cart calls."),
         "currency_code": text("The currency of the cart's amounts, such as `AUD`."),
         "currency_symbol": text("The currency symbol, such as `$`."),
@@ -476,7 +467,7 @@ SCHEMAS = {
     "CartItemInput": {"type": "object", "properties": {
         "product_id": {"type": "integer", "description": "Required. The product's `id`."},
         "quantity": {"type": "integer", "description": "Required. How many to add. If the product is already in the cart, this raises that item's `quantity`."},
-        "customer_id": {"type": "integer", "description": "Required. The customer's `internal_id`. The customer's `customer_id` is rejected with `400` and the message `No Customer Found`."},
+        "customer_id": {"type": "integer", "description": "Required. The customer's `customer_id`."},
         "session_id": text("The name you choose for the cart. Without it, the store uses your HTTP session's `JSESSIONID`, and `cart.session_id` in the response shows it."),
         "shipping_address": dict(ADDRESS_INPUT_REF, description="Sets the cart's shipping taxes. It never reaches an order made from the cart."),
     }, "required": ["product_id", "quantity", "customer_id"], "description": "Send these fields at the top level of the body."},
@@ -504,7 +495,7 @@ SCHEMAS = {
         "sessionId": {"type": ["string", "null"], "description": "A value to get back as `sessionId`. `null` or `\"\"` returns your HTTP session's `JSESSIONID` instead: the cookie your client sends, or a new value when it sends none."},
     }, "description": "Send `{}` to get back the `session_id` from the path. A `session_id` key is ignored."},
     "CartOrderInput": {"type": "object", "properties": {
-        "customer_id": {"type": "integer", "description": "Required. The customer's `customer_id`, not the `internal_id` that [Add a product to a cart](" + ADD_PAGE + ") takes."},
+        "customer_id": {"type": "integer", "description": "Required. The customer's `customer_id`."},
         "payment_gateway": text("The payment gateway. Defaults to `PIS`."),
         "delivery_type": text("The delivery type, such as `shipping`."),
         "transaction_no": text("A transaction number to file the order under. The response shows `transaction_no` as `null`. If the `X-Transaction-No` header has a different value, the header wins."),
@@ -556,7 +547,7 @@ SCHEMAS = {
         "customer_group": text(),
         "gender": {"type": ["string", "null"]},
         "customer_id": {"type": "integer", "description": "The customer's `customer_id`: the number [Create an order from a cart](" + ORDER_PAGE + ") takes."},
-        "internal_id": {"type": "integer", "description": "The customer's `internal_id`: the number [Add a product to a cart](" + ADD_PAGE + ") takes."},
+        "internal_id": {"type": "integer", "description": "The customer's `internal_id`, returned for reference. Paths and fields take `customer_id`."},
         "email": text(),
         "address_line_1": text(),
         "address_line_2": text(),

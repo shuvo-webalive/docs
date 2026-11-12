@@ -6,14 +6,6 @@ description: "Add products to a customer's cart, read it, change or remove its i
 
 The Carts API has seven endpoints, and you can call every one from all seven SDKs. Six of them have paths that start with `/api/v4/carts` and use the same access token as every other endpoint; [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) uses `/api/v4/admin/orders/carts/{session_id}`.
 
-<Warning>
-  **Adding a product and creating an order take different numbers for the same customer.**
-  [Add a product to a cart](/api-reference/carts/add-a-product-to-a-cart) takes the customer's `internal_id` in its `customer_id`
-  field, and rejects the customer's `customer_id` with `400` and the message `No Customer Found`.
-  [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) takes the customer's `customer_id`.
-  [Create a customer](/api-reference/customers/create-a-customer) returns both values.
-</Warning>
-
 ## At a glance
 
 | Endpoint | Method | Path | What it does |
@@ -44,10 +36,9 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   or turn it into an order, and for a `session_id` you never used. Emptying a cart that is already empty
   returns the same `400`.
 - **Only the response to adding a product shows the customer.** Its `cart.customer_id` is the customer's
-  `internal_id` you sent. [Retrieve a cart](/api-reference/carts/retrieve-a-cart) and [Update a cart item](/api-reference/carts/update-a-cart-item)
+  `customer_id` you sent. [Retrieve a cart](/api-reference/carts/retrieve-a-cart) and [Update a cart item](/api-reference/carts/update-a-cart-item)
   return `cart.customer_id` as `null`, even when your client sends back the `JSESSIONID` cookie the store set.
-  A cart never holds the customer's `customer_id`, so keep it yourself:
-  [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) needs it.
+  Keep the customer's `customer_id` yourself: [Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart) needs it.
 - **The shipping address sets the cart's shipping taxes, but no cart response returns an address.** The
   `shipping_address.country_code` you send when you add a product or update an item decides
   `shipping.shipping_tax` and `shipping.handling_tax`, and every later read of the cart shows the result.
