@@ -359,7 +359,7 @@ ENDPOINTS = [
         "body": {"schema": ref("CartOrderInput"), "example": ORDER_BODY},
         "responses": {
             "201": {
-                "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the number you sent; [Retrieve an order](" + RETRIEVE_ORDER_PAGE + ") shows it. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and while it is unpaid it does not lower the product's stock.",
+                "description": "`status` is `success`, and `order` holds the new order. The response shows `transaction_no` as `null`, although the order stores the number you sent; [Retrieve an order](" + RETRIEVE_ORDER_PAGE + ") shows it. The response has no `Location` header. The order stays in your store: no call in the Carts API deletes it, and whether it lowers the product's stock now or later depends on the store's `update_stock` setting, in the `product_inventory` section of [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section): `after_order`, `after_payment` or `after_shipment`.",
                 "schema": {"type": "object", "properties": {
                     "status": {"type": "string", "description": "`success`."},
                     "order": ref("CartOrder"),
