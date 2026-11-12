@@ -4,6 +4,6 @@ description: "Emails an order's invoice to its billing email address."
 openapi: "POST /admin/orders/{order_id}/send-invoice"
 ---
 
-Pass the order's `order_id`. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.
+Pass the order's `order_id`. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`. The store needs an email provider first: a new store's provider is `DEFAULT`, which answers `409` with the message `No email provider is configured for this store`. Choose `SMTP` or `SENDGRID` with [Update a settings section](/api-reference/site-settings/update-a-settings-section) and the section `email_settings`; see [Prepare a new store](/prepare-a-new-store#choose-an-email-provider).
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

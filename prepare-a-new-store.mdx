@@ -1,0 +1,153 @@
+---
+title: "Prepare a new store"
+description: "What a brand-new WebCommander store needs before orders, invoices and stock work through the API, with the check, the error you get without it, and the call that fixes it."
+---
+
+A new store starts empty. Reading data works straight away, but some writes fail until the store is set up:
+orders that ship, invoice emails, stock figures and customer logins each need one setting first. This page
+lists each one in the order you are likely to meet it.
+
+Every call below goes to your store's base URL, such as `https://your-store.mywebcommander.com`, with your
+access token from [Authentication (New)](/authentication) or [Authentication (Legacy)](/authentication-legacy).
+
+| Before you | Check | Without it you get | Fix |
+| --- | --- | --- | --- |
+| Create an order that ships | `default_shipping_profile` is not `null` | `400` "We do not ship to your location." | [Set up shipping](#set-up-shipping) |
+| Send an order's invoice | `service_provider` is not `DEFAULT` | `409` "No email provider is configured for this store" | [Choose an email provider](#choose-an-email-provider) |
+| Set a product's stock | `track_inventory` is `true` | `409` with the reason `tracking_disabled` | [Turn on stock tracking](#turn-on-stock-tracking) |
+| Let a customer sign in | the customer's `status` is `active` | `401` "Invalid Current Credential" on change password | [Create active customers](#create-active-customers) |
+
+## Set up shipping
+
+A new store has no shipping profile. Until it has a **default** shipping profile that covers the order's
+address, every order with `delivery_type` `shipping` or `delivery` is refused, whether you create it with
+[Create an order](/api-reference/orders/create-an-order),
+[Create an order with a payment](/api-reference/orders/create-an-order-with-a-payment) or
+[Create an order from a cart](/api-reference/carts/create-an-order-from-a-cart):
+
+```json
+{"error": {"code": "invalid_request", "message": "We do not ship to your location. Please choose a different shipping address."}}
+```
+
+Orders with `delivery_type` `store_pickup` or `others_shipping` do not need a shipping profile.
+
+<Steps>
+  <Step title="Check the default shipping profile">
+    Call [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings). If
+    `shipping_settings.default_shipping_profile` is `null`, the store cannot ship yet.
+
+    ```bash
+    curl "$WC_BASE_URL/api/v4/admin/settings/shipping_settings/general" \
+      -H "Authorization: Bearer $ACCESS_TOKEN"
+    ```
+  </Step>
+  <Step title="Find the zone to ship to">
+    Call [List tax zones](/api-reference/tax-zones/list-tax-zones). A new store already has a zone for each
+    country, such as `BUILT_IN_AU` for Australia. Note the `id` of the zone that covers your customers.
+  </Step>
+  <Step title="Create a shipping profile">
+    [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard)
+    creates the profile, a rule for the zone and its rate in one call. This example charges a flat $10 anywhere in
+    zone `1`:
+
+    ```bash
+    curl -X POST "$WC_BASE_URL/api/v4/admin/shipping_profiles/wizard" \
+      -H "Authorization: Bearer $ACCESS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"shipping_profile": {"name": "Australia", "rule_preference": "product_assigned_rule",
+           "shipping_rules": [{"name": "Australia flat rate", "zones": [{"id": 1}],
+             "shipping_rate": {"name": "Australia flat rate", "method": "flat_rate",
+               "shipping_cost": {"amount": 10, "type": "fixed"}, "handling_cost": {"amount": 0, "type": "fixed"}}}]}}'
+    ```
+
+    Note the new profile's `id` from `shipping_profile.id`.
+  </Step>
+  <Step title="Make it the default profile">
+    Creating the profile is not enough: orders are still refused until it is the store's default. Send its
+    `id` to [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings):
+
+    ```bash
+    curl -X PATCH "$WC_BASE_URL/api/v4/admin/settings/shipping_settings/general" \
+      -H "Authorization: Bearer $ACCESS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"shipping_settings": {"default_shipping_profile": 1}}'
+    ```
+
+    Orders with `delivery_type` `shipping` or `delivery`, and orders created from a cart, now go through.
+  </Step>
+</Steps>
+
+## Choose an email provider
+
+A new store's email provider is `DEFAULT`, which does not count as a provider for invoices.
+[Send an order's invoice](/api-reference/orders/send-an-orders-invoice) answers:
+
+```json
+{"error": {"code": "conflict", "message": "No email provider is configured for this store"}}
+```
+
+<Steps>
+  <Step title="Check the provider">
+    Call [Get a settings section](/api-reference/site-settings/get-a-settings-section) with the section
+    `email_settings`. `email_settings.service_provider` is `DEFAULT` on a new store, and `available` lists the
+    providers you can choose: `SMTP`, `SENDGRID`, `GMAIL` and `OFFICE365`.
+  </Step>
+  <Step title="Choose SMTP or SendGrid">
+    Send the provider and its settings to [Update a settings section](/api-reference/site-settings/update-a-settings-section).
+    For SMTP:
+
+    ```bash
+    curl -X PATCH "$WC_BASE_URL/api/v4/admin/settings/site_settings/email_settings" \
+      -H "Authorization: Bearer $ACCESS_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"email_settings": {"service_provider": "SMTP", "smtp": {"sender_name": "Your Store",
+           "sender_email": "orders@example.com.au", "host": "smtp.example.com.au", "port": 587, "encryption": "starttls",
+           "authentication": {"enabled": true, "username": "orders@example.com.au", "password": "your-smtp-password"}}}}'
+    ```
+
+    `encryption` takes `no`, `ssl` or `starttls`. A new store can read back `TLS`, but sending `TLS` is refused
+    with `400` and the reason `invalid_enum`, so send `starttls` instead. The password reads back as `***`.
+
+    For SendGrid, send `"service_provider": "SENDGRID"` with `sendgrid.api_key`, `sendgrid.sender_name` and
+    `sendgrid.sender_email`. Gmail and Office 365 sign in through the WebCommander admin, so connect them there.
+  </Step>
+  <Step title="If the invoice still fails">
+    `502` with "The invoice email could not be delivered" means the provider is chosen but the email did not
+    go out. Check the provider's credentials, and check that the order's billing email address can receive
+    mail.
+  </Step>
+</Steps>
+
+## Turn on stock tracking
+
+A new product does not track its stock: it reads `available_stock: 0`, a new stock figure is refused with
+`409` and the reason `tracking_disabled`, and orders do not lower it. Turn tracking on and set the figure in one
+call to [Change a product's stock](/api-reference/products/change-a-products-stock):
+
+```json
+{"tracking": {"enabled": true, "available_stock": 25}}
+```
+
+When stock drops depends on the store's `update_stock` setting, in the `product_inventory` section of
+[Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section): `after_order`,
+`after_payment` or `after_shipment`. Read it before you sync stock, so you do not take the same units off twice.
+
+## Create active customers
+
+[Create a customer](/api-reference/customers/create-a-customer) without `status` makes the customer
+`awaiting_verification`. Such a customer cannot sign in, and
+[Change a password](/api-reference/customers/change-a-password) answers `401` "Invalid Current Credential"
+even with the right old password. Send `"status": "active"` when you create a customer who should be able to
+sign in straight away, or set it later with [Update a customer](/api-reference/customers/update-a-customer).
+
+## Good to know
+
+- **Use `order_id` and `customer_id` everywhere.** Paths, filters and request fields take these ids. Responses
+  also return an `internal_id`; keep it for reference, but do not send it. On a new store the first order and
+  the first customer often have the same number for both, so a mix-up only shows from the second record on.
+- **Deleting a customer moves it to the trash.** [Delete a customer](/api-reference/customers/delete-a-customer)
+  removes the customer from [List customers](/api-reference/customers/list-customers), but
+  [Retrieve a customer](/api-reference/customers/retrieve-a-customer) still returns it, with `is_in_trash: true`.
+- **Only some orders can be deleted.** [Delete an order](/api-reference/orders/delete-an-order) works on a
+  cancelled order that was never paid, refunded or shipped. Any other order is refused with `409`; cancel
+  orders you no longer need instead.

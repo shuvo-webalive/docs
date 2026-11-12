@@ -28,6 +28,11 @@ WARNING = (
 )
 
 NOTES = [
+    "**Choose an email provider before the store sends invoices.** A new store's `email_settings.service_provider` is `DEFAULT`,\n"
+    "  and [Send an order's invoice](/api-reference/orders/send-an-orders-invoice) then answers `409` with the message\n"
+    "  `No email provider is configured for this store`. Choose `SMTP` or `SENDGRID` with its settings; Gmail and Office 365\n"
+    "  connect through the WebCommander admin. `smtp.encryption` takes `no`, `ssl` or `starttls`: a new store can read back `TLS`,\n"
+    "  but `TLS` is refused on write with `400` and the reason `invalid_enum`.",
     "**The settings are split into eight sections, and each has its own path.** The sections are\n"
     "  `administration`, `brand_kit`, `date_time`, `domain_settings`, `email_settings`, `favicon`,\n"
     "  `store_details` and `store_logo`. Read all eight through `/site_settings`, or one through\n"

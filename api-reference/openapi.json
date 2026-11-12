@@ -31580,7 +31580,7 @@
         ],
         "summary": "Create an order",
         "operationId": "create_order",
-        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.\n\nWhether creating the order lowers stock depends on the store. When an order lowers stock depends on the store's `update_stock` setting, which [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section) returns for the `product_inventory` section: `after_order` lowers stock when the order is created, `after_payment` when it is paid, and `after_shipment` when you [create a shipment](/api-reference/orders/create-a-shipment). Read it before you sync stock, so you do not take the same units off twice. Some stores also require `billing_address`: such a store refuses an order without one with `400` and the message `billing.address.required`, so send `billing_address` whenever you have it.",
+        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.\n\nWhether creating the order lowers stock depends on the store. When an order lowers stock depends on the store's `update_stock` setting, which [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section) returns for the `product_inventory` section: `after_order` lowers stock when the order is created, `after_payment` when it is paid, and `after_shipment` when you [create a shipment](/api-reference/orders/create-a-shipment). Read it before you sync stock, so you do not take the same units off twice. Some stores also require `billing_address`: such a store refuses an order without one with `400` and the message `billing.address.required`, so send `billing_address` whenever you have it. **A new store ships nothing until it has a default shipping profile.** Without one, every order with `delivery_type` `shipping` or `delivery` is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` Create a profile with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then set it as `default_shipping_profile` with [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings): creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile. See [Prepare a new store](/prepare-a-new-store).",
         "parameters": [
           {
             "name": "X-Transaction-No",
@@ -32146,7 +32146,7 @@
         ],
         "summary": "Create an order with a payment",
         "operationId": "create_order_with_payment",
-        "description": "Send the same fields as [Create an order](/api-reference/orders/create-an-order) plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `\"\"`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored, and an `X-Transaction-No` header does not file the order under a transaction number either.",
+        "description": "Send the same fields as [Create an order](/api-reference/orders/create-an-order) plus a `payment` record, which is required; `customer` and `customer_id` both name the customer. The store files the payment under gateway `API` with `payment_method` `API`, whatever you send: it keeps `amount` and `track_info`, stores `payer_info` and `transaction_reference` as `\"\"`, and sets `transaction_date` to the time of the call. The order's own `transaction_no` and `external_reference_order_id` are accepted and not stored, and an `X-Transaction-No` header does not file the order under a transaction number either. **A new store ships nothing until it has a default shipping profile.** Without one, every order with `delivery_type` `shipping` or `delivery` is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` Create a profile with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then set it as `default_shipping_profile` with [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings): creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile. See [Prepare a new store](/prepare-a-new-store).",
         "parameters": [],
         "responses": {
           "201": {
@@ -33338,7 +33338,7 @@
         ],
         "summary": "Delete an order",
         "operationId": "delete_order",
-        "description": "Deletes the order permanently and returns `\"status\": \"deleted\"` with the order's `order_id` and `internal_id`. Retrieving the order afterwards returns `404`, and [Count orders](/api-reference/orders/count-orders) goes down by one. When no order has that `order_id`, for example because you already deleted it, the call still returns `200`, with `\"status\": \"not_found\"`, so read `status` rather than the HTTP status. Stock the order already took, at the point set by the store's `update_stock` setting, is not given back.",
+        "description": "Deletes the order permanently and returns `\"status\": \"deleted\"` with the order's `order_id` and `internal_id`. Retrieving the order afterwards returns `404`, and [Count orders](/api-reference/orders/count-orders) goes down by one. When no order has that `order_id`, for example because you already deleted it, the call still returns `200`, with `\"status\": \"not_found\"`, so read `status` rather than the HTTP status. Stock the order already took, at the point set by the store's `update_stock` setting, is not given back. Only a cancelled order that was never paid, refunded or shipped, or a migrated order, can be deleted; any other order is refused with `409` and a `conflict` reason. Cancel an order you no longer need with [Cancel an order](/api-reference/orders/cancel-an-order) instead.",
         "parameters": [
           {
             "name": "order_id",
@@ -34729,7 +34729,7 @@
         ],
         "summary": "Send an order's invoice",
         "operationId": "send_order_invoice",
-        "description": "Pass the order's `order_id`. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`.",
+        "description": "Pass the order's `order_id`. The call needs no body. The response names the address in `sent_to`, the time in `sent_at`, and `template` as `send-invoice`. The store needs an email provider first: a new store's provider is `DEFAULT`, which answers `409` with the message `No email provider is configured for this store`. Choose `SMTP` or `SENDGRID` with [Update a settings section](/api-reference/site-settings/update-a-settings-section) and the section `email_settings`; see [Prepare a new store](/prepare-a-new-store#choose-an-email-provider).",
         "parameters": [
           {
             "name": "order_id",
@@ -34763,6 +34763,26 @@
           },
           "404": {
             "description": "No order has that `order_id`. The message is `Order Not Found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The store has no email provider: its `service_provider` is `DEFAULT`. The message is `No email provider is configured for this store`. Choose `SMTP` or `SENDGRID` in the `email_settings` section of the site settings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "An email provider is chosen, but the email did not go out. The message is `The invoice email could not be delivered`. Check the provider's credentials and the order's billing email address.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38689,7 +38709,7 @@
         ],
         "summary": "Create an order from a cart",
         "operationId": "create_order_from_cart",
-        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.",
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins. **A new store ships nothing until it has a default shipping profile.** Without one, every order with `delivery_type` `shipping` or `delivery` is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` Create a profile with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then set it as `default_shipping_profile` with [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings): creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile. See [Prepare a new store](/prepare-a-new-store).",
         "parameters": [
           {
             "name": "session_id",
