@@ -6,10 +6,6 @@
       "function": "listInventoryLocations",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().listInventoryLocations(Map.of(\"q\", \"Sydney\"));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"inventory_locations\")) {\n    Map<?, ?> location = (Map<?, ?>) row;\n    System.out.println(location.get(\"id\") + \" \" + location.get(\"name\") + \" \" + location.get(\"default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
-    "head_inventory_locations": {
-      "function": "headInventoryLocations",
-      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.inventoryLocations().headInventoryLocations();\nSystem.out.println(response.getStatusCode());"
-    },
     "create_inventory_location": {
       "function": "createInventoryLocation",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().createInventoryLocation(\n        Map.of(\"name\", \"Perth Warehouse\", \"address\", \"4 Example Street, Perth WA 6000\"));\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"id\") + \" \" + location.get(\"name\") + \" \" + location.get(\"active\"));"
@@ -17,10 +13,6 @@
     "get_inventory_location": {
       "function": "getInventoryLocation",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.inventoryLocations().getInventoryLocation(4);\nMap<?, ?> location = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"inventory_location\");\nSystem.out.println(location.get(\"name\") + \" \" + location.get(\"address\"));\nSystem.out.println(location.get(\"active\") + \" \" + location.get(\"default\"));"
-    },
-    "head_inventory_location": {
-      "function": "headInventoryLocation",
-      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.inventoryLocations().headInventoryLocation(4);\nSystem.out.println(response.getStatusCode());"
     },
     "update_inventory_location": {
       "function": "updateInventoryLocation",

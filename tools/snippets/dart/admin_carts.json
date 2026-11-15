@@ -1,0 +1,82 @@
+{
+  "sdk": "dart",
+  "module": "admin_carts",
+  "endpoints": {
+    "create_admin_cart": {
+      "function": "createAdminCart",
+      "code": "final response = await client.adminCarts.createAdminCart({\n  'customer_id': 512,\n  'products': [{'product_id': 101, 'quantity': 2}],\n});\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['session'] as Map)['session_id']} ${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "get_admin_cart": {
+      "function": "getAdminCart",
+      "code": "final response = await client.adminCarts.getAdminCart('PRV-3f2a9c41b7d80e65');\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['session'] as Map)['expires_at']} ${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "replace_admin_cart": {
+      "function": "replaceAdminCart",
+      "code": "final response = await client.adminCarts.replaceAdminCart('PRV-3f2a9c41b7d80e65', {\n  'customer_id': 512,\n  'products': [{'product_id': 101, 'variation_id': 2011, 'quantity': 1}],\n});\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['totals'] as Map)['sub_total']} ${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "update_admin_cart": {
+      "function": "updateAdminCart",
+      "code": "final response = await client.adminCarts.updateAdminCart('PRV-3f2a9c41b7d80e65', {'customer_id': 513});\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['customer'] as Map)['customer_id']} ${(cart['customer'] as Map)['email']}');"
+    },
+    "delete_admin_cart": {
+      "function": "deleteAdminCart",
+      "code": "final response = await client.adminCarts.deleteAdminCart('PRV-3f2a9c41b7d80e65');\nprint(response.statusCode);"
+    },
+    "add_admin_cart_items": {
+      "function": "addAdminCartItems",
+      "code": "final response = await client.adminCarts.addAdminCartItems('PRV-3f2a9c41b7d80e65', {'products': [{'product_id': 102, 'quantity': 1}]});\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['totals'] as Map)['sub_total']} ${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "clear_admin_cart_items": {
+      "function": "clearAdminCartItems",
+      "code": "final response = await client.adminCarts.clearAdminCartItems('PRV-3f2a9c41b7d80e65');\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "update_admin_cart_item": {
+      "function": "updateAdminCartItem",
+      "code": "final response = await client.adminCarts.updateAdminCartItem('PRV-3f2a9c41b7d80e65', 1, {'quantity': 3});\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['totals'] as Map)['sub_total']} ${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "delete_admin_cart_item": {
+      "function": "deleteAdminCartItem",
+      "code": "final response = await client.adminCarts.deleteAdminCartItem('PRV-3f2a9c41b7d80e65', 1);\nfinal cart = (response.map as Map)['cart'] as Map;\nprint('${(cart['totals'] as Map)['sub_total']} ${(cart['totals'] as Map)['grand_total']}');"
+    },
+    "get_checkout": {
+      "function": "getCheckout",
+      "code": "final response = await client.adminCarts.getCheckout('PRV-3f2a9c41b7d80e65');\nfinal checkout = (response.map as Map)['checkout'] as Map;\nprint('${checkout['delivery_type']} ${(checkout['totals'] as Map)['due']}');"
+    },
+    "update_checkout": {
+      "function": "updateCheckout",
+      "code": "final response = await client.adminCarts.updateCheckout('PRV-3f2a9c41b7d80e65', {\n  'delivery_type': 'shipping',\n  'billing_address': {\n    'first_name': 'Jane',\n    'last_name': 'Doe',\n    'email': 'jane.doe@example.com',\n    'address_line_1': '1 Example Street',\n    'city': 'Melbourne',\n    'post_code': '3000',\n    'phone': '0300000000',\n    'country_code': 'AU',\n    'state_code': 'VIC',\n  },\n  'shipping_address': {\n    'first_name': 'Jane',\n    'last_name': 'Doe',\n    'email': 'jane.doe@example.com',\n    'address_line_1': '1 Example Street',\n    'city': 'Melbourne',\n    'post_code': '3000',\n    'phone': '0300000000',\n    'country_code': 'AU',\n    'state_code': 'VIC',\n  },\n});\nfinal checkout = (response.map as Map)['checkout'] as Map;\nprint('${(checkout['shipping'] as Map)['shipping_cost']} ${(checkout['totals'] as Map)['grand_total']}');"
+    },
+    "confirm_checkout": {
+      "function": "confirmCheckout",
+      "code": "final response = await client.adminCarts.confirmCheckout('PRV-3f2a9c41b7d80e65',\n    payload: {'send_email': false}, transactionNo: 'TXN-ORDER-0001');\nfinal order = (response.map as Map)['order'] as Map;\nprint('${order['order_id']} ${order['transaction_no']} ${order['grand_total']}');"
+    },
+    "apply_checkout_coupon": {
+      "function": "applyCheckoutCoupon",
+      "code": "final response = await client.adminCarts.applyCheckoutCoupon('PRV-3f2a9c41b7d80e65', {'code': 'SAVE10'});\nfinal checkout = (response.map as Map)['checkout'] as Map;\nprint('${((checkout['discounts'] as Map)['coupon'] as Map)['applied_amount']} ${(checkout['totals'] as Map)['grand_total']}');"
+    },
+    "remove_checkout_coupon": {
+      "function": "removeCheckoutCoupon",
+      "code": "final response = await client.adminCarts.removeCheckoutCoupon('PRV-3f2a9c41b7d80e65');\nprint(response.statusCode);"
+    },
+    "apply_checkout_gift_card": {
+      "function": "applyCheckoutGiftCard",
+      "code": "final response = await client.adminCarts.applyCheckoutGiftCard('PRV-3f2a9c41b7d80e65', {'code': 'GIFT-0001'});\nfinal checkout = (response.map as Map)['checkout'] as Map;\nprint('${((checkout['discounts'] as Map)['gift_card'] as Map)['applied_amount']} ${(checkout['totals'] as Map)['due']}');"
+    },
+    "remove_checkout_gift_card": {
+      "function": "removeCheckoutGiftCard",
+      "code": "final response = await client.adminCarts.removeCheckoutGiftCard('PRV-3f2a9c41b7d80e65');\nprint(response.statusCode);"
+    },
+    "get_checkout_delivery_schedules": {
+      "function": "getCheckoutDeliverySchedules",
+      "code": "final response = await client.adminCarts.getCheckoutDeliverySchedules('PRV-3f2a9c41b7d80e65');\nfinal checkout = (response.map as Map)['checkout'] as Map;\nprint('${checkout['delivery_schedule']}');"
+    },
+    "set_checkout_delivery_schedule": {
+      "function": "setCheckoutDeliverySchedule",
+      "code": "final response = await client.adminCarts.setCheckoutDeliverySchedule('PRV-3f2a9c41b7d80e65', {'id': 1, 'date': '2026-11-20'});\nprint(response.statusCode);"
+    },
+    "clear_checkout_delivery_schedule": {
+      "function": "clearCheckoutDeliverySchedule",
+      "code": "final response = await client.adminCarts.clearCheckoutDeliverySchedule('PRV-3f2a9c41b7d80e65');\nprint(response.statusCode);"
+    }
+  }
+}

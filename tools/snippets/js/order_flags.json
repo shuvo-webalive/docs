@@ -6,10 +6,6 @@
       "function": "listOrderFlags",
       "code": "const response = await client.orderFlags.listOrderFlags({limit: 20});\nfor (const orderFlag of response.map.order_flags) {\n    console.log(orderFlag.id, orderFlag.name, orderFlag.color);\n}\n"
     },
-    "head_order_flags": {
-      "function": "headOrderFlags",
-      "code": "const response = await client.orderFlags.headOrderFlags();\nconsole.log(response.statusCode);\n"
-    },
     "create_order_flag": {
       "function": "createOrderFlag",
       "code": "const response = await client.orderFlags.createOrderFlag({\n    order_flag: {name: 'Awaiting Stock', color: '#5A7BD4', description: 'Waiting for stock to arrive.'},\n});\nconsole.log(response.map.order_flag.id);\n"
@@ -17,10 +13,6 @@
     "get_order_flag": {
       "function": "getOrderFlag",
       "code": "const response = await client.orderFlags.getOrderFlag(2);\nconsole.log(response.map.order_flag.name, response.map.order_flag.color);\n"
-    },
-    "head_order_flag": {
-      "function": "headOrderFlag",
-      "code": "const response = await client.orderFlags.headOrderFlag(2);\nconsole.log(response.statusCode);\n"
     },
     "update_order_flag": {
       "function": "updateOrderFlag",

@@ -6,10 +6,6 @@
       "function": "listInventoryLocations",
       "code": "const response = await client.inventoryLocations.listInventoryLocations({q: 'Sydney'});\nfor (const inventoryLocation of response.map.inventory_locations) {\n    console.log(inventoryLocation.id, inventoryLocation.name, inventoryLocation.default);\n}\n"
     },
-    "head_inventory_locations": {
-      "function": "headInventoryLocations",
-      "code": "const response = await client.inventoryLocations.headInventoryLocations();\nconsole.log(response.statusCode);\n"
-    },
     "create_inventory_location": {
       "function": "createInventoryLocation",
       "code": "const response = await client.inventoryLocations.createInventoryLocation({\n    name: 'Perth Warehouse',\n    address: '4 Example Street, Perth WA 6000',\n});\nconsole.log(response.map.inventory_location.id, response.map.inventory_location.active);\n"
@@ -17,10 +13,6 @@
     "get_inventory_location": {
       "function": "getInventoryLocation",
       "code": "const response = await client.inventoryLocations.getInventoryLocation(4);\nconst inventoryLocation = response.map.inventory_location;\nconsole.log(inventoryLocation.name, inventoryLocation.address, inventoryLocation.active);\n"
-    },
-    "head_inventory_location": {
-      "function": "headInventoryLocation",
-      "code": "const response = await client.inventoryLocations.headInventoryLocation(4);\nconsole.log(response.statusCode);\n"
     },
     "update_inventory_location": {
       "function": "updateInventoryLocation",

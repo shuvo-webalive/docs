@@ -6,7 +6,7 @@ BASE = "/admin/shipping_classes"
 ICON = "boxes-stacked"
 
 OVERVIEW_DESCRIPTION = "List, count, create, update and delete shipping classes, and choose which one is the default."
-INTRO = "The Shipping classes API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_classes`."
+INTRO = "The Shipping classes API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_classes`."
 
 RETRIEVE_PAGE = "/api-reference/shipping-classes/retrieve-a-shipping-class"
 DEFAULT_PAGE = "/api-reference/shipping-classes/set-the-default-shipping-class"
@@ -115,19 +115,6 @@ ENDPOINTS = [
         "example_call": {"query": "limit=20"},
     },
     {
-        "key": "head_shipping_classes",
-        "slug": "check-the-shipping-classes-list",
-        "title": "Check the shipping classes list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the shipping classes list is reachable. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. Neither this response nor the listing has an `ETag` or a `Last-Modified` header.",
-        "responses": {
-            "200": {"description": "The list is reachable. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "count_shipping_classes",
         "slug": "count-shipping-classes",
         "title": "Count shipping classes",
@@ -180,20 +167,6 @@ ENDPOINTS = [
                 "example": {"shipping_class": SAMPLE_ROWS[2]},
             },
             "404": {"description": "No shipping class has the `shipping_class_id` you passed, or it is not a number. The `code` is `not_found` and the message is `Shipping class not found`. You also get this `404` for a class that exists when the request just before it on the same client was rejected with `404` for a `shipping_class_id` that no shipping class has.", "schema": ERROR_REF, "example": NOT_FOUND},
-        },
-        "example_call": {"path": {"shipping_class_id": 2}},
-    },
-    {
-        "key": "head_shipping_class",
-        "slug": "check-a-shipping-class",
-        "title": "Check a shipping class",
-        "method": "HEAD",
-        "path": BASE + "/{shipping_class_id}",
-        "summary": "Returns `200` and headers only, even when no class has the `shipping_class_id` you pass.",
-        "description": "Returns `200` with headers only: no body and no `ETag`. It returns `200` even when no shipping class has the `shipping_class_id` you pass, so it does not tell you whether the class exists. To check that, use [Retrieve a shipping class](" + RETRIEVE_PAGE + "), which returns `404` when no class has that `shipping_class_id`.",
-        "parameters": [SHIPPING_CLASS_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body. Returned even when no shipping class has the `shipping_class_id` you passed."},
         },
         "example_call": {"path": {"shipping_class_id": 2}},
     },

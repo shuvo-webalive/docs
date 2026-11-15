@@ -1,0 +1,9 @@
+---
+title: "Create an admin cart"
+description: "Creates a cart for a customer with the products you send and returns it with its `session_id`."
+openapi: "POST /admin/orders/carts"
+---
+
+Send `customer_id` and `products` at the top level of the body; each product has a `product_id` and a `quantity`, and a `variation_id` for a variation. The store prices the lines and returns the cart under `cart`, with `cart.session.session_id`, which every other call takes as `session_id`. The session is held for 30 minutes from its last write. Send `session_id` in the body, in the `PRV-` form, to name the session yourself.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string. To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

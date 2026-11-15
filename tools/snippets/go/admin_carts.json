@@ -1,0 +1,82 @@
+{
+  "sdk": "go",
+  "module": "admin_carts",
+  "endpoints": {
+    "create_admin_cart": {
+      "function": "CreateAdminCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().CreateAdminCart(ctx, map[string]any{\n\t\"customer_id\": 512,\n\t\"products\": []any{\n\t\tmap[string]any{\"product_id\": 101, \"quantity\": 2},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"session\"].(map[string]any)[\"session_id\"], cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "get_admin_cart": {
+      "function": "GetAdminCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().GetAdminCart(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"session\"].(map[string]any)[\"expires_at\"], cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "replace_admin_cart": {
+      "function": "ReplaceAdminCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().ReplaceAdminCart(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\n\t\"customer_id\": 512,\n\t\"products\": []any{\n\t\tmap[string]any{\n\t\t\t\"product_id\": 101,\n\t\t\t\"variation_id\": 2011,\n\t\t\t\"quantity\": 1,\n\t\t},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"totals\"].(map[string]any)[\"sub_total\"], cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "update_admin_cart": {
+      "function": "UpdateAdminCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().UpdateAdminCart(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"customer_id\": 513}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"customer\"].(map[string]any)[\"customer_id\"], cart[\"customer\"].(map[string]any)[\"email\"])"
+    },
+    "delete_admin_cart": {
+      "function": "DeleteAdminCart",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().DeleteAdminCart(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "add_admin_cart_items": {
+      "function": "AddAdminCartItems",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().AddAdminCartItems(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\n\t\"products\": []any{\n\t\tmap[string]any{\"product_id\": 102, \"quantity\": 1},\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"totals\"].(map[string]any)[\"sub_total\"], cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "clear_admin_cart_items": {
+      "function": "ClearAdminCartItems",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().ClearAdminCartItems(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "update_admin_cart_item": {
+      "function": "UpdateAdminCartItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().UpdateAdminCartItem(ctx, \"PRV-3f2a9c41b7d80e65\", 1, map[string]any{\"quantity\": 3}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"totals\"].(map[string]any)[\"sub_total\"], cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "delete_admin_cart_item": {
+      "function": "DeleteAdminCartItem",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().DeleteAdminCartItem(ctx, \"PRV-3f2a9c41b7d80e65\", 1, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncart := resp.Map().(map[string]any)[\"cart\"].(map[string]any)\nfmt.Println(cart[\"totals\"].(map[string]any)[\"sub_total\"], cart[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "get_checkout": {
+      "function": "GetCheckout",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().GetCheckout(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncheckout := resp.Map().(map[string]any)[\"checkout\"].(map[string]any)\nfmt.Println(checkout[\"delivery_type\"], checkout[\"totals\"].(map[string]any)[\"due\"])"
+    },
+    "update_checkout": {
+      "function": "UpdateCheckout",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().UpdateCheckout(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\n\t\"delivery_type\": \"shipping\",\n\t\"billing_address\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\": \"Doe\",\n\t\t\"email\": \"jane.doe@example.com\",\n\t\t\"address_line_1\": \"1 Example Street\",\n\t\t\"city\": \"Melbourne\",\n\t\t\"post_code\": \"3000\",\n\t\t\"phone\": \"0300000000\",\n\t\t\"country_code\": \"AU\",\n\t\t\"state_code\": \"VIC\",\n\t},\n\t\"shipping_address\": map[string]any{\n\t\t\"first_name\": \"Jane\",\n\t\t\"last_name\": \"Doe\",\n\t\t\"email\": \"jane.doe@example.com\",\n\t\t\"address_line_1\": \"1 Example Street\",\n\t\t\"city\": \"Melbourne\",\n\t\t\"post_code\": \"3000\",\n\t\t\"phone\": \"0300000000\",\n\t\t\"country_code\": \"AU\",\n\t\t\"state_code\": \"VIC\",\n\t},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncheckout := resp.Map().(map[string]any)[\"checkout\"].(map[string]any)\nfmt.Println(checkout[\"shipping\"].(map[string]any)[\"shipping_cost\"], checkout[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "confirm_checkout": {
+      "function": "ConfirmCheckout",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().ConfirmCheckout(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"send_email\": false}, \"TXN-ORDER-0001\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\norder := resp.Map().(map[string]any)[\"order\"].(map[string]any)\nfmt.Println(order[\"order_id\"], order[\"transaction_no\"], order[\"grand_total\"])"
+    },
+    "apply_checkout_coupon": {
+      "function": "ApplyCheckoutCoupon",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().ApplyCheckoutCoupon(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"code\": \"SAVE10\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncheckout := resp.Map().(map[string]any)[\"checkout\"].(map[string]any)\nfmt.Println(checkout[\"discounts\"].(map[string]any)[\"coupon\"].(map[string]any)[\"applied_amount\"], checkout[\"totals\"].(map[string]any)[\"grand_total\"])"
+    },
+    "remove_checkout_coupon": {
+      "function": "RemoveCheckoutCoupon",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().RemoveCheckoutCoupon(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "apply_checkout_gift_card": {
+      "function": "ApplyCheckoutGiftCard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().ApplyCheckoutGiftCard(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"code\": \"GIFT-0001\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncheckout := resp.Map().(map[string]any)[\"checkout\"].(map[string]any)\nfmt.Println(checkout[\"discounts\"].(map[string]any)[\"gift_card\"].(map[string]any)[\"applied_amount\"], checkout[\"totals\"].(map[string]any)[\"due\"])"
+    },
+    "remove_checkout_gift_card": {
+      "function": "RemoveCheckoutGiftCard",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().RemoveCheckoutGiftCard(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "get_checkout_delivery_schedules": {
+      "function": "GetCheckoutDeliverySchedules",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().GetCheckoutDeliverySchedules(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\ncheckout := resp.Map().(map[string]any)[\"checkout\"].(map[string]any)\nfmt.Println(checkout[\"delivery_schedule\"])"
+    },
+    "set_checkout_delivery_schedule": {
+      "function": "SetCheckoutDeliverySchedule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().SetCheckoutDeliverySchedule(ctx, \"PRV-3f2a9c41b7d80e65\", map[string]any{\"id\": 1, \"date\": \"2026-11-20\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    },
+    "clear_checkout_delivery_schedule": {
+      "function": "ClearCheckoutDeliverySchedule",
+      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.AdminCarts().ClearCheckoutDeliverySchedule(ctx, \"PRV-3f2a9c41b7d80e65\", nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
+    }
+  }
+}

@@ -296,11 +296,9 @@
                 "pages": [
                   "shipping-methods",
                   "api-reference/shipping-methods/list-shipping-methods",
-                  "api-reference/shipping-methods/check-the-shipping-methods-list",
                   "api-reference/shipping-methods/count-shipping-methods",
                   "api-reference/shipping-methods/create-a-shipping-method",
                   "api-reference/shipping-methods/retrieve-a-shipping-method",
-                  "api-reference/shipping-methods/check-a-shipping-method",
                   "api-reference/shipping-methods/rename-a-shipping-method",
                   "api-reference/shipping-methods/delete-a-shipping-method",
                   "api-reference/shipping-methods/set-the-default-shipping-method"
@@ -312,11 +310,9 @@
                 "pages": [
                   "shipping-classes",
                   "api-reference/shipping-classes/list-shipping-classes",
-                  "api-reference/shipping-classes/check-the-shipping-classes-list",
                   "api-reference/shipping-classes/count-shipping-classes",
                   "api-reference/shipping-classes/create-a-shipping-class",
                   "api-reference/shipping-classes/retrieve-a-shipping-class",
-                  "api-reference/shipping-classes/check-a-shipping-class",
                   "api-reference/shipping-classes/update-a-shipping-class",
                   "api-reference/shipping-classes/delete-a-shipping-class",
                   "api-reference/shipping-classes/set-the-default-shipping-class"
@@ -387,10 +383,8 @@
                 "pages": [
                   "tax-codes",
                   "api-reference/tax-codes/list-tax-codes",
-                  "api-reference/tax-codes/check-the-tax-codes-list",
                   "api-reference/tax-codes/create-a-tax-code",
                   "api-reference/tax-codes/retrieve-a-tax-code",
-                  "api-reference/tax-codes/check-a-tax-code",
                   "api-reference/tax-codes/update-a-tax-code",
                   "api-reference/tax-codes/delete-a-tax-code"
                 ]
@@ -425,10 +419,8 @@
                 "pages": [
                   "tax-profiles",
                   "api-reference/tax-profiles/list-tax-profiles",
-                  "api-reference/tax-profiles/check-the-tax-profiles-list",
                   "api-reference/tax-profiles/create-a-tax-profile",
                   "api-reference/tax-profiles/retrieve-a-tax-profile",
-                  "api-reference/tax-profiles/check-a-tax-profile",
                   "api-reference/tax-profiles/update-a-tax-profile",
                   "api-reference/tax-profiles/delete-a-tax-profile"
                 ]
@@ -439,10 +431,8 @@
                 "pages": [
                   "tax-rules",
                   "api-reference/tax-rules/list-tax-rules",
-                  "api-reference/tax-rules/check-the-tax-rules-list",
                   "api-reference/tax-rules/create-a-tax-rule",
                   "api-reference/tax-rules/retrieve-a-tax-rule",
-                  "api-reference/tax-rules/check-a-tax-rule",
                   "api-reference/tax-rules/update-a-tax-rule",
                   "api-reference/tax-rules/delete-a-tax-rule"
                 ]
@@ -463,10 +453,8 @@
                 "pages": [
                   "tax-zones",
                   "api-reference/tax-zones/list-tax-zones",
-                  "api-reference/tax-zones/check-the-tax-zones-list",
                   "api-reference/tax-zones/create-a-tax-zone",
                   "api-reference/tax-zones/retrieve-a-tax-zone",
-                  "api-reference/tax-zones/check-a-tax-zone",
                   "api-reference/tax-zones/update-a-tax-zone",
                   "api-reference/tax-zones/delete-a-tax-zone"
                 ]
@@ -484,10 +472,8 @@
                 "pages": [
                   "inventory-locations",
                   "api-reference/inventory-locations/list-inventory-locations",
-                  "api-reference/inventory-locations/check-the-inventory-locations-list",
                   "api-reference/inventory-locations/create-an-inventory-location",
                   "api-reference/inventory-locations/retrieve-an-inventory-location",
-                  "api-reference/inventory-locations/check-an-inventory-location",
                   "api-reference/inventory-locations/replace-an-inventory-location",
                   "api-reference/inventory-locations/update-an-inventory-location",
                   "api-reference/inventory-locations/delete-an-inventory-location",
@@ -502,10 +488,8 @@
                 "pages": [
                   "order-flags",
                   "api-reference/order-flags/list-order-flags",
-                  "api-reference/order-flags/check-the-order-flags-list",
                   "api-reference/order-flags/create-an-order-flag",
                   "api-reference/order-flags/retrieve-an-order-flag",
-                  "api-reference/order-flags/check-an-order-flag",
                   "api-reference/order-flags/replace-an-order-flag",
                   "api-reference/order-flags/delete-an-order-flag"
                 ]
@@ -563,18 +547,30 @@
             ]
           },
           {
-            "group": "Order previews",
-            "icon": "clipboard-check",
+            "group": "Admin cart and checkout",
+            "icon": "cart-plus",
             "expanded": false,
             "pages": [
-              "order-previews",
-              "api-reference/order-previews/start-an-order-preview",
-              "api-reference/order-previews/retrieve-an-order-preview",
-              "api-reference/order-previews/place-the-order-from-a-preview",
-              "api-reference/order-previews/apply-a-coupon-to-a-preview",
-              "api-reference/order-previews/remove-the-coupon-from-a-preview",
-              "api-reference/order-previews/apply-a-gift-card-to-a-preview",
-              "api-reference/order-previews/remove-the-gift-card-from-a-preview"
+              "admin-cart-and-checkout",
+              "api-reference/admin-cart-and-checkout/create-an-admin-cart",
+              "api-reference/admin-cart-and-checkout/retrieve-an-admin-cart",
+              "api-reference/admin-cart-and-checkout/replace-an-admin-cart",
+              "api-reference/admin-cart-and-checkout/change-an-admin-carts-customer",
+              "api-reference/admin-cart-and-checkout/delete-an-admin-cart",
+              "api-reference/admin-cart-and-checkout/add-products-to-an-admin-cart",
+              "api-reference/admin-cart-and-checkout/remove-every-line-from-an-admin-cart",
+              "api-reference/admin-cart-and-checkout/change-the-quantity-of-a-cart-line",
+              "api-reference/admin-cart-and-checkout/remove-a-cart-line",
+              "api-reference/admin-cart-and-checkout/retrieve-a-checkout",
+              "api-reference/admin-cart-and-checkout/update-a-checkout",
+              "api-reference/admin-cart-and-checkout/place-the-order-from-a-checkout",
+              "api-reference/admin-cart-and-checkout/apply-a-coupon-to-a-checkout",
+              "api-reference/admin-cart-and-checkout/remove-the-coupon-from-a-checkout",
+              "api-reference/admin-cart-and-checkout/apply-a-gift-card-to-a-checkout",
+              "api-reference/admin-cart-and-checkout/remove-the-gift-card-from-a-checkout",
+              "api-reference/admin-cart-and-checkout/retrieve-a-checkouts-delivery-schedule",
+              "api-reference/admin-cart-and-checkout/set-a-checkouts-delivery-schedule",
+              "api-reference/admin-cart-and-checkout/clear-a-checkouts-delivery-schedule"
             ]
           },
           {

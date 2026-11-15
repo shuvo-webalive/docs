@@ -6,10 +6,6 @@
       "function": "listInventoryLocations",
       "code": "final response = await client.inventoryLocations\n    .listInventoryLocations(queryParams: {'q': 'Sydney'});\nfinal locations = (response.map as Map)['inventory_locations'] as List;\nfor (final location in locations) {\n  print('${(location as Map)['id']} ${location['name']}');\n}"
     },
-    "head_inventory_locations": {
-      "function": "headInventoryLocations",
-      "code": "final response = await client.inventoryLocations.headInventoryLocations();\nprint(response.statusCode);"
-    },
     "create_inventory_location": {
       "function": "createInventoryLocation",
       "code": "final response = await client.inventoryLocations.createInventoryLocation({\n  'name': 'Perth Warehouse',\n  'address': '4 Example Street, Perth WA 6000',\n});\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint(location['id']);"
@@ -17,10 +13,6 @@
     "get_inventory_location": {
       "function": "getInventoryLocation",
       "code": "final response = await client.inventoryLocations.getInventoryLocation(4);\nfinal location = (response.map as Map)['inventory_location'] as Map;\nprint('${location['name']} ${location['address']}');"
-    },
-    "head_inventory_location": {
-      "function": "headInventoryLocation",
-      "code": "final response = await client.inventoryLocations.headInventoryLocation(4);\nprint(response.statusCode);"
     },
     "update_inventory_location": {
       "function": "updateInventoryLocation",

@@ -6,10 +6,6 @@
       "function": "listShippingMethods",
       "code": "const response = await client.shippingMethods.listShippingMethods({limit: 20});\nfor (const shippingMethod of response.map.shipping_methods) {\n    console.log(shippingMethod.id, shippingMethod.name, shippingMethod.is_default);\n}\n"
     },
-    "head_shipping_methods": {
-      "function": "headShippingMethods",
-      "code": "const response = await client.shippingMethods.headShippingMethods();\nconsole.log(response.statusCode);\n"
-    },
     "count_shipping_methods": {
       "function": "countShippingMethods",
       "code": "const response = await client.shippingMethods.countShippingMethods();\nconsole.log(response.map.shipping_methods.count);\n"
@@ -21,10 +17,6 @@
     "get_shipping_method": {
       "function": "getShippingMethod",
       "code": "const response = await client.shippingMethods.getShippingMethod(2);\nconsole.log(response.map.shipping_method.name, response.map.shipping_method.is_default);\n"
-    },
-    "head_shipping_method": {
-      "function": "headShippingMethod",
-      "code": "const response = await client.shippingMethods.headShippingMethod(2);\nconsole.log(response.statusCode);\n"
     },
     "update_shipping_method": {
       "function": "updateShippingMethod",

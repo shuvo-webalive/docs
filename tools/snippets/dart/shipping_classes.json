@@ -6,10 +6,6 @@
       "function": "listShippingClasses",
       "code": "final response = await client.shippingClasses\n    .listShippingClasses(queryParams: {'limit': 20});\nfinal shippingClasses = (response.map as Map)['shipping_classes'] as List;\nfor (final shippingClass in shippingClasses) {\n  print('${(shippingClass as Map)['id']} ${shippingClass['name']}');\n}\nfinal pagination = (response.map as Map)['pagination'] as Map;\nprint(pagination['total']);"
     },
-    "head_shipping_classes": {
-      "function": "headShippingClasses",
-      "code": "final response = await client.shippingClasses.headShippingClasses();\nprint(response.statusCode);"
-    },
     "count_shipping_classes": {
       "function": "countShippingClasses",
       "code": "final response = await client.shippingClasses.countShippingClasses();\nfinal shippingClasses = (response.map as Map)['shipping_classes'] as Map;\nprint(shippingClasses['count']);"
@@ -21,10 +17,6 @@
     "get_shipping_class": {
       "function": "getShippingClass",
       "code": "final response = await client.shippingClasses.getShippingClass(2);\nfinal shippingClass = (response.map as Map)['shipping_class'] as Map;\nprint('${shippingClass['name']} ${shippingClass['is_default']}');"
-    },
-    "head_shipping_class": {
-      "function": "headShippingClass",
-      "code": "final response = await client.shippingClasses.headShippingClass(2);\nprint(response.statusCode);"
     },
     "update_shipping_class": {
       "function": "updateShippingClass",

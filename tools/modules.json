@@ -75,10 +75,10 @@
       ]
     },
     {
-      "name": "Order previews",
-      "icon": "clipboard-check",
+      "name": "Admin cart and checkout",
+      "icon": "cart-plus",
       "modules": [
-        "order_previews"
+        "admin_carts"
       ]
     },
     {

@@ -6,10 +6,6 @@
       "function": "listShippingClasses",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().listShippingClasses(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"shipping_classes\")) {\n    Map<?, ?> shippingClass = (Map<?, ?>) row;\n    System.out.println(shippingClass.get(\"id\") + \" \" + shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"has_next\"));"
     },
-    "head_shipping_classes": {
-      "function": "headShippingClasses",
-      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingClasses().headShippingClasses();\nSystem.out.println(response.getStatusCode());"
-    },
     "count_shipping_classes": {
       "function": "countShippingClasses",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().countShippingClasses();\nMap<?, ?> shippingClasses = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_classes\");\nSystem.out.println(shippingClasses.get(\"count\"));"
@@ -21,10 +17,6 @@
     "get_shipping_class": {
       "function": "getShippingClass",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.shippingClasses().getShippingClass(2);\nMap<?, ?> shippingClass = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"shipping_class\");\nSystem.out.println(shippingClass.get(\"name\") + \" \" + shippingClass.get(\"is_default\"));"
-    },
-    "head_shipping_class": {
-      "function": "headShippingClass",
-      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.shippingClasses().headShippingClass(2);\nSystem.out.println(response.getStatusCode());"
     },
     "update_shipping_class": {
       "function": "updateShippingClass",

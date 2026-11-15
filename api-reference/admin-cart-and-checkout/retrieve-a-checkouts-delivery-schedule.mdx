@@ -1,9 +1,9 @@
 ---
-title: "Remove the coupon from a preview"
-description: "Removes the applied coupon, so the totals return to what they were before it."
-openapi: "DELETE /admin/orders/preview/{preview_session_id}/coupon"
+title: "Retrieve a checkout's delivery schedule"
+description: "Returns the delivery schedule chosen for the checkout, or `null` when none is set."
+openapi: "GET /admin/orders/checkout/{session_id}/delivery_schedules"
 ---
 
-Removes the coupon and returns `204` with no body. [Retrieve an order preview](/api-reference/order-previews/retrieve-an-order-preview) then shows the totals the preview had before you applied the coupon. This call moves `session.expires_at` to 30 minutes after the call.
+Returns `session` and `delivery_schedule` under `checkout`. `delivery_schedule` is `null` until you choose one with [Set a checkout's delivery schedule](/api-reference/admin-cart-and-checkout/set-a-checkouts-delivery-schedule).
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

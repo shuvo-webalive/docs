@@ -6,17 +6,12 @@ BASE = "/admin/shipping_methods"
 ICON = "truck"
 
 OVERVIEW_DESCRIPTION = "List, count, create, rename and delete shipping methods, and choose which one is the default."
-INTRO = "The Shipping methods API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_methods`."
+INTRO = "The Shipping methods API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/shipping_methods`."
 
 RETRIEVE_PAGE = "/api-reference/shipping-methods/retrieve-a-shipping-method"
 DEFAULT_PAGE = "/api-reference/shipping-methods/set-the-default-shipping-method"
 
-WARNING = (
-    "**A `HEAD` request for one shipping method returns `200` even when no method has the `shipping_method_id` you send**,\n"
-    "  so it does not tell you whether the method exists. To check that, call\n"
-    "  [Retrieve a shipping method](" + RETRIEVE_PAGE + ") instead: it returns `404` when no method\n"
-    "  has that `shipping_method_id`."
-)
+WARNING = None
 
 NOTES = [
     "**Create and rename wrap the method in `shipping_method`.** Send `{\"shipping_method\": {\"name\": \"Express Post\"}}`\n"
@@ -113,19 +108,6 @@ ENDPOINTS = [
         "example_call": {"query": "limit=20"},
     },
     {
-        "key": "head_shipping_methods",
-        "slug": "check-the-shipping-methods-list",
-        "title": "Check the shipping methods list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the shipping methods list is reachable. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. Neither this response nor the listing has an `ETag` header.",
-        "responses": {
-            "200": {"description": "The list is reachable. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "count_shipping_methods",
         "slug": "count-shipping-methods",
         "title": "Count shipping methods",
@@ -178,20 +160,6 @@ ENDPOINTS = [
                 "example": {"shipping_method": SAMPLE_ROWS[1]},
             },
             "404": {"description": "No method has that `shipping_method_id`, or it is not a number.", "schema": ERROR_REF, "example": NOT_FOUND},
-        },
-        "example_call": {"path": {"shipping_method_id": 2}},
-    },
-    {
-        "key": "head_shipping_method",
-        "slug": "check-a-shipping-method",
-        "title": "Check a shipping method",
-        "method": "HEAD",
-        "path": BASE + "/{shipping_method_id}",
-        "summary": "Returns headers only, and `200` even when no method has that `shipping_method_id`.",
-        "description": "Returns `200` with headers only and no body. It returns `200` even when no method has that `shipping_method_id`, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](" + RETRIEVE_PAGE + "), which returns `404` when no method has it.",
-        "parameters": [SHIPPING_METHOD_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body. Returned even when no method has that `shipping_method_id`."},
         },
         "example_call": {"path": {"shipping_method_id": 2}},
     },

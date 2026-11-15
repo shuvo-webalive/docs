@@ -1,9 +1,9 @@
 ---
-title: "Remove the gift card from a preview"
-description: "Removes the applied gift card, so `due` returns to the grand total."
-openapi: "DELETE /admin/orders/preview/{preview_session_id}/gift-card"
+title: "Retrieve an admin cart"
+description: "Returns the cart whose `session_id` you pass, with its lines and totals."
+openapi: "GET /admin/orders/carts/{session_id}"
 ---
 
-Removes the gift card and returns `204` with no body. This call moves `session.expires_at` to 30 minutes after the call.
+Returns the cart in the same shape as [Create an admin cart](/api-reference/admin-cart-and-checkout/create-an-admin-cart). A cart that was deleted, or that an order was placed from, returns `410`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

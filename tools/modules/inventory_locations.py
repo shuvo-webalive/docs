@@ -6,7 +6,7 @@ BASE = "/admin/inventory_locations"
 ICON = "warehouse"
 
 OVERVIEW_DESCRIPTION = "List, create, replace, update and delete inventory locations, activate or deactivate them, see the products each one holds, and choose the default location."
-INTRO = "The Inventory locations API has eleven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/inventory_locations`."
+INTRO = "The Inventory locations API has nine endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/inventory_locations`."
 
 RETRIEVE_PAGE = "/api-reference/inventory-locations/retrieve-an-inventory-location"
 DEFAULT_PAGE = "/api-reference/inventory-locations/set-the-default-inventory-location"
@@ -38,11 +38,10 @@ NOTES = [
     "  `pagination.has_next` is `true`. The listing accepts only `q`, `limit` and `offset`, and the stock\n"
     "  listing only `limit` and `offset`: any other query parameter, `page` included, is rejected with\n"
     "  `400`.",
-    "**A method a path does not support is rejected with `405`.** The response has an `Allow` header\n"
-    "  that lists the methods the path accepts. A location accepts `GET`, `HEAD`, `PUT`, `PATCH` and\n"
-    "  `DELETE`: use `PUT` to replace it, `PATCH` to change only the fields you send, and\n"
+    "**A method a path does not support is rejected with `405`.** A location accepts `GET`, `PUT`,\n"
+    "  `PATCH` and `DELETE`: use `PUT` to replace it, `PATCH` to change only the fields you send, and\n"
     "  [Activate or deactivate an inventory location](" + STATUS_PAGE + ") to change only `active`.\n"
-    "  `/stock` accepts only `GET` and `HEAD`, so no call changes stock.",
+    "  `/stock` accepts only `GET`, so no call changes stock.",
 ]
 
 INVENTORY_LOCATION_ID = {
@@ -119,19 +118,6 @@ ENDPOINTS = [
         "example_call": {"query": "q=Sydney"},
     },
     {
-        "key": "head_inventory_locations",
-        "slug": "check-the-inventory-locations-list",
-        "title": "Check the inventory locations list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the inventory locations list is reachable. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. The response has no `ETag` header.",
-        "responses": {
-            "200": {"description": "The list is reachable. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "create_inventory_location",
         "slug": "create-an-inventory-location",
         "title": "Create an inventory location",
@@ -167,20 +153,6 @@ ENDPOINTS = [
                 "example": {"inventory_location": SAMPLE_ROWS[1]},
             },
             "404": NOT_FOUND_RESPONSE,
-        },
-        "example_call": {"path": {"inventory_location_id": 4}},
-    },
-    {
-        "key": "head_inventory_location",
-        "slug": "check-an-inventory-location",
-        "title": "Check an inventory location",
-        "method": "HEAD",
-        "path": BASE + "/{inventory_location_id}",
-        "summary": "Returns headers only, with no body, for the location you pass as `inventory_location_id`.",
-        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. It returns `200` even when no location has that `inventory_location_id`, so it does not tell you whether the location exists. To read the location's fields, or to get `404` for a location that does not exist, use [Retrieve an inventory location](" + RETRIEVE_PAGE + ").",
-        "parameters": [INVENTORY_LOCATION_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body. You get `200` for any `inventory_location_id`, including one no location has."},
         },
         "example_call": {"path": {"inventory_location_id": 4}},
     },

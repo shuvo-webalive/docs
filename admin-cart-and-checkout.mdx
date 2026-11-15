@@ -1,0 +1,90 @@
+---
+title: "Admin cart and checkout"
+sidebarTitle: "Overview"
+description: "Build a cart for a customer, set its delivery and addresses, apply a coupon, a gift card and a delivery date, and place the order."
+---
+
+The Admin cart and checkout API has 19 endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/orders/carts` or `/api/v4/admin/orders/checkout`. You create a cart for a customer, change its lines, set the delivery and the addresses on its checkout, apply a coupon, a gift card and a delivery date, and place the order. A cart and its checkout are one session, and every call reaches it by its `session_id`. The storefront's carts are in the [Carts](/carts) API.
+
+<Warning>
+  **[Place the order from a checkout](/api-reference/admin-cart-and-checkout/place-the-order-from-a-checkout) creates a real order.**
+  It closes the session, and every later call on the cart or the checkout, a second confirm included, is rejected
+  with `410` and the code `session_confirmed`. A session also ends on its own: it is held for 30 minutes from its
+  last write. Create a new cart when you need one again.
+</Warning>
+
+## At a glance
+
+| Endpoint | Method | Path | What it does |
+| --- | --- | --- | --- |
+| [Create an admin cart](/api-reference/admin-cart-and-checkout/create-an-admin-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/carts` | Creates a cart for a customer with the products you send and returns it with its `session_id`. |
+| [Retrieve an admin cart](/api-reference/admin-cart-and-checkout/retrieve-an-admin-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/carts/{session_id}` | Returns the cart whose `session_id` you pass, with its lines and totals. |
+| [Replace an admin cart](/api-reference/admin-cart-and-checkout/replace-an-admin-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/orders/carts/{session_id}` | Replaces the cart's customer and lines with the ones you send and returns the cart. |
+| [Change an admin cart's customer](/api-reference/admin-cart-and-checkout/change-an-admin-carts-customer) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/orders/carts/{session_id}` | Moves the cart to another customer and returns the cart. |
+| [Delete an admin cart](/api-reference/admin-cart-and-checkout/delete-an-admin-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/orders/carts/{session_id}` | Deletes the cart and its checkout, returning `204` with no body. |
+| [Add products to an admin cart](/api-reference/admin-cart-and-checkout/add-products-to-an-admin-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/carts/{session_id}/cart_items` | Adds the products you send to the cart and returns the cart. |
+| [Remove every line from an admin cart](/api-reference/admin-cart-and-checkout/remove-every-line-from-an-admin-cart) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/orders/carts/{session_id}/cart_items` | Removes every line from the cart and returns the empty cart. |
+| [Change the quantity of a cart line](/api-reference/admin-cart-and-checkout/change-the-quantity-of-a-cart-line) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/orders/carts/{session_id}/cart_items/{cart_item_id}` | Sets the quantity of one cart line and returns the cart. |
+| [Remove a cart line](/api-reference/admin-cart-and-checkout/remove-a-cart-line) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/orders/carts/{session_id}/cart_items/{cart_item_id}` | Removes one line from the cart and returns the cart. |
+| [Retrieve a checkout](/api-reference/admin-cart-and-checkout/retrieve-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/checkout/{session_id}` | Returns the cart's checkout: totals, delivery, addresses and what still blocks the order. |
+| [Update a checkout](/api-reference/admin-cart-and-checkout/update-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#7a5af8"}}>PATCH</span> | `…/orders/checkout/{session_id}` | Sets the delivery type and the billing and shipping addresses and returns the priced checkout. |
+| [Place the order from a checkout](/api-reference/admin-cart-and-checkout/place-the-order-from-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/checkout/{session_id}/confirm` | Places a real order from the checkout and closes the session. |
+| [Apply a coupon to a checkout](/api-reference/admin-cart-and-checkout/apply-a-coupon-to-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/checkout/{session_id}/coupon` | Applies a coupon code to the checkout and returns the lower totals. |
+| [Remove the coupon from a checkout](/api-reference/admin-cart-and-checkout/remove-the-coupon-from-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/orders/checkout/{session_id}/coupon` | Removes the applied coupon, so the totals return to what they were before it. |
+| [Apply a gift card to a checkout](/api-reference/admin-cart-and-checkout/apply-a-gift-card-to-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/orders/checkout/{session_id}/gift_card` | Applies a gift card to the checkout, lowering the amount due. |
+| [Remove the gift card from a checkout](/api-reference/admin-cart-and-checkout/remove-the-gift-card-from-a-checkout) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/orders/checkout/{session_id}/gift_card` | Removes the applied gift card, so `due` returns to the grand total. |
+| [Retrieve a checkout's delivery schedule](/api-reference/admin-cart-and-checkout/retrieve-a-checkouts-delivery-schedule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/orders/checkout/{session_id}/delivery_schedules` | Returns the delivery schedule chosen for the checkout, or `null` when none is set. |
+| [Set a checkout's delivery schedule](/api-reference/admin-cart-and-checkout/set-a-checkouts-delivery-schedule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/orders/checkout/{session_id}/delivery_schedules` | Chooses a delivery schedule and date for the checkout. |
+| [Clear a checkout's delivery schedule](/api-reference/admin-cart-and-checkout/clear-a-checkouts-delivery-schedule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/orders/checkout/{session_id}/delivery_schedules` | Clears the checkout's delivery schedule, returning `204` with no body. |
+
+## Before you call
+
+Register your credentials once when your app starts, as shown in
+[Authentication (New)](/authentication), or in [Authentication (Legacy)](/authentication-legacy) if your store
+signs in with a redirect URI and an auth string. Every SDK sample on these pages then gets its client in one line.
+With cURL, send the access token in an `Authorization` header: `Authorization: Bearer $ACCESS_TOKEN`.
+
+## Things to know
+
+- **Every call takes the cart's `session_id`.** [Create an admin cart](/api-reference/admin-cart-and-checkout/create-an-admin-cart) returns it as
+  `cart.session.session_id`, a value such as `PRV-3f2a9c41b7d80e65`. Every other call takes it as `session_id` in the
+  path, and the two line calls also take the line's `cart_item_id` from `cart.items`. Send `session_id` in the
+  create body to name the session yourself, in the same `PRV-` form.
+- **Bodies are bare, and `customer_id` is the customer's own `customer_id`.** Send the fields at the top level, with
+  no wrapper. A field a call does not accept is rejected with `400` and the code `unknown_field`. Find the
+  `customer_id` with [Retrieve a customer](/api-reference/customers/retrieve-a-customer) or a customer listing.
+- **Every cart call returns the whole cart, except the delete.** [Delete an admin cart](/api-reference/admin-cart-and-checkout/delete-an-admin-cart) returns
+  `204` with no body. [Replace an admin cart](/api-reference/admin-cart-and-checkout/replace-an-admin-cart) puts the lines on again, so each gets a new
+  `cart_item_id`. [Change an admin cart's customer](/api-reference/admin-cart-and-checkout/change-an-admin-carts-customer) takes only `customer_id`: sending
+  `products` there is rejected with `400`. [Add products to an admin cart](/api-reference/admin-cart-and-checkout/add-products-to-an-admin-cart) raises the
+  quantity of a product that is already on the cart.
+- **A closed session returns `410`.** After [Place the order from a checkout](/api-reference/admin-cart-and-checkout/place-the-order-from-a-checkout) every call on it
+  returns `410` with the code `session_confirmed`, and the detail on `order_id` holds the new order. After
+  [Delete an admin cart](/api-reference/admin-cart-and-checkout/delete-an-admin-cart) every call on it, a second delete included, returns `410` with the code
+  `session_deleted`. A `cart_item_id` the cart does not hold returns `404`.
+- **The checkout lists what blocks the order in `issues`.** [Retrieve a checkout](/api-reference/admin-cart-and-checkout/retrieve-a-checkout) returns
+  `issues` with `delivery_type` `required` until you set a delivery type with
+  [Update a checkout](/api-reference/admin-cart-and-checkout/update-a-checkout). While `issues` is not empty,
+  [Place the order from a checkout](/api-reference/admin-cart-and-checkout/place-the-order-from-a-checkout) is rejected with `422` and the code `checkout_incomplete`.
+- **An address you send replaces the whole address.** `delivery_type` is `shipping`, `delivery`, `others_shipping` or
+  `store_pickup`. The checkout starts with the customer's addresses. A field you leave out of an address you send
+  reads `""`. Shipping and handling follow the shipping address, so send it with `delivery_type`; a `store_pickup`
+  has no shipping cost.
+- **A `shipping` or `delivery` checkout needs a default shipping profile.** A new store has none. Create a shipping
+  profile, then make it the store's `default_shipping_profile` with
+  [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings): creating the profile alone is not enough.
+- **A checkout takes one coupon and one gift card.** A second coupon, or a second gift card, is rejected with `409`.
+  A code the store does not accept, or a coupon or gift card that is not active, is rejected with `422`: the
+  code is `invalid_coupon` or `invalid_gift_card` on `code`. A missing `code` is `400`. A coupon lowers
+  `totals.total_discount` and `totals.grand_total`, and `discounts.coupon.applied_amount` is what it takes off.
+  A gift card leaves `grand_total` as it was, sets `totals.gift_card_applied` and lowers `totals.due`, and pays
+  only for the cart's own customer; find a customer's cards with [List gift cards](/api-reference/gift-cards/list-gift-cards).
+  The two remove calls return `404` when nothing is applied.
+- **A delivery date needs `delivery_type` `delivery`.** [Set a checkout's delivery schedule](/api-reference/admin-cart-and-checkout/set-a-checkouts-delivery-schedule)
+  needs the schedule `id` and a `date`. With another delivery type it is rejected with `422` and the code
+  `delivery_type_not_supported`. A schedule that does not apply to the order is rejected with `422` and the code
+  `schedule_not_applicable`, an unknown `id` with `404`, and a `date` that is not a date with `400`.
+  [Clear a checkout's delivery schedule](/api-reference/admin-cart-and-checkout/clear-a-checkouts-delivery-schedule) returns `204`, also when none was set.
+- **The transaction number can go in the body or in a header.** Send `transaction_no` in the confirm body, or send it
+  as the `X-Transaction-No` header, which the SDKs send for you. The store files the order under that number. When
+  both are present and differ, the call is rejected with `400` and the code `header_body_mismatch`.

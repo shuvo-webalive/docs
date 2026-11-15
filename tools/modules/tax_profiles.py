@@ -6,7 +6,7 @@ BASE = "/admin/tax_profiles"
 ICON = "percent"
 
 OVERVIEW_DESCRIPTION = "List, create, update and delete tax profiles, and choose which profile is the store's default."
-INTRO = "The Tax profiles API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_profiles`."
+INTRO = "The Tax profiles API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_profiles`."
 
 RETRIEVE_PAGE = "/api-reference/tax-profiles/retrieve-a-tax-profile"
 UPDATE_PAGE = "/api-reference/tax-profiles/update-a-tax-profile"
@@ -111,19 +111,6 @@ ENDPOINTS = [
         "example_call": {"query": "limit=20"},
     },
     {
-        "key": "head_tax_profiles",
-        "slug": "check-the-tax-profiles-list",
-        "title": "Check the tax profiles list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the tax profiles list is reachable. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. Neither this response nor the listing has an `ETag` or `Last-Modified` header.",
-        "responses": {
-            "200": {"description": "The list is reachable. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "create_tax_profile",
         "slug": "create-a-tax-profile",
         "title": "Create a tax profile",
@@ -162,20 +149,6 @@ ENDPOINTS = [
                 "example": {"tax_profile": SAMPLE_ROWS[1]},
             },
             "404": {"description": "No tax profile has that `tax_profile_id` (`Profile not found`).", "schema": ERROR_REF},
-        },
-        "example_call": {"path": {"tax_profile_id": 2}},
-    },
-    {
-        "key": "head_tax_profile",
-        "slug": "check-a-tax-profile",
-        "title": "Check a tax profile",
-        "method": "HEAD",
-        "path": BASE + "/{tax_profile_id}",
-        "summary": "Returns headers only, and `200` even when no tax profile has that `tax_profile_id`.",
-        "description": "Returns `200` with headers only and no body, and no `ETag` or `Last-Modified` header. It returns `200` even when no tax profile has that `tax_profile_id`, so it does not tell you whether the profile exists. To check that, use [Retrieve a tax profile](" + RETRIEVE_PAGE + "), which returns `404` when no tax profile has it.",
-        "parameters": [TAX_PROFILE_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body. Returned even when no tax profile has that `tax_profile_id`."},
         },
         "example_call": {"path": {"tax_profile_id": 2}},
     },

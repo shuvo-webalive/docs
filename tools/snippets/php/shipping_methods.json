@@ -6,10 +6,6 @@
       "function": "listShippingMethods",
       "code": "use WebCommander\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::listShippingMethods($client, ['limit' => 20]);\n\nforeach ($response->map['shipping_methods'] as $method) {\n    echo $method['id'], ' ', $method['name'], $method['is_default'] ? ' (default)' : '', PHP_EOL;\n}"
     },
-    "head_shipping_methods": {
-      "function": "headShippingMethods",
-      "code": "use WebCommander\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::headShippingMethods($client);\n\necho $response->statusCode, PHP_EOL;"
-    },
     "count_shipping_methods": {
       "function": "countShippingMethods",
       "code": "use WebCommander\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::countShippingMethods($client);\n\necho $response->map['shipping_methods']['count'], PHP_EOL;"
@@ -21,10 +17,6 @@
     "get_shipping_method": {
       "function": "getShippingMethod",
       "code": "use WebCommander\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::getShippingMethod($client, 2);\n\necho $response->map['shipping_method']['name'], PHP_EOL;"
-    },
-    "head_shipping_method": {
-      "function": "headShippingMethod",
-      "code": "use WebCommander\\Resources\\ShippingMethods\\ShippingMethods;\n\n$response = ShippingMethods::headShippingMethod($client, 2);\n\necho $response->statusCode, PHP_EOL;"
     },
     "update_shipping_method": {
       "function": "updateShippingMethod",

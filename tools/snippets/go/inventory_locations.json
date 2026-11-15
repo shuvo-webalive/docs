@@ -6,10 +6,6 @@
       "function": "ListInventoryLocations",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().ListInventoryLocations(ctx, map[string]any{\"q\": \"Sydney\"}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"inventory_locations\"].([]any) {\n\tlocation := row.(map[string]any)\n\tfmt.Println(location[\"id\"], location[\"name\"], location[\"default\"])\n}"
     },
-    "head_inventory_locations": {
-      "function": "HeadInventoryLocations",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().HeadInventoryLocations(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
-    },
     "create_inventory_location": {
       "function": "CreateInventoryLocation",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().CreateInventoryLocation(ctx, map[string]any{\n\t\"name\":    \"Perth Warehouse\",\n\t\"address\": \"4 Example Street, Perth WA 6000\",\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"id\"], location[\"name\"], location[\"active\"])"
@@ -17,10 +13,6 @@
     "get_inventory_location": {
       "function": "GetInventoryLocation",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().GetInventoryLocation(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nlocation := resp.Map().(map[string]any)[\"inventory_location\"].(map[string]any)\nfmt.Println(location[\"name\"], location[\"address\"], location[\"active\"])"
-    },
-    "head_inventory_location": {
-      "function": "HeadInventoryLocation",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.InventoryLocations().HeadInventoryLocation(ctx, 4, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "update_inventory_location": {
       "function": "UpdateInventoryLocation",

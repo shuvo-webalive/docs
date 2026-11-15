@@ -1,9 +1,9 @@
 ---
-title: "Check a shipping method"
-description: "Returns headers only, and `200` even when no method has that `shipping_method_id`."
-openapi: "HEAD /admin/shipping_methods/{shipping_method_id}"
+title: "Remove a cart line"
+description: "Removes one line from the cart and returns the cart."
+openapi: "DELETE /admin/orders/carts/{session_id}/cart_items/{cart_item_id}"
 ---
 
-Returns `200` with headers only and no body. It returns `200` even when no method has that `shipping_method_id`, so it does not tell you whether the method exists. To check that, use [Retrieve a shipping method](/api-reference/shipping-methods/retrieve-a-shipping-method), which returns `404` when no method has it.
+Removes the line whose `cart_item_id` you pass in the path. The response is the whole cart without that line, not `204`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

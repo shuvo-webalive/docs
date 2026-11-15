@@ -6,10 +6,6 @@
       "function": "listShippingClasses",
       "code": "use WebCommander\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::listShippingClasses($client, ['limit' => 20]);\n\nforeach ($response->map['shipping_classes'] as $class) {\n    echo $class['id'], ' ', $class['name'], $class['is_default'] ? ' (default)' : '', PHP_EOL;\n}\necho $response->map['pagination']['total'], ' shipping classes in total', PHP_EOL;"
     },
-    "head_shipping_classes": {
-      "function": "headShippingClasses",
-      "code": "use WebCommander\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::headShippingClasses($client);\n\necho $response->statusCode, PHP_EOL;"
-    },
     "count_shipping_classes": {
       "function": "countShippingClasses",
       "code": "use WebCommander\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::countShippingClasses($client);\n\necho $response->map['shipping_classes']['count'], PHP_EOL;"
@@ -21,10 +17,6 @@
     "get_shipping_class": {
       "function": "getShippingClass",
       "code": "use WebCommander\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::getShippingClass($client, 2);\n\n$class = $response->map['shipping_class'];\necho $class['name'], ': ', $class['description'], PHP_EOL;"
-    },
-    "head_shipping_class": {
-      "function": "headShippingClass",
-      "code": "use WebCommander\\Resources\\ShippingClasses\\ShippingClasses;\n\n$response = ShippingClasses::headShippingClass($client, 2);\n\necho $response->statusCode, PHP_EOL;"
     },
     "update_shipping_class": {
       "function": "updateShippingClass",

@@ -1,0 +1,9 @@
+---
+title: "Apply a gift card to a checkout"
+description: "Applies a gift card to the checkout, lowering the amount due."
+openapi: "POST /admin/orders/checkout/{session_id}/gift_card"
+---
+
+Send the card's `code` at the top level of the body. The card pays up to its balance: `discounts.gift_card.applied_amount` is the lesser of the card's balance and `grand_total`, `totals.gift_card_applied` equals it, `grand_total` does not change and `due` is lower by that amount. The card pays only for the cart's own customer, and nothing is spent from it until an order is placed. A checkout takes one gift card: a second call is rejected with `409`. A code the store does not accept, or a card that is not active, is rejected with `422`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string. To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

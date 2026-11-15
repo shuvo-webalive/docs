@@ -6,10 +6,6 @@
       "function": "ListShippingClasses",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().ListShippingClasses(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"shipping_classes\"].([]any) {\n\tshippingClass := row.(map[string]any)\n\tfmt.Println(shippingClass[\"id\"], shippingClass[\"name\"], shippingClass[\"is_default\"])\n}"
     },
-    "head_shipping_classes": {
-      "function": "HeadShippingClasses",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().HeadShippingClasses(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
-    },
     "count_shipping_classes": {
       "function": "CountShippingClasses",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().CountShippingClasses(ctx, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.Map().(map[string]any)[\"shipping_classes\"].(map[string]any)[\"count\"])"
@@ -21,10 +17,6 @@
     "get_shipping_class": {
       "function": "GetShippingClass",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().GetShippingClass(ctx, 2, nil, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nshippingClass := resp.Map().(map[string]any)[\"shipping_class\"].(map[string]any)\nfmt.Println(shippingClass[\"name\"], shippingClass[\"description\"], shippingClass[\"is_default\"])"
-    },
-    "head_shipping_class": {
-      "function": "HeadShippingClass",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.ShippingClasses().HeadShippingClass(ctx, 2, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "update_shipping_class": {
       "function": "UpdateShippingClass",

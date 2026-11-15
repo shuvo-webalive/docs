@@ -1,0 +1,82 @@
+{
+  "sdk": "python",
+  "module": "admin_carts",
+  "endpoints": {
+    "create_admin_cart": {
+      "function": "create_admin_cart",
+      "code": "response = client.admin_carts.create_admin_cart({\n    \"customer_id\": 512,\n    \"products\": [{\"product_id\": 101, \"quantity\": 2}],\n})\ncart = response.map[\"cart\"]\nprint(cart[\"session\"][\"session_id\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "get_admin_cart": {
+      "function": "get_admin_cart",
+      "code": "response = client.admin_carts.get_admin_cart(\"PRV-3f2a9c41b7d80e65\")\ncart = response.map[\"cart\"]\nprint(cart[\"session\"][\"expires_at\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "replace_admin_cart": {
+      "function": "replace_admin_cart",
+      "code": "response = client.admin_carts.replace_admin_cart(\"PRV-3f2a9c41b7d80e65\", {\n    \"customer_id\": 512,\n    \"products\": [{\"product_id\": 101, \"variation_id\": 2011, \"quantity\": 1}],\n})\ncart = response.map[\"cart\"]\nprint(cart[\"totals\"][\"sub_total\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "update_admin_cart": {
+      "function": "update_admin_cart",
+      "code": "response = client.admin_carts.update_admin_cart(\"PRV-3f2a9c41b7d80e65\", {\"customer_id\": 513})\ncart = response.map[\"cart\"]\nprint(cart[\"customer\"][\"customer_id\"], cart[\"customer\"][\"email\"])\n"
+    },
+    "delete_admin_cart": {
+      "function": "delete_admin_cart",
+      "code": "response = client.admin_carts.delete_admin_cart(\"PRV-3f2a9c41b7d80e65\")\nprint(response.status_code)\n"
+    },
+    "add_admin_cart_items": {
+      "function": "add_admin_cart_items",
+      "code": "response = client.admin_carts.add_admin_cart_items(\"PRV-3f2a9c41b7d80e65\", {\"products\": [{\"product_id\": 102, \"quantity\": 1}]})\ncart = response.map[\"cart\"]\nprint(cart[\"totals\"][\"sub_total\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "clear_admin_cart_items": {
+      "function": "clear_admin_cart_items",
+      "code": "response = client.admin_carts.clear_admin_cart_items(\"PRV-3f2a9c41b7d80e65\")\ncart = response.map[\"cart\"]\nprint(cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "update_admin_cart_item": {
+      "function": "update_admin_cart_item",
+      "code": "response = client.admin_carts.update_admin_cart_item(\"PRV-3f2a9c41b7d80e65\", 1, {\"quantity\": 3})\ncart = response.map[\"cart\"]\nprint(cart[\"totals\"][\"sub_total\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "delete_admin_cart_item": {
+      "function": "delete_admin_cart_item",
+      "code": "response = client.admin_carts.delete_admin_cart_item(\"PRV-3f2a9c41b7d80e65\", 1)\ncart = response.map[\"cart\"]\nprint(cart[\"totals\"][\"sub_total\"], cart[\"totals\"][\"grand_total\"])\n"
+    },
+    "get_checkout": {
+      "function": "get_checkout",
+      "code": "response = client.admin_carts.get_checkout(\"PRV-3f2a9c41b7d80e65\")\ncheckout = response.map[\"checkout\"]\nprint(checkout[\"delivery_type\"], checkout[\"totals\"][\"due\"])\n"
+    },
+    "update_checkout": {
+      "function": "update_checkout",
+      "code": "response = client.admin_carts.update_checkout(\"PRV-3f2a9c41b7d80e65\", {\n    \"delivery_type\": \"shipping\",\n    \"billing_address\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane.doe@example.com\",\n        \"address_line_1\": \"1 Example Street\",\n        \"city\": \"Melbourne\",\n        \"post_code\": \"3000\",\n        \"phone\": \"0300000000\",\n        \"country_code\": \"AU\",\n        \"state_code\": \"VIC\",\n    },\n    \"shipping_address\": {\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Doe\",\n        \"email\": \"jane.doe@example.com\",\n        \"address_line_1\": \"1 Example Street\",\n        \"city\": \"Melbourne\",\n        \"post_code\": \"3000\",\n        \"phone\": \"0300000000\",\n        \"country_code\": \"AU\",\n        \"state_code\": \"VIC\",\n    },\n})\ncheckout = response.map[\"checkout\"]\nprint(checkout[\"shipping\"][\"shipping_cost\"], checkout[\"totals\"][\"grand_total\"])\n"
+    },
+    "confirm_checkout": {
+      "function": "confirm_checkout",
+      "code": "response = client.admin_carts.confirm_checkout(\"PRV-3f2a9c41b7d80e65\", {\"send_email\": False}, transaction_no=\"TXN-ORDER-0001\")\norder = response.map[\"order\"]\nprint(order[\"order_id\"], order[\"transaction_no\"], order[\"grand_total\"])\n"
+    },
+    "apply_checkout_coupon": {
+      "function": "apply_checkout_coupon",
+      "code": "response = client.admin_carts.apply_checkout_coupon(\"PRV-3f2a9c41b7d80e65\", {\"code\": \"SAVE10\"})\ncheckout = response.map[\"checkout\"]\nprint(checkout[\"discounts\"][\"coupon\"][\"applied_amount\"], checkout[\"totals\"][\"grand_total\"])\n"
+    },
+    "remove_checkout_coupon": {
+      "function": "remove_checkout_coupon",
+      "code": "response = client.admin_carts.remove_checkout_coupon(\"PRV-3f2a9c41b7d80e65\")\nprint(response.status_code)\n"
+    },
+    "apply_checkout_gift_card": {
+      "function": "apply_checkout_gift_card",
+      "code": "response = client.admin_carts.apply_checkout_gift_card(\"PRV-3f2a9c41b7d80e65\", {\"code\": \"GIFT-0001\"})\ncheckout = response.map[\"checkout\"]\nprint(checkout[\"discounts\"][\"gift_card\"][\"applied_amount\"], checkout[\"totals\"][\"due\"])\n"
+    },
+    "remove_checkout_gift_card": {
+      "function": "remove_checkout_gift_card",
+      "code": "response = client.admin_carts.remove_checkout_gift_card(\"PRV-3f2a9c41b7d80e65\")\nprint(response.status_code)\n"
+    },
+    "get_checkout_delivery_schedules": {
+      "function": "get_checkout_delivery_schedules",
+      "code": "response = client.admin_carts.get_checkout_delivery_schedules(\"PRV-3f2a9c41b7d80e65\")\ncheckout = response.map[\"checkout\"]\nprint(checkout[\"delivery_schedule\"])\n"
+    },
+    "set_checkout_delivery_schedule": {
+      "function": "set_checkout_delivery_schedule",
+      "code": "response = client.admin_carts.set_checkout_delivery_schedule(\"PRV-3f2a9c41b7d80e65\", {\"id\": 1, \"date\": \"2026-11-20\"})\nprint(response.status_code)\n"
+    },
+    "clear_checkout_delivery_schedule": {
+      "function": "clear_checkout_delivery_schedule",
+      "code": "response = client.admin_carts.clear_checkout_delivery_schedule(\"PRV-3f2a9c41b7d80e65\")\nprint(response.status_code)\n"
+    }
+  }
+}
