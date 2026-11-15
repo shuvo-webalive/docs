@@ -166,7 +166,7 @@ REPLACED_ROW = dict(
     CREATED_ROW, title="Spring Sale Extended", content="<p>The spring sale now runs one more week.</p>",
     visibility="restricted", visible_to="selected", last_updated_on="2026-10-07T09:20:41",
     image=spring_image("20261007092041"),
-    selected_customers={"customers": [{"id": 5501, "name": "Ada Reader"}], "groups": []},
+    selected_customers={"customers": [{"id": 5501, "internal_id": 16503, "name": "Ada Reader"}], "groups": []},
 )
 PATCHED_ROW = dict(CREATED_ROW, title="Spring Sale: Final Week", last_updated_on="2026-10-07T09:25:10", image=spring_image("20261007092510"))
 
@@ -581,11 +581,12 @@ SCHEMAS = {
         "name": {"type": "string", "description": "The creator's name."},
     }},
     "BlogAudience": {"type": "object", "description": "The customers and customer groups a restricted post is shown to.", "properties": {
-        "customers": {"type": "array", "items": ref("BlogAudienceMember"), "description": "One entry per customer: the customer's `customer_id` as `id`, and the customer's first and last name as `name`."},
+        "customers": {"type": "array", "items": ref("BlogAudienceMember"), "description": "One entry per customer: the customer's `customer_id` as `id`, its `internal_id`, and the customer's first and last name as `name`."},
         "groups": {"type": "array", "items": ref("BlogAudienceMember"), "description": "One entry per customer group: the group's `id` and `name`."},
     }},
     "BlogAudienceMember": {"type": "object", "properties": {
         "id": {"type": "integer", "description": "For a customer, the customer's `customer_id`; for a customer group, the group's `id`."},
+        "internal_id": {"type": "integer", "description": "For a customer only: the customer's `internal_id`, returned for reference; audiences take `customer_id`."},
         "name": {"type": "string", "description": "The customer's or customer group's name."},
     }},
     "BlogSeoConfigs": {"type": "object", "description": "The post's SEO meta tags, the same on a write and a read. Other keys inside it are ignored on a write.", "properties": {
