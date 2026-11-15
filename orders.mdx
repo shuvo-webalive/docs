@@ -45,6 +45,10 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 
 ## Things to know
 
+- **A new store needs a default shipping profile before orders ship.** Until the store has one, [Create an order](/api-reference/orders/create-an-order)
+  and [Create an order with a payment](/api-reference/orders/create-an-order-with-a-payment) refuse every order with `delivery_type` `shipping` or `delivery`
+  with `400` and the message `We do not ship to your location.` Create a shipping profile, then make it the store's
+  `default_shipping_profile` with [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings): creating the profile alone is not enough.
 - **An order comes back in one of two shapes.** [Retrieve an order](/api-reference/orders/retrieve-an-order),
   [List orders](/api-reference/orders/list-orders), [Update an order](/api-reference/orders/update-an-order) and
   [Update selected order fields](/api-reference/orders/update-selected-order-fields) return it in sections: `customer`, `billing_address`,

@@ -27,6 +27,9 @@ WARNING = (
 )
 
 NOTES = [
+    "**A new profile is not used until it is the default.** Creating a profile, even with rules for the order's zone, does not\n"
+    "  let orders ship. Set it as `default_shipping_profile` with [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings); until then\n"
+    "  orders are refused with `400` and the message `We do not ship to your location.`",
     "**Create, replace, update and the wizard wrap the profile in `shipping_profile`.** Send\n"
     "  `{\"shipping_profile\": {...}}`. A body without the wrapper is rejected with `400`. A field the profile\n"
     "  does not have is rejected with `400`, and so is an `id` in the body. Responses return the profile inside\n"
