@@ -643,7 +643,7 @@ ENDPOINTS = [
             "200": {
                 "description": "The order's custom field values.",
                 "schema": ref("OrderCustomFields"),
-                "example": {"order_id": 1043, "custom_fields": []},
+                "example": {"order_id": 1043, "internal_id": 2187, "custom_fields": []},
             },
             "404": {"description": "No order has that `order_id`. The message is `Order not found`.", "schema": ERROR_REF},
         },
@@ -696,7 +696,7 @@ ENDPOINTS = [
             "200": {
                 "description": "The order's refunds in `refunds`, newest first, and the paging details in `pagination`.",
                 "schema": ref("OrderRefundPage"),
-                "example": {"order_id": 1043, "order_no": 1043, "refunds": [REFUND_RECORD], "pagination": SAMPLE_REFUND_PAGINATION},
+                "example": {"order_id": 1043, "internal_id": 2187, "order_no": 1043, "refunds": [REFUND_RECORD], "pagination": SAMPLE_REFUND_PAGINATION},
             },
             "400": {"description": "`limit` is `0`, or `offset` is negative.", "schema": ERROR_REF},
             "404": {"description": "No order has this `order_id`.", "schema": ERROR_REF},
@@ -747,7 +747,7 @@ ENDPOINTS = [
                 "description": "The refund, with `status` set to `success` and `amount` as a number. A repeat under the same `Idempotency-Key` returns the same `refund_id`, adds `\"idempotent_replay\": true`, and leaves out `adjust_with_order`, `gateway_refund`, `inventory_readjusted` and `refund_email_queued`.",
                 "schema": ref("OrderPaymentRefund"),
                 "example": {
-                    "status": "success", "refund_id": 62, "payment_id": 7712, "order_id": 1043, "order_no": 1043, "currency": "AUD",
+                    "status": "success", "refund_id": 62, "payment_id": 7712, "order_id": 1043, "internal_id": 2187, "order_no": 1043, "currency": "AUD",
                     "amount": 5.0, "reason": "Damaged item", "gateway_refund": False, "gateway_transaction_id": None,
                     "transaction_status": None, "payment_status": "partial", "payment_refund_status": None, "order_refund_status": "partial",
                     "order_refunded_total": 5.0, "order_adjustment": 0.0, "order_total": 40.0, "available_for_refund": 15.0,
@@ -1223,6 +1223,7 @@ SCHEMAS = {
     }},
     "OrderCustomFields": {"type": "object", "properties": {
         "order_id": whole("The order's `order_id`: the number you passed."),
+        "internal_id": whole("The order's `internal_id`, returned for reference; paths and fields take `order_id`."),
         "custom_fields": {"type": "array", "items": {}, "description": "The order's custom field values."},
         "delivery_cost": number("Only on an order with `delivery_type` `delivery`."),
     }},
@@ -1258,6 +1259,7 @@ SCHEMAS = {
     }},
     "OrderRefundPage": {"type": "object", "properties": {
         "order_id": whole("The order's `order_id`."),
+        "internal_id": whole("The order's `internal_id`, returned for reference; paths and fields take `order_id`."),
         "order_no": whole("Equals `order_id`."),
         "refunds": {"type": "array", "items": ref("OrderRefundRecord"), "description": "The refunds on this page, newest first."},
         "pagination": ref("OrderRefundPagination"),
@@ -1308,12 +1310,13 @@ SCHEMAS = {
         "previous_page": nullable_text("The previous page, or `null` on the first page."),
         "next_page": nullable_text("The next page, or `null` on the last page."),
     }},
-    "OrderPaymentRefund": {"type": "object", "description": "A payment refund. `order_id` and `order_no` are named the other way round from every other response.", "properties": {
+    "OrderPaymentRefund": {"type": "object", "description": "A payment refund. `order_no` equals `order_id`.", "properties": {
         "status": text("`success`."),
         "refund_id": whole("Identifies the refund. A repeat under the same `Idempotency-Key` returns the same value."),
         "payment_id": whole("The `payment_id` you passed."),
         "order_id": whole("The order's `order_id`."),
-        "order_no": whole("The order's `order_id`."),
+        "internal_id": whole("The order's `internal_id`, returned for reference; paths and fields take `order_id`."),
+        "order_no": whole("Equals `order_id`."),
         "currency": text("The currency code."),
         "amount": number("The amount refunded, as a number."),
         "reason": nullable_text("The `reason` you sent."),
