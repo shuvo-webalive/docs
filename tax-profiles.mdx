@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "List, create, update and delete tax profiles, and choose which profile is the store's default."
 ---
 
-The Tax profiles API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_profiles`.
+The Tax profiles API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_profiles`.
 
 <Warning>
   **When a tax request is rejected, the next request on the same connection can fail too.** Straight after
@@ -20,10 +20,8 @@ The Tax profiles API has seven endpoints, and you can call every one from all se
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
 | [List tax profiles](/api-reference/tax-profiles/list-tax-profiles) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_profiles` | Returns up to 20 tax profiles per call, and a `pagination` object with the total count. |
-| [Check the tax profiles list](/api-reference/tax-profiles/check-the-tax-profiles-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_profiles` | Checks that the tax profiles list is reachable. Returns headers only, with no body. |
 | [Create a tax profile](/api-reference/tax-profiles/create-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_profiles` | Creates a tax profile and returns it with its `id`, which other calls take as `tax_profile_id`. |
 | [Retrieve a tax profile](/api-reference/tax-profiles/retrieve-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_profiles/{tax_profile_id}` | Returns the tax profile whose `id` you pass as `tax_profile_id`. |
-| [Check a tax profile](/api-reference/tax-profiles/check-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_profiles/{tax_profile_id}` | Returns headers only, and `200` even when no tax profile has that `tax_profile_id`. |
 | [Update a tax profile](/api-reference/tax-profiles/update-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/tax_profiles/{tax_profile_id}` | Changes the fields you send and returns the updated tax profile. |
 | [Delete a tax profile](/api-reference/tax-profiles/delete-a-tax-profile) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tax_profiles/{tax_profile_id}` | Deletes a tax profile permanently. The default profile can be deleted too. |
 

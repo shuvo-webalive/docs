@@ -1,9 +1,9 @@
 ---
-title: "Check the shipping methods list"
-description: "Checks that the shipping methods list is reachable. Returns headers only, with no body."
-openapi: "HEAD /admin/shipping_methods"
+title: "Clear a checkout's delivery schedule"
+description: "Clears the checkout's delivery schedule, returning `204` with no body."
+openapi: "DELETE /admin/orders/checkout/{session_id}/delivery_schedules"
 ---
 
-Returns `200` with headers only and no body. Neither this response nor the listing has an `ETag` header.
+Clears the delivery schedule and returns `204` with no body. The call also returns `204` when no schedule was set.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

@@ -6,10 +6,6 @@
       "function": "list_inventory_locations",
       "code": "response = client.inventory_locations.list_inventory_locations({\"q\": \"Sydney\"})\nfor location in response.map[\"inventory_locations\"]:\n    print(location[\"id\"], location[\"name\"], location[\"default\"])\nprint(response.map[\"pagination\"][\"has_next\"])\n"
     },
-    "head_inventory_locations": {
-      "function": "head_inventory_locations",
-      "code": "response = client.inventory_locations.head_inventory_locations()\nprint(response.status_code)\n"
-    },
     "create_inventory_location": {
       "function": "create_inventory_location",
       "code": "response = client.inventory_locations.create_inventory_location({\n    \"name\": \"Perth Warehouse\",\n    \"address\": \"4 Example Street, Perth WA 6000\",\n})\nprint(response.map[\"inventory_location\"][\"id\"])\n"
@@ -17,10 +13,6 @@
     "get_inventory_location": {
       "function": "get_inventory_location",
       "code": "response = client.inventory_locations.get_inventory_location(4)\nlocation = response.map[\"inventory_location\"]\nprint(location[\"name\"], location[\"address\"], location[\"default\"])\n"
-    },
-    "head_inventory_location": {
-      "function": "head_inventory_location",
-      "code": "response = client.inventory_locations.head_inventory_location(4)\nprint(response.status_code)\n"
     },
     "update_inventory_location": {
       "function": "update_inventory_location",

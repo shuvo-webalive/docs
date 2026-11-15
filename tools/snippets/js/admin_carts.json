@@ -1,0 +1,82 @@
+{
+  "sdk": "js",
+  "module": "admin_carts",
+  "endpoints": {
+    "create_admin_cart": {
+      "function": "createAdminCart",
+      "code": "const response = await client.adminCarts.createAdminCart({customer_id: 512, products: [{product_id: 101, quantity: 2}]});\nconst cart = response.map.cart;\nconsole.log(cart.session.session_id, cart.totals.grand_total);\n"
+    },
+    "get_admin_cart": {
+      "function": "getAdminCart",
+      "code": "const response = await client.adminCarts.getAdminCart('PRV-3f2a9c41b7d80e65');\nconst cart = response.map.cart;\nconsole.log(cart.session.expires_at, cart.totals.grand_total);\n"
+    },
+    "replace_admin_cart": {
+      "function": "replaceAdminCart",
+      "code": "const response = await client.adminCarts.replaceAdminCart('PRV-3f2a9c41b7d80e65', {\n    customer_id: 512,\n    products: [{product_id: 101, variation_id: 2011, quantity: 1}],\n});\nconst cart = response.map.cart;\nconsole.log(cart.totals.sub_total, cart.totals.grand_total);\n"
+    },
+    "update_admin_cart": {
+      "function": "updateAdminCart",
+      "code": "const response = await client.adminCarts.updateAdminCart('PRV-3f2a9c41b7d80e65', {customer_id: 513});\nconst cart = response.map.cart;\nconsole.log(cart.customer.customer_id, cart.customer.email);\n"
+    },
+    "delete_admin_cart": {
+      "function": "deleteAdminCart",
+      "code": "const response = await client.adminCarts.deleteAdminCart('PRV-3f2a9c41b7d80e65');\nconsole.log(response.statusCode);\n"
+    },
+    "add_admin_cart_items": {
+      "function": "addAdminCartItems",
+      "code": "const response = await client.adminCarts.addAdminCartItems('PRV-3f2a9c41b7d80e65', {products: [{product_id: 102, quantity: 1}]});\nconst cart = response.map.cart;\nconsole.log(cart.totals.sub_total, cart.totals.grand_total);\n"
+    },
+    "clear_admin_cart_items": {
+      "function": "clearAdminCartItems",
+      "code": "const response = await client.adminCarts.clearAdminCartItems('PRV-3f2a9c41b7d80e65');\nconst cart = response.map.cart;\nconsole.log(cart.totals.grand_total);\n"
+    },
+    "update_admin_cart_item": {
+      "function": "updateAdminCartItem",
+      "code": "const response = await client.adminCarts.updateAdminCartItem('PRV-3f2a9c41b7d80e65', 1, {quantity: 3});\nconst cart = response.map.cart;\nconsole.log(cart.totals.sub_total, cart.totals.grand_total);\n"
+    },
+    "delete_admin_cart_item": {
+      "function": "deleteAdminCartItem",
+      "code": "const response = await client.adminCarts.deleteAdminCartItem('PRV-3f2a9c41b7d80e65', 1);\nconst cart = response.map.cart;\nconsole.log(cart.totals.sub_total, cart.totals.grand_total);\n"
+    },
+    "get_checkout": {
+      "function": "getCheckout",
+      "code": "const response = await client.adminCarts.getCheckout('PRV-3f2a9c41b7d80e65');\nconst checkout = response.map.checkout;\nconsole.log(checkout.delivery_type, checkout.totals.due);\n"
+    },
+    "update_checkout": {
+      "function": "updateCheckout",
+      "code": "const response = await client.adminCarts.updateCheckout('PRV-3f2a9c41b7d80e65', {\n    delivery_type: 'shipping',\n    billing_address: {\n        first_name: 'Jane',\n        last_name: 'Doe',\n        email: 'jane.doe@example.com',\n        address_line_1: '1 Example Street',\n        city: 'Melbourne',\n        post_code: '3000',\n        phone: '0300000000',\n        country_code: 'AU',\n        state_code: 'VIC',\n    },\n    shipping_address: {\n        first_name: 'Jane',\n        last_name: 'Doe',\n        email: 'jane.doe@example.com',\n        address_line_1: '1 Example Street',\n        city: 'Melbourne',\n        post_code: '3000',\n        phone: '0300000000',\n        country_code: 'AU',\n        state_code: 'VIC',\n    },\n});\nconst checkout = response.map.checkout;\nconsole.log(checkout.shipping.shipping_cost, checkout.totals.grand_total);\n"
+    },
+    "confirm_checkout": {
+      "function": "confirmCheckout",
+      "code": "const response = await client.adminCarts.confirmCheckout('PRV-3f2a9c41b7d80e65', {send_email: false}, 'TXN-ORDER-0001');\nconst order = response.map.order;\nconsole.log(order.order_id, order.transaction_no, order.grand_total);\n"
+    },
+    "apply_checkout_coupon": {
+      "function": "applyCheckoutCoupon",
+      "code": "const response = await client.adminCarts.applyCheckoutCoupon('PRV-3f2a9c41b7d80e65', {code: 'SAVE10'});\nconst checkout = response.map.checkout;\nconsole.log(checkout.discounts.coupon.applied_amount, checkout.totals.grand_total);\n"
+    },
+    "remove_checkout_coupon": {
+      "function": "removeCheckoutCoupon",
+      "code": "const response = await client.adminCarts.removeCheckoutCoupon('PRV-3f2a9c41b7d80e65');\nconsole.log(response.statusCode);\n"
+    },
+    "apply_checkout_gift_card": {
+      "function": "applyCheckoutGiftCard",
+      "code": "const response = await client.adminCarts.applyCheckoutGiftCard('PRV-3f2a9c41b7d80e65', {code: 'GIFT-0001'});\nconst checkout = response.map.checkout;\nconsole.log(checkout.discounts.gift_card.applied_amount, checkout.totals.due);\n"
+    },
+    "remove_checkout_gift_card": {
+      "function": "removeCheckoutGiftCard",
+      "code": "const response = await client.adminCarts.removeCheckoutGiftCard('PRV-3f2a9c41b7d80e65');\nconsole.log(response.statusCode);\n"
+    },
+    "get_checkout_delivery_schedules": {
+      "function": "getCheckoutDeliverySchedules",
+      "code": "const response = await client.adminCarts.getCheckoutDeliverySchedules('PRV-3f2a9c41b7d80e65');\nconst checkout = response.map.checkout;\nconsole.log(checkout.delivery_schedule);\n"
+    },
+    "set_checkout_delivery_schedule": {
+      "function": "setCheckoutDeliverySchedule",
+      "code": "const response = await client.adminCarts.setCheckoutDeliverySchedule('PRV-3f2a9c41b7d80e65', {id: 1, date: '2026-11-20'});\nconsole.log(response.statusCode);\n"
+    },
+    "clear_checkout_delivery_schedule": {
+      "function": "clearCheckoutDeliverySchedule",
+      "code": "const response = await client.adminCarts.clearCheckoutDeliverySchedule('PRV-3f2a9c41b7d80e65');\nconsole.log(response.statusCode);\n"
+    }
+  }
+}

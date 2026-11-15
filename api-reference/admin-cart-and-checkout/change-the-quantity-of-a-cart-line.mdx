@@ -1,0 +1,9 @@
+---
+title: "Change the quantity of a cart line"
+description: "Sets the quantity of one cart line and returns the cart."
+openapi: "PATCH /admin/orders/carts/{session_id}/cart_items/{cart_item_id}"
+---
+
+Send the new `quantity` at the top level of the body. The line is the one whose `cart_item_id` you pass in the path. The response is the whole cart, repriced.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string. To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

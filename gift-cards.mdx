@@ -26,7 +26,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   `limit=0` is rejected with `400` and the reason `invalid_pagination`.
 - **`code` and `email` match the whole value.** Both ignore letter case, and a part of a code or of an address
   matches nothing. Pass the whole address to find a customer's cards, then use the card's `code` in
-  [Apply a gift card to a preview](/api-reference/order-previews/apply-a-gift-card-to-a-preview).
+  [Apply a gift card to a checkout](/api-reference/admin-cart-and-checkout/apply-a-gift-card-to-a-checkout).
 - **The listing accepts only six parameters.** `limit`, `offset`, `page`, `code`, `email` and `is_active` are the
   ones on this page; any other name, such as `is_paid`, `balance`, `customer_id` or `sort`, is rejected with `400` and
   the reason `unknown_parameter`.

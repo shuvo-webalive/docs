@@ -4,7 +4,7 @@ sidebarTitle: "Overview"
 description: "List, create, update and delete tax rules, and read the tax code and tax zones on each rule."
 ---
 
-The Tax rules API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_rules`.
+The Tax rules API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_rules`.
 
 <Warning>
   **`code`, `zones`, `decimal_point` and `rounding_type` cannot be set through this API.** Create and
@@ -18,10 +18,8 @@ The Tax rules API has seven endpoints, and you can call every one from all seven
 | Endpoint | Method | Path | What it does |
 | --- | --- | --- | --- |
 | [List tax rules](/api-reference/tax-rules/list-tax-rules) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules` | Returns up to 100 tax rules per call, each with its tax code and tax zones. |
-| [Check the tax rules list](/api-reference/tax-rules/check-the-tax-rules-list) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_rules` | Checks that the tax rules path exists. Returns headers only, with no body. |
 | [Create a tax rule](/api-reference/tax-rules/create-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#2563eb"}}>POST</span> | `…/tax_rules` | Creates a tax rule and returns the new rule, whose `id` other calls take as `tax_rule_id`. |
 | [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#0f7b6c"}}>GET</span> | `…/tax_rules/{tax_rule_id}` | Returns the tax rule whose `id` you pass as `tax_rule_id`, with its tax code and zones. |
-| [Check a tax rule](/api-reference/tax-rules/check-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#475467"}}>HEAD</span> | `…/tax_rules/{tax_rule_id}` | Returns headers only, and `200` even when no tax rule has that `tax_rule_id`. |
 | [Update a tax rule](/api-reference/tax-rules/update-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#b45309"}}>PUT</span> | `…/tax_rules/{tax_rule_id}` | Changes a tax rule's `name` or `description` and returns the updated rule. |
 | [Delete a tax rule](/api-reference/tax-rules/delete-a-tax-rule) | <span style={{fontFamily: "var(--font-mono, monospace)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.02em", color: "#c2410c"}}>DELETE</span> | `…/tax_rules/{tax_rule_id}` | Deletes a tax rule permanently and returns `204` with no body. |
 
@@ -51,9 +49,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
   when it returns the previous call's error.
 - **A `200` does not always mean the call worked.** A method these paths do not handle returns `200`
   with `{"isSuccess": false, "message": "Invalid API Request"}` instead of `405`, and stores
-  nothing. `OPTIONS` returns `404` on the list and on a rule. A `HEAD` request for one rule returns
-  `200` even when no rule has the `tax_rule_id` you send; use [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule)
-  to check that a rule exists.
+  nothing. `OPTIONS` returns `404` on the list and on a rule. To check that a rule exists, use
+  [Retrieve a tax rule](/api-reference/tax-rules/retrieve-a-tax-rule).
 - **Tax rules live at `/admin/tax_rules`, not under `/admin/tax/`.** `/admin/tax/custom_rules`, the
   path an older API collection used, returns `404` with the error code `not_found` and a message that
   starts `Unknown tax path`.

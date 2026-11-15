@@ -1,0 +1,9 @@
+---
+title: "Add products to an admin cart"
+description: "Adds the products you send to the cart and returns the cart."
+openapi: "POST /admin/orders/carts/{session_id}/cart_items"
+---
+
+Send `products` at the top level of the body. A product that is not on the cart gets a new line with its own `cart_item_id`. A product that is already on the cart raises that line's `quantity` instead.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string. To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

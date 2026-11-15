@@ -6,10 +6,6 @@
       "function": "ListTaxRules",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxRules().ListTaxRules(ctx, map[string]any{\"limit\": 20}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfor _, row := range resp.Map().(map[string]any)[\"tax_rules\"].([]any) {\n\trule := row.(map[string]any)\n\tfmt.Println(rule[\"id\"], rule[\"name\"], rule[\"default\"])\n}"
     },
-    "head_tax_rules": {
-      "function": "HeadTaxRules",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxRules().HeadTaxRules(ctx, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
-    },
     "create_tax_rule": {
       "function": "CreateTaxRule",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxRules().CreateTaxRule(ctx, map[string]any{\n\t\"tax_rule\": map[string]any{\"name\": \"Reduced rate\", \"description\": \"Rule for reduced-rate goods\"},\n}, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"tax_rule\"].(map[string]any)\nfmt.Println(rule[\"id\"], rule[\"name\"])"
@@ -17,10 +13,6 @@
     "get_tax_rule": {
       "function": "GetTaxRule",
       "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxRules().GetTaxRule(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nrule := resp.Map().(map[string]any)[\"tax_rule\"].(map[string]any)\ncode := rule[\"code\"].(map[string]any)\nfmt.Println(rule[\"name\"], code[\"name\"], len(rule[\"zones\"].([]any)))"
-    },
-    "head_tax_rule": {
-      "function": "HeadTaxRule",
-      "code": "import (\n\t\"fmt\"\n)\n\nresp, err := client.TaxRules().HeadTaxRule(ctx, 7, nil)\nif err != nil {\n\tlog.Fatal(err)\n}\nfmt.Println(resp.StatusCode)"
     },
     "update_tax_rule": {
       "function": "UpdateTaxRule",

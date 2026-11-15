@@ -1,9 +1,9 @@
 ---
-title: "Check a tax zone"
-description: "Returns headers only, and `200` even when no zone has that `tax_zone_id`."
-openapi: "HEAD /admin/tax_zones/{tax_zone_id}"
+title: "Remove the coupon from a checkout"
+description: "Removes the applied coupon, so the totals return to what they were before it."
+openapi: "DELETE /admin/orders/checkout/{session_id}/coupon"
 ---
 
-Returns `200` with headers only and no body. It returns `200` even when no zone has that `tax_zone_id`, so it does not tell you whether the zone exists. To check that, use [Retrieve a tax zone](/api-reference/tax-zones/retrieve-a-tax-zone), which returns `404` when no zone has it.
+Removes the coupon and returns `200`. With no coupon applied, the call returns `404`.
 
 <Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

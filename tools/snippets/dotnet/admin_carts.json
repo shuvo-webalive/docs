@@ -1,0 +1,82 @@
+{
+  "sdk": "dotnet",
+  "module": "admin_carts",
+  "endpoints": {
+    "create_admin_cart": {
+      "function": "CreateAdminCartAsync",
+      "code": "var response = await client.AdminCarts.CreateAdminCartAsync(new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512,\n    [\"products\"] = new[]\n    {\n        new Dictionary<string, object?>\n        {\n            [\"product_id\"] = 101,\n            [\"quantity\"] = 2,\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"session\"]!)[\"session_id\"]} {((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "get_admin_cart": {
+      "function": "GetAdminCartAsync",
+      "code": "var response = await client.AdminCarts.GetAdminCartAsync(\"PRV-3f2a9c41b7d80e65\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"session\"]!)[\"expires_at\"]} {((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "replace_admin_cart": {
+      "function": "ReplaceAdminCartAsync",
+      "code": "var response = await client.AdminCarts.ReplaceAdminCartAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?>\n{\n    [\"customer_id\"] = 512,\n    [\"products\"] = new[]\n    {\n        new Dictionary<string, object?>\n        {\n            [\"product_id\"] = 101,\n            [\"variation_id\"] = 2011,\n            [\"quantity\"] = 1,\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"sub_total\"]} {((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "update_admin_cart": {
+      "function": "UpdateAdminCartAsync",
+      "code": "var response = await client.AdminCarts.UpdateAdminCartAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?> { [\"customer_id\"] = 513 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"customer\"]!)[\"customer_id\"]} {((IReadOnlyDictionary<string, object?>)cart[\"customer\"]!)[\"email\"]}\");"
+    },
+    "delete_admin_cart": {
+      "function": "DeleteAdminCartAsync",
+      "code": "var response = await client.AdminCarts.DeleteAdminCartAsync(\"PRV-3f2a9c41b7d80e65\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "add_admin_cart_items": {
+      "function": "AddAdminCartItemsAsync",
+      "code": "var response = await client.AdminCarts.AddAdminCartItemsAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?>\n{\n    [\"products\"] = new[]\n    {\n        new Dictionary<string, object?>\n        {\n            [\"product_id\"] = 102,\n            [\"quantity\"] = 1,\n        },\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"sub_total\"]} {((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "clear_admin_cart_items": {
+      "function": "ClearAdminCartItemsAsync",
+      "code": "var response = await client.AdminCarts.ClearAdminCartItemsAsync(\"PRV-3f2a9c41b7d80e65\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "update_admin_cart_item": {
+      "function": "UpdateAdminCartItemAsync",
+      "code": "var response = await client.AdminCarts.UpdateAdminCartItemAsync(\"PRV-3f2a9c41b7d80e65\", 1, new Dictionary<string, object?> { [\"quantity\"] = 3 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"sub_total\"]} {((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "delete_admin_cart_item": {
+      "function": "DeleteAdminCartItemAsync",
+      "code": "var response = await client.AdminCarts.DeleteAdminCartItemAsync(\"PRV-3f2a9c41b7d80e65\", 1);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar cart = (IReadOnlyDictionary<string, object?>)body[\"cart\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"sub_total\"]} {((IReadOnlyDictionary<string, object?>)cart[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "get_checkout": {
+      "function": "GetCheckoutAsync",
+      "code": "var response = await client.AdminCarts.GetCheckoutAsync(\"PRV-3f2a9c41b7d80e65\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkout = (IReadOnlyDictionary<string, object?>)body[\"checkout\"]!;\nConsole.WriteLine($\"{checkout[\"delivery_type\"]} {((IReadOnlyDictionary<string, object?>)checkout[\"totals\"]!)[\"due\"]}\");"
+    },
+    "update_checkout": {
+      "function": "UpdateCheckoutAsync",
+      "code": "var response = await client.AdminCarts.UpdateCheckoutAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?>\n{\n    [\"delivery_type\"] = \"shipping\",\n    [\"billing_address\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\",\n        [\"last_name\"] = \"Doe\",\n        [\"email\"] = \"jane.doe@example.com\",\n        [\"address_line_1\"] = \"1 Example Street\",\n        [\"city\"] = \"Melbourne\",\n        [\"post_code\"] = \"3000\",\n        [\"phone\"] = \"0300000000\",\n        [\"country_code\"] = \"AU\",\n        [\"state_code\"] = \"VIC\",\n    },\n    [\"shipping_address\"] = new Dictionary<string, object?>\n    {\n        [\"first_name\"] = \"Jane\",\n        [\"last_name\"] = \"Doe\",\n        [\"email\"] = \"jane.doe@example.com\",\n        [\"address_line_1\"] = \"1 Example Street\",\n        [\"city\"] = \"Melbourne\",\n        [\"post_code\"] = \"3000\",\n        [\"phone\"] = \"0300000000\",\n        [\"country_code\"] = \"AU\",\n        [\"state_code\"] = \"VIC\",\n    },\n});\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkout = (IReadOnlyDictionary<string, object?>)body[\"checkout\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)checkout[\"shipping\"]!)[\"shipping_cost\"]} {((IReadOnlyDictionary<string, object?>)checkout[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "confirm_checkout": {
+      "function": "ConfirmCheckoutAsync",
+      "code": "var response = await client.AdminCarts.ConfirmCheckoutAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?> { [\"send_email\"] = false }, \"TXN-ORDER-0001\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar order = (IReadOnlyDictionary<string, object?>)body[\"order\"]!;\nConsole.WriteLine($\"{order[\"order_id\"]} {order[\"transaction_no\"]} {order[\"grand_total\"]}\");"
+    },
+    "apply_checkout_coupon": {
+      "function": "ApplyCheckoutCouponAsync",
+      "code": "var response = await client.AdminCarts.ApplyCheckoutCouponAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?> { [\"code\"] = \"SAVE10\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkout = (IReadOnlyDictionary<string, object?>)body[\"checkout\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)((IReadOnlyDictionary<string, object?>)checkout[\"discounts\"]!)[\"coupon\"]!)[\"applied_amount\"]} {((IReadOnlyDictionary<string, object?>)checkout[\"totals\"]!)[\"grand_total\"]}\");"
+    },
+    "remove_checkout_coupon": {
+      "function": "RemoveCheckoutCouponAsync",
+      "code": "var response = await client.AdminCarts.RemoveCheckoutCouponAsync(\"PRV-3f2a9c41b7d80e65\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "apply_checkout_gift_card": {
+      "function": "ApplyCheckoutGiftCardAsync",
+      "code": "var response = await client.AdminCarts.ApplyCheckoutGiftCardAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?> { [\"code\"] = \"GIFT-0001\" });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkout = (IReadOnlyDictionary<string, object?>)body[\"checkout\"]!;\nConsole.WriteLine($\"{((IReadOnlyDictionary<string, object?>)((IReadOnlyDictionary<string, object?>)checkout[\"discounts\"]!)[\"gift_card\"]!)[\"applied_amount\"]} {((IReadOnlyDictionary<string, object?>)checkout[\"totals\"]!)[\"due\"]}\");"
+    },
+    "remove_checkout_gift_card": {
+      "function": "RemoveCheckoutGiftCardAsync",
+      "code": "var response = await client.AdminCarts.RemoveCheckoutGiftCardAsync(\"PRV-3f2a9c41b7d80e65\");\nConsole.WriteLine(response.StatusCode);"
+    },
+    "get_checkout_delivery_schedules": {
+      "function": "GetCheckoutDeliverySchedulesAsync",
+      "code": "var response = await client.AdminCarts.GetCheckoutDeliverySchedulesAsync(\"PRV-3f2a9c41b7d80e65\");\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar checkout = (IReadOnlyDictionary<string, object?>)body[\"checkout\"]!;\nConsole.WriteLine($\"{checkout[\"delivery_schedule\"]}\");"
+    },
+    "set_checkout_delivery_schedule": {
+      "function": "SetCheckoutDeliveryScheduleAsync",
+      "code": "var response = await client.AdminCarts.SetCheckoutDeliveryScheduleAsync(\"PRV-3f2a9c41b7d80e65\", new Dictionary<string, object?>\n{\n    [\"id\"] = 1,\n    [\"date\"] = \"2026-11-20\",\n});\nConsole.WriteLine(response.StatusCode);"
+    },
+    "clear_checkout_delivery_schedule": {
+      "function": "ClearCheckoutDeliveryScheduleAsync",
+      "code": "var response = await client.AdminCarts.ClearCheckoutDeliveryScheduleAsync(\"PRV-3f2a9c41b7d80e65\");\nConsole.WriteLine(response.StatusCode);"
+    }
+  }
+}

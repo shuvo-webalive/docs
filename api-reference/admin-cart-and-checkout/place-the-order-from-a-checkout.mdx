@@ -1,0 +1,9 @@
+---
+title: "Place the order from a checkout"
+description: "Places a real order from the checkout and closes the session."
+openapi: "POST /admin/orders/checkout/{session_id}/confirm"
+---
+
+This creates an order and closes the session. The body is optional. With no `payment`, or with `payment_gateway` `PIS`, the order is unpaid. To record a payment, send `payment` with an `amount` and a `payment_method`; an `amount` above what is due is rejected. The call returns `422` with the code `checkout_incomplete` while the checkout's `issues` is not empty. Send `transaction_no` in the body, or as the `X-Transaction-No` header, to file the order under that number; a header that differs from the body's `transaction_no` is rejected with `400`.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string. To send a raw JSON body instead of filling in fields, copy the cURL sample and edit its `-d` payload.</Note>

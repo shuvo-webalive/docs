@@ -6,7 +6,7 @@ BASE = "/admin/tax_rules"
 ICON = "scale-balanced"
 
 OVERVIEW_DESCRIPTION = "List, create, update and delete tax rules, and read the tax code and tax zones on each rule."
-INTRO = "The Tax rules API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_rules`."
+INTRO = "The Tax rules API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_rules`."
 
 RETRIEVE_PAGE = "/api-reference/tax-rules/retrieve-a-tax-rule"
 
@@ -35,9 +35,8 @@ NOTES = [
     "  when it returns the previous call's error.",
     "**A `200` does not always mean the call worked.** A method these paths do not handle returns `200`\n"
     "  with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` instead of `405`, and stores\n"
-    "  nothing. `OPTIONS` returns `404` on the list and on a rule. A `HEAD` request for one rule returns\n"
-    "  `200` even when no rule has the `tax_rule_id` you send; use [Retrieve a tax rule](" + RETRIEVE_PAGE + ")\n"
-    "  to check that a rule exists.",
+    "  nothing. `OPTIONS` returns `404` on the list and on a rule. To check that a rule exists, use\n"
+    "  [Retrieve a tax rule](" + RETRIEVE_PAGE + ").",
     "**Tax rules live at `/admin/tax_rules`, not under `/admin/tax/`.** `/admin/tax/custom_rules`, the\n"
     "  path an older API collection used, returns `404` with the error code `not_found` and a message that\n"
     "  starts `Unknown tax path`.",
@@ -120,19 +119,6 @@ ENDPOINTS = [
         "example_call": {"query": "limit=20"},
     },
     {
-        "key": "head_tax_rules",
-        "slug": "check-the-tax-rules-list",
-        "title": "Check the tax rules list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the tax rules path exists. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. A `200` shows only that the path exists: the store also returns `200` for a method it does not handle, and a `HEAD` response has no body to tell the two apart. The response has no `ETag` or `Last-Modified` header.",
-        "responses": {
-            "200": {"description": "The path exists. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "create_tax_rule",
         "slug": "create-a-tax-rule",
         "title": "Create a tax rule",
@@ -168,20 +154,6 @@ ENDPOINTS = [
                 "example": {"tax_rule": SAMPLE_ROWS[0]},
             },
             "404": {"description": "No tax rule has that `tax_rule_id`. The message is `Rule not found`.", "schema": ERROR},
-        },
-        "example_call": {"path": {"tax_rule_id": 7}},
-    },
-    {
-        "key": "head_tax_rule",
-        "slug": "check-a-tax-rule",
-        "title": "Check a tax rule",
-        "method": "HEAD",
-        "path": BASE + "/{tax_rule_id}",
-        "summary": "Returns headers only, and `200` even when no tax rule has that `tax_rule_id`.",
-        "description": "Returns `200` with headers only and no body. It returns `200` even when no tax rule has that `tax_rule_id`, so it does not tell you whether the rule exists. To check that, use [Retrieve a tax rule](" + RETRIEVE_PAGE + "), which returns `404` with the message `Rule not found`. The response has no `ETag` or `Last-Modified` header.",
-        "parameters": [TAX_RULE_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body. Returned even when no tax rule has that `tax_rule_id`."},
         },
         "example_call": {"path": {"tax_rule_id": 7}},
     },

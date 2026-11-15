@@ -6,7 +6,7 @@ BASE = "/admin/order_flags"
 ICON = "flag"
 
 OVERVIEW_DESCRIPTION = "List, create, read, replace and delete your store's order flags."
-INTRO = "The Order flags API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/order_flags`."
+INTRO = "The Order flags API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/order_flags`."
 
 LIST_PAGE = "/api-reference/order-flags/list-order-flags"
 RETRIEVE_PAGE = "/api-reference/order-flags/retrieve-an-order-flag"
@@ -118,19 +118,6 @@ ENDPOINTS = [
         "example_call": {"query": "limit=20"},
     },
     {
-        "key": "head_order_flags",
-        "slug": "check-the-order-flags-list",
-        "title": "Check the order flags list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the order flags list is reachable. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. Unlike [List order flags](" + LIST_PAGE + "), the response has no `ETag` header.",
-        "responses": {
-            "200": {"description": "The list is reachable. Headers only, no body, and no `ETag` header."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "create_order_flag",
         "slug": "create-an-order-flag",
         "title": "Create an order flag",
@@ -166,20 +153,6 @@ ENDPOINTS = [
                 "example": {"order_flag": SAMPLE_ROWS[0]},
             },
             "404": {"description": "No order flag has that `order_flag_id`, or it is not a number. The message is `Order flag not found`.", "schema": ERROR_REF, "example": NOT_FOUND},
-        },
-        "example_call": {"path": {"order_flag_id": 2}},
-    },
-    {
-        "key": "head_order_flag",
-        "slug": "check-an-order-flag",
-        "title": "Check an order flag",
-        "method": "HEAD",
-        "path": BASE + "/{order_flag_id}",
-        "summary": "Returns headers only, with no body, for the order flag you pass as `order_flag_id`.",
-        "description": "Returns `200` with headers only and no body. The response has no `ETag` header. It returns `200` even when no order flag has that `order_flag_id`, so it does not tell you whether the flag exists. To read the flag's fields, or to get `404` for a flag that does not exist, use [Retrieve an order flag](" + RETRIEVE_PAGE + ").",
-        "parameters": [ORDER_FLAG_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body, and no `ETag` header. You get `200` for any `order_flag_id`, including one no order flag has."},
         },
         "example_call": {"path": {"order_flag_id": 2}},
     },

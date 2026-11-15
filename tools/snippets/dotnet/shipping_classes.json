@@ -6,10 +6,6 @@
       "function": "ListShippingClassesAsync",
       "code": "var response = await client.ShippingClasses.ListShippingClassesAsync(\n    new Dictionary<string, object?> { [\"limit\"] = 20 });\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nforeach (var shippingClass in ((IReadOnlyList<object?>)body[\"shipping_classes\"]!).Cast<IReadOnlyDictionary<string, object?>>())\n    Console.WriteLine($\"{shippingClass[\"id\"]} {shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");"
     },
-    "head_shipping_classes": {
-      "function": "HeadShippingClassesAsync",
-      "code": "var response = await client.ShippingClasses.HeadShippingClassesAsync();\nConsole.WriteLine(response.StatusCode);"
-    },
     "count_shipping_classes": {
       "function": "CountShippingClassesAsync",
       "code": "var response = await client.ShippingClasses.CountShippingClassesAsync();\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClasses = (IReadOnlyDictionary<string, object?>)body[\"shipping_classes\"]!;\nConsole.WriteLine(shippingClasses[\"count\"]);"
@@ -21,10 +17,6 @@
     "get_shipping_class": {
       "function": "GetShippingClassAsync",
       "code": "var response = await client.ShippingClasses.GetShippingClassAsync(2);\nvar body = (IReadOnlyDictionary<string, object?>)response.Map!;\nvar shippingClass = (IReadOnlyDictionary<string, object?>)body[\"shipping_class\"]!;\nConsole.WriteLine($\"{shippingClass[\"name\"]} {shippingClass[\"is_default\"]}\");"
-    },
-    "head_shipping_class": {
-      "function": "HeadShippingClassAsync",
-      "code": "var response = await client.ShippingClasses.HeadShippingClassAsync(2);\nConsole.WriteLine(response.StatusCode);"
     },
     "update_shipping_class": {
       "function": "UpdateShippingClassAsync",

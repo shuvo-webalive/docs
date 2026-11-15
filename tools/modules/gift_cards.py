@@ -5,7 +5,7 @@ SLUG = "gift-cards"
 BASE = "/admin/gift_cards"
 ICON = "gift"
 
-PREVIEW_GIFT_CARD_PAGE = "/api-reference/order-previews/apply-a-gift-card-to-a-preview"
+CHECKOUT_GIFT_CARD_PAGE = "/api-reference/admin-cart-and-checkout/apply-a-gift-card-to-a-checkout"
 
 OVERVIEW_DESCRIPTION = "List your store's gift cards, newest first, and filter them by code, email address or active state."
 INTRO = "The Gift cards API has one endpoint, and you can call it from all seven SDKs. Its path is `/api/v4/admin/gift_cards`."
@@ -18,7 +18,7 @@ NOTES = [
     "  `limit=0` is rejected with `400` and the reason `invalid_pagination`.",
     "**`code` and `email` match the whole value.** Both ignore letter case, and a part of a code or of an address\n"
     "  matches nothing. Pass the whole address to find a customer's cards, then use the card's `code` in\n"
-    "  [Apply a gift card to a preview](" + PREVIEW_GIFT_CARD_PAGE + ").",
+    "  [Apply a gift card to a checkout](" + CHECKOUT_GIFT_CARD_PAGE + ").",
     "**The listing accepts only six parameters.** `limit`, `offset`, `page`, `code`, `email` and `is_active` are the\n"
     "  ones on this page; any other name, such as `is_paid`, `balance`, `customer_id` or `sort`, is rejected with `400` and\n"
     "  the reason `unknown_parameter`.",

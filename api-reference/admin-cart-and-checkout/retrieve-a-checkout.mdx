@@ -1,0 +1,9 @@
+---
+title: "Retrieve a checkout"
+description: "Returns the cart's checkout: totals, delivery, addresses and what still blocks the order."
+openapi: "GET /admin/orders/checkout/{session_id}"
+---
+
+Returns the checkout for the cart whose `session_id` you pass. `issues` lists what still blocks [Place the order from a checkout](/api-reference/admin-cart-and-checkout/place-the-order-from-a-checkout): it holds `delivery_type` `required` until you set a delivery type, and it is empty when the order can be placed. The addresses start as the customer's.
+
+<Note>The SDK samples get their client from credentials your app registers once when it starts, as shown in [Authentication (New)](/authentication#set-up-a-client). To try the call here, click **Try it**, set `store` to your store's host name and paste an access token. Get the token as shown in [Authentication (New)](/authentication#calling-the-api-directly), or in [Authentication (Legacy)](/authentication-legacy#calling-the-api-directly) if your store signs in with a redirect URI and an auth string.</Note>

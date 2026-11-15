@@ -8,7 +8,7 @@ ICON = "map-location-dot"
 RETRIEVE_PAGE = "/api-reference/tax-zones/retrieve-a-tax-zone"
 
 OVERVIEW_DESCRIPTION = "List, create, read, update and delete tax zones, each a named set of countries, states and post codes."
-INTRO = "The Tax zones API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_zones`; the path in the old API collection, `/api/v4/admin/tax/custom_zones`, returns `404 not_found` with a message that starts `Unknown tax path`."
+INTRO = "The Tax zones API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_zones`; the path in the old API collection, `/api/v4/admin/tax/custom_zones`, returns `404 not_found` with a message that starts `Unknown tax path`."
 
 WARNING = (
     "**An update replaces the zone's lists.** A `PUT` replaces `countries`, `states` and `post_code` with\n"
@@ -143,19 +143,6 @@ ENDPOINTS = [
         "example_call": {"query": "limit=2"},
     },
     {
-        "key": "head_tax_zones",
-        "slug": "check-the-tax-zones-list",
-        "title": "Check the tax zones list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Returns `200` with headers only, to check that the tax zones path exists.",
-        "description": "Returns `200` with headers only and no body. The `200` only tells you the path exists: the store also returns `200` for methods it does not handle, and a `HEAD` response has no body to tell the two apart. Neither this response nor the listing has an `ETag` or `Last-Modified` header.",
-        "responses": {
-            "200": {"description": "The path exists. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "create_tax_zone",
         "slug": "create-a-tax-zone",
         "title": "Create a tax zone",
@@ -191,20 +178,6 @@ ENDPOINTS = [
                 "example": {"tax_zone": SAMPLE_ROWS[0]},
             },
             "404": {"description": "No zone has that `tax_zone_id`. The message is `Rule not found`, not the `Zone not found` that a delete returns. The next retrieve you send on the same connection, from any tax collection, returns `404` too, even when that record exists."},
-        },
-        "example_call": {"path": {"tax_zone_id": 1}},
-    },
-    {
-        "key": "head_tax_zone",
-        "slug": "check-a-tax-zone",
-        "title": "Check a tax zone",
-        "method": "HEAD",
-        "path": BASE + "/{tax_zone_id}",
-        "summary": "Returns headers only, and `200` even when no zone has that `tax_zone_id`.",
-        "description": "Returns `200` with headers only and no body. It returns `200` even when no zone has that `tax_zone_id`, so it does not tell you whether the zone exists. To check that, use [Retrieve a tax zone](" + RETRIEVE_PAGE + "), which returns `404` when no zone has it.",
-        "parameters": [TAX_ZONE_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body. Returned even when no zone has that `tax_zone_id`."},
         },
         "example_call": {"path": {"tax_zone_id": 1}},
     },

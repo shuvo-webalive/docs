@@ -1,0 +1,82 @@
+{
+  "sdk": "php",
+  "module": "admin_carts",
+  "endpoints": {
+    "create_admin_cart": {
+      "function": "createAdminCart",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::createAdminCart($client, [\n    'customer_id' => 512,\n    'products' => [['product_id' => 101, 'quantity' => 2]],\n]);\n\n$cart = $response->map['cart'];\necho $cart['session']['session_id'], ' ', $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "get_admin_cart": {
+      "function": "getAdminCart",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::getAdminCart($client, 'PRV-3f2a9c41b7d80e65');\n\n$cart = $response->map['cart'];\necho $cart['session']['expires_at'], ' ', $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "replace_admin_cart": {
+      "function": "replaceAdminCart",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::replaceAdminCart($client, 'PRV-3f2a9c41b7d80e65', [\n    'customer_id' => 512,\n    'products' => [['product_id' => 101, 'variation_id' => 2011, 'quantity' => 1]],\n]);\n\n$cart = $response->map['cart'];\necho $cart['totals']['sub_total'], ' ', $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "update_admin_cart": {
+      "function": "updateAdminCart",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::updateAdminCart($client, 'PRV-3f2a9c41b7d80e65', ['customer_id' => 513]);\n\n$cart = $response->map['cart'];\necho $cart['customer']['customer_id'], ' ', $cart['customer']['email'], PHP_EOL;"
+    },
+    "delete_admin_cart": {
+      "function": "deleteAdminCart",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::deleteAdminCart($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "add_admin_cart_items": {
+      "function": "addAdminCartItems",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::addAdminCartItems($client, 'PRV-3f2a9c41b7d80e65', ['products' => [['product_id' => 102, 'quantity' => 1]]]);\n\n$cart = $response->map['cart'];\necho $cart['totals']['sub_total'], ' ', $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "clear_admin_cart_items": {
+      "function": "clearAdminCartItems",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::clearAdminCartItems($client, 'PRV-3f2a9c41b7d80e65');\n\n$cart = $response->map['cart'];\necho $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "update_admin_cart_item": {
+      "function": "updateAdminCartItem",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::updateAdminCartItem($client, 'PRV-3f2a9c41b7d80e65', 1, ['quantity' => 3]);\n\n$cart = $response->map['cart'];\necho $cart['totals']['sub_total'], ' ', $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "delete_admin_cart_item": {
+      "function": "deleteAdminCartItem",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::deleteAdminCartItem($client, 'PRV-3f2a9c41b7d80e65', 1);\n\n$cart = $response->map['cart'];\necho $cart['totals']['sub_total'], ' ', $cart['totals']['grand_total'], PHP_EOL;"
+    },
+    "get_checkout": {
+      "function": "getCheckout",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::getCheckout($client, 'PRV-3f2a9c41b7d80e65');\n\n$checkout = $response->map['checkout'];\necho $checkout['delivery_type'], ' ', $checkout['totals']['due'], PHP_EOL;"
+    },
+    "update_checkout": {
+      "function": "updateCheckout",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::updateCheckout($client, 'PRV-3f2a9c41b7d80e65', [\n    'delivery_type' => 'shipping',\n    'billing_address' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane.doe@example.com',\n        'address_line_1' => '1 Example Street',\n        'city' => 'Melbourne',\n        'post_code' => '3000',\n        'phone' => '0300000000',\n        'country_code' => 'AU',\n        'state_code' => 'VIC',\n    ],\n    'shipping_address' => [\n        'first_name' => 'Jane',\n        'last_name' => 'Doe',\n        'email' => 'jane.doe@example.com',\n        'address_line_1' => '1 Example Street',\n        'city' => 'Melbourne',\n        'post_code' => '3000',\n        'phone' => '0300000000',\n        'country_code' => 'AU',\n        'state_code' => 'VIC',\n    ],\n]);\n\n$checkout = $response->map['checkout'];\necho $checkout['shipping']['shipping_cost'], ' ', $checkout['totals']['grand_total'], PHP_EOL;"
+    },
+    "confirm_checkout": {
+      "function": "confirmCheckout",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::confirmCheckout($client, 'PRV-3f2a9c41b7d80e65', ['send_email' => false], 'TXN-ORDER-0001');\n\n$order = $response->map['order'];\necho $order['order_id'], ' ', $order['transaction_no'], ' ', $order['grand_total'], PHP_EOL;"
+    },
+    "apply_checkout_coupon": {
+      "function": "applyCheckoutCoupon",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::applyCheckoutCoupon($client, 'PRV-3f2a9c41b7d80e65', ['code' => 'SAVE10']);\n\n$checkout = $response->map['checkout'];\necho $checkout['discounts']['coupon']['applied_amount'], ' ', $checkout['totals']['grand_total'], PHP_EOL;"
+    },
+    "remove_checkout_coupon": {
+      "function": "removeCheckoutCoupon",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::removeCheckoutCoupon($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "apply_checkout_gift_card": {
+      "function": "applyCheckoutGiftCard",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::applyCheckoutGiftCard($client, 'PRV-3f2a9c41b7d80e65', ['code' => 'GIFT-0001']);\n\n$checkout = $response->map['checkout'];\necho $checkout['discounts']['gift_card']['applied_amount'], ' ', $checkout['totals']['due'], PHP_EOL;"
+    },
+    "remove_checkout_gift_card": {
+      "function": "removeCheckoutGiftCard",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::removeCheckoutGiftCard($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "get_checkout_delivery_schedules": {
+      "function": "getCheckoutDeliverySchedules",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::getCheckoutDeliverySchedules($client, 'PRV-3f2a9c41b7d80e65');\n\n$checkout = $response->map['checkout'];\necho $checkout['delivery_schedule'], PHP_EOL;"
+    },
+    "set_checkout_delivery_schedule": {
+      "function": "setCheckoutDeliverySchedule",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::setCheckoutDeliverySchedule($client, 'PRV-3f2a9c41b7d80e65', ['id' => 1, 'date' => '2026-11-20']);\n\necho $response->statusCode, PHP_EOL;"
+    },
+    "clear_checkout_delivery_schedule": {
+      "function": "clearCheckoutDeliverySchedule",
+      "code": "use WebCommander\\Resources\\Carts\\AdminCarts;\n\n$response = AdminCarts::clearCheckoutDeliverySchedule($client, 'PRV-3f2a9c41b7d80e65');\n\necho $response->statusCode, PHP_EOL;"
+    }
+  }
+}

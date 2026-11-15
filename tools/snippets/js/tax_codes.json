@@ -6,10 +6,6 @@
       "function": "listTaxCodes",
       "code": "const response = await client.taxCodes.listTaxCodes({limit: 20});\nfor (const taxCode of response.map.tax_codes) {\n    console.log(taxCode.id, taxCode.name, taxCode.rate);\n}\nconsole.log(response.map.pagination.total);\n"
     },
-    "head_tax_codes": {
-      "function": "headTaxCodes",
-      "code": "const response = await client.taxCodes.headTaxCodes();\nconsole.log(response.statusCode);\n"
-    },
     "create_tax_code": {
       "function": "createTaxCode",
       "code": "const taxCode = {\n    name: 'LUXURY',\n    label: 'Luxury goods',\n    description: 'Higher rate for luxury goods',\n    rate: 15.0,\n    resolver_type: 'flat',\n    priority: 1,\n};\nconst response = await client.taxCodes.createTaxCode({tax_code: taxCode});\nconsole.log(response.map.tax_code.id);\n"
@@ -17,10 +13,6 @@
     "get_tax_code": {
       "function": "getTaxCode",
       "code": "const response = await client.taxCodes.getTaxCode(2);\nconsole.log(response.map.tax_code.name, response.map.tax_code.rate);\n"
-    },
-    "head_tax_code": {
-      "function": "headTaxCode",
-      "code": "const response = await client.taxCodes.headTaxCode(2);\nconsole.log(response.statusCode);\n"
     },
     "update_tax_code": {
       "function": "updateTaxCode",

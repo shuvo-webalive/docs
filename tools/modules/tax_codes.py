@@ -9,7 +9,7 @@ RETRIEVE_PAGE = "/api-reference/tax-codes/retrieve-a-tax-code"
 UPDATE_PAGE = "/api-reference/tax-codes/update-a-tax-code"
 
 OVERVIEW_DESCRIPTION = "List, create, retrieve, update and delete your store's tax codes."
-INTRO = "The Tax codes API has seven endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_codes`."
+INTRO = "The Tax codes API has five endpoints, and you can call every one from all seven SDKs. Every path starts with `/api/v4/admin/tax_codes`."
 
 WARNING = (
     "**An update sets `priority` to `0` and `resolver_type` to `flat` when you leave them out.**\n"
@@ -38,9 +38,8 @@ NOTES = [
     "  gone.",
     "**A `200` does not prove that a call did anything.** `PATCH` on a tax code and `POST` to a tax\n"
     "  code's path return `200` with `{\"isSuccess\": false, \"message\": \"Invalid API Request\"}` and\n"
-    "  change nothing. `OPTIONS` returns `404` on the list and on a tax code. A `HEAD` returns\n"
-    "  `200` even when no tax code has the `tax_code_id` you send. Use `PUT` to update a tax code, and\n"
-    "  [Retrieve a tax code](" + RETRIEVE_PAGE + ") to check that one exists.",
+    "  change nothing. `OPTIONS` returns `404` on the list and on a tax code. Use `PUT` to update a tax\n"
+    "  code, and [Retrieve a tax code](" + RETRIEVE_PAGE + ") to check that one exists.",
 ]
 
 TAX_CODE_ID = {
@@ -109,26 +108,13 @@ ENDPOINTS = [
         "example_call": {"query": "limit=20"},
     },
     {
-        "key": "head_tax_codes",
-        "slug": "check-the-tax-codes-list",
-        "title": "Check the tax codes list",
-        "method": "HEAD",
-        "path": BASE,
-        "summary": "Checks that the tax codes list is reachable. Returns headers only, with no body.",
-        "description": "Returns `200` with headers only and no body. A `200` tells you only that the path is reachable. Neither this response nor the listing has an `ETag` or `Last-Modified` header.",
-        "responses": {
-            "200": {"description": "The list is reachable. Headers only, no body."},
-        },
-        "example_call": {},
-    },
-    {
         "key": "create_tax_code",
         "slug": "create-a-tax-code",
         "title": "Create a tax code",
         "method": "POST",
         "path": BASE,
         "summary": "Creates a tax code and returns it with its `id`, which other calls take as `tax_code_id`.",
-        "description": "Creates a tax code and returns it with the `id` the store assigned. Pass that `id` as `tax_code_id` to retrieve, update or delete the tax code. Wrap the fields in `tax_code`; `name` is the only required field. The store ignores a tax code `id`, a `default` or an unknown field inside `tax_code`, and stores `resolver_type` exactly as you send it, without checking the value.",
+        "description": "Creates a tax code and returns it with the `id` the store assigned. Pass that `id` as `tax_code_id` to retrieve, update or delete the tax code. Wrap the fields in `tax_code`; `name` is the only required field. The store ignores a tax code `id`, a `default` or an unknown field inside `tax_code`, `resolver_type` must be `flat`, or you can leave it out: any other value is rejected with `400`, reported as `tax.code.resolver.type.invalid`, and no tax code is created.",
         "body": {"schema": WRITE_BODY, "example": {"tax_code": {"name": "LUXURY", "label": "Luxury goods", "description": "Higher rate for luxury goods", "rate": 15.0, "resolver_type": "flat", "priority": 1}}},
         "responses": {
             "201": {
@@ -136,7 +122,7 @@ ENDPOINTS = [
                 "schema": ROW_RESPONSE,
                 "example": {"tax_code": CREATED_ROW},
             },
-            "400": {"description": WRAPPER_400, "schema": ERROR},
+            "400": {"description": WRAPPER_400 + " A create with a `resolver_type` other than `flat` is also rejected with `400`, reported as `tax.code.resolver.type.invalid`.", "schema": ERROR},
             "500": {"description": "The body has no `name`. The store rejects a create without a `name` with `500`, not `400`.", "schema": ERROR},
         },
         "example_call": {},
@@ -157,20 +143,6 @@ ENDPOINTS = [
                 "example": {"tax_code": SAMPLE_ROWS[1]},
             },
             "404": {"description": "No tax code has that `tax_code_id`. The message is `Tax code not found`.", "schema": ERROR},
-        },
-        "example_call": {"path": {"tax_code_id": 2}},
-    },
-    {
-        "key": "head_tax_code",
-        "slug": "check-a-tax-code",
-        "title": "Check a tax code",
-        "method": "HEAD",
-        "path": BASE + "/{tax_code_id}",
-        "summary": "Returns headers only, with `200` even when no tax code has the `tax_code_id` you send.",
-        "description": "Returns `200` with headers only and no body. It returns `200` even when no tax code has the `tax_code_id` you send, or when `tax_code_id` is not a number, so it does not tell you whether the tax code exists. To check that, use [Retrieve a tax code](" + RETRIEVE_PAGE + "), which returns `404` when no tax code has that `tax_code_id`.",
-        "parameters": [TAX_CODE_ID],
-        "responses": {
-            "200": {"description": "Headers only, no body, and no `ETag` or `Last-Modified` header. Returned even when no tax code has the `tax_code_id` you send."},
         },
         "example_call": {"path": {"tax_code_id": 2}},
     },
@@ -218,7 +190,7 @@ SCHEMAS = {
         "label": {"type": ["string", "null"], "description": "The tax code's label, or `null` when the tax code has none. An update that leaves it out keeps the stored label."},
         "description": {"type": ["string", "null"], "description": "The tax code's description, or `null` when the tax code has none. An update that leaves it out keeps the stored description."},
         "rate": {"type": "number", "description": "The tax code's rate. An update that leaves it out keeps the stored rate."},
-        "resolver_type": {"type": "string", "description": "The tax code's resolver type, such as `flat`. The store keeps any value you send without checking it. An update that leaves it out sets it to `flat`."},
+        "resolver_type": {"type": "string", "description": "The tax code's resolver type, which is `flat`. A create rejects any other value with `400`, reported as `tax.code.resolver.type.invalid`. An update that leaves it out sets it to `flat`."},
         "priority": {"type": "integer", "description": "The tax code's priority. An update that leaves it out sets it to `0`."},
         "default": {"type": "boolean", "description": "`true` marks a tax code the store built. More than one tax code can have it. Read-only: a create or an update that sends `default: true` stores `false`."},
     }},
@@ -227,7 +199,7 @@ SCHEMAS = {
         "label": {"type": "string"},
         "description": {"type": "string"},
         "rate": {"type": "number"},
-        "resolver_type": {"type": "string", "description": "Stored exactly as you send it. An update that leaves it out sets it to `flat`."},
+        "resolver_type": {"type": "string", "description": "Must be `flat` when you create a tax code; any other value is rejected with `400`, reported as `tax.code.resolver.type.invalid`. An update that leaves it out sets it to `flat`."},
         "priority": {"type": "integer", "description": "An update that leaves it out sets it to `0`."},
     }},
     "TaxCodePagination": {"type": "object", "properties": {

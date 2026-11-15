@@ -6,10 +6,6 @@
       "function": "listTaxCodes",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.List;\nimport java.util.Map;\n\nApiResponse response = client.taxCodes().listTaxCodes(Map.of(\"limit\", 20));\nMap<?, ?> body = (Map<?, ?>) response.getMap();\nfor (Object row : (List<?>) body.get(\"tax_codes\")) {\n    Map<?, ?> taxCode = (Map<?, ?>) row;\n    System.out.println(taxCode.get(\"id\") + \" \" + taxCode.get(\"name\") + \" \" + taxCode.get(\"rate\"));\n}\nSystem.out.println(((Map<?, ?>) body.get(\"pagination\")).get(\"total\"));"
     },
-    "head_tax_codes": {
-      "function": "headTaxCodes",
-      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.taxCodes().headTaxCodes();\nSystem.out.println(response.getStatusCode());"
-    },
     "create_tax_code": {
       "function": "createTaxCode",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCodes().createTaxCode(Map.of(\"tax_code\", Map.of(\n        \"name\", \"LUXURY\", \"label\", \"Luxury goods\", \"description\", \"Higher rate for luxury goods\",\n        \"rate\", 15.0, \"resolver_type\", \"flat\", \"priority\", 1)));\nMap<?, ?> taxCode = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_code\");\nSystem.out.println(taxCode.get(\"id\") + \" \" + taxCode.get(\"name\") + \" \" + taxCode.get(\"rate\"));"
@@ -17,10 +13,6 @@
     "get_tax_code": {
       "function": "getTaxCode",
       "code": "import com.webcommander.client.ApiResponse;\nimport java.util.Map;\n\nApiResponse response = client.taxCodes().getTaxCode(2);\nMap<?, ?> taxCode = (Map<?, ?>) ((Map<?, ?>) response.getMap()).get(\"tax_code\");\nSystem.out.println(taxCode.get(\"name\") + \" \" + taxCode.get(\"rate\") + \" \" + taxCode.get(\"resolver_type\"));"
-    },
-    "head_tax_code": {
-      "function": "headTaxCode",
-      "code": "import com.webcommander.client.ApiResponse;\n\nApiResponse response = client.taxCodes().headTaxCode(2);\nSystem.out.println(response.getStatusCode());"
     },
     "update_tax_code": {
       "function": "updateTaxCode",
