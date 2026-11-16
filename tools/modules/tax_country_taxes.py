@@ -31,7 +31,7 @@ NOTES = [
     "**You can file a create under a transaction number.** Send the number in an `X-Transaction-No` header,\n"
     "  or as `transaction_no` at the top level of the body, beside `country_tax`. The SDKs send it as the header\n"
     "  when you pass `transaction_no` to the create. A `transaction_no` inside `country_tax` is accepted and\n"
-    "  files nothing. If the header and the body name different numbers, the header wins. No response returns\n"
+    "  files nothing. If the header and a `transaction_no` beside `country_tax` name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns\n"
     "  the number. `GET /api/v4/admin/transactions/{transaction_no}` then counts the country tax under\n"
     "  `country_tax`, until you delete it. An update with a number, in the header or beside `country_tax`, files\n"
     "  the country tax under the new number, and the old number then returns `404`. An update without a number\n"
@@ -75,7 +75,7 @@ IF_MATCH = {
 TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
-    "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. It wins over a different `transaction_no` in the body. No response returns it.",
+    "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `country_tax` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -207,7 +207,7 @@ ENDPOINTS = [
         "body": {
             "schema": {"type": "object", "required": ["country_tax"], "properties": {
                 "country_tax": dict(ref("CountryTaxInput"), description="The new country tax. `country_code` is required."),
-                "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the new country tax under. Send it here, beside `country_tax`: inside `country_tax` it files nothing. An `X-Transaction-No` header with a different number wins."},
+                "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the new country tax under. Send it here, beside `country_tax`: inside `country_tax` it files nothing. An `X-Transaction-No` header with a different number is refused with `400` and the code `header_body_mismatch`."},
             }},
             "example": {"country_tax": {"country_code": "NZ", "name": "NZ GST", "tax_rate": 15.0, "tax_method": "fixed_rate"}, "transaction_no": "TXN-IMPORT-0001"},
         },

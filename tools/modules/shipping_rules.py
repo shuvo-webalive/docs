@@ -60,7 +60,7 @@ TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
     "required": False,
-    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rule under it, and the rule returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rule`: when you send both, the header wins. Another record may use the same number.",
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rule under it, and the rule returns it as `transaction_no`. A `transaction_no` inside `shipping_rule` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_rule` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -332,7 +332,7 @@ SCHEMAS = {
         "shipping_rate": {"description": "The `id` of the shipping rate, bare as `21` or as `{\"id\": 21}`, or `null` for none. Required on a replace.", "oneOf": [{"type": "integer"}, REFERENCE, {"type": "null"}]},
         "zones": {"type": "array", "description": "The whole list of zones, each by its `id`, bare or as `{\"id\": 5}`, each zone once. `[]` for none. Required on a replace.", "items": {"oneOf": [{"type": "integer"}, REFERENCE]}},
         "profile_id": {"type": "integer", "description": "Only on create. The `id` of a shipping profile to put the new rule on."},
-        "transaction_no": {"type": "string", "description": "A transaction number. The `X-Transaction-No` header wins when you send both."},
+        "transaction_no": {"type": "string", "description": "A transaction number. Inside `shipping_rule`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_rule` with a different value from the header is refused with `400` and the code `header_body_mismatch`."},
         "suggest_name": {"type": "boolean", "description": "Only on create. `true` saves the next free name, such as `Metro(1)`, when another rule has the `name`."},
     }},
     "ShippingRulePagination": {"type": "object", "properties": {

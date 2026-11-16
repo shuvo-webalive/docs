@@ -35,7 +35,7 @@ NOTES = [
     "**You can file a create under a transaction number.** Send the number in an `X-Transaction-No` header, or as\n"
     "  `transaction_no` at the top level of the body, beside `custom_profile`. The SDKs send it as the header when you\n"
     "  pass `transaction_no` to the create. A `transaction_no` inside `custom_profile` is accepted and files nothing.\n"
-    "  If the header and the body name different numbers, the header wins. No response returns the number.\n"
+    "  If the header and a `transaction_no` beside `custom_profile` name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns the number.\n"
     "  `GET /api/v4/admin/transactions/{transaction_no}` then counts the profile under `custom_tax_profile`. A profile\n"
     "  keeps the first number it is filed under: an update with a number files only a profile that has none yet.",
     "**A listing returns up to 100 profiles per call, newest first.** A larger `limit` is cut to `100`, and\n"
@@ -73,7 +73,7 @@ IF_MATCH = {
 TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
-    "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. It wins over a different `transaction_no` in the body. No response returns it.",
+    "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `custom_profile` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -100,7 +100,7 @@ ERROR_REF = {"$ref": "#/components/schemas/TaxCustomProfileError"}
 ROW_REF = {"$ref": "#/components/schemas/TaxCustomProfile"}
 WRITE_BODY = {"type": "object", "required": ["custom_profile"], "properties": {
     "custom_profile": {"$ref": "#/components/schemas/TaxCustomProfileInput"},
-    "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number wins. On an update, it files only a profile that has no number yet."},
+    "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number is refused with `400` and the code `header_body_mismatch`. On an update, it files only a profile that has no number yet."},
 }}
 ROW_RESPONSE = {"type": "object", "properties": {"custom_profile": ROW_REF}}
 

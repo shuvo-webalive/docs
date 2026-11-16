@@ -457,13 +457,13 @@
         ],
         "summary": "Create a customer",
         "operationId": "create_customer",
-        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id` in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address. You can send `email_verified`, `true` or `false`, to mark the customer's email address as verified or not. It does not change `status`. To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the two differ, the header wins. The response returns the number in `customer.transaction_number`.",
+        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id` in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address. You can send `email_verified`, `true` or `false`, to mark the customer's email address as verified or not. It does not change `status`. To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the header and a `transaction_no` beside `customer` differ, the store refuses the call with `400` and the code `header_body_mismatch`; a `transaction_no` inside `customer` is not compared with the header, and the customer is filed under the header's number only. The response returns the number in `customer.transaction_number`.",
         "parameters": [
           {
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the customer is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number as `transaction_no` beside `customer` in the body instead. If you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -593,7 +593,7 @@
                   },
                   "transaction_no": {
                     "type": "string",
-                    "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value, the header wins."
+                    "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value from a `transaction_no` beside `customer`, the store refuses the call with `400` and the code `header_body_mismatch`. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only."
                   }
                 }
               }
@@ -19977,7 +19977,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new profile under it, and the profile returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_profile`: when you send both, the header wins. Another record may use the same number.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new profile under it, and the profile returns it as `transaction_no`. A `transaction_no` inside `shipping_profile` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_profile` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -21525,7 +21525,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rate under it, and the rate returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rate`: when you send both, the header wins. Another record may use the same number.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rate under it, and the rate returns it as `transaction_no`. A `transaction_no` inside `shipping_rate` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_rate` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -22929,7 +22929,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rule under it, and the rule returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rule`: when you send both, the header wins. Another record may use the same number.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rule under it, and the rule returns it as `transaction_no`. A `transaction_no` inside `shipping_rule` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_rule` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -24834,7 +24834,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. It wins over a different `transaction_no` in the body. No response returns it.",
+            "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `country_tax` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -24954,7 +24954,7 @@
                   },
                   "transaction_no": {
                     "type": "string",
-                    "description": "Optional. A transaction number to file the new country tax under. Send it here, beside `country_tax`: inside `country_tax` it files nothing. An `X-Transaction-No` header with a different number wins."
+                    "description": "Optional. A transaction number to file the new country tax under. Send it here, beside `country_tax`: inside `country_tax` it files nothing. An `X-Transaction-No` header with a different number is refused with `400` and the code `header_body_mismatch`."
                   }
                 }
               }
@@ -25548,7 +25548,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. It wins over a different `transaction_no` in the body. No response returns it.",
+            "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `custom_profile` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -25659,7 +25659,7 @@
                   },
                   "transaction_no": {
                     "type": "string",
-                    "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number wins. On an update, it files only a profile that has no number yet."
+                    "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number is refused with `400` and the code `header_body_mismatch`. On an update, it files only a profile that has no number yet."
                   }
                 }
               }
@@ -25934,7 +25934,7 @@
                   },
                   "transaction_no": {
                     "type": "string",
-                    "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number wins. On an update, it files only a profile that has no number yet."
+                    "description": "Optional. A transaction number to file the profile under. Send it here, beside `custom_profile`: inside `custom_profile` it files nothing. An `X-Transaction-No` header with a different number is refused with `400` and the code `header_body_mismatch`. On an update, it files only a profile that has no number yet."
                   }
                 }
               }
@@ -30604,13 +30604,13 @@
         ],
         "summary": "Create an order",
         "operationId": "create_order",
-        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.\n\nWhether creating the order lowers stock depends on the store. When an order lowers stock depends on the store's `update_stock` setting, which [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section) returns for the `product_inventory` section: `after_order` lowers stock when the order is created, `after_payment` when it is paid, and `after_shipment` when you [create a shipment](/api-reference/orders/create-a-shipment). Read it before you sync stock, so you do not take the same units off twice. Some stores also require `billing_address`: such a store refuses an order without one with `400` and the message `billing.address.required`, so send `billing_address` whenever you have it.\n\n**Before you create a `shipping` or `delivery` order, check that the store can ship.** Call [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings): a `default_shipping_profile` of `null`, as on a new store, means every such order is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` To fix it, create a profile for the customer's zone with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then make it the default by sending `{\"shipping_settings\": {\"default_shipping_profile\": 1}}` to [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings); creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile.",
+        "description": "Send the fields at the top level of the body, not wrapped in `order`; only `products` is required, each line with a `product_id` and a `quantity`. Without `customer_id` the order is a guest order; `payment_gateway` defaults to `PIS` (pay in store), and `delivery_type` defaults to `shipping`. The new order is `in_progress` and `unpaid`, and with `PIS` its `payments` holds one `awaiting` payment for the grand total. A `transaction_no` another order already has creates a second order: the store does not check it for duplicates. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the store refuses the call with `400` and the code `header_body_mismatch`.\n\nWhether creating the order lowers stock depends on the store. When an order lowers stock depends on the store's `update_stock` setting, which [Get a settings section](/api-reference/ecommerce-settings/get-a-settings-section) returns for the `product_inventory` section: `after_order` lowers stock when the order is created, `after_payment` when it is paid, and `after_shipment` when you [create a shipment](/api-reference/orders/create-a-shipment). Read it before you sync stock, so you do not take the same units off twice. Some stores also require `billing_address`: such a store refuses an order without one with `400` and the message `billing.address.required`, so send `billing_address` whenever you have it.\n\n**Before you create a `shipping` or `delivery` order, check that the store can ship.** Call [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings): a `default_shipping_profile` of `null`, as on a new store, means every such order is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` To fix it, create a profile for the customer's zone with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then make it the default by sending `{\"shipping_settings\": {\"default_shipping_profile\": 1}}` to [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings); creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile.",
         "parameters": [
           {
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it, and the response returns it in `order.transaction_no`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the order is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it, and the response returns it in `order.transaction_no`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. You can send the number in the body's `transaction_no` instead. If you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -36361,7 +36361,7 @@
         ],
         "summary": "Create an order from a cart",
         "operationId": "create_order_from_cart",
-        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; when the two differ, the header wins.\n\n**Before you create a `shipping` or `delivery` order, check that the store can ship.** Call [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings): a `default_shipping_profile` of `null`, as on a new store, means every such order is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` To fix it, create a profile for the customer's zone with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then make it the default by sending `{\"shipping_settings\": {\"default_shipping_profile\": 1}}` to [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings); creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile.",
+        "description": "Creates an order from the cart's items, empties the cart, and returns the order under `order` with `status` set to `success`. Send the customer's `customer_id`; it is the only required field, and `payment_gateway` defaults to `PIS`. The new order has `order_status` `in_progress`, `payment_status` `unpaid`, and one `order_line_details` entry per cart item. It gets the customer's saved addresses unless you sent addresses to [Update a cart item](/api-reference/carts/update-a-cart-item) with the same `JSESSIONID` cookie as this call. To file the order under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body; send one number, not two different ones.\n\n**Before you create a `shipping` or `delivery` order, check that the store can ship.** Call [Get shipping settings](/api-reference/shipping-settings/get-shipping-settings): a `default_shipping_profile` of `null`, as on a new store, means every such order is refused with `400` and the message `We do not ship to your location. Please choose a different shipping address.` To fix it, create a profile for the customer's zone with [Create a shipping profile with the wizard](/api-reference/shipping-profiles/create-a-shipping-profile-with-the-wizard), then make it the default by sending `{\"shipping_settings\": {\"default_shipping_profile\": 1}}` to [Update shipping settings](/api-reference/shipping-settings/update-shipping-settings); creating the profile alone is not enough. `store_pickup` and `others_shipping` orders need no profile.",
         "parameters": [
           {
             "name": "session_id",
@@ -36376,7 +36376,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. The response to this call shows `transaction_no` as `null`; [Retrieve an order](/api-reference/orders/retrieve-an-order) shows the number. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the order is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new order under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `order` with `count` `1`. The response to this call shows `transaction_no` as `null`; [Retrieve an order](/api-reference/orders/retrieve-an-order) shows the number. You can send the number in the body's `transaction_no` instead. If you send both, send the same number in both: the store does not accept two different numbers. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -43371,13 +43371,13 @@
         ],
         "summary": "Create a category",
         "operationId": "create_category",
-        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`. To file the category under a transaction number, send the `X-Transaction-No` header or `transaction_no` inside `category`, beside the sections; a `transaction_no` beside `category` is ignored and files nothing. When the header and the body differ, the header wins.",
+        "description": "Wrap the sections in `category`; only `general.name` is required. Fields you leave out get their defaults: `available` and `visible` are `true`, `available_for` is `everyone`, and the category has no images and no products. The store generates the `sku`, and makes the `url` from the name, when you leave them out. A name that a top-level category has, in any letter case and even in the trash, is rejected; a name that only child categories have is accepted, and the new `url` gets a suffix such as `-1`. To file the category under a transaction number, send the `X-Transaction-No` header or `transaction_no` inside `category`, beside the sections; a `transaction_no` beside `category` is ignored and files nothing. When the header and the body differ, the store refuses the call with `400` and the code `header_body_mismatch`.",
         "parameters": [
           {
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new category under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `category` with `count` `1`. You can send the number as `transaction_no` inside `category` instead. If you send both with different values, the header wins: the call still returns `201`, and the category is filed only under the header's number. Every category you read returns the number as `transaction_no`, or `null` when none was set. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new category under it. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `category` with `count` `1`. You can send the number as `transaction_no` inside `category` instead. If you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. Every category you read returns the number as `transaction_no`, or `null` when none was set. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -49045,7 +49045,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to tag this create with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.",
+            "description": "Optional. A transaction number to tag this create with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body instead. When you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both.",
             "schema": {
               "type": "string",
               "example": "IMPORT-2026-10-18"
@@ -49828,7 +49828,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.",
+            "description": "Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both.",
             "schema": {
               "type": "string",
               "example": "IMPORT-2026-10-18"
@@ -53645,7 +53645,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error. [List a product's variants](/api-reference/variations/list-a-products-variants) does not show it. [Retrieve a product's variant](/api-reference/variations/retrieve-a-products-variant) returns it as the variant's `transaction_no`, and [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) counts the variant under `product_variation`.",
+            "description": "Optional. A transaction number to tag the imported variants with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `variations` instead. When you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. [List a product's variants](/api-reference/variations/list-a-products-variants) does not show it. [Retrieve a product's variant](/api-reference/variations/retrieve-a-products-variant) returns it as the variant's `transaction_no`, and [Retrieve a transaction](/api-reference/transactions/retrieve-a-transaction) counts the variant under `product_variation`.",
             "schema": {
               "type": "string",
               "example": "IMPORT-2026-10-18"
@@ -71915,7 +71915,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. The `X-Transaction-No` header wins when you send both."
+            "description": "A transaction number. Inside `shipping_profile`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_profile` with a different value from the header is refused with `400` and the code `header_body_mismatch`."
           },
           "suggest_name": {
             "type": "boolean",
@@ -72543,7 +72543,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. The `X-Transaction-No` header wins when you send both."
+            "description": "A transaction number. Inside `shipping_rate`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_rate` with a different value from the header is refused with `400` and the code `header_body_mismatch`."
           },
           "suggest_name": {
             "type": "boolean",
@@ -72838,7 +72838,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. The `X-Transaction-No` header wins when you send both."
+            "description": "A transaction number. Inside `shipping_rule`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_rule` with a different value from the header is refused with `400` and the code `header_body_mismatch`."
           },
           "suggest_name": {
             "type": "boolean",
@@ -76596,7 +76596,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number to file the order under. The store does not check it for duplicates. If the `X-Transaction-No` header has a different value, the header wins."
+            "description": "A transaction number to file the order under. The store does not check it for duplicates. If the `X-Transaction-No` header has a different value, the store refuses the call with `400` and the code `header_body_mismatch`."
           },
           "external_reference_order_id": {
             "type": "string",
@@ -79075,7 +79075,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number to file the order under. The response shows `transaction_no` as `null`. If the `X-Transaction-No` header has a different value, the header wins."
+            "description": "A transaction number to file the order under. The response shows `transaction_no` as `null`. Send one of the header and this field, not two different numbers."
           }
         },
         "required": [
@@ -81958,7 +81958,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number to file the category under. Send it here, beside the sections: beside `category` it is ignored and files nothing, and inside `general` it is rejected with `400` and `details[0].code` `unknown_field`. [Create a category](/api-reference/categories/create-a-category) and [Update a category](/api-reference/categories/update-a-category) file the category under it; [Replace a category](/api-reference/categories/replace-a-category) ignores it. On a create, an `X-Transaction-No` header with a different value wins. A category you read returns the number as `transaction_no`, or `null` when none was set."
+            "description": "A transaction number to file the category under. Send it here, beside the sections: beside `category` it is ignored and files nothing, and inside `general` it is rejected with `400` and `details[0].code` `unknown_field`. [Create a category](/api-reference/categories/create-a-category) and [Update a category](/api-reference/categories/update-a-category) file the category under it; [Replace a category](/api-reference/categories/replace-a-category) ignores it. On a create, an `X-Transaction-No` header with a different value is refused with `400` and the code `header_body_mismatch`. A category you read returns the number as `transaction_no`, or `null` when none was set."
           }
         }
       },
@@ -86069,7 +86069,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."
+            "description": "A transaction number. A create stores it. If you also send an `X-Transaction-No` header with a different value, the store refuses the call with `400` and the code `header_body_mismatch`. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."
           },
           "heading": {
             "type": "string"
@@ -86464,7 +86464,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."
+            "description": "A transaction number. A create stores it. If you also send an `X-Transaction-No` header with a different value, the store refuses the call with `400` and the code `header_body_mismatch`. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."
           },
           "heading": {
             "type": "string"
@@ -86734,7 +86734,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "Optional. A transaction number to tag the reviews with. An `X-Transaction-No` header with a different value wins over it."
+            "description": "Optional. A transaction number to tag the reviews with. An `X-Transaction-No` header with a different value is refused with `400` and the code `header_body_mismatch`."
           }
         }
       },
@@ -88538,7 +88538,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "Optional. A transaction number to tag the variants with. An `X-Transaction-No` header with a different value wins over it."
+            "description": "Optional. A transaction number to tag the variants with. An `X-Transaction-No` header with a different value is refused with `400` and the code `header_body_mismatch`."
           }
         }
       },

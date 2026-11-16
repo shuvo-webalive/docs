@@ -73,8 +73,8 @@ NOTES = [
     "**Tag a create with a transaction number in the `X-Transaction-No` header or the body.** [Create a product](" + CREATE_PAGE + "),\n"
     "  [Import a product's reviews](" + REVIEWS_PAGE + ") and [Import a product's variants](" + IMPORT_VARIANTS_PAGE + ")\n"
     "  take an optional `X-Transaction-No` header; in the SDKs, pass `transaction_no`. You can send\n"
-    "  `transaction_no` in the body instead. When you send both with different values, the header's value is\n"
-    "  stored and the body's is lost, with no error. On `PUT` and `PATCH` the header is ignored, and a body\n"
+    "  `transaction_no` in the body instead. When you send both with different values, the store\n"
+    "  refuses the call with `400` and the code `header_body_mismatch`. On `PUT` and `PATCH` the header is ignored, and a body\n"
     "  `transaction_no` is stored only on a product that has none: a product that has one keeps it.",
     "**Some fields cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,\n"
     "  `sold_out`, `sold_out_label`, `length`, `width`, `height`, `weight`, `featured`, `new`, `model`, `is_draft`,\n"
@@ -190,7 +190,7 @@ PRODUCT_ID = {
 TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
-    "description": "Optional. A transaction number to tag this create with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.",
+    "description": "Optional. A transaction number to tag this create with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body instead. When you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both.",
     "schema": {"type": "string", "example": "IMPORT-2026-10-18"},
 }
 
@@ -631,7 +631,7 @@ ENDPOINTS = [
         "path": BASE + "/{product_id}/reviews",
         "summary": "Adds the reviews you send to the product and returns every review the product now has.",
         "description": "Wrap the reviews in `product`: `{\"product\": {\"reviews\": [...]}}`. Each review needs `name`, `email` and a `rating` from `1` to `5`. Send the text as `review` or `comment`; it reads back as `review`. `status` `approved` is kept, and any other value, or none, is stored as `pending`. To set the review's date, send `dateCreated` as `yyyy-MM-ddTHH:mm:ss`: `date`, the key the response uses, is rejected. A review with an `email` the product already has a review from replaces that review: it keeps the earlier review's `id` and takes the new text and `rating`, with the same `201` and nothing in the response to show it. `title` and other unknown keys are accepted and dropped. To tag the reviews with a transaction number, send the `X-Transaction-No` header (in the SDKs, `transaction_no`) or `transaction_no` beside `product`, not inside it. A product in the trash is rejected with `409`.",
-        "parameters": [PRODUCT_ID, dict(TRANSACTION_NO, description="Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the header's value is stored and the body's is lost, with no error.")],
+        "parameters": [PRODUCT_ID, dict(TRANSACTION_NO, description="Optional. A transaction number to tag the imported reviews with, such as `IMPORT-2026-10-18`. In the SDKs, pass it as `transaction_no`. You can send `transaction_no` in the body beside `product` instead. When you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both.")],
         "body": {"schema": ref("ProductReviewsImportInput"), "example": REVIEWS_BODY},
         "responses": {
             "201": {
@@ -1610,7 +1610,7 @@ SCHEMAS = {
     "ProductInput": {"type": "object", "description": "The body of `PUT` and `PATCH`. Send these fields at the top level of the body, not inside `product`. A `PUT` must include `name`, `sku`, `base_price`, `product_type`, `available`, `is_on_sale`, `available_on_date_range`, `available_on_weekdays`, `available_for` and `selected_customers`. Apart from those, only the fields you send change, inside nested blocks too. `product_url`, `links` and `restrict_for_selected_customers` are read-only, and a value you send in `updated_by` returns `200` and is not kept. A read-only field from [Retrieve a product](" + RETRIEVE_PAGE + ") is accepted when its value is unchanged and rejected with `400` and the reason `read_only_field` when it differs. `status` and `reviews` are rejected with the reason `unknown_field`. `updated_at`, `version`, `last_updated_on` and `last_updated_by` are ignored.", "properties": {
         "name": typed("string"),
         "sku": typed("string"),
-        "transaction_no": typed("string", "A transaction number. A create stores it, unless you also send an `X-Transaction-No` header with a different value: the header's value is stored instead. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."),
+        "transaction_no": typed("string", "A transaction number. A create stores it. If you also send an `X-Transaction-No` header with a different value, the store refuses the call with `400` and the code `header_body_mismatch`. `PUT` and `PATCH` store it only on a product that has no `transaction_no`; a product that has one keeps it, and the value you send is dropped with no error."),
         "heading": typed("string"),
         "product_type": typed("string"),
         "custom_type": typed("string"),
@@ -1720,7 +1720,7 @@ SCHEMAS["ProductReviewsImportInput"] = {"type": "object", "required": ["product"
     "product": {"type": "object", "required": ["reviews"], "properties": {
         "reviews": {"type": "array", "minItems": 1, "items": ref("ProductReviewInput"), "description": "Required and not empty. The reviews to add."},
     }},
-    "transaction_no": typed("string", "Optional. A transaction number to tag the reviews with. An `X-Transaction-No` header with a different value wins over it."),
+    "transaction_no": typed("string", "Optional. A transaction number to tag the reviews with. An `X-Transaction-No` header with a different value is refused with `400` and the code `header_body_mismatch`."),
 }}
 
 SCHEMAS["ProductReviews"] = {"type": "object", "description": "Every review the product has, oldest first.", "properties": {

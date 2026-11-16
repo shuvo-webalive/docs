@@ -67,7 +67,7 @@ TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
     "required": False,
-    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new profile under it, and the profile returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_profile`: when you send both, the header wins. Another record may use the same number.",
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new profile under it, and the profile returns it as `transaction_no`. A `transaction_no` inside `shipping_profile` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_profile` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -386,7 +386,7 @@ SCHEMAS = {
         "rule_preference": {"type": "string", "enum": RULE_PREFERENCES, "description": "Defaults to `product_assigned_rule`. Required on a replace. The short codes `hp`, `lsc` and `hsc` are also accepted."},
         "default": {"type": "boolean", "description": "`true` makes the profile the store default. Only `true` or `false` is accepted, not `\"yes\"` or `1`. `false` on the default profile is rejected with `409`."},
         "shipping_rules": {"type": "array", "description": "The whole list of rule `id` values, each rule once. `[]` for none. Required on a replace.", "items": {"type": "integer"}},
-        "transaction_no": {"type": "string", "description": "A transaction number. The `X-Transaction-No` header wins when you send both."},
+        "transaction_no": {"type": "string", "description": "A transaction number. Inside `shipping_profile`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_profile` with a different value from the header is refused with `400` and the code `header_body_mismatch`."},
         "suggest_name": {"type": "boolean", "description": "Only on create. `true` saves the next free name, such as `Metro profile(1)`, when another profile has the `name`."},
     }},
     "ShippingProfileWizardInput": {"type": "object", "required": ["name"], "properties": {

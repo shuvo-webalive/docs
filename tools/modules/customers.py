@@ -15,7 +15,7 @@ TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
     "required": False,
-    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number in the body's `transaction_no` instead. If you send both with different values, the header wins: the call still returns `201`, and the customer is filed only under the header's number. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number as `transaction_no` beside `customer` in the body instead. If you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -153,7 +153,7 @@ ENDPOINTS = [
         "summary": "Add a customer and get back its new `customer_id`.",
         "description": "Creates a customer and returns it with its new `customer_id`. Without `status`, a new customer is `awaiting_verification` and has no usable login, whatever `password` was sent; send `status: \"active\"` with a `password` for a customer who can sign in. Address fields sent inline are accepted and discarded: use [Add addresses](/api-reference/customers/add-addresses) instead. The answer always carries three addresses of the store's own making: primary, shipping and billing.",
         "parameters": [TRANSACTION_NO],
-        "body": {"schema": {"type": "object", "required": ["customer"], "properties": {"customer": {"$ref": "#/components/schemas/CustomerInput"}, "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value, the header wins."}}}, "example": {"customer": {"first_name": "Jane", "last_name": "Doe", "email": "jane@example.com", "company": False}}},
+        "body": {"schema": {"type": "object", "required": ["customer"], "properties": {"customer": {"$ref": "#/components/schemas/CustomerInput"}, "transaction_no": {"type": "string", "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value from a `transaction_no` beside `customer`, the store refuses the call with `400` and the code `header_body_mismatch`. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only."}}}, "example": {"customer": {"first_name": "Jane", "last_name": "Doe", "email": "jane@example.com", "company": False}}},
         "responses": {
             "201": {"description": "The new customer.", "schema": {"type": "object", "properties": {"customer": {"$ref": "#/components/schemas/Customer"}}}, "example": {"customer": SAMPLE_CUSTOMER}},
             "400": {"description": "A required field is missing, for example `Customer name is required`."},
@@ -386,7 +386,7 @@ def _apply_copy():
 _apply_copy()
 
 TRANSACTION_NO_COPY = {
-    "description": "To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the two differ, the header wins. The response returns the number in `customer.transaction_number`.",
+    "description": "To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the header and a `transaction_no` beside `customer` differ, the store refuses the call with `400` and the code `header_body_mismatch`; a `transaction_no` inside `customer` is not compared with the header, and the customer is filed under the header's number only. The response returns the number in `customer.transaction_number`.",
     "201": "When you send a transaction number, `customer.transaction_number` returns it.",
 }
 
