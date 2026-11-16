@@ -31,7 +31,7 @@ NOTES = [
     "**You can file a create under a transaction number.** Send the number in an `X-Transaction-No` header,\n"
     "  or as `transaction_no` at the top level of the body, beside `country_tax`. The SDKs send it as the header\n"
     "  when you pass `transaction_no` to the create. A `transaction_no` inside `country_tax` is accepted and\n"
-    "  files nothing. If the header and the body name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns\n"
+    "  files nothing. If the header and a `transaction_no` beside `country_tax` name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns\n"
     "  the number. `GET /api/v4/admin/transactions/{transaction_no}` then counts the country tax under\n"
     "  `country_tax`, until you delete it. An update with a number, in the header or beside `country_tax`, files\n"
     "  the country tax under the new number, and the old number then returns `404`. An update without a number\n"
@@ -75,7 +75,7 @@ IF_MATCH = {
 TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
-    "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
+    "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `country_tax` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 

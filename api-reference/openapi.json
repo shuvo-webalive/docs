@@ -457,13 +457,13 @@
         ],
         "summary": "Create a customer",
         "operationId": "create_customer",
-        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id` in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address. You can send `email_verified`, `true` or `false`, to mark the customer's email address as verified or not. It does not change `status`. To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the two differ, the store refuses the call with `400` and the code `header_body_mismatch`; a `transaction_no` inside `customer` is not compared with the header, and the customer is filed under the header's number only. The response returns the number in `customer.transaction_number`.",
+        "description": "Creates a customer from the fields you send in the `customer` object and returns `201` with the new customer. Use its `customer_id` in later calls. `first_name` is required. `status` must be `active`, `inactive`, `pending`, `approval_awaiting` or `awaiting_verification`. If you leave `status` out, the API creates the customer as `awaiting_verification` with no usable password, even if you sent one. For that customer, [Change a password](/api-reference/customers/change-a-password) returns `401`, even straight after [Reset a password](/api-reference/customers/reset-a-password). To create a customer who can sign in, send `status: \"active\"` together with `password`. To create a company, send `company: true` and `company_name`. The response includes `company_name` but not `company`. The API accepts address fields placed directly on the customer, such as `address1`, `suburb` and `postcode`, but does not save them. To save addresses, use [Add addresses](/api-reference/customers/add-addresses). The response always lists three addresses, `primary`, `shipping` and `billing`, even when you sent none. If no address was saved, all three are blank. `primary` and `billing` have the same address `id`, so they are one saved address. You can send `email_verified`, `true` or `false`, to mark the customer's email address as verified or not. It does not change `status`. To file the customer under a transaction number, send the `X-Transaction-No` header or `transaction_no` in the body, beside `customer` or inside it. When the header and a `transaction_no` beside `customer` differ, the store refuses the call with `400` and the code `header_body_mismatch`; a `transaction_no` inside `customer` is not compared with the header, and the customer is filed under the header's number only. The response returns the number in `customer.transaction_number`.",
         "parameters": [
           {
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number in the body's `transaction_no` instead. If you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both.. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new customer under it, and the response returns it in `customer.transaction_number`. `GET /api/v4/admin/transactions/{transaction_no}` then returns a `by_type` row for `customer` with `count` `1`, and the customer stays counted there after you delete it. You can send the number as `transaction_no` beside `customer` in the body instead. If you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only. The SDK rejects a header value that has characters outside printable ASCII or a space at either end, before it sends the call; send a number like that in the body instead.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -593,7 +593,7 @@
                   },
                   "transaction_no": {
                     "type": "string",
-                    "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value, the store refuses the call with `400` and the code `header_body_mismatch`. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only."
+                    "description": "Optional. A transaction number to file the new customer under. You can send it here, beside `customer`, or inside `customer`. If the `X-Transaction-No` header has a different value from a `transaction_no` beside `customer`, the store refuses the call with `400` and the code `header_body_mismatch`. A `transaction_no` inside `customer` is not compared with the header: the customer is filed under the header's number only."
                   }
                 }
               }
@@ -19977,7 +19977,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new profile under it, and the profile returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_profile`: when you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. Another record may use the same number.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new profile under it, and the profile returns it as `transaction_no`. A `transaction_no` inside `shipping_profile` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_profile` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -21525,7 +21525,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rate under it, and the rate returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rate`: when you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. Another record may use the same number.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rate under it, and the rate returns it as `transaction_no`. A `transaction_no` inside `shipping_rate` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_rate` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -22929,7 +22929,7 @@
             "name": "X-Transaction-No",
             "in": "header",
             "required": false,
-            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rule under it, and the rule returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rule`: when you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. Another record may use the same number.",
+            "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rule under it, and the rule returns it as `transaction_no`. A `transaction_no` inside `shipping_rule` is not compared with the header: the header's number files the record, and the inner number finds nothing. A `transaction_no` beside `shipping_rule` that differs from the header is refused with `400` and the code `header_body_mismatch`; send one of them, or the same number in both. Another record may use the same number.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -24834,7 +24834,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
+            "description": "Optional. A transaction number to file the new country tax under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `country_tax` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -25548,7 +25548,7 @@
           {
             "name": "X-Transaction-No",
             "in": "header",
-            "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
+            "description": "Optional. A transaction number to file the new profile under. The SDKs send it when you pass `transaction_no` to the create. A different `transaction_no` beside `custom_profile` in the body is refused with `400` and the code `header_body_mismatch`. No response returns it.",
             "schema": {
               "type": "string",
               "example": "TXN-IMPORT-0001"
@@ -71915,7 +71915,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. If the `X-Transaction-No` header has a different value, the store refuses the call with `400` and the code `header_body_mismatch`."
+            "description": "A transaction number. Inside `shipping_profile`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_profile` with a different value from the header is refused with `400` and the code `header_body_mismatch`."
           },
           "suggest_name": {
             "type": "boolean",
@@ -72543,7 +72543,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. If the `X-Transaction-No` header has a different value, the store refuses the call with `400` and the code `header_body_mismatch`."
+            "description": "A transaction number. Inside `shipping_rate`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_rate` with a different value from the header is refused with `400` and the code `header_body_mismatch`."
           },
           "suggest_name": {
             "type": "boolean",
@@ -72838,7 +72838,7 @@
           },
           "transaction_no": {
             "type": "string",
-            "description": "A transaction number. If the `X-Transaction-No` header has a different value, the store refuses the call with `400` and the code `header_body_mismatch`."
+            "description": "A transaction number. Inside `shipping_rule`, it is not compared with the `X-Transaction-No` header: the header's number files the record, and this one finds nothing. A `transaction_no` beside `shipping_rule` with a different value from the header is refused with `400` and the code `header_body_mismatch`."
           },
           "suggest_name": {
             "type": "boolean",

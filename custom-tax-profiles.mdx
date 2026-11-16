@@ -48,7 +48,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **You can file a create under a transaction number.** Send the number in an `X-Transaction-No` header, or as
   `transaction_no` at the top level of the body, beside `custom_profile`. The SDKs send it as the header when you
   pass `transaction_no` to the create. A `transaction_no` inside `custom_profile` is accepted and files nothing.
-  If the header and the body name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns the number.
+  If the header and a `transaction_no` beside `custom_profile` name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns the number.
   `GET /api/v4/admin/transactions/{transaction_no}` then counts the profile under `custom_tax_profile`. A profile
   keeps the first number it is filed under: an update with a number files only a profile that has none yet.
 - **A listing returns up to 100 profiles per call, newest first.** A larger `limit` is cut to `100`, and
