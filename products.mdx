@@ -76,8 +76,8 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **Tag a create with a transaction number in the `X-Transaction-No` header or the body.** [Create a product](/api-reference/products/create-a-product),
   [Import a product's reviews](/api-reference/products/import-a-products-reviews) and [Import a product's variants](/api-reference/variations/import-a-products-variants)
   take an optional `X-Transaction-No` header; in the SDKs, pass `transaction_no`. You can send
-  `transaction_no` in the body instead. When you send both with different values, the header's value is
-  stored and the body's is lost, with no error. On `PUT` and `PATCH` the header is ignored, and a body
+  `transaction_no` in the body instead. When you send both with different values, the store
+  refuses the call with `400` and the code `header_body_mismatch`. On `PUT` and `PATCH` the header is ignored, and a body
   `transaction_no` is stored only on a product that has none: a product that has one keeps it.
 - **Some fields cannot be written.** A changed `id`, `created_at`, `created_on`, `custom_class`,
   `sold_out`, `sold_out_label`, `length`, `width`, `height`, `weight`, `featured`, `new`, `model`, `is_draft`,

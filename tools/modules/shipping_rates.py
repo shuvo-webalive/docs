@@ -66,7 +66,7 @@ TRANSACTION_NO = {
     "name": "X-Transaction-No",
     "in": "header",
     "required": False,
-    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rate under it, and the rate returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rate`: when you send both, the header wins. Another record may use the same number.",
+    "description": "Optional. A transaction number you choose, such as `TXN-IMPORT-0001`. The store files the new rate under it, and the rate returns it as `transaction_no`. You can also send `transaction_no` inside `shipping_rate`: when you send both with different values, the store refuses the call with `400` and the code `header_body_mismatch`, and files nothing; send one of them, or the same number in both. Another record may use the same number.",
     "schema": {"type": "string", "example": "TXN-IMPORT-0001"},
 }
 
@@ -371,7 +371,7 @@ SCHEMAS = {
         "conditions": {"type": "array", "description": "The rows of a `ship_by_...` rate. Rows must not overlap.", "items": CONDITION},
         "additional_rule": dict(ADDITIONAL_RULE, description="The extra cost for further items. When `enabled` is `true`, `for_each_additional` must be `1` or more and `additional_cost` `0` or more."),
         "shipping_rule_id": {"type": "integer", "description": "Only on create. The `id` of a shipping rule that has no rate; the new rate is attached to it."},
-        "transaction_no": {"type": "string", "description": "A transaction number. The `X-Transaction-No` header wins when you send both."},
+        "transaction_no": {"type": "string", "description": "A transaction number. If the `X-Transaction-No` header has a different value, the store refuses the call with `400` and the code `header_body_mismatch`."},
         "suggest_name": {"type": "boolean", "description": "Only on create. `true` saves the next free name, such as `Flat 10(1)`, when another rate has the `name`."},
     }},
     "ShippingRatePagination": {"type": "object", "properties": {

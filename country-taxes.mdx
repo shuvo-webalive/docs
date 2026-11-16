@@ -45,7 +45,7 @@ With cURL, send the access token in an `Authorization` header: `Authorization: B
 - **You can file a create under a transaction number.** Send the number in an `X-Transaction-No` header,
   or as `transaction_no` at the top level of the body, beside `country_tax`. The SDKs send it as the header
   when you pass `transaction_no` to the create. A `transaction_no` inside `country_tax` is accepted and
-  files nothing. If the header and the body name different numbers, the header wins. No response returns
+  files nothing. If the header and the body name different numbers, the store refuses the call with `400` and the code `header_body_mismatch`. No response returns
   the number. `GET /api/v4/admin/transactions/{transaction_no}` then counts the country tax under
   `country_tax`, until you delete it. An update with a number, in the header or beside `country_tax`, files
   the country tax under the new number, and the old number then returns `404`. An update without a number
